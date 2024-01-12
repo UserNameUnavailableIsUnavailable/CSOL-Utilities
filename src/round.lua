@@ -1,0 +1,2 @@
+local CONFIG = require(config)
+
