@@ -1,10 +1,15 @@
 ----- 攻击相关 -----
-function start_attack()
-    PressMouseButton(attack_mouse_button) -- 开始攻击
-    Sleep(SHORT_INTERVAL)
+local weapon = require("weapon")
+local config = require("config")
+module = {}
+function module.StartAttack()
+    PressMouseButton(weapon.G_AttackButton) -- 开始攻击
+    Sleep(config.SHORT_INTERVAL)
 end
 
-function stop_attack()
-    ReleaseMouseButton(attack_mouse_button) -- 结束攻击
-    Sleep(SHORT_INTERVAL)
+function module.StopAttack()
+    ReleaseMouseButton(weapon.G_AttackButton) -- 结束攻击
+    Sleep(config.SHORT_INTERVAL)
 end
+
+return module
