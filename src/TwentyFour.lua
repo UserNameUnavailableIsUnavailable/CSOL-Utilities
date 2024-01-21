@@ -1,3 +1,26 @@
+local Weapon = {
+    name = '', -- 武器名称
+    purchaseKeySeq = {}, -- 武器购买按键序列
+    attackMouseButton = {}, -- 攻击按键
+    new = function (self, obj)
+        obj = obj or {} -- 确保obj非nil
+        self.__index = self
+        setmetatable(obj, self)
+        return obj
+    end,
+    purchase = function (self)
+        for key in self.purchaseKeySeq
+        do
+            PressAndReleaseKey(key)
+            Sleep(config.LONG_INTERVAL)
+        end
+    end,
+    attack = function (self)
+
+    end
+}
+
+
 util = {}
 
 function util.ClickButton(x, y)
