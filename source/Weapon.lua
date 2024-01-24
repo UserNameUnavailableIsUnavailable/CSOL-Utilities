@@ -35,7 +35,7 @@ then
     function Weapon:purchase()
         for _, key in ipairs(self.purchaseKeySeq)
         do
-            Keyboard:click(key, Delay.LONG)
+            Keyboard:click(key, Delay.NORMAL)
         end
     end
     function Weapon:abandon()

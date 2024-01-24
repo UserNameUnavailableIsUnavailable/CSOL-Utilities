@@ -134,7 +134,7 @@ then
             self.playerList[self.playerNumber]:turn()
             self.playerList[self.playerNumber]:stopAttack()
             self.playerList[self.playerNumber]:stopMove()
-        until Runtime:execTime() - Round.LOAD_TIME > moment
+        until Runtime:execTime() - Round.LOAD_TIME > moment or Runtime.exit
         Round:chooseClass()
         self.playerList[self.playerNumber].useDefaultWeapon = false
         Console:infomation("Finish resetting round.")
