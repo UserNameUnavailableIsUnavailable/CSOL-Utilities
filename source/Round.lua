@@ -124,9 +124,6 @@ then
     -- @param nil
     -- @return nil
     function Round:reset()
-        do
-            return
-        end
         Console:infomation("Start resetting round.")
         local moment = Runtime:execTime()
         self.playerList[self.playerNumber].useDefaultWeapon = true
