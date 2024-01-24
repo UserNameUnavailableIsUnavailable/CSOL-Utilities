@@ -1142,11 +1142,8 @@ function Store:purchaseItems()
     do
         Mouse:clickOn(buyX, buyY)
         Mouse:clickOn(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y) -- 选项
-        Runtime:sleep(Delay.MINI)
         Mouse:clickOn(Setting.STORE_BUY_BUY_X, Setting.STORE_BUY_BUY_Y) -- 二级“兑换”按钮
-        Runtime:sleep(Delay.MINI)
         Mouse:clickOn(Setting.STORE_BUY_BUY_CONFIRM_X, Setting.STORE_BUY_BUY_CONFIRM_Y) -- “确认”按钮
-        Runtime:sleep(Delay.LONG_LONG)
         Keyboard:click(Keyboard.ESCAPE, Delay.SHORT)
     end
     Console:infomation("物品购买结束")
