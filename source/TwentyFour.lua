@@ -874,7 +874,7 @@ end
 -- @remark 依照概率分布随机使用血包（5和6），故分布表应有两项
 function Player:randomlyUseMedicalKits(probabilityDistribution)
     local probabilityDistribution = probabilityDistribution or {0.1, 0.15}
-    local random = Util:generateRandom()
+    local random = Utility:generateRandom()
     if (random < probabilityDistribution[1])
     then
         Keyboard:press(Keyboard.FIVE, Delay.SHORT)
