@@ -534,10 +534,10 @@ function Runtime:interuptHandler()
         then
             -- 恢复现场
             self:restoreContext(interuptContext)
-            -- 中断处理完毕，中断标志位失能
-            self.interuptFlag = false
             break
         end
+        -- 中断处理完毕，中断标志位失能
+        self.interuptFlag = false
     end
 end
 
@@ -745,7 +745,7 @@ Player.auxiliaryWeapon = {
         name = "圣翼皓印",
         switchDelay = Delay.LONG_LONG,
         number = Weapon.GRENADE ,
-        purchaseKeySeq = {Keyboard.B, Keyboard.EIGHT, Keyboard.NINE},
+        purchaseKeySeq = {Keyboard.H, Keyboard.NINE},
         discharging = false,
         turnOnMoment = -114514,
         turnOffMoment = -114514,
@@ -775,7 +775,7 @@ Player.auxiliaryWeapon = {
 Player.AC = 
     Weapon:new({
         name = "避弹衣+头盔",
-        purchaseKeySeq = {Keyboard.B, Keyboard.EIGHT, Keyboard.TWO},
+        purchaseKeySeq = {Keyboard.H, Keyboard.TWO},
         number = 0
     })
 
@@ -842,15 +842,16 @@ function Player:purchaseChiefWeapon()
         local weapon
         local random
         random = Utility:generateRandom()
-        for i = 1, #self.chiefWeaponProbabilityDistribution
-        do
-            if (random < self.chiefWeaponProbabilityDistribution[i]) -- 根据概率分布确定被随机到的武器
-            then
-                weapon = self.chiefWeapon[i]
-                break
+        repeat
+            for i = 1, #self.chiefWeaponProbabilityDistribution
+            do
+                if (random < self.chiefWeaponProbabilityDistribution[i]) -- 根据概率分布确定被随机到的武器
+                then
+                    weapon = self.chiefWeapon[i]
+                    break
+                end
             end
-        end
-        weapon:abandon()
+        until weapon.name ~= self.chiefWeaponToUse.name
         weapon:purchase()
         self.chiefWeaponToUse = weapon
     end
@@ -865,6 +866,22 @@ end
 -- 购买护甲
 function Player:purchaseAC()
     self.AC:purchase()
+end
+
+-- 随机使用血包
+-- @param [(table)probabilityDistribution] 概率分布表
+-- @return nil
+-- @remark 依照概率分布随机使用血包（5和6），故分布表应有两项
+function Player:randomlyUseMedicalKits(probabilityDistribution)
+    local probabilityDistribution = probabilityDistribution or {0.1, 0.15}
+    local random = Util:generateRandom()
+    if (random < probabilityDistribution[1])
+    then
+        Keyboard:press(Keyboard.FIVE, Delay.SHORT)
+    elseif (random < probabilityDistribution[2])
+    then
+        Keyboard:press(Keyboard.SIX, Delay.SHORT)
+    end
 end
 
 -- 创建Player实例
@@ -886,7 +903,7 @@ function Player:swtichWeaponTo(weapon)
 end
 
 -- 一次转圈的时长
-Player.turnDuration = 6 * 1000
+Player.turnDuration = 5.5 * 1000
 
 -- 以随机方向、随机速度转圈
 -- @param nil
