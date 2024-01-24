@@ -65,7 +65,7 @@ then
                 Console:infomation("Interupt: Runtime:exit bit is set.")
                 break
             -- 锁定值为7（全亮），左Ctrl、左Alt、左Shift按下（表示确认），则撤销中断处理并恢复中断现场，程序执行不受到影响
-            elseif (Keyboard:getKeyLockState() == 7 and
+            elseif (Keyboard:getKeyLockState() ~= 0 and
             (Keyboard:modifierPressed(Keyboard.LALT) and Keyboard:modifierPressed(Keyboard.LCTRL) and Keyboard:modifierPressed(Keyboard.LSHIFT))) 
             then
                 -- 恢复现场
