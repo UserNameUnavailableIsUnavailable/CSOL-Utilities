@@ -1,6 +1,6 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Delay.lua")
-dofile(PATH .. "Runtime.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Delay.lua")
+dofile(PATH .. "source/Runtime.lua")
 ----- 键盘按键设定 -----
 if (Keyboard == nil)
 then

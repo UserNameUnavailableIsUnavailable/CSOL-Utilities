@@ -1,8 +1,8 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Keyboard.lua")
-dofile(PATH .. "Mouse.lua")
-dofile(PATH .. "Weapon.lua")
-dofile(PATH .. "Utility.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Keyboard.lua")
+dofile(PATH .. "source/Mouse.lua")
+dofile(PATH .. "source/Weapon.lua")
+dofile(PATH .. "source/Utility.lua")
 
 if (not Player)
 then
@@ -198,6 +198,9 @@ then
         self.chiefWeaponToUse:switch() -- 购买之后换回主要武器
     end
 
+    -- 为了防止连续使用同一把主/副武器（子弹用完导致空转），增设以下字段用于区分
+    Player.lastUsedPrimaryWeapon = "" -- 最近一次使用的主武器
+    Player.lastUsedSecondaryWeapon = "" -- 最近一次使用的副武器
     -- 随机购买主要武器，并在下次使用该武器
     -- @param nil
     -- @return nil
@@ -208,16 +211,24 @@ then
         else
             local weapon
             local random
-            random = Utility:generateRandom()
-            for i = 1, #self.chiefWeaponProbabilityDistribution
-            do
-                if (random < self.chiefWeaponProbabilityDistribution[i]) -- 根据概率分布确定被随机到的武器
-                then
-                    weapon = self.chiefWeapon[i]
-                    break
+            repeat
+                random = Utility:generateRandom()
+                for i = 1, #self.chiefWeaponProbabilityDistribution
+                do
+                    if (random < self.chiefWeaponProbabilityDistribution[i]) -- 根据概率分布确定被随机到的武器
+                    then
+                        weapon = self.chiefWeapon[i]
+                        break
+                    end
                 end
+            until weapon.name ~= self.lastUsedPrimaryWeapon and weapon.name ~= self.lastUsedSecondaryWeapon
+            if (weapon.number == Weapon.PRIMARY)
+            then
+                self.lastUsedPrimaryWeapon = weapon.name
+            elseif (weapon.number == Weapon.SECONDARY)
+            then
+                self.lastUsedSecondaryWeapon = weapon.name
             end
-            weapon:abandon()
             weapon:purchase()
             self.chiefWeaponToUse = weapon
         end
@@ -279,7 +290,7 @@ then
         end
         repeat
             Mouse:moveRelative(100 * direction * sensitivity, 0, Delay.MINI)
-        until Runtime:execTime() > rotateStopMoment
+        until Runtime:execTime() > rotateStopMoment or Runtime.exit
         Keyboard:click(Keyboard.R, Delay.SHORT)
     end
 

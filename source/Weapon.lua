@@ -1,6 +1,6 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Console.lua")
-dofile(PATH .. "Runtime.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Console.lua")
+dofile(PATH .. "source/Runtime.lua")
 if (not Weapon)
 then
     Weapon = {
@@ -13,7 +13,7 @@ then
         number = 0, -- 第几号武器栏
         purchaseKeySeq = {}, -- 武器购买按键序列
         switchDelay = Delay.MEDIUM, -- 武器切枪延迟
-        attackButton = Mouse.LEFT -- 攻击按键
+        attackButton = Mouse.LEFT, -- 攻击按键
     }
 
      -- 创建一个武器对象

@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
 if (not Utility)
 then
     Utility = {}

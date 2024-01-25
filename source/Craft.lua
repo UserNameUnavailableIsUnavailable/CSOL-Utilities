@@ -1,8 +1,8 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Keyboard.lua")
-dofile(PATH .. "Mouse.lua")
-dofile(PATH .. "Console.lua")
-dofile(PATH .. "Setting.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Keyboard.lua")
+dofile(PATH .. "source/Mouse.lua")
+dofile(PATH .. "source/Console.lua")
+dofile(PATH .. "source/Setting.lua")
 
 if (not Craft)
 then
