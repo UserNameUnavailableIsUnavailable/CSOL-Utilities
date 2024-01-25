@@ -1,10 +1,10 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Player.lua")
-dofile(PATH .. "Keyboard.lua")
-dofile(PATH .. "Mouse.lua")
-dofile(PATH .. "Weapon.lua")
-dofile(PATH .. "Utility.lua")
-dofile(PATH .. "Console.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Player.lua")
+dofile(PATH .. "source/Keyboard.lua")
+dofile(PATH .. "source/Mouse.lua")
+dofile(PATH .. "source/Weapon.lua")
+dofile(PATH .. "source/Utility.lua")
+dofile(PATH .. "source/Console.lua")
 
 if (not Round)
 then

@@ -1,6 +1,6 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Runtime.lua")
-dofile(PATH .. "Delay.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Runtime.lua")
+dofile(PATH .. "source/Delay.lua")
 ----- 鼠标按钮设定 -----
 if (Mouse == nil)
 then

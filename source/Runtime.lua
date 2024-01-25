@@ -1,6 +1,6 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
-dofile(PATH .. "Console.lua")
-dofile(PATH .. "Delay.lua")
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+dofile(PATH .. "source/Console.lua")
+dofile(PATH .. "source/Delay.lua")
 
 if (not Runtime)
 then

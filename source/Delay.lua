@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/source/"
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
 ----- 延时设定 -----
 Delay = {
     MINI = 10,
