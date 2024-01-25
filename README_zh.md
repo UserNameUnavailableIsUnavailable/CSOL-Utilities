@@ -29,7 +29,7 @@ Windows 7及以上版本（推荐Windows 10/11）、Logitech G Hub软件（支�
 
 clone本项目到某个目录下，进入该目录，在命令行输入以下命令。
 
-```make
+```powershell
 make clean && make all && make
 ```
 
