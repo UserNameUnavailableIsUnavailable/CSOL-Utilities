@@ -2,7 +2,7 @@ local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
 dofile(PATH .. "source/Runtime.lua")
 dofile(PATH .. "source/Delay.lua")
 ----- 鼠标按钮设定 -----
-if (Mouse == nil)
+if (not Mouse)
 then
     Mouse = {
         LEFT = 1, MIDDLE = 2 ,RIGHT = 3, X1 = 4, X2 = 5

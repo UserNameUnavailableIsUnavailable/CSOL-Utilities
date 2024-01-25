@@ -1,6 +1,6 @@
 local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
 -- 游戏内各种按钮坐标
-if (Setting == nil)
+if (not Setting)
 then
     Setting = {
         -- “开始游戏”按钮
