@@ -7,10 +7,11 @@ dofile(PATH .. "source/Mouse.lua")
 dofile(PATH .. "source/Console.lua")
 dofile(PATH .. "source/Store.lua")
 dofile(PATH .. "source/Craft.lua")
+dofile(PATH .. "source/Delay.lua")
 
 function OnEvent(event, arg, family)
     Runtime.exit = false
-    if (Keyboard:getKeyLockState() > 0)
+    if (Keyboard:getKeyLockState() > 0 and Keyboard:modifierPressed(Keyboard.LALT) and Keyboard:modifierPressed(Keyboard.RALT))
     then
         if (event == "MOUSE_BUTTON_PRESSED" and arg == 7 and family == "mouse")
         then
