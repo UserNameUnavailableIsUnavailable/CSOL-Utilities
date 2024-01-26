@@ -40,7 +40,7 @@ then
             return
         end
         -- 右alt、右ctrl、右shift同时按下触发中断
-        if (not (Keyboard:modifierPressed(Keyboard.RALT) and Keyboard:modifierPressed(Keyboard.RCTRL) and Keyboard:modifierPressed(Keyboard.RSHIFT))) 
+        if (not (Keyboard:modifierPressed(Keyboard.RALT) and Keyboard:modifierPressed(Keyboard.RCTRL) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
         then
             return
         end
@@ -57,16 +57,16 @@ then
         while (true)
         do
             Sleep(Delay.LONG)
-            -- 锁定值为0（全不亮），左Ctrl、左Alt、左Shift按下（表示确认），则退出位使能，此时不会恢复中断现场，任何后续的挂起、外围设备操作将直接返回，资源随之释放
+            -- 锁定值为0（全不亮），左右Shift按下（表示确认），则退出位使能，此时不会恢复中断现场，任何后续的挂起、外围设备操作将直接返回，资源随之释放
             if (Keyboard:getKeyLockState() == 0 and
-            (Keyboard:modifierPressed(Keyboard.LALT) and Keyboard:modifierPressed(Keyboard.LCTRL) and Keyboard:modifierPressed(Keyboard.LSHIFT)))
+            (Keyboard:modifierPressed(Keyboard.LSHIFT) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
             then
                 Runtime.exit = true
                 Console:infomation("Interupt: Runtime:exit bit is set.")
                 break
-            -- 锁定值为7（全亮），左Ctrl、左Alt、左Shift按下（表示确认），则撤销中断处理并恢复中断现场，程序执行不受到影响
+            -- 锁定值为7（全亮），左右Shift按下（表示确认），则撤销中断处理并恢复中断现场，程序执行不受到影响
             elseif (Keyboard:getKeyLockState() ~= 0 and
-            (Keyboard:modifierPressed(Keyboard.LALT) and Keyboard:modifierPressed(Keyboard.LCTRL) and Keyboard:modifierPressed(Keyboard.LSHIFT))) 
+            (Keyboard:modifierPressed(Keyboard.LSHIFT) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
             then
                 -- 恢复现场
                 self:restoreContext(interuptContext)

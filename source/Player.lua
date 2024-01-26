@@ -229,9 +229,9 @@ then
             then
                 self.lastUsedSecondaryWeapon = weapon.name
             end
-            weapon:purchase()
             self.chiefWeaponToUse = weapon
         end
+        self.chiefWeaponToUse:purchase()
         self.chiefWeaponToUse:switch()
     end
 
