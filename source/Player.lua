@@ -291,7 +291,7 @@ then
         repeat
             Mouse:moveRelative(100 * direction * sensitivity, 0, Delay.MINI)
         until Runtime:execTime() > rotateStopMoment or Runtime.exit
-        Keyboard:click(Keyboard.R, Delay.SHORT)
+        Keyboard:click(Keyboard.R, Delay.LONG)
     end
 
     function Player:startAttack()

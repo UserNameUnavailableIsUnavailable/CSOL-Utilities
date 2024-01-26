@@ -129,6 +129,7 @@ then
         self.playerList[self.playerNumber].useDefaultWeapon = true
         repeat
             self.playerList[self.playerNumber]:purchaseChiefWeapon()
+            Weapon:closePreorderMenu()
             self.playerList[self.playerNumber]:startMove()
             self.playerList[self.playerNumber]:startAttack()
             self.playerList[self.playerNumber]:turn()
@@ -144,7 +145,7 @@ then
     -- @param nil
     -- @return nil
     function Round:clearUI()
-        Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.SHORT)
+        Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.NORMAL)
         Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y)
         Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 点击ESC菜单的取消按钮
     end
