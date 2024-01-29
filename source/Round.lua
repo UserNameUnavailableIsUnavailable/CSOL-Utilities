@@ -103,7 +103,7 @@ then
                     name = "逆界星轮",
                     switchDelay = Delay.NORMAL,
                     number = Weapon.PRIMARY,
-                    purchaseKeySeq = {Keyboard.H, Keyboard.EIGHT, Keyboard.SIX},
+                    purchaseKeySeq = {Keyboard.B, Keyboard.EIGHT, Keyboard.SIX},
                     attackButton = Mouse.RIGHT
                 }
             },

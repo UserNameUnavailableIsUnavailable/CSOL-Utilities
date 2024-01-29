@@ -3,6 +3,7 @@ if (not Delay)
 then
     ----- 延时设定 -----
     Delay = {
+        MINI_MINI = 5,
         MINI = 10,
         SHORT = 50,
         NORMAL = 100,
