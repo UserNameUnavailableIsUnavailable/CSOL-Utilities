@@ -88,7 +88,6 @@ then
     Player.chiefWeapon = {
         Weapon:new({
             name = "幻境！光棱剑",
-            switchDelay = Delay.NORMAL,
             number = Weapon.MELEE,
             purchaseKeySeq = {Keyboard.B, Keyboard.G},
             attackButton = Mouse.LEFT})

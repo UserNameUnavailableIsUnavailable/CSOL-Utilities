@@ -8,7 +8,7 @@ then
         LEFT = 1, MIDDLE = 2 ,RIGHT = 3, X1 = 4, X2 = 5
     }
 
-    -- 鼠标按下但未释放的按钮，true表示按下，nil表示弹起
+    -- 鼠标按下但未释放的按钮，true表示按下，nil表示起
     Mouse.unreleased = {}
 
     -- 按下某个按钮，但不释放
