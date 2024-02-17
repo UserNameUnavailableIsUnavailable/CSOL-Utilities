@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
 dofile(PATH .. "source/Player.lua")
 dofile(PATH .. "source/Keyboard.lua")
 dofile(PATH .. "source/Mouse.lua")
@@ -72,11 +72,11 @@ then
                     attackButton = Mouse.LEFT
                 },
                 Weapon:new{
-                    name = "【深渊】Elites",
+                    name = "【黯火】加特林",
                     switchDelay = Delay.SHORT,
                     number = Weapon.SECONDARY,
-                    purchaseKeySeq = {Keyboard.B, Keyboard.ONE, Keyboard.EIGHT},
-                    attackButton = Mouse.RIGHT
+                    purchaseKeySeq = {Keyboard.B, Keyboard.FIVE, Keyboard.SEVEN},
+                    attackButton = Mouse.LEFT
                 },
                 Weapon:new{
                     name = "【恶龙】霰弹炮",
@@ -207,7 +207,7 @@ then
             end
             if (Runtime:execTime() - Round.timer > Round.ROUND_TIME)
             then
-                Mouse:clickOn(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+                Mouse:doubleClickOn(Setting.GAMESTART_X, Setting.GAMESTART_Y)
                 self:reset()
                 self.timer = Runtime:execTime()
             end
