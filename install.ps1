@@ -1,4 +1,4 @@
-$PROJECT_NAME = "CSOL24H"
+$PROJECT_NAME = "CSOL-24H"
 $PROJECT_PATH = (Get-Location).ToString() -replace("\\", "/")
 
 $SOURCE_PATH = Join-Path $PROJECT_PATH "source"
@@ -7,8 +7,8 @@ $EXEC_NAME = -join($PROJECT_NAME, ".LUA")
 
 foreach ($file in Get-ChildItem $SOURCE_PATH)
 {
-    # Write-Host $file.FullName
-    (Get-Content -Path $file) -replace("local\s+PATH\s*=\s*`".*`"\s+", "local PATH = `"$PROJECT_PATH/`"") | Out-File -FilePath $file.FullName
+    Write-Host $file.FullName
+    (Get-Content -Path $file.Fullname) -replace("local\s+PATH\s*=\s*`".*`"", "local PATH = `"$PROJECT_PATH/`"") | Out-File -FilePath $file.FullName
 }
 
 New-Item -Type Directory -Path $BUILD_PATH -Force

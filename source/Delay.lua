@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL24H/"
+local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
 if (not Delay)
 then
     ----- 延时设定 -----

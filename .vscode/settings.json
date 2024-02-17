@@ -1,0 +1,21 @@
+{
+    "Lua.diagnostics.globals": [
+        "PressAndReleaseMouseButton",
+        "IsMouseButtonPressed",
+        "GetMousePosition",
+        "ReleaseMouseButton",
+        "PressMouseButton",
+        "GetRunningTime",
+        "Sleep",
+        "IsKeyLockOn",
+        "IsModifierPressed",
+        "OutputLogMessage",
+        "ClearLog",
+        "PressKey",
+        "ReleaseKey",
+        "PressAndReleaseKey",
+        "MoveMouseRelative",
+        "MoveMouseTo",
+        "GetDate"
+    ]
+}
