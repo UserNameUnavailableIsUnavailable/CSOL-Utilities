@@ -48,6 +48,9 @@ then
     function Weapon:switch()
         Keyboard:click(self.number, self.switchDelay)
     end
+    function Weapon:switchWithoutDelay()
+        Keyboard:click(self.number)
+    end
     -- 确认武器购买资金不足提示框（预设按钮在Setting中）
     -- @param nil
     -- @return nil

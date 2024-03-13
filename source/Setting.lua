@@ -35,6 +35,9 @@ then
         STORE_BUY_BUY_Y = 41726,
         -- 【商店】物品“兑换”->“兑换”->“确认”按钮
         STORE_BUY_BUY_CONFIRM_X = 37019,
-        STORE_BUY_BUY_CONFIRM_Y = 38993
+        STORE_BUY_BUY_CONFIRM_Y = 38993,
+        -- 角色选择界面 T 阵营
+        CHOOSE_T_CLASS_X = 11304,
+        CHOOSE_T_CLASS_Y = 9596
     }
 end

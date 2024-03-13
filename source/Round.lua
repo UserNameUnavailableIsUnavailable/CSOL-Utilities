@@ -10,7 +10,7 @@ if (not Round)
 then
     Round = {}
     -- 一局时间（非游戏中一局真实时间），原因不再赘述
-    Round.ROUND_TIME = 60 * 1000
+    Round.ROUND_TIME = 50 * 1000
     -- 加载进度条时间
     Round.LOAD_TIME = 20 * 1000
     -- 玩家列表
@@ -74,7 +74,7 @@ then
                 Weapon:new{
                     name = "【黯火】加特林",
                     switchDelay = Delay.SHORT,
-                    number = Weapon.SECONDARY,
+                    number = Weapon.PRIMARY,
                     purchaseKeySeq = {Keyboard.B, Keyboard.FIVE, Keyboard.SEVEN},
                     attackButton = Mouse.LEFT
                 },
@@ -123,7 +123,9 @@ then
     -- 重置一局，选定角色
     -- @param nil
     -- @return nil
+    Round.isResetting = false
     function Round:reset()
+        Round.isResetting = true
         Console:infomation("Start resetting round.")
         local moment = Runtime:execTime()
         self.playerList[self.playerNumber].useDefaultWeapon = true
@@ -136,9 +138,10 @@ then
             self.playerList[self.playerNumber]:stopAttack()
             self.playerList[self.playerNumber]:stopMove()
         until Runtime:execTime() - Round.LOAD_TIME > moment or Runtime.exit
-        Round:chooseClass()
+        Round:chooseClass(false)
         self.playerList[self.playerNumber].useDefaultWeapon = false
         Console:infomation("Finish resetting round.")
+        Round.isResetting = false
     end
 
     -- 按ESC键清除所有UI
@@ -146,16 +149,23 @@ then
     -- @return nil
     function Round:clearUI()
         Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.NORMAL)
-        Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y)
-        Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 点击ESC菜单的取消按钮
+        Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
+        Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
     end
 
     -- 角色选项
-    Round.classOption = Keyboard.THREE
+    Round.classOption = Keyboard.FOUR
     -- 选定角色
     -- @param nil
     -- @return nil
-    function Round:chooseClass()
+    function Round:chooseClass(isTerrorist)
+        if (isTerrorist)
+        then
+            for _ = 1, 5
+            do
+                Mouse:clickOn(11304, 9596) -- 选择 T 阵营人物
+            end
+        end
         for _ = 1, 3
         do
             Keyboard:click(self.classOption, Delay.SHORT)
@@ -221,10 +231,10 @@ then
                 self.playerList[self.playerNumber]:purchaseAuxiliaryWeapon()
             end
             self.playerList[self.playerNumber]:purchaseChiefWeapon()
-            self:clearUI()
+            self:clearUI() -- 清空所有界面或游戏结算界面确认
             self.playerList[self.playerNumber]:startMove()
             self.playerList[self.playerNumber]:startAttack()
-            self.playerList[self.playerNumber]:turn()
+            self.playerList[self.playerNumber]:turn(Round.isResetting)
             self.playerList[self.playerNumber]:stopAttack()
             self.playerList[self.playerNumber]:stopMove()
             self.playerList[self.playerNumber]:useAuxiliaryWeapon()
