@@ -102,7 +102,12 @@ then
         Weapon:new({
             name = "FNP-45战损版",
             number = Weapon.DONT_USE,
-            purchaseKeySeq = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}})
+            purchaseKeySeq = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}}),
+        -- Weapon:new({
+        --     name = "燃爆Ignite-10",
+        --     number = Weapon.DONT_USE,
+        --     purchaseKeySeq = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}}
+        -- )
     }
 
     -- 使用的默认辅助武器序列
@@ -277,7 +282,7 @@ then
     -- 以随机方向、随机速度转圈
     -- @param nil
     -- @return nil
-    function Player:turn()
+    function Player:turn(isResetting)
         local rotateStopMoment = Runtime:execTime() + self.turnDuration
         local sensitivity = (2 - Utility:generateRandom()) / 2 -- 灵敏度∈(0.5, 1]
         local direction
@@ -287,8 +292,16 @@ then
         else
             direction = -1
         end
+        local count = 0
         repeat
             Mouse:moveRelative(100 * direction * sensitivity, 0, Delay.MINI)
+            count = count + 1
+            -- Keyboard:click(Keyboard.G)
+            if (isResetting and count % 10 == 0)
+            then
+                self.chiefWeaponToUse:switchWithoutDelay()
+                -- Keyboard:click(Keyboard.LCTRL)
+            end
         until Runtime:execTime() > rotateStopMoment or Runtime.exit
         Keyboard:click(Keyboard.R, Delay.LONG)
     end
