@@ -10,7 +10,7 @@ if (not Round)
 then
     Round = {}
     -- 一局时间（非游戏中一局真实时间），原因不再赘述
-    Round.ROUND_TIME = 50 * 1000
+    Round.ROUND_TIME = 30 * 1000
     -- 加载进度条时间
     Round.LOAD_TIME = 20 * 1000
     -- 玩家列表
@@ -79,6 +79,13 @@ then
                     attackButton = Mouse.LEFT
                 },
                 Weapon:new{
+                    name = "【黯影】Hecate II",
+                    switchDelay = Delay.SHORT,
+                    number = Weapon.PRIMARY,
+                    purchaseKeySeq = {Keyboard.B, Keyboard.FOUR, Keyboard.FOUR},
+                    attackButton = Mouse.LEFT
+                },
+                Weapon:new{
                     name = "【恶龙】霰弹炮",
                     switchDelay = Delay.NORMAL,
                     number = Weapon.PRIMARY,
@@ -110,7 +117,7 @@ then
             partWeapon = {},
             -- 辅助武器默认使用天使雷
             -- 主要武器概率分布
-            chiefWeaponProbabilityDistribution = {0.2, 0.28, 0.36, 0.44, 0.52, 0.60, 0.68, 0.76, 0.84, 0.92, 1.00}
+            chiefWeaponProbabilityDistribution = {0.1, 0.2, 0.28, 0.36, 0.44, 0.52, 0.60, 0.68, 0.76, 0.84, 0.92, 1.00}
         })
         self.playerList = {
             self.defaultPlayer,
@@ -132,11 +139,11 @@ then
         repeat
             self.playerList[self.playerNumber]:purchaseChiefWeapon()
             Weapon:closePreorderMenu()
-            self.playerList[self.playerNumber]:startMove()
+            -- self.playerList[self.playerNumber]:startMove()
             self.playerList[self.playerNumber]:startAttack()
             self.playerList[self.playerNumber]:turn()
             self.playerList[self.playerNumber]:stopAttack()
-            self.playerList[self.playerNumber]:stopMove()
+            -- self.playerList[self.playerNumber]:stopMove()
         until Runtime:execTime() - Round.LOAD_TIME > moment or Runtime.exit
         Round:chooseClass(false)
         self.playerList[self.playerNumber].useDefaultWeapon = false
@@ -154,19 +161,19 @@ then
     end
 
     -- 角色选项
-    Round.classOption = Keyboard.FOUR
+    Round.classOption = Keyboard.THREE
     -- 选定角色
     -- @param nil
     -- @return nil
     function Round:chooseClass(isTerrorist)
-        if (isTerrorist)
-        then
-            for _ = 1, 5
-            do
-                Mouse:clickOn(11304, 9596) -- 选择 T 阵营人物
-            end
-        end
-        for _ = 1, 3
+        -- if (isTerrorist)
+        -- then
+        --     for _ = 1, 5
+        --     do
+        --         Mouse:clickOn(11304, 9596) -- 选择 T 阵营人物
+        --     end
+        -- end
+        for _ = 1, 5
         do
             Keyboard:click(self.classOption, Delay.SHORT)
         end
