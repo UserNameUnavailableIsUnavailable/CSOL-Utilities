@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 dofile(PATH .. "source/Keyboard.lua")
 dofile(PATH .. "source/Mouse.lua")
 dofile(PATH .. "source/Weapon.lua")
@@ -7,6 +7,17 @@ dofile(PATH .. "source/Utility.lua")
 if (not Player)
 then
     Player = {}
+    -- @brief 创建Player实例
+    -- @param obj 初始化列表
+    -- @return nil
+    -- @remark 如果选择直接创建Player实例，则默认使用类中预定义好的若干内容
+    function Player:new(obj)
+        self.__index = self
+        obj = obj or {}
+        setmetatable(obj, self)
+        return obj
+    end
+
     -- 跑动方向，0表示向前，1表示向后
     Player.runDirection = 1
     -- 扫射方向，0表示向右，1表示向左
@@ -265,24 +276,13 @@ then
         end
     end
 
-    -- 创建Player实例
-    -- @param [obj] 初始化列表
-    -- @return nil
-    -- @remark 如果选择直接创建Player实例，则默认使用类中预定义好的若干内容
-    function Player:new(obj)
-        self.__index = self
-        obj = obj or {}
-        setmetatable(obj, self)
-        return obj
-    end
-
     -- 一次转圈的时长
     Player.turnDuration = 5.5 * 1000
 
     -- 以随机方向、随机速度转圈
     -- @param nil
     -- @return nil
-    function Player:turn(isResetting)
+    function Player:turn()
         local rotateStopMoment = Runtime:execTime() + self.turnDuration
         local sensitivity = (2 - Utility:generateRandom()) / 2 -- 灵敏度∈(0.5, 1]
         local direction
@@ -295,13 +295,12 @@ then
         local count = 0
         repeat
             Mouse:moveRelative(100 * direction * sensitivity, 0, Delay.MINI)
-            count = count + 1
-            -- Keyboard:click(Keyboard.G)
-            if (isResetting and count % 10 == 0)
-            then
-                self.chiefWeaponToUse:switchWithoutDelay()
+            -- count = count + 1
+            -- if (not Round.isResetting and count % 10 == 0)
+            -- then
+            --     self.chiefWeaponToUse:switchWithoutDelay()
                 -- Keyboard:click(Keyboard.LCTRL)
-            end
+            -- end
         until Runtime:execTime() > rotateStopMoment or Runtime.exit
         Keyboard:click(Keyboard.R, Delay.LONG)
     end

@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 dofile(PATH .. "source/Player.lua")
 dofile(PATH .. "source/Keyboard.lua")
 dofile(PATH .. "source/Mouse.lua")
@@ -10,9 +10,9 @@ if (not Round)
 then
     Round = {}
     -- 一局时间（非游戏中一局真实时间），原因不再赘述
-    Round.ROUND_TIME = 30 * 1000
+    Round.ROUND_TIME = 60 * 1000
     -- 加载进度条时间
-    Round.LOAD_TIME = 20 * 1000
+    Round.LOAD_TIME = 30 * 1000
     -- 玩家列表
     Round.playerList = {}
     Round.playerNumber = 1
@@ -241,12 +241,44 @@ then
             self:clearUI() -- 清空所有界面或游戏结算界面确认
             self.playerList[self.playerNumber]:startMove()
             self.playerList[self.playerNumber]:startAttack()
-            self.playerList[self.playerNumber]:turn(Round.isResetting)
+            self.playerList[self.playerNumber]:turn()
             self.playerList[self.playerNumber]:stopAttack()
             self.playerList[self.playerNumber]:stopMove()
             self.playerList[self.playerNumber]:useAuxiliaryWeapon()
             self.playerList[self.playerNumber]:purchaseAC()
         end
         Console:infomation("Procedure Round:start() has exited.")
+    end
+    function Round:resultConfirm()
+        Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.NORMAL) -- 连续按数次 ESC
+        Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
+        Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
+        Runtime:sleep(3000)
+    end
+
+    function Round:startGame()
+        Mouse:clickOn(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+        Runtime:sleep(Round.LOAD_TIME)
+        Round:chooseClass()
+    end
+    function Round:play(playerNumber)
+        local player = self.playerList[playerNumber] or self.playerList[0]
+        -- 概率购买配件和辅助武器，防止购买次数过多
+        local random = Utility:generateRandom()
+        if (random <= 0.33)
+        then
+            player:purchasePartWeapon()
+        elseif (random <= 0.67)
+        then
+            player:purchaseAuxiliaryWeapon()
+        end
+        player:purchaseChiefWeapon()
+        player:startMove()
+        player:startAttack()
+        player:turn()
+        player:stopAttack()
+        player:stopMove()
+        player:useAuxiliaryWeapon()
+        player:purchaseAC()
     end
 end

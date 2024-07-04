@@ -16,6 +16,15 @@
         "PressAndReleaseKey",
         "MoveMouseRelative",
         "MoveMouseTo",
-        "GetDate"
-    ]
+        "GetDate",
+        "Dispacher",
+        "COMMAND",
+        "PLAYER",
+        "EXIT"
+    ],
+    "files.associations": {
+        "regex": "cpp",
+        "istream": "cpp",
+        "xlocbuf": "cpp"
+    }
 }
