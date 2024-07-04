@@ -1,9 +1,9 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
-dofile(PATH .. "source/Delay.lua")
-dofile(PATH .. "source/Runtime.lua")
------ 键盘按键设定 -----
 if (not Keyboard)
 then
+    local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
+    dofile(PATH .. "source/Delay.lua")
+    dofile(PATH .. "source/Runtime.lua")
+----- 键盘按键设定 -----
     Keyboard = {
         TILDE = "tilde",
         ESCAPE = "escape",  ONE = "1", TWO = "2", THREE = "3", FOUR = "4", FIVE = "5", SIX = "6", SEVEN = "7",

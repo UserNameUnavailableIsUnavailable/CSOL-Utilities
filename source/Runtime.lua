@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 dofile(PATH .. "source/Console.lua")
 dofile(PATH .. "source/Delay.lua")
 
@@ -39,8 +39,8 @@ then
         then
             return
         end
-        -- 右alt、右ctrl、右shift同时按下触发中断
-        if (not (Keyboard:modifierPressed(Keyboard.RALT) and Keyboard:modifierPressed(Keyboard.RCTRL) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
+        pcall(dofile(PATH .. "build/COMMAND.LUA"))
+        if (EXIT)
         then
             return
         end

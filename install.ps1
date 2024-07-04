@@ -7,8 +7,11 @@ $EXEC_NAME = -join($PROJECT_NAME, ".LUA")
 
 foreach ($file in Get-ChildItem $SOURCE_PATH)
 {
-    Write-Host $file.FullName
-    (Get-Content -Path $file.Fullname) -replace("local\s+PATH\s*=\s*`".*`"", "local PATH = `"$PROJECT_PATH/`"") | Out-File -FilePath $file.FullName
+    if ($file.GetType() -eq "FileInfo")
+    {
+        Write-Host $file.FullName
+        (Get-Content -Path $file.Fullname) -replace("local\s+PATH\s*=\s*`".*`"", "local PATH = `"$PROJECT_PATH/`"") | Out-File -FilePath $file.FullName
+    }
 }
 
 New-Item -Type Directory -Path $BUILD_PATH -Force

@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 
 dofile(PATH .. "source/Runtime.lua")
 dofile(PATH .. "source/Keyboard.lua")
@@ -8,8 +8,10 @@ dofile(PATH .. "source/Console.lua")
 dofile(PATH .. "source/Store.lua")
 dofile(PATH .. "source/Craft.lua")
 dofile(PATH .. "source/Delay.lua")
+dofile(PATH .. "source/Dispacher.lua")
 
 function OnEvent(event, arg, family)
+
     Runtime.exit = false
     if (Keyboard:getKeyLockState() > 0 and Keyboard:modifierPressed(Keyboard.LALT) and Keyboard:modifierPressed(Keyboard.RALT))
     then

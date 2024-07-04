@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 dofile(PATH .. "source/Console.lua")
 dofile(PATH .. "source/Runtime.lua")
 if (not Weapon)

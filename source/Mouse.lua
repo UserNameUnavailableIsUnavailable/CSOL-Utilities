@@ -1,4 +1,4 @@
-local PATH = "C:/Users/Silve/Develop/Projects/CSOL-24H/"
+local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
 dofile(PATH .. "source/Runtime.lua")
 dofile(PATH .. "source/Delay.lua")
 ----- 鼠标按钮设定 -----
