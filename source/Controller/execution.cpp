@@ -1,55 +1,45 @@
 #include <Windows.h>
+#include <cwchar>
 #include <fileapi.h>
+#include <memory>
 #include <synchapi.h>
 #include <winnt.h>
-
-HANDLE g_hStartGameEvent;
-HANDLE g_hPlayGameEvent;
-HANDLE g_hConfirmRoundEvent;
-
-HANDLE g_hStartGameThread;
-HANDLE g_hPlayGameThread;
-HANDLE g_hConfirmGameThread;
-
-HANDLE g_hCmdFile;
+#include "global.hpp"
+#include "command.hpp"
+#include "game.hpp"
+#include <regex>
+#include <winscard.h>
 
 #define CMD_START_GAME "command = CMD_START_GAME"
 
-void give_command(LPCSTR lpszCmd, DWORD cbLength)
+enum GameState
 {
-    // HANDLE hCmdFile = CreateFileW(
-    //     L".\\~command.lua",
-    //     GENERIC_READ | GENERIC_WRITE,
-    //     FILE_SHARE_READ, /* do not open this file while modifying it */
-    //     nullptr,
-    //     CREATE_ALWAYS, /* create (not exists) or clear this file (already exists) */
-    //     FILE_ATTRIBUTE_HIDDEN, /* hidden file */
-    //     nullptr
-    // );
-    /*
-    Writes command to lua script, this will cause a click on START GAME button.
-    */
-    SetFilePointer(
-        g_hCmdFile,
-        0,
-        0,
-        FILE_BEGIN
-    );
-    WriteFile(
-        g_hCmdFile,
-        lpszCmd, /* command to start game */
-        cbLength,
-        nullptr,
-        nullptr
-    );
-    SetEndOfFile(g_hCmdFile);
+    GS_CONNECT_TO_HOST,
+    GS_CONFIRM_RESULT,
+    GS_CREATE_ROOM,
+    GS_LEAVE_ROOM
+};
+
+void check_game_state()
+{
+
 }
+
 
 /*
 @brief
 */
 void initialize_game()
 {
+    g_hCmdFile = CreateFileW(
+        L".\\command.lua",
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ,
+        nullptr,
+        CREATE_ALWAYS, /* create (not exists) or clear this file (already exists) */
+        FILE_ATTRIBUTE_HIDDEN, /* hidden file */
+        nullptr
+    );
     g_hStartGameEvent = CreateEventW(nullptr, true, false, L"g_hStartGameEvent");
     g_hPlayGameEvent = CreateEventW(nullptr, true, false, L"g_hPlayGameEvent");
     g_hConfirmRoundEvent = CreateEventW(nullptr, true, false, L"g_hConfirmRoundEvent");
@@ -78,14 +68,26 @@ void initialize_game()
         0, /* create running */
         nullptr
     );
-
-    /* Read Error.log, get game state */
+    /* Get the location of Error.log */
+    std::shared_ptr<wchar_t[]> gameInstallationPath = query_installation_path();
+    auto qwLength = std::wcslen(gameInstallationPath.get()) + std::wcslen(L"\\bin\\Error.log");
+    g_ErrorLogPath = std::shared_ptr<wchar_t[]>(new wchar_t[qwLength]);
+    g_hLogFile = CreateFileW(
+        g_ErrorLogPath.get(), 
+        GENERIC_READ, 
+        FILE_SHARE_READ | FILE_SHARE_WRITE, 
+        nullptr, 
+        OPEN_EXISTING, 
+        FILE_ATTRIBUTE_NORMAL, 
+        nullptr
+    );
 }
 /*
 @brief start game by clicking the Start button
 */
 void start_game()
 {
+    give_command(CMD_START_GAME, sizeof(CMD_START_GAME) / sizeof(char));
     /* Basically, it takes less than 20 s to load */
     Sleep(30 * 1000); /* Wait 30 s for the round to start */
 }
