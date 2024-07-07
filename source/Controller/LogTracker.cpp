@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <fstream>
 
-enum ENUM_REG_PREDEFINED_KEY
+enum REG_PREDEFINED_KEY_ENUM
 {
     REG_CLASSES_ROOT,
     REG_CURRENT_CONFIG,
@@ -90,18 +90,18 @@ std::shared_ptr<char[]> ConvertUtf16ToUtf8(const void* byte_string)
 * @note CSOL 安装路径保存在注册表项 HKEY_CURRENT_USER\Software\TCGame\csol\gamepath 中，返回的字符串在堆中
 */
 
-std::shared_ptr<char[]> CSOL_QueryInstallationPath(ENUM_REG_PREDEFINED_KEY predefinedTopDir, LPCTSTR lpSubDir, LPCTSTR lpItemName)
+std::shared_ptr<char[]> CSOL_QueryInstallationPath(REG_PREDEFINED_KEY_ENUM predefinedTopDir, LPCTSTR lpSubDir, LPCTSTR lpItemName)
 {
     HKEY hPredefinedTopDir;
     DWORD dwBufferSize;
 
     switch (predefinedTopDir)
     {
-    case ENUM_REG_PREDEFINED_KEY::REG_CLASSES_ROOT: hPredefinedTopDir = HKEY_CLASSES_ROOT; break;
-    case ENUM_REG_PREDEFINED_KEY::REG_CURRENT_CONFIG: hPredefinedTopDir = HKEY_CURRENT_CONFIG; break;
-    case ENUM_REG_PREDEFINED_KEY::REG_CURRENT_USER: hPredefinedTopDir = HKEY_CURRENT_USER; break;
-    case ENUM_REG_PREDEFINED_KEY::REG_LOCAL_MACHINE: hPredefinedTopDir = HKEY_LOCAL_MACHINE; break;
-    case ENUM_REG_PREDEFINED_KEY::REG_USERS: hPredefinedTopDir = HKEY_USERS; break;
+    case REG_PREDEFINED_KEY_ENUM::REG_CLASSES_ROOT: hPredefinedTopDir = HKEY_CLASSES_ROOT; break;
+    case REG_PREDEFINED_KEY_ENUM::REG_CURRENT_CONFIG: hPredefinedTopDir = HKEY_CURRENT_CONFIG; break;
+    case REG_PREDEFINED_KEY_ENUM::REG_CURRENT_USER: hPredefinedTopDir = HKEY_CURRENT_USER; break;
+    case REG_PREDEFINED_KEY_ENUM::REG_LOCAL_MACHINE: hPredefinedTopDir = HKEY_LOCAL_MACHINE; break;
+    case REG_PREDEFINED_KEY_ENUM::REG_USERS: hPredefinedTopDir = HKEY_USERS; break;
     }
 
     RegGetValueW(
@@ -149,7 +149,7 @@ ENUM_CSOL_GAME_COMMAND CSOL_TrasferState(std::shared_ptr<char []> CSOL_ErrorLog,
 
 int main()
 {
-    auto gameInstallationPath = CSOL_QueryInstallationPath(ENUM_REG_PREDEFINED_KEY::REG_CURRENT_USER, L"Software\\TCGame\\csol", L"gamepath");
+    auto gameInstallationPath = CSOL_QueryInstallationPath(REG_PREDEFINED_KEY_ENUM::REG_CURRENT_USER, L"Software\\TCGame\\csol", L"gamepath");
     if (!std::regex_match(gameInstallationPath.get(), std::regex(".*\\\\$"))) // 尾字符非反斜杠
     {
         strcat(gameInstallationPath.get(), "\\");
