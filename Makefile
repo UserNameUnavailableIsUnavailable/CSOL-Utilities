@@ -20,7 +20,7 @@ all:
 
 # compile and link test
 Test:
-	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lAdvapi32 --include-directory=$(SOURCE)/include
+	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(SOURCE)/include
 # compile Controller
 Controller:
 	New-Item -Type Directory -Path $(BUILD)/$@ -Force

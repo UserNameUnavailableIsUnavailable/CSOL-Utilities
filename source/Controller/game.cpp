@@ -1,7 +1,9 @@
 #include <Windows.h>
 #include <memory>
+#include <winerror.h>
 #include "game.hpp"
 #include "util.hpp"
+#include "csol24except.hpp"
 
 /*
 * CSOL_QueryInstallationPath 获取 CSOL 安装路径
@@ -34,9 +36,8 @@ std::shared_ptr<wchar_t[]> query_installation_path(REG_PREDEFINED_KEY_ENUM prede
         nullptr,
         &dwBufferSize
     ); // 获取需要的缓冲区长度
-    dwBufferSize = (dwBufferSize - 1) / sizeof(wchar_t) + 1; /* ceil(dwBufferSize / sizeof(wchar_t)) */
-    std::shared_ptr<wchar_t[]> game_installation_path(new wchar_t[dwBufferSize]{0});
-    RegGetValueW(
+    std::shared_ptr<wchar_t[]> game_installation_path(new wchar_t[(dwBufferSize - 1) / 2 + 1]{0});
+    LSTATUS ret = RegGetValueW(
         hPredefinedTopDir,
         lpSubDir,
         lpItemName,
@@ -45,5 +46,9 @@ std::shared_ptr<wchar_t[]> query_installation_path(REG_PREDEFINED_KEY_ENUM prede
         game_installation_path.get(),
         &dwBufferSize
     ); // 读取字符串
+    if (ret != ERROR_SUCCESS)
+    {
+        throw CSOL24EXCEPT(u8"获取注册表信息失败！错误代码：%ld。", ret);
+    }
     return game_installation_path;
 }
