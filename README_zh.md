@@ -38,7 +38,3 @@ make clean && make all && make
 ### 方法二：使用项目文件夹下的powershell脚本
 
 右键`install.ps1`，点击在Powershell中运行。
-
-## 其他
-
-更多功能正在开发中

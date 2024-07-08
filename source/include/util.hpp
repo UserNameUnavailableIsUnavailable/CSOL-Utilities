@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <memory>
+#include <winnt.h>
 
 enum REG_PREDEFINED_KEY_ENUM
 {

@@ -17,8 +17,19 @@ enum ENUM_CSOL_GAME_COMMAND
     CSOL_STORE_PURCHASE, // 商店购买物品
 };
 
+enum ENUM_GAME_STATE
+{
+    GS_CONNECT_TO_HOST,
+    GS_CONFIRM_RESULT,
+    GS_CREATE_ROOM,
+    GS_LEAVE_ROOM
+};
+
 std::shared_ptr<wchar_t[]> query_installation_path(
     REG_PREDEFINED_KEY_ENUM predefinedTopDir = REG_PREDEFINED_KEY_ENUM::REG_CURRENT_USER,
     LPCWSTR lpSubDir = L"Software\\TCGame\\csol",
     LPCWSTR lpItemName = L"gamepath"
 );
+
+DWORD CALLBACK update_game_state(LPVOID lpParam);
+DWORD CALLBACK start_game(LPVOID lpParam);

@@ -12,5 +12,8 @@ HANDLE g_hConfirmGameThread;
 
 HANDLE g_hCmdFile;
 HANDLE g_hLogFile;
+UINT64 g_qwLogFileSize;
+UINT64 g_qwLogFileLastModifyTime;
+ENUM_GAME_STATE g_GameState;
 
 std::shared_ptr<wchar_t []> g_ErrorLogPath;

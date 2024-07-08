@@ -13,15 +13,6 @@
 #include <regex>
 #include <winscard.h>
 
-#define CMD_START_GAME "command = CMD_START_GAME"
-
-enum GameState
-{
-    GS_CONNECT_TO_HOST,
-    GS_CONFIRM_RESULT,
-    GS_CREATE_ROOM,
-    GS_LEAVE_ROOM
-};
 
 void check_game_state()
 {
@@ -43,15 +34,24 @@ void initialize_game()
         FILE_ATTRIBUTE_HIDDEN, /* hidden file */
         nullptr
     );
-    g_hStartGameEvent = CreateEventW(nullptr, true, false, L"g_hStartGameEvent");
-    g_hPlayGameEvent = CreateEventW(nullptr, true, false, L"g_hPlayGameEvent");
-    g_hConfirmRoundEvent = CreateEventW(nullptr, true, false, L"g_hConfirmRoundEvent");
+    g_hStartGameWatcherEvent = CreateEventW(nullptr, true, false, L"Local\\g_hStartGameWatcherEvent");
+    g_hStartGameEvent = CreateEventW(nullptr, true, false, L"Local\\g_hStartGameEvent");
+    g_hPlayGameEvent = CreateEventW(nullptr, true, false, L"Local\\g_hPlayGameEvent");
+    g_hConfirmRoundEvent = CreateEventW(nullptr, true, false, L"Local\\g_hConfirmRoundEvent");
     // TODO: error handling
     g_hStartGameThread = CreateThread(
         nullptr,
         4096,
-        nullptr, // TODO
+        update_game_state,
+        g_hStartGameEvent,
+        0, /* create running */
+        nullptr
+    );
+    g_hStartGameThread = CreateThread(
         nullptr,
+        4096,
+        start_game, // TODO
+        g_hStartGameEvent,
         0, /* create running */
         nullptr
     );
@@ -100,15 +100,6 @@ void initialize_game()
     {
         NotifyError("打开文件失败，错误代码：%lu。文件名：%ls。", GetLastError(), g_ErrorLogPath.get());
     }
-}
-/*
-@brief start game by clicking the Start button
-*/
-void start_game()
-{
-    give_command(CMD_START_GAME, sizeof(CMD_START_GAME) / sizeof(char));
-    /* Basically, it takes less than 20 s to load */
-    Sleep(30 * 1000); /* Wait 30 s for the round to start */
 }
 
 /*
