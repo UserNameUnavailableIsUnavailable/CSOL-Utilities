@@ -155,9 +155,9 @@ then
     -- @param nil
     -- @return nil
     function Round:clearUI()
-        Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.NORMAL)
-        Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
-        Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.NORMAL)
+        Mouse:double_click_on(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
+        Mouse:double_click_on(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
     end
 
     -- 角色选项
@@ -180,7 +180,7 @@ then
     end
 
     function Round:chooseMainPlayer(confirm)
-        confirm = confirm or (Keyboard:modifierPressed(Keyboard.LCTRL) and Keyboard:modifierPressed(Keyboard.RCTRL))
+        confirm = confirm or (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
         local number = Keyboard:getKeyLockState()
         if (confirm and number > 0 and number <= #self.playerList)
         then
@@ -215,8 +215,8 @@ then
                 if (exit) -- 退出
                 then
                     Console:infomation("Procedure Round:start() will exit.")
-                    Keyboard:releaseAll(Delay.SHORT)
-                    Mouse:releaseAll(Delay.SHORT)
+                    Keyboard:release_all(Delay.SHORT)
+                    Mouse:release_all(Delay.SHORT)
                     break
                 end
                 Console:infomation(string.format("Player Number: %d", self.playerNumber))
@@ -224,7 +224,7 @@ then
             end
             if (Runtime:execTime() - Round.timer > Round.ROUND_TIME)
             then
-                Mouse:doubleClickOn(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+                Mouse:double_click(Setting.GAMESTART_X, Setting.GAMESTART_Y)
                 self:reset()
                 self.timer = Runtime:execTime()
             end
@@ -250,14 +250,14 @@ then
         Console:infomation("Procedure Round:start() has exited.")
     end
     function Round:resultConfirm()
-        Keyboard:clickSeveralTimes(Keyboard.ESCAPE, 4, Delay.NORMAL) -- 连续按数次 ESC
-        Mouse:clickOn(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
-        Mouse:clickOn(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.NORMAL) -- 连续按数次 ESC
+        Mouse:double_click_on(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
+        Mouse:double_click_on(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
         Runtime:sleep(3000)
     end
 
     function Round:startGame()
-        Mouse:clickOn(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+        Mouse:double_click_on(Setting.GAMESTART_X, Setting.GAMESTART_Y)
         Runtime:sleep(Round.LOAD_TIME)
         Round:chooseClass()
     end
