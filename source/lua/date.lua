@@ -1,7 +1,11 @@
+if (not TimeDate)
+then
 
+---@class TimeDate
 TimeDate = {}
----Judge whether `year` is leap 
----@param year number
+
+---判断 `year` 是否为闰年。
+---@param year integer 
 ---@return boolean
 function TimeDate:is_leap(year)
 	if year % 4 == 0 and year % 100 ~= 0 then
@@ -12,21 +16,21 @@ function TimeDate:is_leap(year)
 	return false
 end
 
----Calculate timestamp based on given time (UTC+0)
----@param year number
----@param month number
----@param day number
----@param hour number
----@param minute number
----@param second number
----@return number
+---计算给定时间的 UNIX 时间戳。
+---@param year integer
+---@param month integer 
+---@param day integer
+---@param hour integer 
+---@param minute integer
+---@param second integer 
+---@return integer
 function TimeDate:timestamp(year, month, day, hour, minute, second, time_zone)
 	time_zone = time_zone or 0
 	local total_days = 0
 	local ret = 0
 	local i = 1970
 	while i < year do
-		if is_leap(i) then
+		if self:is_leap(i) then
 			total_days = total_days + 366
 		else
 			total_days = total_days + 365
@@ -44,10 +48,12 @@ function TimeDate:timestamp(year, month, day, hour, minute, second, time_zone)
 		end
 		i = i + 1
 	end
-	if month > 2 and is_leap(year) then
+	if month > 2 and self:is_leap(year) then
 		total_days = total_days + 1
 	end
 	total_days = total_days + day - 1
 	ret = total_days * 86400 + hour * 3600 + minute * 60 + second
 	return ret
 end
+
+end -- if (not TimeDate)
