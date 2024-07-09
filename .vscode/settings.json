@@ -17,7 +17,6 @@
         "MoveMouseRelative",
         "MoveMouseTo",
         "GetDate",
-        "Dispacher",
         "COMMAND",
         "PLAYER",
         "EXIT"

@@ -20,5 +20,6 @@ void give_command(LPCSTR lpszCmd, DWORD cbLength)
         nullptr,
         nullptr
     );
+    
     SetEndOfFile(g_hCmdFile);
 }

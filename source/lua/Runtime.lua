@@ -27,7 +27,9 @@ then
         end
         -- 中断处理
         self:interuptHandler()
-        Sleep(duration)
+        if (type(duration) == "number" and duration > 0) then
+            Sleep(math.floor(duration))
+        end
     end
 
     -- 中断处理函数
@@ -59,14 +61,14 @@ then
             Sleep(Delay.LONG)
             -- 锁定值为0（全不亮），左右Shift按下（表示确认），则退出位使能，此时不会恢复中断现场，任何后续的挂起、外围设备操作将直接返回，资源随之释放
             if (Keyboard:getKeyLockState() == 0 and
-            (Keyboard:modifierPressed(Keyboard.LSHIFT) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
+            (Keyboard:is_modifier_pressed(Keyboard.LSHIFT) and Keyboard:is_modifier_pressed(Keyboard.RSHIFT)))
             then
                 Runtime.exit = true
                 Console:infomation("Interupt: Runtime:exit bit is set.")
                 break
             -- 锁定值为7（全亮），左右Shift按下（表示确认），则撤销中断处理并恢复中断现场，程序执行不受到影响
             elseif (Keyboard:getKeyLockState() ~= 0 and
-            (Keyboard:modifierPressed(Keyboard.LSHIFT) and Keyboard:modifierPressed(Keyboard.RSHIFT)))
+            (Keyboard:is_modifier_pressed(Keyboard.LSHIFT) and Keyboard:is_modifier_pressed(Keyboard.RSHIFT)))
             then
                 -- 恢复现场
                 self:restoreContext(interuptContext)

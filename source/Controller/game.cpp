@@ -5,6 +5,7 @@
 #include <minwindef.h>
 #include <processenv.h>
 #include <processthreadsapi.h>
+#include <regex>
 #include <synchapi.h>
 #include <wincon.h>
 #include <winerror.h>
@@ -22,7 +23,7 @@
 * @note CSOL 安装路径保存在注册表项 HKEY_CURRENT_USER\Software\TCGame\csol\gamepath 中，返回的字符串在堆中
 */
 
-std::shared_ptr<wchar_t[]> query_installation_path(REG_PREDEFINED_KEY_ENUM predefinedTopDir, LPCWSTR lpSubDir, LPCWSTR lpItemName)
+std::shared_ptr<wchar_t[]> CSOL24H::QueryInstallationPath(REG_PREDEFINED_KEY_ENUM predefinedTopDir, LPCWSTR lpSubDir, LPCWSTR lpItemName)
 {
     HKEY hPredefinedTopDir;
     DWORD dwBufferSize;
@@ -62,7 +63,7 @@ std::shared_ptr<wchar_t[]> query_installation_path(REG_PREDEFINED_KEY_ENUM prede
     return game_installation_path;
 }
 
-DWORD CALLBACK update_game_state(LPVOID lpParam)
+DWORD CALLBACK CSOL24H::UpdateGameState(LPVOID lpParam)
 {
     LPBYTE lpBuffer = new BYTE[1024 * 1024 * 1024]; /* 1 GiB to accomodate the file, impossible to get that large in practice */
     static UINT32 dwLogFileSize = 0xFFFFFFFF; /* log file size, initialize it to maximum */
@@ -119,6 +120,7 @@ DWORD CALLBACK update_game_state(LPVOID lpParam)
                 );
                 dwLogFileSize = dwBytesWritten;
             }
+            
         }
         Sleep(1000); /* update every 1 s */
     }
@@ -129,12 +131,12 @@ DWORD CALLBACK update_game_state(LPVOID lpParam)
 /*
 @brief start game by clicking the Start button
 */
-DWORD CALLBACK start_game(LPVOID lpParam)
+DWORD CALLBACK CSOL24H::StartGameRoom(LPVOID lpParam)
 {   
     HANDLE hEvent = lpParam;
     while (WaitForSingleObject(g_hStartGameEvent, INFINITE) && !g_bExit)
     {
-        give_command(CMD_START_GAME, sizeof(CMD_START_GAME) / sizeof(char));
+        CSOL24H::GiveCommand(CMD_START_GAME_ROOM);
         /* Basically, it takes less than 20 s to load */
         Sleep(30 * 1000); /* Wait 30 s for the round to start */
     }

@@ -55,7 +55,7 @@ then
     -- @param nil
     -- @return nil
     function Weapon:inCasePurchaseFailsForInsuffFunds()
-        Mouse:clickOn(Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_X, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_Y)
+        Mouse:double_click_on(Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_X, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_Y)
         Keyboard:click(Keyboard.ZERO, Delay.SHORT)
     end
 
@@ -63,7 +63,7 @@ then
     -- @param nil
     -- @return nil
     function Weapon:closePreorderMenu()
-        Mouse:clickOn(Setting.GAME_PREORDER_MENU_REBUY_X, Setting.GAME_PREORDER_MENU_REBUY_Y)
+        Mouse:double_click_on(Setting.GAME_PREORDER_MENU_REBUY_X, Setting.GAME_PREORDER_MENU_REBUY_Y)
     end
 
     -- 开始使用该武器攻击

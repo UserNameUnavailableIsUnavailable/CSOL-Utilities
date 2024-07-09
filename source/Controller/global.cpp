@@ -2,6 +2,8 @@
 #include "global.hpp"
 #include <memory>
 
+BOOL g_bExit;
+
 HANDLE g_hStartGameEvent; /* the event that triggers the game to start */
 HANDLE g_hPlayGameEvent; /* the event that causes the lua script to play game */
 HANDLE g_hConfirmRoundEvent; /* the event that causes the lua script to confirm a round */
