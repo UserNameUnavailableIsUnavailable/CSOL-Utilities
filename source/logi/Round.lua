@@ -134,7 +134,7 @@ then
     function Round:reset()
         Round.isResetting = true
         Console:infomation("Start resetting round.")
-        local moment = Runtime:execTime()
+        local moment = Runtime:get_running_time()
         self.playerList[self.playerNumber].useDefaultWeapon = true
         repeat
             self.playerList[self.playerNumber]:purchaseChiefWeapon()
@@ -144,7 +144,7 @@ then
             self.playerList[self.playerNumber]:turn()
             self.playerList[self.playerNumber]:stopAttack()
             -- self.playerList[self.playerNumber]:stopMove()
-        until Runtime:execTime() - Round.LOAD_TIME > moment or Runtime.exit
+        until Runtime:get_running_time() - Round.LOAD_TIME > moment or Runtime.pause_flag
         Round:chooseClass(false)
         self.playerList[self.playerNumber].useDefaultWeapon = false
         Console:infomation("Finish resetting round.")
@@ -197,22 +197,16 @@ then
     -- @return nil
     function Round:start()
         self:initialize() -- 初始化
-        while (not Runtime.exit)  -- 没有要求退出
+        while (not Runtime.pause_flag)  -- 没有要求退出
         do
             if (Keyboard:getKeyLockState() == 0) -- 锁存器值为0，进入自陷状态
             then
                 Console:infomation("Procedure Round:start() is suspended.")
-                local exit = Runtime:waitFor(
-                    function()
-                        while (not(Runtime.exit or self:chooseMainPlayer(false))) -- 未发出退出或者继续指令则保持挂起
-                        do
-                            Runtime:sleep(Delay.LONG_LONG)
-                        end
-                        return Runtime.exit
-                    end
-                )
-                
-                if (exit) -- 退出
+                while (not(Runtime.pause_flag or self:chooseMainPlayer(false))) -- 未发出退出或者继续指令则保持挂起
+                do
+                    Runtime:sleep(Delay.LONG_LONG)
+                end
+                if (Runtime.pause_flag) -- 退出
                 then
                     Console:infomation("Procedure Round:start() will exit.")
                     Keyboard:release_all(Delay.SHORT)
@@ -222,11 +216,11 @@ then
                 Console:infomation(string.format("Player Number: %d", self.playerNumber))
                 Console:infomation("Procedure Round:start() is resumed.")
             end
-            if (Runtime:execTime() - Round.timer > Round.ROUND_TIME)
+            if (Runtime:get_running_time() - Round.timer > Round.ROUND_TIME)
             then
                 Mouse:double_click(Setting.GAMESTART_X, Setting.GAMESTART_Y)
                 self:reset()
-                self.timer = Runtime:execTime()
+                self.timer = Runtime:get_running_time()
             end
             -- 概率购买配件和辅助武器，防止购买次数过多
             local random = Utility:generateRandom()

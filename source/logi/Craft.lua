@@ -10,7 +10,7 @@ then
     function Craft:combineParts()
         local counter = 0
         Console:infomation("开始合成配件")
-        while (Keyboard:getKeyLockState() == 1 and not Runtime.exit)
+        while (Keyboard:getKeyLockState() == 1 and not Runtime.pause_flag)
         do
             Keyboard:press(Keyboard.ENTER, Delay.MINI)
             Mouse:double_click_on(Setting.CRAFT_PARTS_AUTO_FILL_X, Setting.CRAFT_PARTS_AUTO_FILL_Y)

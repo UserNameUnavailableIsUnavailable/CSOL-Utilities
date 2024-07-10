@@ -6,7 +6,7 @@ then
     -- @param 同math.random
     -- @remark 参见math.random了解参数信息
     function Utility:generateRandom(...)
-        math.randomseed(Runtime:execTime())
+        math.randomseed(Runtime:get_running_time())
         return math.random(...)
     end
 

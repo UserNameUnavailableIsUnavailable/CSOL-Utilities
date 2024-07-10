@@ -12,7 +12,7 @@ dofile(PATH .. "source/Dispacher.lua")
 
 function OnEvent(event, arg, family)
 
-    Runtime.exit = false
+    Runtime.pause_flag = false
     if (Keyboard:getKeyLockState() > 0 and Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
     then
         if (event == "MOUSE_BUTTON_PRESSED" and arg == 7 and family == "mouse")
