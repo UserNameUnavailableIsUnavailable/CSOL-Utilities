@@ -1,5 +1,6 @@
-if (not Console)
+if (not Console_lua)
 then
+Console_lua = true
 Console = {}
 ---在控制台上打印字符串，不换行
 ---@param msg any
@@ -35,4 +36,4 @@ function Console:clear()
     ClearLog()
 end
 
-end -- if (not Console)
+end -- Console_lua

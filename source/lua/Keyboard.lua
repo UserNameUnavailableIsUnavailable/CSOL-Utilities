@@ -1,7 +1,11 @@
-if (not Keyboard)
+if (not Keyboard_lua)
 then
+
+Keyboard_lua = true
+
 Load("Delay.lua")
 Load("Runtime.lua")
+Load("Context.lua")
 
 ---@class Keyboard
 ---@enum
@@ -12,7 +16,7 @@ Keyboard = {
     Q = "q", W = "w", E = "e", R = "r", T = "t", Y = "y", U = "u", I = "i", O = "o",
     P = "p", LBRACKET = "lbracket", RBRACKET = "rbracket", BACKSLASH = "backslash", 
     A = "a", S = "s", D = "d", F = "f", G = "g", H = "h", J = "j", K = "k", L = "l", SEMICOLON = "semicolon",
-    QUOTE = "quote", ENTER = "enter", NON_US_LAYOUT_SLASH = "non_us_slash", 
+    QUOTE = "quote", ENTER = "enter", NON_US_LAYOUT_SLASH = "non_us_slash",
     Z = "z", X = "x", C = "c", V = "v", B = "b", N = "n", M = "m", COMMA = "comma", PERIOD = "period", SLASH = "slash",
     LSHIFT = "lshift", RSHIFT = "rshift",
     LWIN = "lgui", RWIN = "rgui",
@@ -48,7 +52,7 @@ Keyboard.unreleased = {}
 ---@return nil
 ---按下按键。
 function Keyboard:press(key, delay)
-    if (Runtime.exit) -- 当下达退出指令时，不进行任何操作。
+    if (Runtime.pause_flag) -- 当下达退出指令时，不进行任何操作。
     then
         return
     end
@@ -62,7 +66,7 @@ end
 ---@param delay integer | nil 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release(key, delay)
-    if (Runtime.exit)
+    if (Runtime.pause_flag)
     then
         return
     end
@@ -76,7 +80,7 @@ end
 ---@param delay integer | nil 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click(key, delay)
-    if (Runtime.exit)
+    if (Runtime.pause_flag)
     then
         return
     end
@@ -88,7 +92,7 @@ end
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release_all(delay)
-    if (Runtime.exit) -- 当下达退出指令时，不进行任何操作
+    if (Runtime.pause_flag) -- 当下达退出指令时，不进行任何操作
     then
         return
     end
@@ -105,7 +109,7 @@ end
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click_several_times(key, times, delay)
-    if (Runtime.exit)
+    if (Runtime.pause_flag)
     then
         return
     end
@@ -152,6 +156,23 @@ function Keyboard:getKeyLockState()
     return keyLockState
 end
 
+Runtime:register_context(
+    Context:new(
+    function (self)
+        for key, _ in pairs(Keyboard.unreleased)
+        do
+            Keyboard:release(key)
+            self.storage[key] = true
+        end
+    end,
+    function (self)
+        for key, _ in pairs(self.storage --[=[@as {[string]: boolean}]=])
+        do
+            Keyboard:press(key)
+            self.storage[key] = nil
+        end
+    end
+    )
+)
 
-
-end -- if (not Keyboard)
+end -- Keyboard_lua

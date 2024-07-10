@@ -10,12 +10,12 @@ then
     function Store:purchaseItems()
         local buyX, buyY = Mouse:locate_cursor() -- “兑换”按钮坐标
         Console:infomation(string.format("开始批量购买物品，兑换按钮位置：(%d, %d)", buyX, buyY))
-        while (Keyboard:getKeyLockState() == 1 and not Runtime.exit)
+        while (Keyboard:getKeyLockState() == 1 and not Runtime.pause_flag)
         do
             Mouse:double_click_on(buyX, buyY)
             Mouse:double_click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y) -- 选项
-            Mouse:double_click_on(Setting.STORE_BUY_BUY_X, Setting.STORE_BUY_BUY_Y) -- 二级“兑换”按钮
-            Mouse:double_click_on(Setting.STORE_BUY_BUY_CONFIRM_X, Setting.STORE_BUY_BUY_CONFIRM_Y) -- “确认”按钮
+            Mouse:double_click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y) -- 二级“兑换”按钮
+            Mouse:double_click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y) -- “确认”按钮
             Keyboard:click(Keyboard.ESCAPE, Delay.SHORT)
         end
         Console:infomation("物品购买结束")

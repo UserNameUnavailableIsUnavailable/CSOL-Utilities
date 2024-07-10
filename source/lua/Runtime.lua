@@ -1,127 +1,136 @@
-local PATH = "C:/Users/Silve/Develop/CSOL-24H/"
-dofile(PATH .. "source/Console.lua")
-dofile(PATH .. "source/Delay.lua")
-
-if (not Runtime)
+if (not Runtime_lua)
 then
-    Runtime = {}
-    -- 运行时退出位，若置为true，则所有挂起、IO操作都将被跳过
-    Runtime.exit = false
-    -- 中断标志位，用于屏蔽中断以禁用中断嵌套
-    Runtime.interuptFlag = false
-    -- 获取当前程序运行时间，单位为毫秒
-    -- @param nil
-    -- @return nil
-    function Runtime:execTime()
-        return GetRunningTime()
-    end
-
-    -- 挂起当前线程，挂起后，可以处理中断事件
-    -- @param duration 挂起的时间，不保证挂起的时间是否精确，尤其是有中断事件需要处理时
-    -- @remark 除了Runtime内部方法外，其他地方都应当调用Runtime:sleep，而非直接调用罗技API中的Sleep，这样可以进行中断处理
-    function Runtime:sleep(duration)
-        -- 罗技API不支持真正的中断，故而当某个过程主动将自己挂起时（即调用Runtime:sleep)视为自发中断，此时可以处理外部事件
-        if (self.exit) -- 下达退出命令后，挂起操作不被允许，直接返回
-        then
-            return
-        end
-        -- 中断处理
-        self:interuptHandler()
-        if (type(duration) == "number" and duration > 0) then
-            Sleep(math.floor(duration))
-        end
-    end
-
-    -- 中断处理函数
-    -- @param nil
-    -- @return nil
-    -- @remark 只有中断标志位失能时才允许中断，允许中断时，按下右Ctrl、右Alt、右Shift触发中断
-    function Runtime:interuptHandler()
-        if (self.interuptFlag) -- 未关中断才会触发中断
-        then
-            return
-        end
-        pcall(dofile(PATH .. "build/COMMAND.LUA"))
-        if (EXIT)
-        then
-            return
-        end
-        Console:infomation("Interupt: Begin handling interupt.")
-        -- 中断开始时，中断标志位使能以屏蔽中断
-        self.interuptFlag = true
-        -- 中断现场（临时变量，自动回收，以免后患）
-        local interuptContext = {
-                keyboardUnreleased = {},
-                mouseUnreleased = {}
-            }
-        -- 现场切换，保护中断现场
-        self:protectContext(interuptContext)
-        while (true)
-        do
-            Sleep(Delay.LONG)
-            -- 锁定值为0（全不亮），左右Shift按下（表示确认），则退出位使能，此时不会恢复中断现场，任何后续的挂起、外围设备操作将直接返回，资源随之释放
-            if (Keyboard:getKeyLockState() == 0 and
-            (Keyboard:is_modifier_pressed(Keyboard.LSHIFT) and Keyboard:is_modifier_pressed(Keyboard.RSHIFT)))
-            then
-                Runtime.exit = true
-                Console:infomation("Interupt: Runtime:exit bit is set.")
-                break
-            -- 锁定值为7（全亮），左右Shift按下（表示确认），则撤销中断处理并恢复中断现场，程序执行不受到影响
-            elseif (Keyboard:getKeyLockState() ~= 0 and
-            (Keyboard:is_modifier_pressed(Keyboard.LSHIFT) and Keyboard:is_modifier_pressed(Keyboard.RSHIFT)))
-            then
-                -- 恢复现场
-                self:restoreContext(interuptContext)
-                Console:infomation("Interupt: Cancel interupt operations.")
-                break
-            end
-            -- 中断处理完毕，中断标志位失能
-        end
-        self.interuptFlag = false
-        Console:infomation("Interupt: Finish Handling interupt.")
-    end
-
-    -- 保护中断现场：把所有按下但未释放的键盘按键和鼠标按钮全部弹起，避免干扰中断处理，随后可以进行上下文切换
-    -- @param (table)interuptContext 将中断现场保存到表中
-    -- @return nil
-    function Runtime:protectContext(interuptContext)
-        for key, _ in pairs(Keyboard.unreleased)
-        do
-            Keyboard:release(key)
-            interuptContext.keyboardUnreleased[key] = true
-        end
-        for button, _ in pairs (Mouse.unreleased)
-        do
-            Mouse:release(button)
-            interuptContext.mouseUnreleased[button] = true
-        end
-    end
-
-    -- 恢复中断现场：中断处理完成后，重新按下保存中断现场中的按下但未弹起的键盘按键和鼠标按钮
-    -- @param (table)interuptContext 中断现场
-    -- @return nil
-    function Runtime:restoreContext(interuptContext)
-        for key, _ in pairs(interuptContext.keyboardUnreleased)
-        do
-            Keyboard:press(key)
-            interuptContext.keyboardUnreleased[key] = nil
-        end
-        for button, _ in pairs(interuptContext.mouseUnreleased)
-        do
-            Mouse:press(button)
-            interuptContext.mouseUnreleased[button] = nil
-        end
-    end
-
-    -- 阻塞等待某个流程执行完毕
-    -- @param (function)procedure 需要等待的流程
-    -- @param ... procedure接收的参数
-    -- @return 与procedure相同
-    function Runtime:waitFor(procedure, ...)
-        if (type(procedure) == "function")
-        then
-            return procedure(...)
-        end
-    end
-
+Runtime_lua = true
+Runtime = {}
+---暂停标志。若置为 `true`，则所有键鼠操作都将被跳过。
+Runtime.pause_flag = false
+---中断标志位，用于开/关中断，避免中断嵌套。
+Runtime.interrupt_flag = true
+---中断发生时保存的中断现场。
+---@type Context[]
+Runtime.interrupt_context = {}
+---获取当前程序运行时间，单位为毫秒。
+---@return integer
+function Runtime:get_running_time()
+    return GetRunningTime()
 end
+
+---挂起当前用户级线程，挂起后，可以处理中断事件。除了 `Runtime` 内部方法外，其他地方都应当调用 `Runtime:sleep`，而非直接调用罗技 API 中的 Sleep，这样可以进行中断处理。
+---@param milliseconds integer | nil 挂起的时间，不保证挂起的时间是否精确，尤其是在有中断事件需要处理时。
+---@return nil
+function Runtime:sleep(milliseconds)
+    -- 罗技API不支持真正的中断，故而当某个过程主动将自己挂起时（即调用Runtime:sleep)视为自发中断，此时可以处理外部事件
+    self:interrupt_handler()
+    if (type(milliseconds) ~= "number" or milliseconds < 1)
+    then
+        return
+    end
+    milliseconds = math.floor(milliseconds)
+    if (milliseconds <= 10)
+    then
+        Sleep(milliseconds)
+    else
+        -- 将长时间的休眠拆分为若干短时间休眠，确保 `Runtime` 常常保持对程序的控制权
+        local quotient = milliseconds / 10
+        local remainder = milliseconds % 10
+    while (quotient > 0)
+    do
+        Runtime:sleep(10)
+        quotient = quotient - 1
+    end
+        if (remainder > 0)
+        then
+            Sleep(remainder)
+        end
+    end
+end
+
+---中断处理函数。只有中断标志位使能时才允许中断。
+---@return nil
+function Runtime:interrupt_handler()
+    if (not self.interrupt_flag) -- 未关中断才会触发中断
+    then
+        return
+    end
+    -- 中断开始时，中断标志位使能以屏蔽后续中断
+    self.interrupt_flag = false -- 关中断
+    -- 现场切换，保护中断现场
+    self:save_context()
+    -- 是否暂停执行
+    if (self:is_paused())
+    then
+        Runtime.pause_flag = true -- 暂停执行
+        Console:infomation("paused.")
+    elseif (self:is_restored())
+    then
+        Runtime.pause_flag = false -- 恢复执行
+        Console:infomation("restored.")
+    end
+    -- 中断处理完毕
+    self:restore_context()
+    self.interrupt_flag = true -- 开中断
+end
+
+---注册中断现场，中断发生时保存。
+---@param context_object Context
+---@return boolean
+function Runtime:register_context(context_object)
+    if (type(context_object.save_callback) == "function" and type(context_object.restore_callback) == "function")
+    then
+        self.interrupt_context[#self.interrupt_context + 1] = context_object
+        return true
+    end
+    return false
+end
+
+---注销中断现场。
+---@param context_object Context
+---@return boolean
+function Runtime:unregister_context(context_object)
+    for index, value in pairs(self.interrupt_context)
+    do
+        if (value == context_object)
+        then
+            table.remove(self.interrupt_context, index)
+            return true
+        end
+    end
+    return false
+end
+---保护中断现场。把所有按下但未释放的键盘按键和鼠标按钮全部弹起，避免干扰中断处理，随后可以进行上下文切换。
+---@return nil
+function Runtime:save_context()
+    for _, obj in pairs(self.interrupt_context)
+    do
+        obj:save_callback()
+    end
+end
+
+---恢复中断现场：中断处理完成后，重新按下保存中断现场中的按下但未弹起的键盘按键和鼠标按钮
+---@return nil
+function Runtime:restore_context()
+    for _, obj in pairs(self.interrupt_context)
+    do
+        obj:restore_callback()
+    end
+end
+
+function Runtime:is_paused()
+    return Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL)
+end
+
+function Runtime:is_restored()
+    return Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT)
+end
+
+---用于测试 `Runtime`，请勿在程序中使用。
+---@return nil
+function Runtime:test()
+    while (true)
+    do
+        Runtime:sleep(1000)
+        Sleep(10)
+    end
+end
+
+end -- Runtime_lua

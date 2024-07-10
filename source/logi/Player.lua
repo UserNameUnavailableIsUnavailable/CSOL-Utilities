@@ -134,20 +134,20 @@ then
             DISCHARGE_TIME = 24 * 1000,
             RECHARGE_TIME = 9 * 1000,
             use = function (self)
-                if (not self.discharging and Runtime:execTime() - self.turnOffMoment > self.RECHARGE_TIME)
+                if (not self.discharging and Runtime:get_running_time() - self.turnOffMoment > self.RECHARGE_TIME)
                 then
                     self.discharging = true
-                    self.turnOnMoment = Runtime:execTime()
+                    self.turnOnMoment = Runtime:get_running_time()
                     self:switch()
                     Mouse:click(Mouse.LEFT, Delay.NORMAL)
-                elseif (self.discharging and Runtime:execTime() - self.turnOnMoment > self.DISCHARGE_TIME)
+                elseif (self.discharging and Runtime:get_running_time() - self.turnOnMoment > self.DISCHARGE_TIME)
                 then
                     self.discharging = false
-                    self.turnOffMoment = Runtime:execTime()
+                    self.turnOffMoment = Runtime:get_running_time()
                     self:switch()
-                    Mouse:moveRelative(0, 4000, Delay.NORMAL)
+                    Mouse:move_relative(0, 4000, Delay.NORMAL)
                     Keyboard:click(Keyboard.R, self.switchDelay)
-                    Mouse:moveRelative(0, -4000, Delay.NORMAL)
+                    Mouse:move_relative(0, -4000, Delay.NORMAL)
                 end
             end
         })
@@ -283,7 +283,7 @@ then
     -- @param nil
     -- @return nil
     function Player:turn()
-        local rotateStopMoment = Runtime:execTime() + self.turnDuration
+        local rotateStopMoment = Runtime:get_running_time() + self.turnDuration
         local sensitivity = (2 - Utility:generateRandom()) / 2 -- 灵敏度∈(0.5, 1]
         local direction
         if (Utility:generateRandom(0, 1) == 0)
@@ -294,14 +294,14 @@ then
         end
         local count = 0
         repeat
-            Mouse:moveRelative(100 * direction * sensitivity, 0, Delay.MINI)
+            Mouse:move_relative(100 * direction * sensitivity, 0, Delay.MINI)
             -- count = count + 1
             -- if (not Round.isResetting and count % 10 == 0)
             -- then
             --     self.chiefWeaponToUse:switchWithoutDelay()
                 -- Keyboard:click(Keyboard.LCTRL)
             -- end
-        until Runtime:execTime() > rotateStopMoment or Runtime.exit
+        until Runtime:get_running_time() > rotateStopMoment or Runtime.pause_flag
         Keyboard:click(Keyboard.R, Delay.LONG)
     end
 
