@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <CSOL24H.hpp>
-#include "command.hpp"
+#include "Command.hpp"
 #include <ctime>
 
 void CSOL24H::GiveCommand(const char* cmd) noexcept

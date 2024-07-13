@@ -18,9 +18,9 @@
 #include <winnt.h>
 #include "CSOL24H.hpp"
 #include "GameState.hpp"
-#include "util.hpp"
+#include "Util.hpp"
 #include "CSOL24H_EXCEPT.hpp"
-#include "command.hpp"
+#include "Command.hpp"
 
 /*
 @brief 按“开始游戏”按钮
@@ -68,6 +68,30 @@
 //     }
 //     return 0;
 // }
+DWORD CALLBACK CSOL24H::WatchGameState(LPVOID lpParam) noexcept
+{
+    HANDLE objects_to_wait[] = {
+        hGameWatcherEvent,
+        // hRunnableMutex
+    };
+    while (
+        WAIT_OBJECT_0 == WaitForSingleObject(
+            hGameWatcherEvent,
+            INFINITE
+        )) /* 获取到所有可等待对象才开始运行 */
+    {
+        if (bExit)
+        {
+            break;
+        }
+        UpdateErrorLogBuffer();
+        TransferGameState();
+        DispatchCommand();
+        // ReleaseMutex(hRunnableMutex); /* 释放持有的 mutex */
+        Sleep(100);
+    }
+    return 0;
+}
 
 /*
 @brief 状态迁移函数。
@@ -75,7 +99,6 @@
 void CSOL24H::TransferGameState() noexcept
 {
     if (cbErrorLogSize <= 0) return;
-    static std::regex msg_pattern("(\\d{2}):(\\d{2}):(\\d{2}).(\\d{3}) - (.+)");
     int64_t begin = cbErrorLogSize;
     int64_t end = cbErrorLogSize;
     int64_t current_time;
@@ -184,20 +207,50 @@ void CSOL24H::TransferGameState() noexcept
     }
 }
 
-DWORD CALLBACK CSOL24H::WatchGameState(LPVOID lpParam) noexcept
+
+/*
+@brief 更新日志文件缓冲区。
+@return 日志文件缓冲区是否更新。
+*/
+bool CSOL24H::UpdateErrorLogBuffer() noexcept
 {
-    while (WAIT_OBJECT_0 == WaitForSingleObject(hGameWatcherEvent, INFINITE))
+    DWORD dwBytesWritten;
+    uint64_t qwLogFileLastModifiedTime = 0;
+    GetFileTime(hErrorLogFile, nullptr, nullptr, (LPFILETIME)&qwLogFileLastModifiedTime);
+    if (qwLogBufferLastModifiedTime != qwLogFileLastModifiedTime) /* 文件已经被修改，需要加载 */
     {
-        if (bExit)
+        qwLogBufferLastModifiedTime = qwLogFileLastModifiedTime;
+        bLogBufferResolved = false;
+        INT64 cbUpdatedLog = 0;
+        DWORD dwNewSizeHigh = 0;
+        DWORD dwNewSizeLow = GetFileSize(hErrorLogFile, &dwNewSizeHigh);
+        cbUpdatedLog = dwNewSizeLow | ((INT64)dwNewSizeHigh << 32);
+        if (cbUpdatedLog > cbErrorLogSize) /* 文件变大且时间戳非零（初始状态），则说明只是向 Error.log 追加新内容，故只需要读取新增部分 */
         {
-            break;
+            ReadFile(
+                hErrorLogFile,
+                lpErrorLogBuffer + cbErrorLogSize, /* append to buffer */
+                dwNewSizeLow - cbErrorLogSize, /* new content */
+                &dwBytesWritten,
+                nullptr
+            );
+            cbErrorLogSize += dwBytesWritten;
         }
-        UpdateErrorLogBuffer();
-        TransferGameState();
-        DispatchCommand();
-        Sleep(100);
+        else
+        {
+            SetFilePointer(
+                hErrorLogFile,
+                0,
+                0,
+                FILE_BEGIN
+            );
+            ReadFile(hErrorLogFile, lpErrorLogBuffer, dwNewSizeLow, &dwBytesWritten, nullptr);
+            cbErrorLogSize = dwBytesWritten;
+        }
+        qwLogFileDate = ResolveLogDate(lpErrorLogBuffer, cbErrorLogSize); /* 更新日志时间 */
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void CSOL24H::DispatchCommand() noexcept

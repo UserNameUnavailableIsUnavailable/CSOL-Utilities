@@ -1,5 +1,5 @@
 #include "CSOL24H.hpp"
-
+#include <regex>
 /*
 @brief 判断 `dwYear` 是否为闰年。
 @return 判断结果。
@@ -62,5 +62,68 @@ uint64_t CSOL24H::GetUNIXTimestamp(uint32_t dwYear, uint32_t dwMonth, uint32_t d
     total_days += dwDay - 1;
     ret = total_days * 86400 + dwHour * 3600 + dwMinute * 60 + dwSecond;
     ret -= fTimeZone * 3600;
+    return ret;
+}
+
+/*
+@brief 将消息中的时间解析为 UNIX 时间戳（调整为 UTC 标准时）。
+@param `message` 消息。
+@return 成功时返回时间戳，失败时返回 `0`。
+*/
+int64_t CSOL24H::ResolveMessageTimestamp(const std::string message, int32_t* lpMilliseconds) noexcept
+{
+    static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
+    std::smatch match;
+    int32_t hour = 0, minute = 0, second = 0, millisecond = 0;
+    int64_t ret;
+    if (
+        std::regex_search(message, match, time_pattern) &&
+        match.size() - 1 == 4 /* 时、分、秒、毫秒 */
+    )
+    {
+        hour = std::atoi(match[1].str().c_str());
+        minute = std::atoi(match[2].str().c_str());
+        second = std::atoi(match[3].str().c_str());
+        millisecond = std::atoi(match[4].str().c_str());
+        ret = qwLogFileDate + hour * 3600 + minute * 60 + second + time_bias;
+    }
+    if (lpMilliseconds) *lpMilliseconds = millisecond;
+    return ret;
+}
+
+/*
+@brief 解析日志日期，以时间戳形式返回。
+@param `lpBuffer` 日志存储的缓冲区。
+@param `dwLength` 日志文件长度。
+@return 解析所得日期的 00:00:00 时刻（非 UTC 标准时）的 UNIX 时间戳。
+*/
+int64_t CSOL24H::ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept
+{
+    static std::regex date_pattern("\\d{1,2}:\\d{2}:\\d{2}\\.\\d{3}.+?(\\d{2})/(\\d{2})/(\\d{4})");
+    std::time_t ret = 0llu;
+    INT32 begin = 0, end = 1;
+    while (end < cbLength)
+    {
+        if (lpBuffer[end] != '\n')
+        {
+            end++;
+            continue;
+        }
+        std::string line(lpBuffer + begin, end - begin);
+        begin = end + 1;
+        end = begin;
+        std::smatch smatch_result;
+        if (
+            std::regex_search(line, smatch_result, date_pattern) &&
+            smatch_result.size() - 1 == 3
+        )
+        {
+            auto month = std::atoi(smatch_result[1].str().c_str());
+            auto day = std::atoi(smatch_result[2].str().c_str());
+            auto year = std::atoi(smatch_result[3].str().c_str());
+            ret = GetUNIXTimestamp(year, month, day);
+            break;
+        }
+    }
     return ret;
 }

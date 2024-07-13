@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <memory>
-#include "util.hpp"
+#include "Util.hpp"
 
 std::shared_ptr<wchar_t[]> ConvertUtf8ToUtf16(const void* byte_string)
 {
