@@ -20,9 +20,10 @@ enum ENUM_CSOL_GAME_COMMAND
 /* Four types of game states */
 enum ENUM_GAME_STATE
 {
-    GS_IN_HALL,
-    GS_IN_ROOM,
-    GS_IN_MAP,
+    GS_HALL,
+    GS_LOADING,
+    GS_ROOM,
+    GS_MAP,
     GS_SHUTDOWN,
     GS_UNKNOWN
 };
@@ -34,7 +35,8 @@ namespace CSOL24H
     REG_PREDEFINED_KEY_ENUM predefinedTopDir = REG_PREDEFINED_KEY_ENUM::REG_CURRENT_USER,
     LPCWSTR lpSubDir = L"Software\\TCGame\\csol",
     LPCWSTR lpItemName = L"gamepath"
-);
+    );
     DWORD CALLBACK UpdateGameState(LPVOID lpParam);
     DWORD CALLBACK StartGameRoom(LPVOID lpParam);
+    extern UINT64 LogFileDate;
 }

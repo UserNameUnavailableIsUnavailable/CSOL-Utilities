@@ -4,7 +4,6 @@
 
 std::shared_ptr<wchar_t[]> ConvertUtf8ToUtf16(const void* byte_string)
 {
-    
     auto length = MultiByteToWideChar(
         CP_UTF8,
         0,

@@ -25,5 +25,6 @@ Test:
 Controller:
 	New-Item -Type Directory -Path $(BUILD)/$@ -Force
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
+	clang++ -g $(BUILD)/Controller.obj -o $(BUILD)/Controller.exe
 clean:
 	Remove-Item -Force -Recurse -Path $(BUILD)

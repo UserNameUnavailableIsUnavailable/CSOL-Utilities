@@ -23,7 +23,7 @@ end
 ---@param hour integer 
 ---@param minute integer
 ---@param second integer 
----@param time_zone number
+---@param time_zone number | nil 时区，默认为 `0`
 ---@return integer
 function DateTime:timestamp(year, month, day, hour, minute, second, time_zone)
 	time_zone = time_zone or 0
@@ -58,7 +58,7 @@ function DateTime:timestamp(year, month, day, hour, minute, second, time_zone)
 	return ret
 end
 
----获取本地时间戳（非 UTC + 0 世界标准时）。
+---将本机时间转换为时间戳（UTC+0，需确保时区设置正确）。
 ---@return integer # 时间戳。
 function DateTime:get_local_timestamp()
 	local year = tonumber(GetDate("%Y"))
@@ -74,9 +74,8 @@ function DateTime:get_local_timestamp()
 		hour--[[@as integer]],
 		minute--[[@as integer]],
 		second--[[@as integer]],
-		0
+		Setting.TIME_ZONE
 	)
 end
-
 
 end -- DateTime_lua

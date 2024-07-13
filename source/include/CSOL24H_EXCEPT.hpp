@@ -4,11 +4,11 @@
 
 #define ERROR_MESSAGE_LENGTH (512)
 
-class CSOL24EXCEPT : std::exception
+class CSOL24H_EXCEPT : std::exception
 {
 public:
     template<typename... ARG>
-    explicit CSOL24EXCEPT(const char* fmt, const ARG&... args)
+    explicit CSOL24H_EXCEPT(const char* fmt, const ARG&... args)
     {
         sprintf_s(
             message,
