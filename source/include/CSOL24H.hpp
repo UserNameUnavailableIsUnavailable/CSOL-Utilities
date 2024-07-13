@@ -1,10 +1,10 @@
 #pragma once
-
 #include "GameState.hpp"
 #include <Windows.h>
 #include <cstdint>
 #include <memory>
 #include <winreg.h>
+#include <string>
 #include "GameState.hpp"
 
 // enum ENUM_CSOL_GAME_COMMAND
@@ -38,7 +38,7 @@ static std::shared_ptr<wchar_t[]> QueryInstallationPath(HKEY predefinedTopDir = 
     LPCWSTR lpSubDir = L"Software\\TCGame\\csol",
     LPCWSTR lpItemName = L"gamepath"
     );
-static void Initialize() noexcept;
+static void Initialize();
 static void Destroy() noexcept;
 static uint64_t GetUNIXTimestamp(
     uint32_t dwYear = 0,
@@ -95,4 +95,7 @@ static bool bExit; /* will cause the process to exit */
 
 static GameState game_state;
 static std::shared_ptr<wchar_t[]> ErrorLogFilePath;
+// static const char* ERROR_LOG_MSG_PATTERN;
+// static const char* ERROR_LOG_TIME_PATTERN;
+// static const char* ERROR_LOG_DATE_PATTERN;
 };

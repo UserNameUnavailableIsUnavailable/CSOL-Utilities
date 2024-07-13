@@ -2,7 +2,7 @@
 #include <iostream>
 int main()
 {
-    if (!RegisterHotKey(nullptr, 0, MOD_ALT | MOD_NOREPEAT | MOD_SHIFT, '0') ||
+    if (!RegisterHotKey(nullptr, 0, MOD_ALT | MOD_NOREPEAT | MOD_SHIFT, MOD_) ||
     !RegisterHotKey(nullptr, 1, MOD_ALT | MOD_NOREPEAT | MOD_SHIFT, '1'))
     {
         std::cout << "Error " << GetLastError() << std::endl;

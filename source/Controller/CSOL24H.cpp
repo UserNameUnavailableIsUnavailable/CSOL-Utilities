@@ -3,13 +3,16 @@
 #include <cstddef>
 #include <errhandlingapi.h>
 #include <handleapi.h>
-#include <iostream>
+#include <minwindef.h>
 #include <processthreadsapi.h>
 #include <synchapi.h>
 #include <timezoneapi.h>
+#include <winnt.h>
+#include <iostream>
 #include "CSOL24H_EXCEPT.hpp"
 #include "GameState.hpp"
-#include "command.hpp"
+#include "Command.hpp"
+
 
 int64_t CSOL24H::time_bias = 0;
 bool CSOL24H::initialized = false;
@@ -17,6 +20,7 @@ bool CSOL24H::initialized = false;
 // HANDLE CSOL24H::hPlayGameEvent = NULL;
 // HANDLE CSOL24H::hConfirmRoundEvent = NULL;
 HANDLE CSOL24H::hGameWatcherEvent = NULL;
+HANDLE CSOL24H::hRunnableMutex = NULL;
 // HANDLE CSOL24H::hGiveCmdMutex = NULL;
 HANDLE CSOL24H::hGameStateWatcherThread = NULL;
 HANDLE CSOL24H::hGameProcessWatcherThread = NULL;
@@ -35,14 +39,16 @@ bool CSOL24H::bExit = false;
 GameState CSOL24H::game_state(ENUM_GAME_STATE::GS_UNKNOWN, 0);
 std::shared_ptr<wchar_t[]> CSOL24H::ErrorLogFilePath = nullptr;
 char* CSOL24H::lpErrorLogBuffer = nullptr;
+// const char* CSOL24H::ERROR_LOG_MSG_PATTERN = "(\\d{1,2}):(\\d{2}):(\\d{2}).(\\d{3}) - (.+)"; /* 匹配日志中的消息，另包含消息时间 */
+// const char* CSOL24H::ERROR_LOG_TIME_PATTERN = "(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"; /* 匹配日志中的时间 */
+// const char* CSOL24H::ERROR_LOG_DATE_PATTERN = "\\d{1,2}:\\d{2}:\\d{2}\\.\\d{3}.+?(\\d{2})/(\\d{2})/(\\d{4})"; /* 匹配日志文件的日期 */
 
-void CSOL24H::Initialize() noexcept
+void CSOL24H::Initialize()
 {
     TIME_ZONE_INFORMATION tzi;
     if (TIME_ZONE_ID_INVALID == GetTimeZoneInformation(&tzi))
     {
-        std::printf("获取操作系统时区信息失败。错误代码：%lu。", GetLastError());
-        ExitProcess(-1);
+        throw CSOL24H_EXCEPT("【错误】获取操作系统时区信息失败。错误代码：%lu。", GetLastError());
     }
     time_bias = tzi.Bias * 60;
     hCmdFile = CreateFileW(
@@ -54,8 +60,21 @@ void CSOL24H::Initialize() noexcept
         FILE_ATTRIBUTE_HIDDEN, /* hidden file */
         nullptr
     );
+    if (hCmdFile == INVALID_HANDLE_VALUE)
+    {
+        throw CSOL24H_EXCEPT("【错误】打开文件 %ls 失败。错误代码 %lu。", CMD_FILE_NAME, GetLastError());
+    }
+    hRunnableMutex = CreateMutexW(NULL, FALSE, L"Local\\hRunnableMutex");
+    if (!hRunnableMutex)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建互斥体 %ls 失败。错误代码：%lu。", L"Local\\hRunnableMutex", GetLastError());
+    }
     bExit = false;
     hGameWatcherEvent = CreateEventW(nullptr, true, false, L"Local\\hGameWatcherEvent");
+    if (!hGameWatcherEvent)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建事件对象 %ls 失败。错误代码 %lu。", L"Local\\hGameWatcherEvent", GetLastError());
+    }
     // hStartGameEvent = CreateEventW(nullptr, false, false, L"Local\\hStartGameEvent");
     // hPlayGameEvent = CreateEventW(nullptr, false, false, L"Local\\hPlayGameEvent");
     // hConfirmRoundEvent = CreateEventW(nullptr, false, false, L"Local\\hConfirmRoundEvent");
@@ -78,6 +97,14 @@ void CSOL24H::Initialize() noexcept
         0, /* create running */
         nullptr
     );
+    if (!hGameStateWatcherThread)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建用于监测游戏状态的线程时失败。错误代码：%lu。", GetLastError());
+    }
+    if (WAIT_OBJECT_0 == WaitForSingleObject(hGameStateWatcherThread, 0))
+    {
+        throw CSOL24H_EXCEPT("【错误】线程 hGameStateWatcherThread 异常退出。");
+    }
     hHotKeyEventHandlerThread = CreateThread(
         nullptr,
         4096,
@@ -86,11 +113,13 @@ void CSOL24H::Initialize() noexcept
         0,
         nullptr
     );
+    if (!hHotKeyEventHandlerThread)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建用于处理热键事件的线程时失败。错误代码：%lu。", GetLastError());
+    }
     if (WAIT_OBJECT_0 == WaitForSingleObject(hHotKeyEventHandlerThread, 100))
     {
-        std::printf("【错误】绑定热键失败，无法继续运行。错误代码：%lu。按任意键关闭当前窗口。", GetLastError());
-        std::getchar();
-        ExitProcess(0);
+        throw CSOL24H_EXCEPT("【错误】绑定热键失败。错误代码：%lu。", GetLastError());
     }
     // hStartGameThread = CreateThread(
     //     nullptr,
@@ -119,19 +148,11 @@ void CSOL24H::Initialize() noexcept
     // TODO: error handling
 
     /* Get the location of Error.log */
-    try
-    {
-        std::shared_ptr<wchar_t[]> gameInstallationPath = CSOL24H::QueryInstallationPath(); /* Query CSOL installation path */
-        size_t error_log_path_length = 1 + wcslen(gameInstallationPath.get()) + wcslen(L"\\bin\\Error.log"); /* length of error.log path */
-        ErrorLogFilePath = std::shared_ptr<wchar_t[]>(new wchar_t[error_log_path_length]);
-        wcscpy_s(ErrorLogFilePath.get(), error_log_path_length, gameInstallationPath.get());
-        wcscat_s(ErrorLogFilePath.get(), error_log_path_length, L"\\bin\\Error.log");
-    }
-    catch (CSOL24H_EXCEPT e)
-    {
-        std::puts(e.what());
-        ExitProcess(-1);
-    }
+    std::shared_ptr<wchar_t[]> gameInstallationPath = CSOL24H::QueryInstallationPath(); /* 查询 CSOL 安装路径 */
+    size_t error_log_path_length = 1 + wcslen(gameInstallationPath.get()) + wcslen(L"\\bin\\Error.log"); /* length of error.log path */
+    ErrorLogFilePath = std::shared_ptr<wchar_t[]>(new wchar_t[error_log_path_length]);
+    wcscpy_s(ErrorLogFilePath.get(), error_log_path_length, gameInstallationPath.get());
+    wcscat_s(ErrorLogFilePath.get(), error_log_path_length, L"\\bin\\Error.log");
     hErrorLogFile = CreateFileW(
         ErrorLogFilePath.get(),
         GENERIC_READ,
@@ -143,9 +164,15 @@ void CSOL24H::Initialize() noexcept
     );
     if (hErrorLogFile == INVALID_HANDLE_VALUE)
     {
-        std::printf("打开文件失败，错误代码：%lu。文件名：%ls。\r\n", GetLastError(), ErrorLogFilePath.get());
+        throw CSOL24H_EXCEPT("打开文件 %ls 失败，错误代码：%lu。", ErrorLogFilePath.get(), GetLastError() );
     }
     initialized = true;
+    HANDLE hThreads[] = {
+        hHotKeyEventHandlerThread,
+        hGameStateWatcherThread
+    };
+    std::cout << "【消息】初始化完成" << std::endl;
+    WaitForMultipleObjects(sizeof(hThreads) / sizeof(HANDLE), hThreads, TRUE, INFINITE);
 }
 
 /*
@@ -180,7 +207,7 @@ std::shared_ptr<wchar_t[]> CSOL24H::QueryInstallationPath(HKEY hPredefinedTopDir
     ); // 读取字符串
     if (ret != ERROR_SUCCESS)
     {
-        throw CSOL24H_EXCEPT(u8"获取注册表信息失败！错误代码：%ld。", ret);
+        throw CSOL24H_EXCEPT(u8"获取注册表信息失败。错误代码：%ld。", ret);
     }
     return game_installation_path;
 }
@@ -194,6 +221,11 @@ void CSOL24H::Destroy() noexcept
     // SetEvent(hPlayGameEvent);
     // SetEvent(hConfirmRoundEvent);
     SetEvent(hGameWatcherEvent);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hGameStateWatcherThread, 2000))
+    {
+        TerminateThread(hGameStateWatcherThread, -1);
+    }
+    PostThreadMessage(GetThreadId(hHotKeyEventHandlerThread), WM_QUIT, 0, 0);
     if (WAIT_OBJECT_0 != WaitForSingleObject(hGameStateWatcherThread, 2000))
     {
         TerminateThread(hGameStateWatcherThread, -1);
@@ -215,6 +247,7 @@ void CSOL24H::Destroy() noexcept
     // CloseHandle(hConfirmRoundEvent);
     CloseHandle(hGameWatcherEvent);
     CloseHandle(hGameStateWatcherThread);
+    CloseHandle(hHotKeyEventHandlerThread);
     // CloseHandle(hStartGameThread);
     // CloseHandle(hPlayGameThread);
     // CloseHandle(hConfirmGameThread);

@@ -3,6 +3,7 @@
 #include <errhandlingapi.h>
 #include <imm.h>
 #include <iostream>
+#include <synchapi.h>
 #include "CSOL24H.hpp"
 
 DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
@@ -22,20 +23,24 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
         {
             if (msg.wParam == 0)
             {
-                std::cout << "HotKey 0" << std::endl;
+                std::cout << "【消息】切换为 0 模式" << std::endl;
+                ResetEvent(hGameWatcherEvent); /* GameWatcher 线程将被阻塞 */
             }
             else if (msg.wParam == 1)
             {
-                std::cout << "HotKey 1" << std::endl;
+                std::cout << "【消息】切换为 1 模式" << std::endl;
+                SetEvent(hGameWatcherEvent);
             }
             else if (msg.wParam == 2)
             {
-                std::cout << "HotKey 2" << std::endl;
+                std::cout << "【消息】切换为 2 模式" << std::endl;
+                SetEvent(hGameWatcherEvent);
             }
         }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    std::cout << "【消息】注销热键。" << std::endl;
     UnregisterHotKey(nullptr, 0);
     UnregisterHotKey(nullptr, 1);
     UnregisterHotKey(nullptr, 2);
