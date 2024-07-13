@@ -12,8 +12,10 @@ HANDLE g_hStartGameThread;
 HANDLE g_hPlayGameThread;
 HANDLE g_hConfirmGameThread;
 
+HANDLE g_hExecLogFile;
+
 HANDLE g_hCmdFile;
-HANDLE g_hLogFile;
+HANDLE g_hErrorLogFile;
 UINT64 g_qwLogFileSize;
 UINT64 g_qwLogFileLastModifyTime;
 ENUM_GAME_STATE g_GameState;

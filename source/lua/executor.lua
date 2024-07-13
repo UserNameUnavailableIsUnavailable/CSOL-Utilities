@@ -4,8 +4,10 @@ Executor_lua = true
 Executor = {}
 
 function Executor:start_game_room()
-    Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.NORMAL)
-    Mouse:click_on(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+    -- Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.NORMAL)
+    -- Mouse:click_on(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+    Console:println("Start Game Room")
+    Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
 end
 
 ---选定角色。
@@ -51,8 +53,7 @@ function Executor:combine_parts()
 end
 
 ---购买商店物品。
-function Executor:purchase_item()
-    local buy_button_x, buy_button_y = Mouse:locate_cursor() -- 兑换按钮位置
+function Executor:purchase_item(buy_button_x, buy_button_y)
     Mouse:click_on(buy_button_x, buy_button_y, 20)
     Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 20) -- 弹出界面选项
     Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 20) -- 弹出界面兑换按钮

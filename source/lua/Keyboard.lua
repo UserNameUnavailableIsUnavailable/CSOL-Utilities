@@ -47,12 +47,12 @@ Keyboard = {
 ---@type { [string]: boolean }
 Keyboard.unreleased = {}
 
----@param key string 按键名称，如 `Keyboard.F1`。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---@param key string 按键名称，如 `Keyboard.F1`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 按下按键后的延迟时间。可以直接使用预定义于Delay表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 ---按下按键。
 function Keyboard:press(key, delay)
-    if (Runtime.pause_flag) -- 当下达退出指令时，不进行任何操作。
+    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
     then
         return
     end
@@ -62,11 +62,11 @@ function Keyboard:press(key, delay)
 end
 
 ---弹起按键。
----@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release(key, delay)
-    if (Runtime.pause_flag)
+    if (Runtime:is_paused())
     then
         return
     end
@@ -75,12 +75,12 @@ function Keyboard:release(key, delay)
     Runtime:sleep(delay)
 end
 
----按下，而后弹起按键（视为一次点击）。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---按下，而后弹起按键（视为一次点击）。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param key string 按键名称，如 `Keyboard.ESCAPE`
 ---@param delay integer | nil 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click(key, delay)
-    if (Runtime.pause_flag)
+    if (Runtime:is_paused())
     then
         return
     end
@@ -88,11 +88,11 @@ function Keyboard:click(key, delay)
     Runtime:sleep(delay)
 end
 
----释放所有按键。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---释放所有按键。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release_all(delay)
-    if (Runtime.pause_flag) -- 当下达退出指令时，不进行任何操作
+    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
     then
         return
     end
@@ -103,13 +103,13 @@ function Keyboard:release_all(delay)
     end
 end
 
----点击某个按键若干次。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
----@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---点击某个按键若干次。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param times integer | nil 重复次数。
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click_several_times(key, times, delay)
-    if (Runtime.pause_flag)
+    if (Runtime:is_paused())
     then
         return
     end
@@ -120,7 +120,7 @@ function Keyboard:click_several_times(key, times, delay)
     end
 end
 
----判断修饰键（如 `CTRL`，`ALT` 等）是否按下。当 `Runtime.exit` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---判断修饰键（如 `CTRL`，`ALT` 等）是否按下。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param key string 按键名称，如 `Keyboard.LALT`。 
 ---@return boolean # 指定修饰键是否按下
 function Keyboard:is_modifier_pressed(key) return IsModifierPressed(key) end

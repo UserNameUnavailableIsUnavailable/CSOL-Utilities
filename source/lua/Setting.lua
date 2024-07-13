@@ -3,6 +3,8 @@ if (not Setting_lua)
 then
 Setting_lua = true
 Setting = {
+    -- 操作系统时区，东八区（UTC+8），此项必须设置正确，否则无法正常运行  
+    TIME_ZONE = 8,
     -- “开始游戏”按钮
     GAMESTART_X = 47025,
     GAMESTART_Y = 42030,

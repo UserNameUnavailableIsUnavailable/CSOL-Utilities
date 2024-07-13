@@ -1,1 +1,2 @@
-CmdTime = 0; Cmd = CMD_PAUSE;
+Cmd = Command.CMD_NOP
+CmdTime = 1720882424

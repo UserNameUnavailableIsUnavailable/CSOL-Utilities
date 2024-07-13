@@ -74,14 +74,14 @@ int main()
     std::shared_ptr<wchar_t[]> error_log_path;
     try
     {
-        path = query_installation_path();
+        path = CSOL24H::QueryInstallationPath();
         std::cout << ConvertUtf16ToUtf8(path.get()) << std::endl;
         qwLength = wcslen(path.get()) + wcslen(L"\\bin\\Error.log") + 1;
         error_log_path = std::shared_ptr<wchar_t[]>(new wchar_t[qwLength]);
         wcscpy_s(error_log_path.get(), qwLength, path.get());
         wcscat_s(error_log_path.get(), qwLength, L"\\bin\\Error.log");
     }
-    catch (CSOL24EXCEPT e)
+    catch (CSOL24HEXCEPT e)
     {
         NotifyError(e.what());
         return -1;
@@ -100,20 +100,14 @@ int main()
         );
         if (hFile == INVALID_HANDLE_VALUE)
         {
-            throw CSOL24EXCEPT("打开文件 .../Error.log 失败！错误代码 %lu。", GetLastError());
+            throw CSOL24HEXCEPT("打开文件 .../Error.log 失败！错误代码 %lu。", GetLastError());
         }
     }
-    catch (CSOL24EXCEPT e)
+    catch (CSOL24HEXCEPT e)
     {
         NotifyError(e.what());
     }
-    UINT64 last_write_time;
-    GetFileTime(hFile, nullptr, nullptr, (LPFILETIME)&last_write_time);
-    LPBYTE lpBuffer = new BYTE[1024 * 1024 * 1024]; /* 1 GiB to accomodate the file, impossible to get that large in practice */
-    ULONG dwBytesWritten = 0;
-    static UINT32 dwLogFileSize = 0;
-    UINT64 g_qwLogFileLastModifyTime = 0;
-    update_game_state(hFile);
+    CSOL24H::UpdateGameState(hFile);
     CloseHandle(hFile);
     // DWORD dwLow;
     // ULONGLONG qwSize;

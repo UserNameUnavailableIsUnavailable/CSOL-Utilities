@@ -2,6 +2,8 @@ if (not Runtime_lua)
 then
 Runtime_lua = true
 Runtime = {}
+---手动接管标志。若置为 `true` 则 `pause_flag` 被屏蔽，且无法由程序自身恢复，必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。
+Runtime.manual_flag = false
 ---暂停标志。若置为 `true`，则所有键鼠操作都将被跳过。
 Runtime.pause_flag = false
 ---中断标志位，用于开/关中断，避免中断嵌套。
@@ -57,13 +59,14 @@ function Runtime:interrupt_handler()
     -- 现场切换，保护中断现场
     self:save_context()
     -- 是否暂停执行
-    if (self:is_paused())
+    if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
     then
-        Runtime.pause_flag = true -- 暂停执行
+        -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
+        Runtime.manual_flag = true -- 暂停执行，中断现场将不会恢复
         Console:infomation("paused.")
-    elseif (self:is_restored())
+    elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
     then
-        Runtime.pause_flag = false -- 恢复执行
+        Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
         Console:infomation("restored.")
     end
     -- 中断处理完毕
@@ -115,12 +118,20 @@ function Runtime:restore_context()
     end
 end
 
+---判断是否处于停止状态，停止状态下跳过所有键鼠操作。
 function Runtime:is_paused()
-    return Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL)
+    Runtime:sleep(0)
+    return Runtime.manual_flag or Runtime.pause_flag
 end
 
-function Runtime:is_restored()
-    return Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT)
+---将 `pause_flag` 置为 `true`。
+function Runtime:set_pause_flag()
+    Runtime.pause_flag = true
+end
+
+---将 `pause_flag` 置为 `false`。
+function Runtime:reset_pause_flag()
+    Runtime.pause_flag = false
 end
 
 ---用于测试 `Runtime`，请勿在程序中使用。

@@ -1,6 +1,6 @@
-#include "csol24except.hpp"
+#include "CSOL24H_EXCEPT.hpp"
 
-const char* CSOL24EXCEPT::what() noexcept
+const char* CSOL24H_EXCEPT::what() noexcept
 {
     return message;
 }

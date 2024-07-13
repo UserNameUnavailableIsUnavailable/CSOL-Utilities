@@ -21,4 +21,5 @@ Load("Runtime.lua")
 Load("Keyboard.lua")
 Load("Mouse.lua")
 Load("Executor.lua")
+Load("Interpreter.lua")
 end -- Global_lua

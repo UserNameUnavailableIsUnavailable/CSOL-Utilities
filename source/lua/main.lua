@@ -9,4 +9,4 @@ function Load(file_name)
     end
 end
 Load("Global.lua")
-Executor:start_game_room()
+Interpreter()
