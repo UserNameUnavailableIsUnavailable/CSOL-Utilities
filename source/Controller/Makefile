@@ -1,5 +1,5 @@
 VPATH := $(BUILD)/$(MOD)
-SUBMODULES := main Command CSOL24H_EXCEPT CSOL24H DateTime GameStateWatcher HotKey Util
+SUBMODULES := main Command CSOL24H_EXCEPT CSOL24H DateTime HotKey Util GameState GameProcess
 OBJECTS := $(addsuffix .obj, $(SUBMODULES))
 .PHONY: all
 all: $(OBJECTS)

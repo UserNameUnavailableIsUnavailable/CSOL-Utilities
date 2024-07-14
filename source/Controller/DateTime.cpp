@@ -85,7 +85,7 @@ int64_t CSOL24H::ResolveMessageTimestamp(const std::string message, int32_t* lpM
         minute = std::atoi(match[2].str().c_str());
         second = std::atoi(match[3].str().c_str());
         millisecond = std::atoi(match[4].str().c_str());
-        ret = qwLogFileDate + hour * 3600 + minute * 60 + second + time_bias;
+        ret = qwGameErrorLogFileDateTime + hour * 3600 + minute * 60 + second + time_bias;
     }
     if (lpMilliseconds) *lpMilliseconds = millisecond;
     return ret;
