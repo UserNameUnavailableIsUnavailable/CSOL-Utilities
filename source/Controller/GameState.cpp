@@ -22,74 +22,24 @@
 #include "CSOL24H_EXCEPT.hpp"
 #include "Command.hpp"
 
-/*
-@brief 按“开始游戏”按钮
-*/
-// DWORD CALLBACK CSOL24H::StartGameRoom(LPVOID lpParam) noexcept
-// {
-//     while (WaitForSingleObject(hStartGameEvent, INFINITE))
-//     {
-//         if (bExit)
-//         {
-//             break;
-//         }
-//         CSOL24H::GiveCommand(LUA_CMD_START_GAME_ROOM);
-//     }
-//     return 0;
-// }
-/*
-@brief 下达游玩命令。
-*/
-// DWORD CALLBACK CSOL24H::PlayGame(LPVOID lpParam) noexcept
-// {
-//     while (WaitForSingleObject(hPlayGameEvent, INFINITE))
-//     {
-//         if (bExit)
-//         {
-//             break;
-//         }
-//         if (WAIT_OBJECT_0 == WaitForSingleObject(hGiveCmdMutex, INFINITE))
-//             CSOL24H::GiveCommand(LUA_CMD_PLAY_GAME);
-//     }
-//     return 0;
-// }
-/*
-@brief 确认游戏结算页面。
-*/
-// DWORD CALLBACK CSOL24H::ConfirmGame(LPVOID lpParam) noexcept
-// {
-//     while (WaitForSingleObject(hConfirmRoundEvent, INFINITE))
-//     {
-//         if (bExit)
-//         {
-//             break;
-//         }
-//         CSOL24H::GiveCommand(LUA_CMD_TRY_CONFIRM_RESULT);
-//     }
-//     return 0;
-// }
-DWORD CALLBACK CSOL24H::WatchGameState(LPVOID lpParam) noexcept
+DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
 {
-    HANDLE objects_to_wait[] = {
-        hGameWatcherEvent,
-        // hRunnableMutex
-    };
     while (
         WAIT_OBJECT_0 == WaitForSingleObject(
-            hGameWatcherEvent,
+            hEnableWatchGameStateEvent,
             INFINITE
         )) /* 获取到所有可等待对象才开始运行 */
     {
-        if (bExit)
+        if (bDestroy)
         {
             break;
         }
         UpdateErrorLogBuffer();
         TransferGameState();
         DispatchCommand();
-        // ReleaseMutex(hRunnableMutex); /* 释放持有的 mutex */
         Sleep(100);
     }
+    std::cout << "【消息】线程 hWatchInGameStateThread 退出。" << std::endl;
     return 0;
 }
 
@@ -98,16 +48,16 @@ DWORD CALLBACK CSOL24H::WatchGameState(LPVOID lpParam) noexcept
 */
 void CSOL24H::TransferGameState() noexcept
 {
-    if (cbErrorLogSize <= 0) return;
-    int64_t begin = cbErrorLogSize;
-    int64_t end = cbErrorLogSize;
+    if (cbGameErrorLogSize <= 0) return;
+    int64_t begin = cbGameErrorLogSize;
+    int64_t end = cbGameErrorLogSize;
     int64_t current_time;
     int64_t log_timestamp;
     std::string line;
     const char* msg = nullptr;
     GameState gs;
     /* 例行检查 */
-    if (bLogBufferResolved)
+    if (bGameErrorLogBufferResolved)
     {
         current_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
         if (game_state.get_state() == ENUM_GAME_STATE::GS_LOADING && std::abs(current_time - game_state.get_timestamp()) > 30) /* 加载时间达到 30 秒 */
@@ -131,16 +81,16 @@ void CSOL24H::TransferGameState() noexcept
     {
         if (begin == 0 && begin != end) /* [begin, end) 可划分为子串 */
         {
-            line = std::string(lpErrorLogBuffer + begin, end - begin);
+            line = std::string(lpGameErrorLogBuffer + begin, end - begin);
             begin--; /* begin 减小为负数后退出 */
         }
-        else if (lpErrorLogBuffer[begin - 1] == '\n' && begin != end) /* [begin, end) 可划分为子串 */
+        else if (lpGameErrorLogBuffer[begin - 1] == '\n' && begin != end) /* [begin, end) 可划分为子串 */
         {
-            line = std::string(lpErrorLogBuffer + begin, end - begin);
+            line = std::string(lpGameErrorLogBuffer + begin, end - begin);
             begin -= 2; /* 越过 \r\n */
             end = begin;
         }
-        else if (lpErrorLogBuffer[begin - 1] == '\n' && begin == end) /* [begin, end) 长度为 0 */
+        else if (lpGameErrorLogBuffer[begin - 1] == '\n' && begin == end) /* [begin, end) 长度为 0 */
         {
             begin -= 2;
             end = begin;
@@ -184,6 +134,11 @@ void CSOL24H::TransferGameState() noexcept
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "回到游戏房间";
         }
+        else if (line.find("QuitLog: game shutdown") != std::string::npos)
+        {
+            gs.update(ENUM_GAME_STATE::GS_SHUTDOWN, log_timestamp);
+            msg = "游戏退出";
+        }
         else if (line.find("Game Server Login") != std::string::npos)
         {
             gs.update(ENUM_GAME_STATE::GS_LOGIN, log_timestamp);
@@ -202,7 +157,7 @@ void CSOL24H::TransferGameState() noexcept
         {
             std::printf("【消息】%s。游戏日志时间戳：%lld，当前时间戳：%lld。\r\n", msg, log_timestamp, current_time);
         }
-        bLogBufferResolved = true;
+        bGameErrorLogBufferResolved = true;
         return;
     }
 }
@@ -216,38 +171,38 @@ bool CSOL24H::UpdateErrorLogBuffer() noexcept
 {
     DWORD dwBytesWritten;
     uint64_t qwLogFileLastModifiedTime = 0;
-    GetFileTime(hErrorLogFile, nullptr, nullptr, (LPFILETIME)&qwLogFileLastModifiedTime);
+    GetFileTime(hGameErrorLogFile, nullptr, nullptr, (LPFILETIME)&qwLogFileLastModifiedTime);
     if (qwLogBufferLastModifiedTime != qwLogFileLastModifiedTime) /* 文件已经被修改，需要加载 */
     {
         qwLogBufferLastModifiedTime = qwLogFileLastModifiedTime;
-        bLogBufferResolved = false;
+        bGameErrorLogBufferResolved = false;
         INT64 cbUpdatedLog = 0;
         DWORD dwNewSizeHigh = 0;
-        DWORD dwNewSizeLow = GetFileSize(hErrorLogFile, &dwNewSizeHigh);
+        DWORD dwNewSizeLow = GetFileSize(hGameErrorLogFile, &dwNewSizeHigh);
         cbUpdatedLog = dwNewSizeLow | ((INT64)dwNewSizeHigh << 32);
-        if (cbUpdatedLog > cbErrorLogSize) /* 文件变大且时间戳非零（初始状态），则说明只是向 Error.log 追加新内容，故只需要读取新增部分 */
+        if (cbUpdatedLog > cbGameErrorLogSize) /* 文件变大且时间戳非零（初始状态），则说明只是向 Error.log 追加新内容，故只需要读取新增部分 */
         {
             ReadFile(
-                hErrorLogFile,
-                lpErrorLogBuffer + cbErrorLogSize, /* append to buffer */
-                dwNewSizeLow - cbErrorLogSize, /* new content */
+                hGameErrorLogFile,
+                lpGameErrorLogBuffer + cbGameErrorLogSize, /* append to buffer */
+                dwNewSizeLow - cbGameErrorLogSize, /* new content */
                 &dwBytesWritten,
                 nullptr
             );
-            cbErrorLogSize += dwBytesWritten;
+            cbGameErrorLogSize += dwBytesWritten;
         }
         else
         {
             SetFilePointer(
-                hErrorLogFile,
+                hGameErrorLogFile,
                 0,
                 0,
                 FILE_BEGIN
             );
-            ReadFile(hErrorLogFile, lpErrorLogBuffer, dwNewSizeLow, &dwBytesWritten, nullptr);
-            cbErrorLogSize = dwBytesWritten;
+            ReadFile(hGameErrorLogFile, lpGameErrorLogBuffer, dwNewSizeLow, &dwBytesWritten, nullptr);
+            cbGameErrorLogSize = dwBytesWritten;
         }
-        qwLogFileDate = ResolveLogDate(lpErrorLogBuffer, cbErrorLogSize); /* 更新日志时间 */
+        qwGameErrorLogFileDateTime = ResolveLogDate(lpGameErrorLogBuffer, cbGameErrorLogSize); /* 更新日志时间 */
         return true;
     }
     return false;
@@ -289,14 +244,3 @@ void CSOL24H::DispatchCommand() noexcept
     }
     GiveCommand(cmd);
 }
-
-void CSOL24H::StartWatch() noexcept
-{
-    SetEvent(hGameWatcherEvent);
-}
-
-void CSOL24H::StopWatch() noexcept
-{
-    ResetEvent(hGameWatcherEvent);
-}
-

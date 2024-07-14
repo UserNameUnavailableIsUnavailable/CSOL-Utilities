@@ -5,11 +5,8 @@
 
 void CSOL24H::GiveCommand(const char* cmd) noexcept
 {
-    /*
-    Writes command to lua script, this will cause a click on START GAME button.
-    */
     SetFilePointer(
-        hCmdFile,
+        hLUACommandFile,
         0,
         0,
         FILE_BEGIN
@@ -24,11 +21,11 @@ void CSOL24H::GiveCommand(const char* cmd) noexcept
         static_cast<unsigned long long>(t)
     );
     WriteFile(
-        hCmdFile,
+        hLUACommandFile,
         buffer, /* command to start game */
         length,
         nullptr,
         nullptr
     );
-    SetEndOfFile(hCmdFile);
+    SetEndOfFile(hLUACommandFile);
 }

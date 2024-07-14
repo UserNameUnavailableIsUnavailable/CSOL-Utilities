@@ -44,6 +44,7 @@ int main()
     try
     {
         CSOL24H::Initialize();
+        CSOL24H::Run();
     }
     catch (CSOL24H_EXCEPT e)
     {
