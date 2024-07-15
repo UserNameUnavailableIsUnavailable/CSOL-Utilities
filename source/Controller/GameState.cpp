@@ -23,6 +23,36 @@
 #include "Command.hpp"
 #include "Console.hpp"
 
+static void AdjustWindowRectToMiddleOfScreen(RECT& rect) noexcept
+{
+    RECT rcScreen = {
+        .left = 0,
+        .top = 0
+    };
+    rcScreen.right = GetSystemMetrics(SM_CXSCREEN);
+    rcScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+    LONG lDeltaX = (rcScreen.right - (rect.left + rect.right)) / 2;
+    LONG lDeltaY = (rcScreen.bottom - (rect.top + rect.bottom)) / 2;
+    rect.left += lDeltaX;
+    rect.right += lDeltaX;
+    rect.top += lDeltaY;
+    rect.bottom += lDeltaY;
+}
+static void MakeWindowBorderless(HWND hWnd) noexcept
+{
+    WINDOWINFO windowInfo;
+    if (!IsWindow(hWnd) || !GetWindowInfo(hWnd, &windowInfo))
+    {
+        return;
+    }
+    DWORD dwStyle = windowInfo.dwStyle & ~WS_CAPTION;
+    RECT& rcClient = windowInfo.rcClient;
+    AdjustWindowRectToMiddleOfScreen(rcClient);
+    ShowWindow(hWnd, SW_SHOW);
+    SetWindowLongPtrW(hWnd, GWL_STYLE, dwStyle);
+    UpdateWindow(hWnd);
+    MoveWindow(hWnd, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
+}
 DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
 {
     while (
@@ -68,6 +98,15 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (game_state.get_state() == ENUM_GAME_STATE::GS_LOGIN && std::abs(current_time - game_state.get_timestamp()) > 15) /* 登陆后等待 15 秒 */
         {
+            HWND hWnd = FindWindowW(NULL, L"Counter-Strike Online");
+            if (hWnd)
+            {
+                SetForegroundWindow(hWnd);
+                SetFocus(hWnd);
+                SetCapture(hWnd);
+                MakeWindowBorderless(hWnd);
+                ConsoleLog("【消息】去除窗口标题栏。\r\n");
+            }
             gs.update(ENUM_GAME_STATE::GS_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
             msg = "登陆后等待时间已过，认为游戏客户端已经完全加载";
         }
