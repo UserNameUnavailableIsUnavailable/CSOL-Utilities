@@ -3,31 +3,34 @@ then
 Console_lua = true
 Console = {}
 ---在控制台上打印字符串，不换行
----@param msg any
+---@param fmt string
+---@param ... any
 ---@return nil
-function Console:print(msg)
-    OutputLogMessage(msg)
+function Console:print(fmt, ...)
+    OutputLogMessage(fmt, ...)
 end
 
 ---在控制台上打印字符串，并换行
----@param msg any
+---@param fmt string
+---@param ... any
 ---@return nil
-function Console:println(msg)
-    OutputLogMessage(msg .. '\n')
+function Console:println(fmt, ...)
+    OutputLogMessage(fmt .. '\n', ...)
 end
 
 ---在控制台上按照固定格式打印信息
----@param msg any
+---@param fmt string 
+---@param ... any
 ---@return nil
-function Console:infomation(msg)
-    self:println("[INFO] " .. msg)
+function Console:infomation(fmt, ...)
+    self:println("【信息】" .. fmt, ...)
 end
 
 ---在控制台上按照固定格式打印错误信息
----@param msg any
+---@param fmt string
 ---@return nil
-function Console:error(msg)
-    self:println("[ERR] " .. msg)
+function Console:error(fmt, ...)
+    self:println("【错误】" .. fmt, ...)
 end
 
 ---清空控制台

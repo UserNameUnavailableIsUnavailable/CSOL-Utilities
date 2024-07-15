@@ -17,11 +17,12 @@
 #include "CSOL24H_EXCEPT.hpp"
 #include "GameState.hpp"
 #include "Command.hpp"
+#include "Console.hpp"
 
 /* 程序运行标志 */
 bool CSOL24H::bInitialize = false;
 bool CSOL24H::bDestroy = false;
-
+bool CSOL24H::bAllowExtendedMode = false;
 /* 程序运行所需时间信息 */
 int64_t CSOL24H::time_bias = 0;
 
@@ -31,7 +32,6 @@ HANDLE CSOL24H::hEnableWatchGameProcessEvent = NULL;
 
 /* 互斥量句柄 */
 HANDLE CSOL24H::hRunnableMutex = NULL;
-
 /* 文件句柄 */
 HANDLE CSOL24H::hGameErrorLogFile = INVALID_HANDLE_VALUE;
 HANDLE CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
@@ -148,20 +148,20 @@ void CSOL24H::InitializeWatchGameProcessThread()
     {
         hGameProcess = NULL; /* 游戏进程句柄设置为 NULL 将自动打开已存在的游戏进程句柄 */
     }
-    HWND hTCGWnd = FindWindowW(NULL, L"TCGame");
+    HWND hTCGWnd = FindWindowW(NULL, L"TCGames");
     if (hTCGWnd)
     {
-        std::cout << "【消息】检测到 TCGame 正在运行，为防止登录信息失效，将结束 TCGame。" << std::endl;
+        ConsoleLog("【消息】检测到 TCGame 正在运行，为防止登录信息失效，将结束 TCGame。\r\n");
         DWORD dwProcessId;
         GetWindowThreadProcessId(hTCGWnd, &dwProcessId);
         HANDLE hTCGProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwProcessId);
         if (!hTCGProcess) /* 无法打开句柄 */
         {
-            std::cout << "【警告】无法获取 TCGame 进程信息。" << std::endl;
+            ConsoleLog("【警告】无法获取 TCGame 进程信息。\r\n");
         }
         else if (!TryStopProcessSafely(hTCGProcess)) /* 句柄打开，但无法结束进程 */
         {
-            std::cout << "【警告】尝试结束 TCGame 失败。TCGame 未结束会导致一段时间后登录信息失效。" << std::endl;
+            ConsoleLog("【警告】尝试结束 TCGame 失败。TCGame 未结束会导致一段时间后登录信息失效。\r\n");
             CloseHandle(hTCGProcess);
         }
         else /* 打开句柄，且结束进程 */
@@ -206,7 +206,7 @@ void CSOL24H::Initialize()
     InitializeWatchGameProcessThread();
     InitializeHandleHotKeyMessageThread();
     bInitialize = true;
-    std::cout << "【消息】初始化完成" << std::endl;
+    ConsoleLog("【消息】初始化完成\r\n");
 }
 
 void CSOL24H::Run()
@@ -238,7 +238,7 @@ void CSOL24H::Run()
             TRUE,
             INFINITE
         );
-        std::cout << "【消息】进程退出。" << std::endl;
+        ConsoleLog("【消息】各线程退出。\r\n");
     }
 }
 
@@ -299,7 +299,7 @@ std::shared_ptr<wchar_t[]> CSOL24H::QueryRegistryStringItem(HKEY hPredefinedTopD
     ); // 读取字符串
     if (ret != ERROR_SUCCESS)
     {
-        throw CSOL24H_EXCEPT("【消息】获取注册表信息失败。注册表项路径：%s\\%s\\%s。错误代码：%ld。", lpszPredefinedTopDirName, lpSubDir, lpItemName, ret);
+        throw CSOL24H_EXCEPT("【错误】获取注册表信息失败。注册表项路径：%s\\%s\\%s。错误代码：%ld。", lpszPredefinedTopDirName, lpSubDir, lpItemName, ret);
     }
     return lpwszResult;
 }

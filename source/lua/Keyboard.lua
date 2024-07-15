@@ -1,11 +1,6 @@
 if (not Keyboard_lua)
 then
-
 Keyboard_lua = true
-
-Load("Delay.lua")
-Load("Runtime.lua")
-Load("Context.lua")
 
 ---@class Keyboard
 ---@enum
@@ -22,6 +17,7 @@ Keyboard = {
     LWIN = "lgui", RWIN = "rgui",
     LALT = "lalt", RALT = "ralt",
     LCTRL = "lctrl", RCTRL = "rctrl",
+    CTRL = "ctrl", SHIFT = "shift", ALT = "alt", -- 注意：这三个不区分左右的修饰键只能用于 `is_modifier_pressed` 中
     SPACE = "spacebar",
     APPS = "appkey",
     INSERT = "insert", HOME = "home", PAGEUP = "pageup",

@@ -10,6 +10,7 @@
 #include <winreg.h>
 #include "CSOL24H.hpp"
 #include "Command.hpp"
+#include "Console.hpp"
 
 DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
 {
@@ -22,7 +23,7 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     bSuccess = bSuccess && RegisterHotKey(NULL, 5, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, '5');
     if (!bSuccess)
     {
-        std::cout << "【错误】线程 hHandleHotKeyMessageThread 注册热键时失败。" << std::endl;
+        ConsoleLog("【错误】线程 hHandleHotKeyMessageThread 注册热键时失败。\r\n");
         return 0;
     }
     MSG msg;
@@ -30,44 +31,48 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     {
         if (msg.message == WM_HOTKEY && msg.wParam >= 0 && msg.wParam <= 5)
         {
-            if (WAIT_OBJECT_0 != WaitForSingleObject(hRunnableMutex, INFINITE)) /* 等待正运行的线程释放互斥体后才继续运行热键处理线程 */
-            {
-                break; /* 出现异常，线程只能退出 */
-            }
-
             if (msg.wParam == 0)
             {
                 ResetEvent(hEnableWatchGameStateEvent);
                 ResetEvent(hEnableWatchGameProcessEvent);
-                std::cout << "【消息】切换为 0 模式" << std::endl;
+                ConsoleLog("【消息】切换为 0 模式\r\n");
                 GiveCommand(LUA_CMD_NOP); /* 写入空命令，LUA 脚本暂停运行 */
-                ReleaseMutex(hRunnableMutex); /* 释放互斥体 */
             }
             else if (msg.wParam == 1)
             {
-                // SetEvent(hEnableWatchGameStateEvent);
+                CSOL24H::DisableExtendedMode();
+                SetEvent(hEnableWatchGameStateEvent);
                 SetEvent(hEnableWatchGameProcessEvent);
-                std::cout << "【消息】切换为 1 模式" << std::endl;
-                ReleaseMutex(hRunnableMutex);
+                ConsoleLog("【消息】切换为 1 模式。\r\n");
             }
             else if (msg.wParam == 2)
             {
+                CSOL24H::EnableExtendedMode();
                 SetEvent(hEnableWatchGameStateEvent);
-                std::cout << "【消息】切换为 2 模式" << std::endl;
+                SetEvent(hEnableWatchGameProcessEvent);
+                ConsoleLog("【消息】切换为 2 模式。\r\n");
             }
             else if (msg.wParam == 3) /* 合成配件 */
             {
-
+                ResetEvent(hEnableWatchGameStateEvent);
+                ResetEvent(hEnableWatchGameProcessEvent);
+                ConsoleLog("【消息】切换为 3 模式。\r\n");
+                GiveCommand(LUA_CMD_COMBINE_PARTS);
             }
             else if (msg.wParam == 4) /* 购买物品 */
             {
-
+                ResetEvent(hEnableWatchGameStateEvent);
+                ResetEvent(hEnableWatchGameProcessEvent);
+                ConsoleLog("【消息】切换为 4 模式。\r\n");
+                GiveCommand(LUA_CMD_PURCHASE_ITEM);
             }
             else if (msg.wParam == 5) /* 光标定位 */
             {
-
+                ResetEvent(hEnableWatchGameStateEvent);
+                ResetEvent(hEnableWatchGameProcessEvent);
+                ConsoleLog("【消息】切换为 5 模式。\r\n");
+                GiveCommand(LUA_CMD_LOCATE_CURSOR);
             }
-
             ReleaseMutex(hRunnableMutex);
         }
         TranslateMessage(&msg);
@@ -79,6 +84,6 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     UnregisterHotKey(NULL, 3);
     UnregisterHotKey(NULL, 4);
     UnregisterHotKey(NULL, 5);
-    std::cout << "【消息】线程 hHandleHotKeyMessageThread 退出。" << std::endl;
+    ConsoleLog("【消息】线程 hHandleHotKeyMessageThread 退出。\r\n");
     return 0;
 }

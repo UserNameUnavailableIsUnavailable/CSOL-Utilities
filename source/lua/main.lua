@@ -5,7 +5,7 @@ PATH = "C:/Users/Silve/Develop/CSOL-24H/source/lua/"
 function Load(file_name)
     if (type(file_name) == "string")
     then
-        pcall(dofile, PATH .. file_name)
+        dofile(PATH .. file_name)
     end
 end
 Load("Global.lua")

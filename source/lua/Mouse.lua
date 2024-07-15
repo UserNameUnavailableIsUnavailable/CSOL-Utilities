@@ -171,6 +171,31 @@ function Mouse:double_click_on(x, y, delay)
     Mouse:double_click(Mouse.LEFT, delay)
 end
 
+---使用鼠标重复点击屏幕上的某个位置若干次。当 `Runtime.is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+---@param x integer 横坐标。
+---@param y integer 纵坐标。
+---@param n integer 重复次数。
+---@param delay integer | nil 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+function Mouse:click_on_several_times(x, y, n, delay)
+    if (Runtime:is_paused())
+    then
+        return
+    end
+    if (type(n) ~= "number")
+    then
+        return
+    end
+    n = math.floor(n) or 0
+    while (n > 0)
+    do
+        Mouse:click_on(x, y, Delay.NORMAL)
+        n = n - 1
+    end
+    delay = delay or Delay.SHORT
+    Runtime:sleep(delay)
+end
+
+
 Runtime:register_context(
     Context:new(
         function (self)
