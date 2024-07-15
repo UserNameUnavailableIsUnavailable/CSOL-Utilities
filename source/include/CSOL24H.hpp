@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <memory>
+#include <synchapi.h>
 #include <winreg.h>
 #include <string>
 #include "GameState.hpp"
@@ -36,6 +37,8 @@ static uint64_t GetUNIXTimestamp(
     uint32_t dwSecond = 0,
     float fTimeZone = 0
     );
+static inline void EnableExtendedMode() noexcept { bAllowExtendedMode = true; };
+static inline void DisableExtendedMode() noexcept {bAllowExtendedMode = false; }
 private:
 static void InitializeWatchInGameStateThread();
 static void InitializeHandleHotKeyMessageThread();
@@ -59,6 +62,7 @@ private:
 /* 程序运行标志 */
 static bool bInitialize; /* 是否初始化 */
 static bool bDestroy; /* 退出 CSOL24H */
+static bool bAllowExtendedMode; /* 是否允许以扩展模式挂机 */
 /* 程序运行所需的时间信息 */
 static int64_t time_bias; /* 世界标准时间与本地时间之差 UTC - localtime，单位为秒 */
 /* 事件句柄 */

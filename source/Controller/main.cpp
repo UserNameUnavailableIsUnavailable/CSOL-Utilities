@@ -1,46 +1,21 @@
 #include "CSOL24H.hpp"
 #include "CSOL24H_EXCEPT.hpp"
+#include <cstddef>
 #include <cstdio>
 #include <cwchar>
 #include <iostream>
+#include <synchapi.h>
 #include <wincon.h>
-
-bool g_Exit = false;
-BOOL HandlerRoutine(DWORD dwCtrlType)
-{
-    if (dwCtrlType == CTRL_C_EVENT)
-    {
-        CSOL24H::Destroy();
-        std::puts("【消息】退出。");
-        g_Exit = true;
-        return TRUE;
-    }
-    else if (dwCtrlType == CTRL_CLOSE_EVENT)
-    {
-        CSOL24H::Destroy();
-        std::puts("【消息】退出。");
-        g_Exit = TRUE;
-        return TRUE;
-    }
-    else
-    {
-        return FALSE;
-    }
-}
+#include "Console.hpp"
 
 int main()
 {
-    SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);
-    std::setlocale(LC_ALL, ".UTF-8");
-    std::puts("【消息】控制台代码页及区域格式设为 UTF-8。");
-    if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE))
+    if (!InitializeConsole())
     {
-        std::printf("【错误】注册控制台控制信号处理函数失败，错误代码 %lu。按任意键退出。\r\n", GetLastError());
+        std::printf("【错误】初始化控制台失败。请按任意键退出。");
         std::getchar();
-        return 0;
+        return -1;
     }
-    std::puts("【消息】注册控制台控制信号处理函数。");
     try
     {
         CSOL24H::Initialize();
@@ -49,8 +24,12 @@ int main()
     catch (CSOL24H_EXCEPT e)
     {
         std::cout << e.what() << std::endl;
+        ConsoleLog("%s\r\n", e.what());
         CSOL24H::Destroy();
-        std::printf("【消息】发生错误，无法继续运行。按任意键退出。");
+        ConsoleLog("【错误】程序无法继续运行。按任意键退出。");
         std::getchar();
     }
+    /* finally */
+    DestroyConsole();
+    return 0;
 }

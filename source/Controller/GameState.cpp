@@ -21,6 +21,7 @@
 #include "Util.hpp"
 #include "CSOL24H_EXCEPT.hpp"
 #include "Command.hpp"
+#include "Console.hpp"
 
 DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
 {
@@ -39,7 +40,7 @@ DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
         DispatchCommand();
         Sleep(100);
     }
-    std::cout << "【消息】线程 hWatchInGameStateThread 退出。" << std::endl;
+    ConsoleLog("【消息】线程 hWatchInGameStateThread 退出。\r\n");
     return 0;
 }
 
@@ -72,7 +73,7 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (game_state.update(gs))
         {
-            std::printf("【消息】%s。游戏日志时间戳更新为当前时间戳：%lld。\r\n", msg, current_time);
+            ConsoleLog("【消息】%s。游戏日志时间戳更新为当前时间戳：%lld。\r\n", msg, current_time);
         }
         return;
     }
@@ -155,7 +156,7 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (game_state.update(gs))
         {
-            std::printf("【消息】%s。游戏日志时间戳：%lld，当前时间戳：%lld。\r\n", msg, log_timestamp, current_time);
+            ConsoleLog("【消息】%s。游戏日志时间戳：%lld，当前时间戳：%lld。\r\n", msg, log_timestamp, current_time);
         }
         bGameErrorLogBufferResolved = true;
         return;
@@ -225,22 +226,22 @@ void CSOL24H::DispatchCommand() noexcept
         {
             cmd = LUA_CMD_CHOOSE_CLASS;
         }
-        else if (std::abs(timestamp - game_state.get_timestamp()) % 30 < 5)
-        {
-            cmd = LUA_CMD_TRY_CONFIRM_RESULT;
-        }
         else if (std::abs(timestamp - game_state.get_timestamp()) < 120)
         {
-            cmd = LUA_CMD_PLAY_GAME;
+            cmd = LUA_CMD_PLAY_GAME_NORMAL;
         }
         else /* 不需要确认，且游戏时间超过 2 分钟，资金充足 */
         {
-            cmd = LUA_CMD_PLAY_GAME_EXTEND;
+            cmd = bAllowExtendedMode ? LUA_CMD_PLAY_GAME_EXTEND : LUA_CMD_PLAY_GAME_NORMAL;
         }
     }
     else if (state == ENUM_GAME_STATE::GS_ROOM)
     {
         cmd = LUA_CMD_START_GAME_ROOM;
+    }
+    else if (state == ENUM_GAME_STATE::GS_HALL)
+    {
+        cmd = LUA_CMD_CREATE_ROOM;
     }
     GiveCommand(cmd);
 }
