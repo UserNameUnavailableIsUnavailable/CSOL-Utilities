@@ -17,13 +17,5 @@
         "MoveMouseRelative",
         "MoveMouseTo",
         "GetDate",
-        "COMMAND",
-        "PLAYER",
-        "EXIT"
-    ],
-    "files.associations": {
-        "regex": "cpp",
-        "istream": "cpp",
-        "xlocbuf": "cpp"
-    }
+    ]
 }
