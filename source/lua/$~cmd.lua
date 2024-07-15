@@ -1,2 +1,2 @@
-Cmd = Command.CMD_CREATE_ROOM
-CmdTime = 1721058982
+Cmd = Command.CMD_NOP
+CmdTime = 1721065117

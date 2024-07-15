@@ -14,33 +14,6 @@
 #include <tlhelp32.h>
 #include "Console.hpp"
 
-static void AdjustWindowRectToMiddleOfScreen(RECT& rect) noexcept
-{
-    RECT rcScreen = {
-        .left = 0,
-        .top = 0
-    };
-    rcScreen.right = GetSystemMetrics(SM_CXSCREEN);
-    rcScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-    LONG lDeltaX = (rcScreen.right - (rect.left + rect.right)) / 2;
-    LONG lDeltaY = (rcScreen.bottom - (rect.top + rect.bottom)) / 2;
-    rect.left += lDeltaX;
-    rect.right += lDeltaX;
-    rect.top += lDeltaY;
-    rect.bottom += lDeltaY;
-}
-static void MakeWindowBorderless(HWND hWnd) noexcept
-{
-    WINDOWINFO windowInfo;
-    GetWindowInfo(hWnd, &windowInfo);
-    DWORD dwStyle = windowInfo.dwStyle & ~WS_CAPTION;
-    RECT& rcClient = windowInfo.rcClient;
-    AdjustWindowRectToMiddleOfScreen(rcClient);
-    ShowWindow(hWnd, SW_SHOW);
-    SetWindowLongPtrW(hWnd, GWL_STYLE, dwStyle);
-    UpdateWindow(hWnd);
-    MoveWindow(hWnd, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
-}
 /*
 @brief 尝试以安全方式结束进程。
 @param `hProcess` 进程句柄，需要具有 `QUERY_LIMITED_INFORMATION | SYNCHRONIZE` 访问权限。
@@ -140,8 +113,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             }
             SetEvent(hEnableWatchGameStateEvent);
             ConsoleLog("【消息】成功获取游戏进程信息。\r\n");
-            SetForegroundWindow(hWnd); /* 游戏窗口前置 */
-            MakeWindowBorderless(hWnd); /* 去除游戏窗口边框 */
         }
         else if (hGameProcess == INVALID_HANDLE_VALUE) /* 重启游戏 */
         {
