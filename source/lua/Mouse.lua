@@ -134,7 +134,7 @@ function Mouse:click_on(x, y, delay)
     then
         return
     end
-    Mouse:move_cursor_to(x, y, Delay.MINI)
+    Mouse:move_cursor_to(x, y, Delay.SHORT)
     delay = delay or Delay.SHORT
     Mouse:click(Mouse.LEFT, delay)
 end

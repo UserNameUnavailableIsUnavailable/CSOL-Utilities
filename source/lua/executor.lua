@@ -6,7 +6,7 @@ Executor = {}
 ---创建游戏房间。
 function Executor:create_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on(Setting.ROOM_LIST_X, Setting.ROOM_LIST_Y, 1000)
+    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 1000)
     Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 1000)
     Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 1000)
     Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 1000)
@@ -22,7 +22,7 @@ end
 ---点击“开始游戏”按钮，开始游戏。
 function Executor:start_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.NORMAL)
-    Mouse:click_on(Setting.GAMESTART_X, Setting.GAMESTART_Y)
+    Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y)
     Console:println("Start Game Room")
     Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
 end
@@ -49,13 +49,13 @@ function Executor:try_confirm()
         return
     end
     Keyboard:click_several_times(Keyboard.ESCAPE, 4)
-    Mouse:click_on(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y)
+    Mouse:click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y)
     self.last_confirm_timestamp = current_timestamp
 end
 
 ---合成配件。
 function Executor:combine_parts()
-    local counter = 20
+    local counter = 30
     Keyboard:press(Keyboard.ENTER, 10)
     repeat
         Mouse:click_on(
@@ -74,7 +74,7 @@ function Executor:combine_parts()
     Mouse:click_on(
         Setting.CRAFT_PARTS_CLEAR_X,
         Setting.CRAFT_PARTS_CLEAR_Y,
-        10
+        20
     )
 end
 

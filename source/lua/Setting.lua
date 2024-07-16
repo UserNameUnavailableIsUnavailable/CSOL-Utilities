@@ -3,11 +3,12 @@ if (not Setting_lua)
 then
 Setting_lua = true
 Setting = {
-    -- 操作系统时区，东八区（UTC+8），此项必须设置正确，否则无法正常运行  
+    -- 操作系统时区，默认为东八区（UTC+8），此项必须设置正确，否则无法正常运行。
     TIME_ZONE = 8,
-    --- “房间列表”按钮
-    ROOM_LIST_X = 36644,
-    ROOM_LIST_Y = 29640,
+---游戏大厅---
+    --- “房间列表”选框
+    HALL_ROOM_LIST_X = 36644,
+    HALL_ROOM_LIST_Y = 29640,
     ---大厅界面的“新建房间”按钮
     HALL_CREATE_ROOM_X = 38283,
     HALL_CREATE_ROOM_Y = 36746,
@@ -38,21 +39,30 @@ Setting = {
     ---“新建房间”按钮
     CREATE_ROOM_X = 30223,
     CREATE_ROOM_Y = 44945,
+---游戏内---
     -- “开始游戏”按钮
-    GAMESTART_X = 47025,
-    GAMESTART_Y = 42030,
-    -- 游戏结算页面的“确认”按钮
-    GAME_SETTLEMENT_CONFIRM_X = 44976,
-    GAME_SETTLEMENT_CONFIRM_Y = 51748,
+    ROOM_START_GAME_X = 47025,
+    ROOM_START_GAME_Y = 42030,
+    -- 是否选择 T 阵营角色
+    CHOOSE_T_CLASS = false,
+    -- 角色选择界面 T 阵营
+    CHOOSE_T_CLASS_X = 11304,
+    CHOOSE_T_CLASS_Y = 9596,
+    -- 角色选项
+    CLASS_OPTION = Keyboard.THREE,
     -- ESC菜单的“取消”按钮
-    ESC_MENU_CANCEL_X = 32375,
-    ESC_MENU_CANCEL_Y = 43913,
+    ZS_GAME_ESC_MENU_CANCEL_X = 32375,
+    ZS_GAME_ESC_MENU_CANCEL_Y = 43913,
     -- 【灾变】资金不足，无法购买
     GAME_INSUFFIENT_FUNDS_CONFIRM_X = 32750,
     GAME_INSUFFIENT_FUNDS_CONFIRM_Y = 34924,
     -- 【灾变】死亡状态预购买菜单“重复购买”按钮（不建议点击取消购买，会与大厅界面其他按钮位置冲突）
     GAME_DEAD_PURCHASE_MENU_REBUY_X = 31692,
     GAME_DEAD_PURCHASE_MENU_REBUY_Y = 43123,
+    -- 游戏结算页面的“确认”按钮
+    GAME_ROUND_CONFIRM_X = 44976,
+    GAME_ROUND_CONFIRM_Y = 51748,
+---制造所---
     -- 【制造所】自动添加配件按钮
     CRAFT_PARTS_AUTO_FILL_X = 20012,
     CRAFT_PARTS_AUTO_FILL_Y = 50533,
@@ -62,6 +72,7 @@ Setting = {
     -- 【制造所】配件“清空”按钮
     CRAFT_PARTS_CLEAR_X = 33263,
     CRAFT_PARTS_CLEAR_Y = 50594,
+---商店---
     -- 【商店】点击兑换后，弹窗中的兑换物品选项
     STORE_BUY_OPTION_X = 22949,
     STORE_BUY_OPTION_Y = 39479,
@@ -71,8 +82,5 @@ Setting = {
     -- 【商店】物品“兑换”->“兑换”->“确认”按钮
     STORE_BUY_CONFIRM_X = 37019,
     STORE_BUY_CONFIRM_Y = 38993,
-    -- 角色选择界面 T 阵营
-    CHOOSE_T_CLASS_X = 11304,
-    CHOOSE_T_CLASS_Y = 9596
 }
 end -- Setting_lua

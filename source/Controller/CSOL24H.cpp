@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cwchar>
 #include <errhandlingapi.h>
+#include <fileapi.h>
 #include <handleapi.h>
 #include <memory>
 #include <minwindef.h>
@@ -25,11 +26,12 @@ bool CSOL24H::bDestroy = false;
 bool CSOL24H::bAllowExtendedMode = false;
 /* 程序运行所需时间信息 */
 int64_t CSOL24H::time_bias = 0;
-
 /* 事件句柄 */
 HANDLE CSOL24H::hEnableWatchGameStateEvent = NULL;
 HANDLE CSOL24H::hEnableWatchGameProcessEvent = NULL;
-
+HANDLE CSOL24H::hEnablePurchaseItemEvent = NULL;
+HANDLE CSOL24H::hEnableCombinePartsEvent = NULL;
+HANDLE CSOL24H::hEnableLocateCursorEvent = NULL;
 /* 互斥量句柄 */
 HANDLE CSOL24H::hRunnableMutex = NULL;
 /* 文件句柄 */
@@ -40,6 +42,9 @@ HANDLE CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
 HANDLE CSOL24H::hWatchInGameStateThread = NULL;
 HANDLE CSOL24H::hWatchGameProcessStateThread = NULL;
 HANDLE CSOL24H::hHandleHotKeyMessageThread = NULL;
+HANDLE CSOL24H::hCombinePartsThread = NULL;
+HANDLE CSOL24H::hPurchaseItemThread = NULL;
+HANDLE CSOL24H::hLocateCursorThread = NULL;
 /* hWatchInGameStateThread 线程所需资源 */
 std::shared_ptr<wchar_t[]> CSOL24H::pwszErrorLogFilePath = nullptr;
 GameState CSOL24H::game_state(ENUM_GAME_STATE::GS_UNKNOWN, 0);
@@ -188,6 +193,55 @@ void CSOL24H::InitializeWatchGameProcessThread()
     }
 }
 
+void CSOL24H::InitializeCombinePartsThread()
+{
+    hEnableCombinePartsEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+    if (!hEnableCombinePartsEvent)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码：%lu。", L"hEnableCombinePartsEvent", GetLastError());
+    }
+    hCombinePartsThread = CreateThread(
+        NULL,
+        512,
+        CombineParts,
+        NULL,
+        0,
+        NULL
+    );
+    if (!hCombinePartsThread)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建合成配件线程失败。错误代码 %lu。", GetLastError());
+    }
+}
+
+void CSOL24H::InitializePurchaseItemThread()
+{
+    hEnablePurchaseItemEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+    if (!hEnableCombinePartsEvent)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hEnablePurchaseItemEvent", GetLastError());
+    }
+    hPurchaseItemThread = CreateThread(NULL, 512, PurchaseItem, NULL, 0, NULL);
+    if (!hPurchaseItemThread)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建用于物品购买的线程失败。错误代码 %lu。", GetLastError());
+    }
+}
+
+void CSOL24H::InitializeLocateCursorThread()
+{
+    hEnableLocateCursorEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+    if (!hEnableCombinePartsEvent)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hEnableLocateCursorThread", GetLastError());
+    }
+    hLocateCursorThread = CreateThread(NULL, 512, LocateCursor, NULL, 0, NULL);
+    if (!hLocateCursorThread)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建用于获取鼠标光标位置的线程失败。错误代码 %lu。", GetLastError());
+    }
+}
+
 void CSOL24H::Initialize()
 {
     bDestroy = false; /* 该变量设为 true 后，各个 watcher 线程将退出 */
@@ -204,9 +258,13 @@ void CSOL24H::Initialize()
     }
     InitializeWatchInGameStateThread();
     InitializeWatchGameProcessThread();
+    InitializeCombinePartsThread();
+    InitializePurchaseItemThread();
+    InitializeLocateCursorThread();
     InitializeHandleHotKeyMessageThread();
     bInitialize = true;
     ConsoleLog("【消息】初始化完成\r\n");
+    ConsoleLog("【消息】本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/gaming-tool。\r\n");
 }
 
 void CSOL24H::Run()
@@ -312,6 +370,9 @@ void CSOL24H::Destroy() noexcept
     bDestroy = true;
     SetEvent(hEnableWatchGameStateEvent);
     SetEvent(hEnableWatchGameProcessEvent);
+    SetEvent(hEnableCombinePartsEvent);
+    SetEvent(hEnablePurchaseItemEvent);
+    SetEvent(hEnableLocateCursorEvent);
     PostThreadMessage(GetThreadId(hHandleHotKeyMessageThread), WM_QUIT, 0, 0);
     if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchInGameStateThread, 2000))
     {
@@ -325,15 +386,34 @@ void CSOL24H::Destroy() noexcept
     {
         TerminateThread(hWatchInGameStateThread, -1);
     }
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hCombinePartsThread, 1500))
+    {
+        TerminateThread(hCombinePartsThread, -1);
+    }
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hPurchaseItemThread, 1500))
+    {
+        TerminateThread(hPurchaseItemThread, -1);
+    }
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hLocateCursorThread, 1500))
+    {
+        TerminateThread(hLocateCursorThread, -1);
+    }
+
     CloseHandle(hEnableWatchGameStateEvent);
     CloseHandle(hEnableWatchGameProcessEvent);
+    CloseHandle(hEnableCombinePartsEvent);
+    CloseHandle(hEnablePurchaseItemEvent);
+    CloseHandle(hEnableLocateCursorEvent);
 
     CloseHandle(hRunnableMutex);
 
     CloseHandle(hWatchInGameStateThread);
-    CloseHandle(hEnableWatchGameStateEvent);
+    CloseHandle(hWatchGameProcessStateThread);
+    CloseHandle(hCombinePartsThread);
+    CloseHandle(hPurchaseItemThread);
+    CloseHandle(hLocateCursorThread);
     CloseHandle(hHandleHotKeyMessageThread);
-
+    GiveCommand(nullptr);
     CloseHandle(hLUACommandFile);
     CloseHandle(hGameErrorLogFile);
 

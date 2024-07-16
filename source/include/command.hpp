@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 
-static const wchar_t* CMD_FILE_NAME = L"C:\\Users\\Silve\\Develop\\CSOL-24H\\source\\lua\\$~cmd.lua"; // todo: 修改为相对路径
+static const wchar_t* CMD_FILE_NAME = L".\\lua\\$~cmd.lua"; // todo: 修改为相对路径
 static const char* LUA_CMD_NOP = u8"Command.CMD_NOP";
 static const char* LUA_CMD_START_GAME_ROOM  = u8"Command.CMD_START_GAME_ROOM";
 static const char* LUA_CMD_CHOOSE_CLASS = u8"Command.CMD_CHOOSE_CLASS";

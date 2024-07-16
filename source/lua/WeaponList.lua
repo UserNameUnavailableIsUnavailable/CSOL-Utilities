@@ -11,21 +11,22 @@ PartWeaponList = {
     Weapon:new({
         name = "星战前线·加特林",
         number = Weapon.PRIMARY,
-        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.TWO, Keyboard.FOUR}}),
+        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.TWO, Keyboard.FOUR}
+    }),
     Weapon:new({
         name = "FNP-45战损版",
         number = Weapon.SECONDARY,
-        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}}),
+        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}
+    }),
     Weapon:new({
         name = "风暴之锤",
         number = Weapon.MELEE,
-
     }),
     Weapon:new({
         name = "燃爆Ignite-10",
         number = Weapon.GRENADE,
-        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}}
-    )
+        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
+    })
 }
 
 ---默认武器列表。
