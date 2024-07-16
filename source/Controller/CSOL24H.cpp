@@ -368,19 +368,20 @@ void CSOL24H::Destroy() noexcept
         return;
     bInitialize = false;
     bDestroy = true;
+    /* 先结束热键处理，避免释放事件时产生并发问题 */
+    PostThreadMessage(GetThreadId(hHandleHotKeyMessageThread), WM_QUIT, 0, 0);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hHandleHotKeyMessageThread, 500))
+    {
+        TerminateThread(hHandleHotKeyMessageThread, -1);
+    }
     SetEvent(hEnableWatchGameStateEvent);
     SetEvent(hEnableWatchGameProcessEvent);
     SetEvent(hEnableCombinePartsEvent);
     SetEvent(hEnablePurchaseItemEvent);
     SetEvent(hEnableLocateCursorEvent);
-    PostThreadMessage(GetThreadId(hHandleHotKeyMessageThread), WM_QUIT, 0, 0);
     if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchInGameStateThread, 2000))
     {
         TerminateThread(hWatchInGameStateThread, -1);
-    }
-    if (WAIT_OBJECT_0 != WaitForSingleObject(hHandleHotKeyMessageThread, 500))
-    {
-        TerminateThread(hHandleHotKeyMessageThread, -1);
     }
     if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchGameProcessStateThread, 5000))
     {

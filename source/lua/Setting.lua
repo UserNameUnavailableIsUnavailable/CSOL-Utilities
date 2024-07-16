@@ -44,12 +44,12 @@ Setting = {
     ROOM_START_GAME_X = 47025,
     ROOM_START_GAME_Y = 42030,
     -- 是否选择 T 阵营角色
-    CHOOSE_T_CLASS = false,
+    CHOOSE_T_CLASS = true,
     -- 角色选择界面 T 阵营
     CHOOSE_T_CLASS_X = 11304,
     CHOOSE_T_CLASS_Y = 9596,
     -- 角色选项
-    CLASS_OPTION = Keyboard.THREE,
+    CLASS_OPTION = 3, -- 可取 0 ~ 9
     -- ESC菜单的“取消”按钮
     ZS_GAME_ESC_MENU_CANCEL_X = 32375,
     ZS_GAME_ESC_MENU_CANCEL_Y = 43913,

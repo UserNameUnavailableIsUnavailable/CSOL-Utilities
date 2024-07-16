@@ -31,10 +31,13 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     {
         if (msg.message == WM_HOTKEY && msg.wParam >= 0 && msg.wParam <= 5)
         {
+            ResetEvent(hEnableWatchGameStateEvent);
+            ResetEvent(hEnableWatchGameProcessEvent);
+            ResetEvent(hEnableCombinePartsEvent);
+            ResetEvent(hEnablePurchaseItemEvent);
+            ResetEvent(hEnableLocateCursorEvent);
             if (msg.wParam == 0)
             {
-                ResetEvent(hEnableWatchGameStateEvent);
-                ResetEvent(hEnableWatchGameProcessEvent);
                 ConsoleLog("【消息】切换为 0 模式\r\n");
                 GiveCommand(LUA_CMD_NOP); /* 写入空命令，LUA 脚本暂停运行 */
             }
@@ -54,24 +57,19 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
             }
             else if (msg.wParam == 3) /* 合成配件 */
             {
-                ResetEvent(hEnableWatchGameStateEvent);
-                ResetEvent(hEnableWatchGameProcessEvent);
+                SetEvent(hEnableCombinePartsEvent);
                 ConsoleLog("【消息】切换为 3 模式。\r\n");
                 GiveCommand(LUA_CMD_COMBINE_PARTS);
             }
             else if (msg.wParam == 4) /* 购买物品 */
             {
-                ResetEvent(hEnableWatchGameStateEvent);
-                ResetEvent(hEnableWatchGameProcessEvent);
+                SetEvent(hEnablePurchaseItemEvent);
                 ConsoleLog("【消息】切换为 4 模式。\r\n");
-                GiveCommand(LUA_CMD_PURCHASE_ITEM);
             }
             else if (msg.wParam == 5) /* 光标定位 */
             {
-                ResetEvent(hEnableWatchGameStateEvent);
-                ResetEvent(hEnableWatchGameProcessEvent);
+                SetEvent(hEnableLocateCursorEvent);
                 ConsoleLog("【消息】切换为 5 模式。\r\n");
-                GiveCommand(LUA_CMD_LOCATE_CURSOR);
             }
             ReleaseMutex(hRunnableMutex);
         }

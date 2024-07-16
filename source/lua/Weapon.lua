@@ -1,6 +1,12 @@
 if (not Weapon_lua)
 then
 Weapon_lua = true
+Load("Runtime.lua")
+Load("Delay.lua")
+Load("Console.lua")
+Load("Mouse.lua")
+Load("Keyboard.lua")
+
 ---@class Weapon
 Weapon = {}
 

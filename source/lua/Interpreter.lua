@@ -20,7 +20,7 @@ function Interpreter()
             Executor:start_game_room()
         elseif (Cmd == Command.CMD_CHOOSE_CLASS and not expired())
         then
-            Executor:choose_class(false, 3)
+            Executor:choose_class()
         elseif (Cmd == Command.CMD_PLAY_GAME_NORMAL and not expired())
         then
             Executor:try_confirm()
@@ -34,10 +34,10 @@ function Interpreter()
         elseif (Cmd == Command.CMD_CREATE_ROOM and not expired())
         then
             Executor:create_game_room()
-        elseif (Cmd == Command.CMD_COMBINE_PARTS)
+        elseif (Cmd == Command.CMD_COMBINE_PARTS and not expired())
         then
             Executor:combine_parts()
-        elseif (Cmd == Command.CMD_PURCHASE_ITEM)
+        elseif (Cmd == Command.CMD_PURCHASE_ITEM and not expired())
         then
             local buy_button_x = 0
             local buy_button_y = 0
@@ -46,7 +46,7 @@ function Interpreter()
                 buy_button_x, buy_button_y = Mouse:locate_cursor()
             end
             Executor:purchase_item(buy_button_x, buy_button_y)
-        elseif (Cmd == Command.CMD_LOCATE_CURSOR)
+        elseif (Cmd == Command.CMD_LOCATE_CURSOR and not expired())
         then
             Executor:locate_cursor()
         end
