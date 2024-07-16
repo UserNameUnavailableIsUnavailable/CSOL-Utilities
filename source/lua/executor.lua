@@ -3,6 +3,38 @@ then
 Executor_lua = true
 Executor = {}
 
+---注册中断处理函数。必须在 `Keyboard` 加载之后执行。
+Runtime:register_interrupt_handler(function (self)
+    if (not self.interrupt_flag) -- 未关中断才会触发中断
+    then
+        return
+    end
+    -- 中断开始时，中断标志位使能以屏蔽后续中断
+    self.interrupt_flag = false -- 关中断
+    -- 现场切换，保护中断现场
+    -- 是否暂停执行
+    if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
+    then
+        Keyboard:release_all()
+        Mouse:release_all()
+        -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
+        if (not Runtime.manual_flag)
+        then
+            Console:infomation("开始手动接管，禁用键鼠动作。")
+        end
+        Runtime.manual_flag = true -- 暂停执行，中断现场将不会恢复
+    elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
+    then
+        if (Runtime.manual_flag)
+        then
+            Console:infomation("中止手动接管，允许键鼠动作。")
+        end
+        Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
+    end
+    -- 中断处理完毕
+    self.interrupt_flag = true -- 开中断
+end)
+
 ---创建游戏房间。
 function Executor:create_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
@@ -23,21 +55,25 @@ end
 function Executor:start_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.NORMAL)
     Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y)
-    Console:println("Start Game Room")
     Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
 end
 
 ---选定角色。
----@param is_terrorist boolean | nil 是否需要选择恐怖分子阵营。
----@param choice integer | string 角色选项，可取 `"0" ~ "9"`。
 ---@return nil
-function Executor:choose_class(is_terrorist, choice)
-    if (is_terrorist)
+function Executor:choose_class()
+    if (Setting.CHOOSE_T_CLASS)
     then
-        Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y)
+        Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
     end
-    Keyboard:click(tostring(choice))
-    Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
+    local option = math.tointeger(Setting.CLASS_OPTION)
+    if (option and option >=0 and option <= 9)
+    then
+        Keyboard:click(tostring(Setting.CLASS_OPTION), Delay.NORMAL)
+    else
+        Console:information("Setting.CLASS_OPTION 设置有误。随机选择角色。")
+        Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
+    end
+    Runtime:sleep(500) -- 等待 0.5 秒，足够控制器更新下条命令
 end
 
 ---上一次尝试确认结算界面的时间戳。
@@ -55,7 +91,7 @@ end
 
 ---合成配件。
 function Executor:combine_parts()
-    local counter = 30
+    local counter = 20
     Keyboard:press(Keyboard.ENTER, 10)
     repeat
         Mouse:click_on(

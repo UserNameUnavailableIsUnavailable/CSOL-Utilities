@@ -1,7 +1,12 @@
 if (not Player_lua)
 then
 Player_lua = true
-
+Load("Keyboard.lua")
+Load("Weapon.lua")
+Load("Mouse.lua")
+Load("Runtime.lua")
+Load("Utility.lua")
+Load("DateTime.lua")
 ---@class Player
 Player = {}
 

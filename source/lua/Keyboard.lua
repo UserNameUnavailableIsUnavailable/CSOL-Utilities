@@ -1,7 +1,8 @@
 if (not Keyboard_lua)
 then
 Keyboard_lua = true
-
+Load("Context.lua")
+Load("Runtime.lua")
 ---@class Keyboard
 ---@enum
 Keyboard = {

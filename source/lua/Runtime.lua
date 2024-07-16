@@ -1,5 +1,6 @@
 if (not Runtime_lua)
 then
+Load("Context.lua")
 Runtime_lua = true
 Runtime = {}
 ---手动接管标志。若置为 `true` 则 `pause_flag` 被屏蔽，且无法由程序自身恢复，必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。
@@ -48,36 +49,15 @@ function Runtime:sleep(milliseconds)
 end
 
 ---中断处理函数。只有中断标志位使能时才允许中断。
----@return nil
 function Runtime:interrupt_handler()
-    if (not self.interrupt_flag) -- 未关中断才会触发中断
-    then
-        return
-    end
-    -- 中断开始时，中断标志位使能以屏蔽后续中断
-    self.interrupt_flag = false -- 关中断
-    -- 现场切换，保护中断现场
-    -- 是否暂停执行
-    if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
-    then
-        Keyboard:release_all()
-        Mouse:release_all()
-        -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
-        if (not Runtime.manual_flag)
-        then
-            Console:infomation("开始手动接管，禁用键鼠动作。")
-        end
-        Runtime.manual_flag = true -- 暂停执行，中断现场将不会恢复
-    elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
-    then
-        if (Runtime.manual_flag)
-        then
-            Console:infomation("中止手动接管，允许键鼠动作。")
-        end
-        Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
-    end
-    -- 中断处理完毕
-    self.interrupt_flag = true -- 开中断
+    return
+end
+
+---注册中断处理函数。
+---@param f function 中断处理函数。
+---return nil
+function Runtime:register_interrupt_handler(f)
+    self.interrupt_handler = f
 end
 
 ---注册中断现场，中断发生时保存。
