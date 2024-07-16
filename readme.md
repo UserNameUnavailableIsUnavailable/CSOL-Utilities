@@ -14,9 +14,11 @@
 
 ## 说明
 
-本项目功能目前均已实现完毕，使用文档也已经发布。
+本项目功能目前均已实现完毕，使用文档也已经发布，使用文档在下载得到的压缩包中。
 
 <a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a>
+
+本集成工具建议搭配 GamingTool 工具使用（原因参见使用文档），具体参考 <a href="https://gitee.com/silver1867/gaming-tool">GamingTool</a> 工具，后续考虑将 GamingTool 工具整合到本项目中。
 
 **本软件使用 GPL v2.0 协议，请尊重作者劳动。**
 
