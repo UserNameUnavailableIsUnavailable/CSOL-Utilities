@@ -166,5 +166,6 @@ SpecialWeapon =
         end
     })
 
+----SpecialWeapon = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
 
 end -- WeaponList_lua
