@@ -139,6 +139,7 @@ end
 Player.last_buy_special_weapon_time = 0
 ---@param weapon Weapon 特殊武器。
 function Player:use_special_weapon(weapon)
+    if (not weapon) then return end
     local current_time = DateTime:get_local_timestamp()
     if (math.abs(current_time - self.last_buy_special_weapon_time) < 30) -- 每隔 30 秒购买一次
     then
@@ -154,7 +155,7 @@ end
 ---@return nil
 function Player:clear_UI()
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.NORMAL)
-    Mouse:double_click_on(Setting.ESC_MENU_CANCEL_X, Setting.ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
-    Mouse:double_click_on(Setting.GAME_SETTLEMENT_CONFIRM_X, Setting.GAME_SETTLEMENT_CONFIRM_Y) -- 结算界面确认
+    Mouse:double_click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
+    Mouse:double_click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y) -- 结算界面确认
 end
 end -- Play_lua

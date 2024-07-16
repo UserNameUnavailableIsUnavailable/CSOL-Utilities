@@ -9,18 +9,20 @@
 
 ## 先决条件
 
-- Logitech G Hub
-- Powershell（Windows 8 及以上自带）
+- Logitech G Hub（无需罗技设备）
+- Powershell 5 及以上（Windows 8 及以上版本 Windows 自带）
 
 ## 说明
 
-本项目功能目前均已实现完毕，功能测试基本通过。该软件的使用文档正在编写中，预计 2024 年 7 月底之前完成，并与可执行文件一同发布。
+本项目功能目前均已实现完毕，使用文档也已经发布。
+
+<a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a>
 
 **本软件使用 GPL v2.0 协议，请尊重作者劳动。**
 
-作者邮箱：ttyuig@126.com
-
 B 站 ID：_CoreDump
+
+作者邮箱：ttyuig@126.com
 
 ## 设计思想
 

@@ -42,6 +42,9 @@ static inline void DisableExtendedMode() noexcept {bAllowExtendedMode = false; }
 private:
 static void InitializeWatchInGameStateThread();
 static void InitializeHandleHotKeyMessageThread();
+static void InitializeCombinePartsThread();
+static void InitializePurchaseItemThread();
+static void InitializeLocateCursorThread();
 static void InitializeWatchGameProcessThread();
 static bool IsErrorLogFileModified() noexcept;
 static bool UpdateErrorLogBuffer() noexcept;
@@ -53,6 +56,9 @@ static DWORD CALLBACK WatchInGameState(LPVOID lpParam) noexcept;
 static DWORD CALLBACK WatchGameProcess(LPVOID lpParam) noexcept; /* 监视游戏进程状态 */
 static void TransferGameState() noexcept;
 static DWORD HandleHotKey(LPVOID lpParam) noexcept; /* 监视热键 */
+static DWORD CombineParts(LPVOID lpParam) noexcept; /* 合成配件 */
+static DWORD LocateCursor(LPVOID lpParam) noexcept; /* 定位光标 */
+static DWORD PurchaseItem(LPVOID lpParam) noexcept; /* 购买物品 */
 static bool TryStopProcessSafely(HANDLE hProcess, HANDLE hThread = NULL) noexcept;
 CSOL24H() = delete;
 ~CSOL24H() = delete;
@@ -68,6 +74,9 @@ static int64_t time_bias; /* 世界标准时间与本地时间之差 UTC - local
 /* 事件句柄 */
 static HANDLE hEnableWatchGameStateEvent; /* 启动 hWatchInGameStateThread 线程的事件 */
 static HANDLE hEnableWatchGameProcessEvent; /* 启动 hWatchGameProcessStateThread 线程的事件 */
+static HANDLE hEnablePurchaseItemEvent; /* 启动 hPurchaseItemThread 线程的事件 */
+static HANDLE hEnableCombinePartsEvent; /* 启动 hCombinePartsThread 线程的事件 */
+static HANDLE hEnableLocateCursorEvent; /* 启动 hLocateCursorThread 线程的事件 */
 /* 互斥量句柄 */
 static HANDLE hRunnableMutex; /* 使线程运行互斥 */
 /* 文件句柄 */
@@ -77,6 +86,9 @@ static HANDLE hLUACommandFile; /* 向罗技 LUA 语言服务器下达命令的�
 static HANDLE hWatchInGameStateThread; /* 通过解析日志文件实时监测游戏内状态 */
 static HANDLE hWatchGameProcessStateThread; /* 监视游戏进程状态，并在游戏进程退出时重新启动游戏进程 */
 static HANDLE hHandleHotKeyMessageThread; /* 绑定、处理热键消息 */
+static HANDLE hCombinePartsThread; /* 合成配件 */
+static HANDLE hPurchaseItemThread; /* 购买物品 */
+static HANDLE hLocateCursorThread; /* 定位光标 */
 /* hWatchInGameStateThread 线程所需资源 */
 static std::shared_ptr<wchar_t[]> pwszErrorLogFilePath; /* 游戏 Error.log 日志路径 */
 static GameState game_state; /* 通过解析日志文件获取到的游戏状态 */

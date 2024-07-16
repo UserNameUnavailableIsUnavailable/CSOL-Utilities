@@ -2,6 +2,7 @@
 #include <CSOL24H.hpp>
 #include "Command.hpp"
 #include <ctime>
+#include <fileapi.h>
 
 void CSOL24H::GiveCommand(const char* cmd) noexcept
 {
@@ -11,6 +12,11 @@ void CSOL24H::GiveCommand(const char* cmd) noexcept
         0,
         FILE_BEGIN
     );
+    if (!cmd)
+    {
+        SetEndOfFile(hLUACommandFile);
+        return;
+    }
     time_t t;
     time(&t); /* timestamp */
     char buffer[512];
