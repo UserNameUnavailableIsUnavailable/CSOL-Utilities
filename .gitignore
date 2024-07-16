@@ -1,4 +1,3 @@
 build/
-test/
-Makefile/
 temp/
+Makefile
