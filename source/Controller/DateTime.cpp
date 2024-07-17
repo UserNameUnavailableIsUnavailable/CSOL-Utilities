@@ -1,5 +1,6 @@
 #include "CSOL24H.hpp"
 #include <regex>
+#include <iostream>
 /*
 @brief 判断 `dwYear` 是否为闰年。
 @return 判断结果。
@@ -85,7 +86,29 @@ int64_t CSOL24H::ResolveMessageTimestamp(const std::string message, int32_t* lpM
         minute = std::atoi(match[2].str().c_str());
         second = std::atoi(match[3].str().c_str());
         millisecond = std::atoi(match[4].str().c_str());
-        ret = qwGameErrorLogFileDateTime + hour * 3600 + minute * 60 + second + time_bias;
+        int32_t time_elapsed_since_midnight = hour * 3600 + minute * 60 + second;
+        int32_t utc_time_elapsed_since_midnight = time_elapsed_since_midnight + time_bias;
+        if (utc_time_elapsed_since_midnight < 0) /* UTC 比本地少一天 */
+        {
+            utc_time_elapsed_since_midnight += 24 * 60 * 60;
+        }
+        else if (utc_time_elapsed_since_midnight == 0) /* UTC 时间为 00:00:00 */
+        {
+
+        }
+        else if (0 < utc_time_elapsed_since_midnight && utc_time_elapsed_since_midnight < 24 * 60 * 60)
+        {
+
+        }
+        else if (utc_time_elapsed_since_midnight == 24 * 60 * 60) /* UTC 时间为 24:00，取模后为 00:00 */
+        {
+            utc_time_elapsed_since_midnight = 0;
+        }
+        else /* > 24 * 60 * 60，UTC 比本地多一天 */
+        {
+            utc_time_elapsed_since_midnight -= 24 * 60 * 60;
+        }
+        ret = game_error_log_file_date /* UTC 当日 00:00:00 时间戳 */ + utc_time_elapsed_since_midnight /* UTC 自从00:00:00 以来经过的时间 */;
     }
     if (lpMilliseconds) *lpMilliseconds = millisecond;
     return ret;
@@ -97,7 +120,7 @@ int64_t CSOL24H::ResolveMessageTimestamp(const std::string message, int32_t* lpM
 @param `dwLength` 日志文件长度。
 @return 解析所得日期的 00:00:00 时刻（非 UTC 标准时）的 UNIX 时间戳。
 */
-int64_t CSOL24H::ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept
+[[deprecated("从日志文件中获取到的日期在日期变更（23:59 之后）后可能不准确。请使用该函数重载版本。")]] int64_t CSOL24H::ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept
 {
     static std::regex date_pattern("\\d{1,2}:\\d{2}:\\d{2}\\.\\d{3}.+?(\\d{2})/(\\d{2})/(\\d{4})");
     std::time_t ret = 0llu;
@@ -125,5 +148,16 @@ int64_t CSOL24H::ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept
             break;
         }
     }
+    return ret;
+}
+/*
+@brief 解析日志文件日期，返回结果为文件最近一次修改日期当日的 00:00:00 时刻的 UNIX 时间戳（UTC）
+@param `filetime` 使用 `GetFileTime` 获取到的文件时间。
+*/
+int64_t CSOL24H::ResolveLogDate(FILETIME filetime) noexcept
+{
+    SYSTEMTIME system_time;
+    FileTimeToSystemTime((LPFILETIME)&filetime, &system_time); /* 获取日志文件被修改的系统时间 */
+    int64_t ret = GetUNIXTimestamp(system_time.wYear, system_time.wMonth, system_time.wDay); /* 将文件修改的日期作为日志的日期，获取日期的 00:00:00（需要考虑时区） 时刻的时间戳 */
     return ret;
 }

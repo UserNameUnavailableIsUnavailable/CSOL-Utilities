@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <cstdio>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
@@ -8,11 +9,13 @@
 #include <fileapi.h>
 #include <iterator>
 #include <memory>
+#include <minwinbase.h>
 #include <minwindef.h>
 #include <processenv.h>
 #include <processthreadsapi.h>
 #include <regex>
 #include <synchapi.h>
+#include <timezoneapi.h>
 #include <wincon.h>
 #include <winerror.h>
 #include <winnt.h>
@@ -210,11 +213,12 @@ void CSOL24H::TransferGameState() noexcept
 bool CSOL24H::UpdateErrorLogBuffer() noexcept
 {
     DWORD dwBytesWritten;
-    uint64_t qwLogFileLastModifiedTime = 0;
-    GetFileTime(hGameErrorLogFile, nullptr, nullptr, (LPFILETIME)&qwLogFileLastModifiedTime);
-    if (qwLogBufferLastModifiedTime != qwLogFileLastModifiedTime) /* 文件已经被修改，需要加载 */
+    FILETIME filetime;
+    GetFileTime(hGameErrorLogFile, nullptr, nullptr, (LPFILETIME)&filetime);
+    int64_t file_last_modified_time = (int64_t)filetime.dwLowDateTime | (int64_t)filetime.dwHighDateTime << 32; /* 文件时间本质实际上是 64 位数 */
+    if (log_buffer_last_modified_time != file_last_modified_time) /* 文件已经被修改，需要加载 */
     {
-        qwLogBufferLastModifiedTime = qwLogFileLastModifiedTime;
+        log_buffer_last_modified_time = file_last_modified_time;
         bGameErrorLogBufferResolved = false;
         INT64 cbUpdatedLog = 0;
         DWORD dwNewSizeHigh = 0;
@@ -242,7 +246,8 @@ bool CSOL24H::UpdateErrorLogBuffer() noexcept
             ReadFile(hGameErrorLogFile, lpGameErrorLogBuffer, dwNewSizeLow, &dwBytesWritten, nullptr);
             cbGameErrorLogSize = dwBytesWritten;
         }
-        qwGameErrorLogFileDateTime = ResolveLogDate(lpGameErrorLogBuffer, cbGameErrorLogSize); /* 更新日志时间 */
+        // qwGameErrorLogFileDateTime = ResolveLogDate(lpGameErrorLogBuffer, cbGameErrorLogSize); /* 更新日志时间（废弃此方法，因为日期变更后若日志文件不刷新则从日志文件解析出的时间不准确） */
+        CSOL24H::game_error_log_file_date = ResolveLogDate(filetime); /* 将文件修改的日期作为日志的日期，获取日期的 00:00:00（需要考虑时区） 时刻的时间戳 */
         return true;
     }
     return false;

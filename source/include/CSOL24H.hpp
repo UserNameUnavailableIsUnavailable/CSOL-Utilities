@@ -49,7 +49,8 @@ static void InitializeWatchGameProcessThread();
 static bool IsErrorLogFileModified() noexcept;
 static bool UpdateErrorLogBuffer() noexcept;
 static void DispatchCommand() noexcept;
-static int64_t ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept;
+[[deprecated("从日志文件中获取到的日期在日期变更（23:59 之后）后可能不准确。")]] static int64_t ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept;
+static int64_t ResolveLogDate(FILETIME filetime) noexcept;
 static int64_t ResolveMessageTimestamp(const std::string message, int32_t* lpMillisecond) noexcept;
 static void GiveCommand(const char* cmd) noexcept;
 static DWORD CALLBACK WatchInGameState(LPVOID lpParam) noexcept;
@@ -93,10 +94,10 @@ static HANDLE hLocateCursorThread; /* 定位光标 */
 static std::shared_ptr<wchar_t[]> pwszErrorLogFilePath; /* 游戏 Error.log 日志路径 */
 static GameState game_state; /* 通过解析日志文件获取到的游戏状态 */
 static char* lpGameErrorLogBuffer; /* 游戏日志文件内容读取到此处 */
-static uint64_t qwLogBufferLastModifiedTime; /* 游戏日志文件缓冲区修改日期 */
+static int64_t log_buffer_last_modified_time; /* 游戏日志文件缓冲区修改时间（WINDOWS FILETIME） */
 static int64_t cbGameErrorLogSize; /* 日志文件缓冲区当前读入大小 */
 static bool bGameErrorLogBufferResolved; /* 日志文件缓冲区在更新后是否被解析过 */
-static uint64_t qwGameErrorLogFileDateTime; /* 游戏日志文件中的日期，使用该日 00:00:00 时刻的时间戳表示 */
+static int64_t game_error_log_file_date; /* 游戏日志文件中的日期，使用该日 00:00:00 时刻的 UNIX 时间戳表示（UTC 时间） */
 /* hWatchGameProcessStateThread 线程所需资源 */
 static std::shared_ptr<wchar_t[]> pwsTCGameExePath; /* TCGame 游戏启动器路径 */
 static std::shared_ptr<wchar_t[]> pwsTCGRunCSOCmd; /* TCGame 启动 CSOL 使用的命令行参数 */
