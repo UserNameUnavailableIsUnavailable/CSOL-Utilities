@@ -168,4 +168,13 @@ SpecialWeapon =
 
 ----SpecialWeapon = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
 
+---- v1.3 版本新增，只将下面的内容根据自身情况复制追加到上一版本 WeaponList.lua 中即可
+
+---防弹衣
+AC = Weapon:new({
+    name = "防弹衣",
+    purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.TWO}
+})
+
+
 end -- WeaponList_lua
