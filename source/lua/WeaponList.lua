@@ -141,8 +141,8 @@ SpecialWeapon =
         discharging = false, -- 是否在释放光印
         discharge_start_moment = 0, --  光印释放的时刻。
         charge_start_moment = 0, -- 充能开始的时刻。
-        DISCHARGE_TIME = 25 * 1000, -- 光印释放时间。
-        RECHARGE_TIME = 10 * 1000, -- 充能时间。
+        DISCHARGE_TIME = 25, -- 光印释放时间。
+        RECHARGE_TIME = 10, -- 充能时间。
         use = function (self)
             local current_time = DateTime:get_local_timestamp() -- 当前时间戳
             -- 当前正在充能，且充能时间超过 `RECHARGE_TIME`。

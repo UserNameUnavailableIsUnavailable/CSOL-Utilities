@@ -89,18 +89,19 @@ Player.last_weapon = nil
 ---@param weapon_list Weapon[] 武器列表。
 ---@return nil
 function Player:play(weapon_list)
+    AC:purchase() -- 购买护甲。
     if (not weapon_list or 0 == #weapon_list)
     then
         return
     end
     local count = #weapon_list
     local weapon = weapon_list[math.random(count)] -- 随机选择一件武器
-    ---上次使用的武器非近战或手雷，则先将其丢弃再购买选中的武器
-    if (self.last_weapon and self.last_weapon.number ~= Weapon.MELEE and self.last_weapon.number ~= Weapon.GRENADE)
+    ---上次使用与本次随机到的武器相同，丢弃后重新购买
+    if (self.last_weapon and self.last_weapon.name == weapon.name and self.last_weapon.number ~= weapon.MELEE and self.last_weapon.number ~= weapon.GRENADE)
     then
+        self.last_weapon:switch()
         self.last_weapon:abandon()
     end
-    AC:purchase()
     weapon:purchase()
     weapon:switch()
     self:start_move()
@@ -154,14 +155,8 @@ function Player:use_special_weapon(weapon)
         weapon:purchase()
         self.last_buy_special_weapon_time = current_time
     end
-    weapon:use()
+    weapon:use() -- 使用武器
+    self.last_weapon:switch() -- 使用后切换回原来的武器
 end
 
----通过多次按下 `Keyboard.ESCAPE` 清除当前界面上的所有窗口。
----@return nil
-function Player:clear_UI()
-    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.NORMAL)
-    Mouse:double_click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y) -- 点击ESC菜单的取消按钮
-    Mouse:double_click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y) -- 结算界面确认
-end
 end -- Play_lua

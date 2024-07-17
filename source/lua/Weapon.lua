@@ -66,8 +66,11 @@ function Weapon:purchase()
     do
         Keyboard:click(key, Delay.NORMAL)
     end
-    self:in_case_insufficient_funds()
-    self:close_dead_purchase_menu()
+    -- 清除当前界面上的所有窗口，用于防止购买资金不足或关闭死亡购买界面。
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
+    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮
+    -- self:in_case_insufficient_funds()
+    -- self:close_dead_purchase_menu()
 end
 
 ---切换到指定武器。

@@ -71,7 +71,6 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
                 SetEvent(hEnableLocateCursorEvent);
                 ConsoleLog("【消息】切换为 5 模式。\r\n");
             }
-            ReleaseMutex(hRunnableMutex);
         }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
