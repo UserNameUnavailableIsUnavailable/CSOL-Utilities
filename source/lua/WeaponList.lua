@@ -151,7 +151,7 @@ SpecialWeapon =
                 self.discharging = true
                 self.discharge_start_moment = current_time
                 self:switch()
-                Mouse:click(Mouse.LEFT, Delay.MEDIUM)
+                Mouse:click(Mouse.LEFT, 200)
             -- 当前正在释放，且释放时间超过 `DISCHARGE_TIME`。
             elseif (self.discharging and current_time - self.charge_start_moment > self.DISCHARGE_TIME)
             then
@@ -160,7 +160,7 @@ SpecialWeapon =
                 self:switch()
                 -- 按 `Keyboard.R` 召唤界徐圣。 
                 Mouse:move_relative(0, 4000, Delay.NORMAL)
-                Keyboard:click(Keyboard.R, self.switch_delay)
+                Keyboard:click(Keyboard.R, 350)
                 Mouse:move_relative(0, -4000, Delay.NORMAL)
             end
         end

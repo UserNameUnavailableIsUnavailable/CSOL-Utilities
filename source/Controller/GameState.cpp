@@ -147,10 +147,10 @@ void CSOL24H::TransferGameState() noexcept
         current_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
         log_timestamp = ResolveMessageTimestamp(line, nullptr);
         /* 按行解析日志消息并下达命令 */
-        if (line.find("Join Host Server") != std::string::npos)
+        if (line.find("Join HostServer") != std::string::npos)
         {
             gs.update(ENUM_GAME_STATE::GS_LOADING, log_timestamp);
-            msg = "加载游戏场景";
+            msg = "连接到服务器主机，加载游戏场景";
         }
         else if (line.find("Result Confirm") != std::string::npos)
         {
@@ -162,11 +162,11 @@ void CSOL24H::TransferGameState() noexcept
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "进入游戏房间";
         }
-        else if (line.find("Start Game Room") != std::string::npos)
-        {
-            gs.update(ENUM_GAME_STATE::GS_LOADING, log_timestamp);
-            msg = "即将加载游戏场景";
-        }
+        // else if (line.find("Start Game Room") != std::string::npos)
+        // {
+        //     gs.update(ENUM_GAME_STATE::GS_LOADING, log_timestamp);
+        //     msg = "开始游戏，即将加载游戏场景";
+        // }
         else if (line.find("Leave Game Room") != std::string::npos)
         {
             gs.update(ENUM_GAME_STATE::GS_HALL, log_timestamp);
