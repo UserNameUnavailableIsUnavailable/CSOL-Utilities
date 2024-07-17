@@ -49,10 +49,10 @@ HANDLE CSOL24H::hLocateCursorThread = NULL;
 std::shared_ptr<wchar_t[]> CSOL24H::pwszErrorLogFilePath = nullptr;
 GameState CSOL24H::game_state(ENUM_GAME_STATE::GS_UNKNOWN, 0);
 char* CSOL24H::lpGameErrorLogBuffer = nullptr;
-uint64_t CSOL24H::qwLogBufferLastModifiedTime = 0;
+int64_t CSOL24H::log_buffer_last_modified_time = 0;
 int64_t CSOL24H::cbGameErrorLogSize = 0;
 bool CSOL24H::bGameErrorLogBufferResolved = false;
-uint64_t CSOL24H::qwGameErrorLogFileDateTime = 0;
+int64_t CSOL24H::game_error_log_file_date = 0;
 /* hWatchGameProcessStateThread 线程所需资源 */
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGameExePath = nullptr;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGRunCSOCmd = nullptr;
