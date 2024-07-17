@@ -100,6 +100,7 @@ function Player:play(weapon_list)
     then
         self.last_weapon:abandon()
     end
+    AC:purchase()
     weapon:purchase()
     weapon:switch()
     self:start_move()
@@ -120,7 +121,7 @@ Player.part_weapon_counter = nil
 ---@param weapon_list Weapon[] 配件武器列表。
 function Player:buy_part_weapon(weapon_list)
     local current_time = DateTime:get_local_timestamp()
-    if (math.abs(current_time - self.last_buy_part_weapon_time) < 30) -- 每隔 30 秒购买一次
+    if (math.abs(current_time - self.last_buy_part_weapon_time) < 30) -- 每隔 20 秒购买一次
     then
         return
     else
@@ -146,7 +147,7 @@ Player.last_buy_special_weapon_time = 0
 function Player:use_special_weapon(weapon)
     if (not weapon) then return end
     local current_time = DateTime:get_local_timestamp()
-    if (math.abs(current_time - self.last_buy_special_weapon_time) < 30) -- 每隔 30 秒购买一次
+    if (math.abs(current_time - self.last_buy_special_weapon_time) < 20) -- 每隔 30 秒购买一次
     then
         return
     else

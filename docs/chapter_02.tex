@@ -11,16 +11,23 @@
 
 \subsection{前提条件}
 
-TCGame \textbf{必须}设置为自动登录，并在本集成工具启动后\textbf{必须}保证登录信息尚未失效，否则将无法使用断线重连功能。
+TCGame \textbf{\color{red}必须}设置为自动登录，并在本集成工具启动后\textbf{\color{red}必须}保证登录信息尚未失效，否则将无法使用断线重连功能。
 
-\textbf{建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
+\textbf{\color{red}建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
 
-本工具在游戏启动时会自动去除窗口的标题栏，并将窗口移动到屏幕正中央位置，防止因预料之外的窗口位置移动导致配置好的坐标信息失效。
-在按照第一章节介绍的方法，正确加载 LUA 脚本文件、启动控制器（0 模式）和 GamingTool 之后，通过 TCGame 启动游戏。
+确保 LUA 脚本文件正确保存并运行。
 
-游戏启动完成，并进入大厅界面后，按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 去除游戏窗口边框，如不去除边框，将导致挂机时使用的游戏按钮坐标不准确。
+运行控制器（0 模式）。
+
+运行 GamingTool.exe。
+
+通过 TCGame 启动游戏。
+
+游戏启动完成，进入大厅界面后，按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框，如不去除边框，将导致挂机时使用的游戏按钮坐标不准确。
 
 \subsection{通用设置}
+
+将控制器调到模式 5 进行坐标定位。
 
 打开 lua 目录下的 \lstinline{Setting.lua} 文件，本文件存放所有游戏内按钮的屏幕坐标位置，所有的坐标均通过 5 模式坐标定位功能确定。
 
@@ -132,7 +139,7 @@ TCGame \textbf{必须}设置为自动登录，并在本集成工具启动后\tex
 
 \lstinline{CHOOSE_T_CLASS}：是否选择 T 阵营角色。如要选择 T 阵营角色，将其设置为 \lstinline{true}，若要选择 CT 阵营角色，将其置为 \lstinline{false}。
 
-\lstinline{CHOOSE_T_CLASS_X}、\lstinline{CHOOSE_T_CLASS_Y}：切换到 T 阵营选择界面的按钮坐标。
+\lstinline{CHOOSE_T_CLASS_X}、\lstinline{CHOOSE_T_CLASS_Y}：切换到 T 阵营选择界面的按钮坐标。只有在您需要选择 T 阵营角色时（\lstinline{CHOOSE_T_CLASS} 为 \lstinline{true}），才会使用到该坐标。
 
 \begin{figure}[H]
     \Centering
@@ -179,9 +186,11 @@ TCGame \textbf{必须}设置为自动登录，并在本集成工具启动后\tex
 
 打开 \lstinline{WeaponList.lua} 文件。文件中已经提供了大量样例，根据下述的说明仔细修改即可。
 
-对于 1 号模式（单武器挂机、并购买配件武器），需要设置 \lstinline{PartWeaponList}（配件武器列表）和 \lstinline{DefaultWeaponList}（默认武器列表）。
+对于 1 号模式挂机（单武器挂机、并购买配件武器），需要设置 \lstinline{PartWeaponList} 和 \lstinline{DefaultWeaponList}。
 
-配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{必须}为英文标点符号，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自由的创建和删除武器。
+\lstinline{PartWeaponList} 是挂机过程中需要购买的配件武器，配件武器购买后不会被切换出来使用。
+
+配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{\color{red}必须}为英文标点符号，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自由的创建和删除武器。
 
 \begin{minted}[breaklines, breakautoindent=true]{lua}
 PartWeaponList = {
@@ -195,10 +204,6 @@ PartWeaponList = {
         number = Weapon.SECONDARY,
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}
     }),
-        Weapon:new({
-        name = "风暴之锤",
-        number = Weapon.MELEE,
-    }),
     Weapon:new({
         name = "燃爆Ignite-10",
         number = Weapon.GRENADE,
@@ -207,7 +212,7 @@ PartWeaponList = {
 }
 \end{minted}
 
-配件武器在游戏中不会被使用。每添加一款武器（数量任意，鉴于配件武器不会被使用，故没有必要超过 3 个），均需要在列表中新增相应的 \lstinline|Weapon:new({...})| 项，各个项之间用逗号分隔，空白字符不影响文件解析。
+每添加一款武器（数量任意，鉴于配件武器不会被使用，故没有必要超过 3 个），均需要在列表中新增相应的 \lstinline|Weapon:new({...})| 项，各个项之间用逗号分隔，空白字符不影响文件解析。
 
 下面对创建配件武器的方式详细说明。
 
@@ -216,20 +221,20 @@ PartWeaponList = {
 \item \lstinline{number} 为武器的序号，可以取：
 \lstinline{Weapon.PRIMARY}（主武器）、\lstinline{Weapon.SECONDARY}（副武器）、\lstinline{Weapon.MELEE}（近战武器）、\lstinline{Weapon.GRENADE}（手雷）。
 \item \lstinline{purchase_sequence}：武器购买按键序列。注意 \lstinline{Keyboard.J} 键可以切换不同阵营的武器。
-例如上面的\textbf{燃爆Ignite-10}，其购买按键序列被设置为 \textbf{BJ87}。仿照上面的例子，应该不难自行配置。
+例如上面的\textbf{\color{red}燃爆Ignite-10}，其购买按键序列被设置为 \textbf{\color{red}BJ87}。仿照上面的例子，应该不难自行配置。
 \end{itemize}
 
-默认挂机武器列表 \lstinline{DefaultWeaponList} 虽不限制武器数量，但建议只设置一件武器，如\textbf{幻境！·光棱剑}（文件中给出的例子）。
-这样，就能够实现单件武器挂机。
-与配件武器不同，默认武器除了设置 \lstinline{name}、\lstinline{number}、\lstinline{purchase_sequence} 外，还\lstinline{必须}设置下列字段：
+默认挂机武器列表 \lstinline{DefaultWeaponList} 是挂机过程中购买并使用的武器。不限制武器数量，不过还是建议只设置一件武器，如\textbf{\color{red}幻境！·光棱剑}（文件中给出的例子），这样就可以实现单武器挂机，可用于 24H 纯刀房。
+默认武器除了设置 \lstinline{name}、\lstinline{number}、\lstinline{purchase_sequence} 外，还\lstinline{必须}设置下列字段：
 
 \begin{itemize}
 \item \lstinline{switch_delay}（切枪延迟时间）：整数，单位为毫秒，默认为 \lstinline{Delay.NORMAL}（100 毫秒），自行配置时可以直接写数字。
 \item \lstinline{attack_button}（攻击鼠标按键）：\lstinline{Mouse.LEFT}（鼠标左键）、\lstinline{Mouse.RIGHT}（鼠标右键）。例如，魔法刀一般使用左键攻击，因而设置为左键。
 \end{itemize}
 
-对于 2 号模式（随机武器挂机、使用特殊武器辅助），需要设置 \lstinline{ExtendedWeaponList} 和 \lstinline{SpecialWeapon}。
+对于 2 号模式挂机（随机武器挂机、使用特殊武器辅助），需要设置 \lstinline{ExtendedWeaponList} 和 \lstinline{SpecialWeapon}。
 \lstinline{ExtendedWeaponList} 为扩展武器列表，不限制武器数量，挂机时随机从中抽取武器并使用，其配置方式同 \lstinline{DefaultWeaponList}，您可以根据提供的样例自行修改。
+
 \lstinline{SpecialWeapon} 为特殊武器，如圣翼皓印或炽翼魔印，如没有特殊武器，只需要将文件中红框部分的短横线删除即可。
 
 \begin{figure}
@@ -242,6 +247,15 @@ PartWeaponList = {
 已经编写好了圣翼皓印（或炽翼魔印）使用的方式，如需使用，只需要将其中的 \lstinline{purchase_sequence} 修改为自己使用的购买按键序列即可。
 对于有一定编程基础的玩家，可以自定义 \lstinline{SpecialWeapon}，重写 \lstinline{use} 方法。
 游戏过程中会通过调用 \lstinline{use} 方法使用该特殊武器。
+
+v1.3 中引入了使用护甲购买功能。在 \lstinline{WeaponList.lua} 中找到 \lstinline{AC}。
+请根据自身情况修改购买按键序列。
+
+\begin{figure}
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/buy_ac.png}
+    \caption{购买护甲}
+\end{figure}
 
 \subsection{使用方法}
 

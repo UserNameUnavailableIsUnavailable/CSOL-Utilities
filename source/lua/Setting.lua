@@ -44,7 +44,7 @@ Setting = {
     ROOM_START_GAME_X = 47025,
     ROOM_START_GAME_Y = 42030,
     -- 是否选择 T 阵营角色
-    CHOOSE_T_CLASS = true,
+    CHOOSE_T_CLASS = false,
     -- 角色选择界面 T 阵营
     CHOOSE_T_CLASS_X = 11304,
     CHOOSE_T_CLASS_Y = 9596,

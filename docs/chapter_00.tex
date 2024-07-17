@@ -10,9 +10,11 @@
 
 \subsection{罗技软件导入 LUA 程序}
 
-将压缩包解压，\textbf{解压路径不能包含非英文字符}，否则 LUA 脚本无法运行。
+将压缩包解压，\textbf{\color{red}解压路径不能包含非英文字符}，否则 LUA 脚本无法运行。
 
 鼠标右键点击 \lstinline{install.ps1} 点击在 Powershell 中运行，完成对 LUA 程序的配置。
+
+配置完成后，如果变动了安装路径，则需要重新运行一次 \lstinline{install.ps1}，并重新在罗技软件中保存并运行（详见下文）。
 
 \begin{figure}[H]
     \Centering
@@ -20,9 +22,9 @@
     \caption{运行 \lstinline{install.ps1}}
 \end{figure}
 
-然后，前往罗技官网下载安装最新版的 Logitech G HUB 软件。\textbf{不需要您拥有任何的罗技硬件设备。}
+然后，前往罗技官网下载安装最新版的 Logitech G HUB 软件。\textbf{\color{red}不需要您拥有任何的罗技硬件设备。}
 
-安装并\textbf{以管理员权限}启动 Logitech G HUB 软件。否则会因为权限问题导致游戏无法正确接收软件发出的键鼠消息。
+安装并\textbf{\color{red}以管理员权限}启动 Logitech G HUB 软件。否则会因为权限问题导致游戏无法正确接收软件发出的键鼠消息。
 
 \begin{figure}[H]
     \Centering
@@ -94,13 +96,17 @@
     \caption{保存并运行}
 \end{figure}
 
-看到控制台输出下述文字信息，则说明导入成功。\textbf{后续若对文件夹内的 LUA 任一个源文件进行修改，则还需要重新在此界面中点击保存并运行。}
+看到控制台输出下述文字信息，则说明导入成功。
 
 \begin{figure}[H]
     \Centering
     \includegraphics[width=\textwidth]{docs/assets/success.png}
     \caption{保存并运行成功}
 \end{figure}
+
+保存并运行后，罗技软件在下一次启动时会自动加载上述脚本文件（启动时加载只会执行一次），无需再重复上述操作。
+
+\textbf{\color{red}但是，加载后若对文件夹内的 LUA 任一个源文件进行修改，则还需要重新在此界面中点击保存并运行。}
 
 \subsection{控制器}
 
@@ -134,15 +140,15 @@
 
 控制器会在 \lstinline{lua} 目录下创建临时文件，实时向该临时文件中写入命令，指导 LUA 模块执行相应的操作。
 每条命令都有一定的有效期（5 秒），超过有效期的命令不会被 LUA 模块执行。
-每条命令的执行完毕都需要一定的时间，\textbf{控制器切换模式不会立即停止当前命令的执行，而是有一定的延迟时间。}
+每条命令的执行完毕都需要一定的时间，\textbf{\color{red}控制器切换模式不会立即停止当前命令的执行，而是有一定的延迟时间}。
 
 \subsection{即时中断功能}
 
 上面提到，控制器切换模式，LUA 模块响应有一定的延迟。
 为了使罗技软件能够及时响应紧急的中断消息，本集成工具通过封装罗技 API，在 LUA 模块中引入了即时中断功能。
 
-例如，若不慎错误地按下前面提及的功能热键，导致鼠标键盘不受控制，可以同时按下键盘上的左 \lstinline{Ctrl} 和右 \lstinline{Ctrl} 紧急暂停，罗技软件会在 10 毫秒内快速响应此中断信号。
-紧急暂停后，罗技软件将不再发出任何键鼠操作，直至同时按下键盘上的左 \lstinline{Alt} 和右 \lstinline{Alt} 恢复。
+例如，\textbf{\color{red}若不慎错误地按下前面提及的功能热键，导致鼠标键盘不受控制，可以同时按下键盘上的左 \lstinline{Ctrl} 和右 \lstinline{Ctrl} 紧急暂停，罗技软件会在 10 毫秒内快速响应此中断信号。
+紧急暂停后，罗技软件将不再发出任何键鼠操作，直至同时按下键盘上的左 \lstinline{Alt} 和右 \lstinline{Alt} 恢复。}
 
 相应地，您可以在罗技软件控制台中看到相应的提示信息。
 
@@ -153,7 +159,7 @@
 \end{figure}
 
 需要注意，紧急暂停功能完全独立于控制器。
-\textbf{紧急暂停后，控制器仍然会持续向罗技软件下达命令，只是罗技软件并不会执行这些命令}。若要取消当前控制器启用的模式，请按热键将控制器切换回 0 模式。
+\textbf{\color{red}紧急暂停后，控制器仍然会持续向罗技软件下达命令，只是罗技软件并不会执行这些命令。}若要取消当前控制器启用的模式，请按热键将控制器切换回 0 模式。
 
 \subsection{使用 GamingTool}
 
@@ -167,3 +173,25 @@
 按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管。
 后续版本更新不会对这两个配置文件内容作出较大的变动。
 更新到新版本时，只需要将这两份文件原样复制到新版本的 \lstinline{lua} 目录下，并在新版本目录下重新运行一次 \lstinline{install.ps1}，在罗技软件中将 \lstinline{main.lua} 重新保存并运行即可。
+
+\subsection{更新方法（初次安装使用可跳过）}
+
+\textbf{\color{red}关闭旧版本控制器和 GamingTool。}
+
+下载新版本压缩包。
+
+\textbf{\color{red}将您在旧版中使用的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 备份。}
+
+打开新版本 \lstinline{lua} 目录下的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}，移动到文件末尾，查看是否有对应版本的更新（更新会注明）。
+如有，将新增的部分复制到备份的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 中并保存。
+上述操作完成后，用备份的两个文件\textbf{\color{red}替换}新版本 \lstinline{lua} 目录中的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}。
+然后，在新版路径下右键在 Powershell 中运行 \lstinline{install.ps1}，并在罗技软件中导入新版 \lstinline{lua} 路径下的 \lstinline{main.lua} 文件，然后点击保存并运行。
+随后，运行控制器和 GamingTool，按照本文所述操作方式即可正常使用各项功能。
+
+解压新版本压缩包\textbf{\color{red}（解压路径不能包含非英文字符）}，将上述两个文件复制到新版本 \lstinline{lua} 路径下，覆盖其中的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}。
+
+在新版本解压路径下右键在 Powershell 中运行 \lstinline{install.ps1}。
+
+然后，阅读更新说明，向 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 中追加新内容（原有内容保持不变）。
+
+修改完成后，打开罗技软件，导入并运行新版本 \lstinline{lua} 目录下的 \lstinline{main.lua} 文件。
