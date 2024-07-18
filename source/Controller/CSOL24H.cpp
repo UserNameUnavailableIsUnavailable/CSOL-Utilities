@@ -136,23 +136,20 @@ void CSOL24H::InitializeWatchGameProcessThread()
 {
     /* 获取 TCGame 可执行文件路径 */
     auto setup = QueryRegistryStringItem(HKEY_CURRENT_USER, L"Software\\TCGame", L"setup"); /* C:\Program Files (x86)\TCGame */
-    uint32_t cchSize = wcslen(setup.get()) + wcslen(L"\\TCGame.exe") + 1; /* C:\Program Files (x86)\TCGame\TCGame.exe */
+    uint32_t cchSize = wcslen(setup.get()) + wcslen(L"\\TCGame.exe") + 8; /* C:\Program Files (x86)\TCGame\TCGame.exe */
     pwsTCGameExePath = std::shared_ptr<wchar_t[]>(new wchar_t[cchSize]);
-    wcscpy_s(pwsTCGameExePath.get(), cchSize, setup.get());
-    wcscat_s(pwsTCGameExePath.get(), cchSize, L"\\TCGame.exe");
+    wcscpy_s(pwsTCGameExePath.get(), cchSize, L"\""); /* " */
+    wcscat_s(pwsTCGameExePath.get(), cchSize, setup.get()); /* "C:\Program Files (x86)\TCGame */
+    wcscat_s(pwsTCGameExePath.get(), cchSize, L"\\TCGame.exe"); /* "C:\Program Files (x86)\TCGame\TCGame.exe */
+    wcscat_s(pwsTCGameExePath.get(), cchSize, L"\""); /* "C:\Program Files (x86)\TCGame\TCGame.exe" */
+    ConsoleLog("【消息】TCGame 所在路径：%ls\r\n", pwsTCGameExePath.get());
     /* 启动 CSOL 的命令行 */
-    cchSize = cchSize + wcslen(L" cso"); /* C:\Program Files (x86)\TCGame\TCGame.exe cso */
+    cchSize = cchSize + wcslen(L" cso") + 8; /* "C:\Program Files (x86)\TCGame\TCGame.exe" cso */
     pwsTCGRunCSOCmd = std::shared_ptr<wchar_t[]>(new wchar_t[cchSize]);
     wcscpy_s(pwsTCGRunCSOCmd.get(), cchSize, pwsTCGameExePath.get());
-    wcscat_s(pwsTCGRunCSOCmd.get(), cchSize, L"cso");
-    if (!FindWindowW(NULL, L"Counter-Strike Online")) /* 未找到游戏窗口 */
-    {
-        hGameProcess = INVALID_HANDLE_VALUE; /* 游戏进程句柄设置为 INVALID_HANDLE_VALUE 将自动创建游戏进程 */
-    }
-    else
-    {
-        hGameProcess = NULL; /* 游戏进程句柄设置为 NULL 将自动打开已存在的游戏进程句柄 */
-    }
+    wcscat_s(pwsTCGRunCSOCmd.get(), cchSize, L" cso");
+    ConsoleLog("【消息】启动 CSOL 使用的命令行：%ls\r\n", pwsTCGRunCSOCmd.get());
+    hGameProcess = INVALID_HANDLE_VALUE; /* 游戏进程句柄设置为 INVALID_HANDLE_VALUE 将自动创建游戏进程 */
     HWND hTCGWnd = FindWindowW(NULL, L"TCGames");
     if (hTCGWnd)
     {

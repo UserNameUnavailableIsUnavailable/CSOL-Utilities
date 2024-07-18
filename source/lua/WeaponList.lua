@@ -19,10 +19,6 @@ PartWeaponList = {
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}
     }),
     Weapon:new({
-        name = "风暴之锤",
-        number = Weapon.MELEE,
-    }),
-    Weapon:new({
         name = "燃爆Ignite-10",
         number = Weapon.GRENADE,
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
