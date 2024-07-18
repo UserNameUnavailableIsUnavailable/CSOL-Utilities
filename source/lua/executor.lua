@@ -53,7 +53,7 @@ end
 
 ---点击“开始游戏”按钮，开始游戏。
 function Executor:start_game_room()
-    Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.NORMAL)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
     Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y)
     Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
 end
@@ -84,7 +84,7 @@ function Executor:try_confirm()
     then
         return
     end
-    Keyboard:click_several_times(Keyboard.ESCAPE, 4)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
     Mouse:click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y)
     self.last_confirm_timestamp = current_timestamp
 end
