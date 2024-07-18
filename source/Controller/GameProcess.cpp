@@ -123,8 +123,9 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             startup_info_w.cb = sizeof(startup_info_w);
             PROCESS_INFORMATION process_information;
             HWND hWnd = FindWindowW(NULL, L"TCGames");
-            if (CreateProcessW(
-                pwsTCGameExePath.get(),
+            if (FindWindowW(NULL, L"Counter-Strike Online") || /* CSOL 已经启动 */
+                CreateProcessW( /* CSOL 未启动，则运行 CSOL */
+                NULL,
                 pwsTCGRunCSOCmd.get(),
                 NULL,
                 NULL,
