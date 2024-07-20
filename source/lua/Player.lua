@@ -99,12 +99,12 @@ function Player:play(weapon_list)
     math.randomseed(Runtime:get_running_time(), DateTime:get_local_timestamp())
     local weapon = weapon_list[math.random(count)] -- 随机选择一件武器
     ---上次使用与本次随机到的武器相同，丢弃后重新购买
-    if (self.last_primary_weapon and weapon.number == Weapon.PRIMARY and self.last_primary_weapon.name == weapon.name) -- 随机到最近一次使用的主武器相同
+    if (weapon == self.last_primary_weapon) -- 随机到最近一次使用的主武器相同
     then
         self.last_primary_weapon:switch()
         self.last_primary_weapon:abandon()
         self.last_primary_weapon = weapon -- 更新上一次使用的主武器
-    elseif (self.last_secondary_weapon and weapon.number == Weapon.SECONDARY and self.last_secondary_weapon.name == weapon.name) -- 随机到最近一次使用的副武器
+    elseif (weapon == self.last_secondary_weapon) -- 随机到最近一次使用的副武器
     then
         self.last_secondary_weapon:switch()
         self.last_secondary_weapon:abandon()
