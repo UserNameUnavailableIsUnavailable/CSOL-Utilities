@@ -33,11 +33,9 @@ Setting = {
     ---“游戏难度”选框
     GAME_DIFFICULTY_X = 33126,
     GAME_DIFFICULTY_Y = 39114,
-    ---难度选项（已废弃）
-    -- GAME_DIFFICULTY_OPTION_X = 32921,
-    -- GAME_DIFFICULTY_OPTION_Y = 42880,
-    --- 难度选项（0 - 入门，1 普通，2 困难，以此类推）
-    GAME_DIFFICULTY_OPTION = 2,
+    ---难度选项
+    GAME_DIFFICULTY_OPTION_X = 32921,
+    GAME_DIFFICULTY_OPTION_Y = 42880,
     ---“新建房间”按钮
     CREATE_ROOM_X = 30223,
     CREATE_ROOM_Y = 44945,
