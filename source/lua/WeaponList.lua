@@ -76,6 +76,13 @@ ExtendedWeaponList = {
         attack_button = Mouse.LEFT
     },
     Weapon:new{
+        name = "【青鸾】迅风轮",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.EIGHT},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
         name = "晖耀审判",
         switch_delay = Delay.NORMAL,
         number = Weapon.SECONDARY,

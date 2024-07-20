@@ -26,7 +26,7 @@ int main()
         std::cout << e.what() << std::endl;
         ConsoleLog("%s\r\n", e.what());
         CSOL24H::Destroy();
-        ConsoleLog("【错误】程序无法继续运行。按任意键退出。");
+        ConsoleLog("【错误】程序无法继续运行。按回车键退出。");
         std::getchar();
     }
     /* finally */
