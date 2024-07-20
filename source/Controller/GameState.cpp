@@ -8,6 +8,7 @@
 #include <ctime>
 #include <fileapi.h>
 #include <iterator>
+#include <libloaderapi.h>
 #include <memory>
 #include <minwinbase.h>
 #include <minwindef.h>
@@ -26,36 +27,6 @@
 #include "Command.hpp"
 #include "Console.hpp"
 
-static void AdjustWindowRectToMiddleOfScreen(RECT& rect) noexcept
-{
-    RECT rcScreen = {
-        .left = 0,
-        .top = 0
-    };
-    rcScreen.right = GetSystemMetrics(SM_CXSCREEN);
-    rcScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
-    LONG lDeltaX = (rcScreen.right - (rect.left + rect.right)) / 2;
-    LONG lDeltaY = (rcScreen.bottom - (rect.top + rect.bottom)) / 2;
-    rect.left += lDeltaX;
-    rect.right += lDeltaX;
-    rect.top += lDeltaY;
-    rect.bottom += lDeltaY;
-}
-static void MakeWindowBorderless(HWND hWnd) noexcept
-{
-    WINDOWINFO windowInfo;
-    if (!IsWindow(hWnd) || !GetWindowInfo(hWnd, &windowInfo))
-    {
-        return;
-    }
-    DWORD dwStyle = windowInfo.dwStyle & ~WS_CAPTION;
-    RECT& rcClient = windowInfo.rcClient;
-    AdjustWindowRectToMiddleOfScreen(rcClient);
-    ShowWindow(hWnd, SW_SHOW);
-    SetWindowLongPtrW(hWnd, GWL_STYLE, dwStyle);
-    UpdateWindow(hWnd);
-    MoveWindow(hWnd, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
-}
 DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
 {
     while (
@@ -99,7 +70,7 @@ void CSOL24H::TransferGameState() noexcept
             gs.update(ENUM_GAME_STATE::GS_MAP, current_time); /* 状态由 LOADING 转为 MAP，时间戳更新为当前时刻 */
             msg =  "预设加载时间已过，认为已经进入游戏场景";
         }
-        if (game_state.get_state() == ENUM_GAME_STATE::GS_LOGIN && std::abs(current_time - game_state.get_timestamp()) > 15) /* 登陆后等待 15 秒 */
+        if (game_state.get_state() == ENUM_GAME_STATE::GS_LOGIN && std::abs(current_time - game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
         {
             HWND hWnd = FindWindowW(NULL, L"Counter-Strike Online");
             if (hWnd)
@@ -107,11 +78,19 @@ void CSOL24H::TransferGameState() noexcept
                 SetForegroundWindow(hWnd);
                 SetFocus(hWnd);
                 SetCapture(hWnd);
-                MakeWindowBorderless(hWnd);
-                ConsoleLog("【消息】去除窗口标题栏。\r\n");
+                auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
+                if (MakeWindowBorderless) {
+                    MakeWindowBorderless(hWnd);
+                    ConsoleLog("【消息】去除窗口标题栏。\r\n");
+                }
             }
             gs.update(ENUM_GAME_STATE::GS_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
             msg = "登陆后等待时间已过，认为游戏客户端已经完全加载";
+        }
+        if (game_state.get_state() == ENUM_GAME_STATE::GS_ROOM && std::abs(current_time - game_state.get_timestamp()) > 15 * 60) /* 在房间内等待 15 分钟而未开始游戏 */
+        {
+            gs.update(ENUM_GAME_STATE::GS_HALL, current_time); /* 状态由 ROOM 转为 HALL，时间戳更新为当前时刻 */
+            msg = "在房间内久未进入游戏，认为已经回到大厅";
         }
         if (game_state.update(gs))
         {
@@ -172,7 +151,7 @@ void CSOL24H::TransferGameState() noexcept
             gs.update(ENUM_GAME_STATE::GS_HALL, log_timestamp);
             msg = "返回到游戏大厅";
         }
-        else if (line.find("Return to Room") != std::string::npos)
+        else if (line.find("Return to room") != std::string::npos)
         {
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "回到游戏房间";

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <synchapi.h>
+#include <windef.h>
 #include <winreg.h>
 #include <string>
 #include "GameState.hpp"
@@ -83,6 +84,11 @@ static HANDLE hRunnableMutex; /* 使线程运行互斥 */
 /* 文件句柄 */
 static HANDLE hGameErrorLogFile; /* 游戏日志文件 */
 static HANDLE hLUACommandFile; /* 向罗技 LUA 语言服务器下达命令的脚本文件 */
+/* GamingTool 模块句柄 */
+static HMODULE hGamingToolModule;
+/* 用于屏蔽系统热键的键盘钩子 */
+static HHOOK hLLKH;
+static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 /* 线程句柄 */
 static HANDLE hWatchInGameStateThread; /* 通过解析日志文件实时监测游戏内状态 */
 static HANDLE hWatchGameProcessStateThread; /* 监视游戏进程状态，并在游戏进程退出时重新启动游戏进程 */

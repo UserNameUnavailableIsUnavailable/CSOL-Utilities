@@ -5,6 +5,7 @@
 #include <errhandlingapi.h>
 #include <fileapi.h>
 #include <handleapi.h>
+#include <libloaderapi.h>
 #include <memory>
 #include <minwindef.h>
 #include <processthreadsapi.h>
@@ -37,7 +38,10 @@ HANDLE CSOL24H::hRunnableMutex = NULL;
 /* 文件句柄 */
 HANDLE CSOL24H::hGameErrorLogFile = INVALID_HANDLE_VALUE;
 HANDLE CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
-
+/* GamingTool 模块 */
+HMODULE CSOL24H::hGamingToolModule = NULL;
+/* 用于屏蔽系统热键的键盘钩子 */
+HHOOK CSOL24H::hLLKH;
 /* 线程句柄 */
 HANDLE CSOL24H::hWatchInGameStateThread = NULL;
 HANDLE CSOL24H::hWatchGameProcessStateThread = NULL;
@@ -253,6 +257,16 @@ void CSOL24H::Initialize()
     {
         throw CSOL24H_EXCEPT("【错误】创建互斥体 %ls 失败。错误代码：%lu。", L"hRunnableMutex", GetLastError());
     }
+    hGamingToolModule = LoadLibraryW(L"GamingTool.dll");
+    if (!hGamingToolModule)
+    {
+        throw CSOL24H_EXCEPT("【错误】加载模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
+    }
+    auto InitializeGamingToolDll = (BOOL(*)(void))GetProcAddress(hGamingToolModule, "InitializeGamingToolDll");
+    if (!InitializeGamingToolDll || !InitializeGamingToolDll())
+    {
+        throw CSOL24H_EXCEPT("【错误】初始化模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
+    }
     InitializeWatchInGameStateThread();
     InitializeWatchGameProcessThread();
     InitializeCombinePartsThread();
@@ -421,8 +435,11 @@ void CSOL24H::Destroy() noexcept
     }
 
     delete[] lpGameErrorLogBuffer;
-    
+    auto DeinitializeGamingToolDll = (void(*)(void))GetProcAddress(hGamingToolModule, "DeinitializeGamingTool");
+    if (DeinitializeGamingToolDll) DeinitializeGamingToolDll();
+    FreeLibrary(hGamingToolModule);   
     pwsTCGameExePath = nullptr;
     pwsTCGRunCSOCmd = nullptr;
     // TODO: 静态变量重新初始化
+
 }
