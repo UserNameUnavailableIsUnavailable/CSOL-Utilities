@@ -103,13 +103,13 @@ function Player:play(weapon_list)
     then
         self.last_primary_weapon:switch()
         self.last_primary_weapon:abandon()
-        self.last_primary_weapon = weapon -- 更新上一次使用的主武器
     elseif (weapon == self.last_secondary_weapon) -- 随机到最近一次使用的副武器
     then
         self.last_secondary_weapon:switch()
         self.last_secondary_weapon:abandon()
-        self.last_secondary_weapon = weapon -- 更新上一次使用的副武器
     end
+    if (weapon.number == Weapon.PRIMARY) then self.last_primary_weapon = weapon end -- 更新上一次使用的主武器
+    if (weapon.number == Weapon.SECONDARY) then self.last_secondary_weapon = weapon end -- 更新上一次使用的副武器
     weapon:purchase()
     weapon:switch()
     self:start_move()
