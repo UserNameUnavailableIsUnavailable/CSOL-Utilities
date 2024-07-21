@@ -151,6 +151,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             {
                 ConsoleLog("【警告】通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。\r\n", GetLastError());
             }
+            ResetEvent(hEnableWatchGameStateEvent);
             continue;
         }
         DWORD dwResult = WaitForSingleObject(hGameProcess, 500);
