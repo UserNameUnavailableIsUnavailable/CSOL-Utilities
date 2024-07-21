@@ -33,7 +33,7 @@ DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
         WAIT_OBJECT_0 == WaitForSingleObject(
             hEnableWatchGameStateEvent,
             INFINITE
-        ))
+        )) /* 获取到所有可等待对象才开始运行 */
     {
         if (bDestroy)
         {
@@ -207,8 +207,8 @@ bool CSOL24H::UpdateErrorLogBuffer() noexcept
         {
             ReadFile(
                 hGameErrorLogFile,
-                lpGameErrorLogBuffer + cbGameErrorLogSize,
-                dwNewSizeLow - cbGameErrorLogSize,
+                lpGameErrorLogBuffer + cbGameErrorLogSize, /* append to buffer */
+                dwNewSizeLow - cbGameErrorLogSize, /* new content */
                 &dwBytesWritten,
                 nullptr
             );
