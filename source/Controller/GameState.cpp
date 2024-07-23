@@ -61,6 +61,7 @@ void CSOL24H::TransferGameState() noexcept
     std::string line;
     const char* msg = nullptr;
     GameState gs;
+    static int32_t return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
     /* 例行检查 */
     if (bGameErrorLogBufferResolved)
     {
@@ -133,6 +134,7 @@ void CSOL24H::TransferGameState() noexcept
         }
         else if (line.find("Result Confirm") != std::string::npos)
         {
+            return_to_room_times = 0; /* 完整进行一场游戏后清零 */
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "游戏结算，回到房间";
         }
@@ -153,8 +155,17 @@ void CSOL24H::TransferGameState() noexcept
         }
         else if (line.find("Return to room") != std::string::npos)
         {
-            gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
-            msg = "回到游戏房间";
+            return_to_room_times++;
+            if (return_to_room_times > 3)
+            {
+                gs.update(ENUM_GAME_STATE::GS_HALL, current_time);
+                msg = "因网络问题返回到房间内次数过多，尝试回到大厅重新创建房间";
+            }
+            else
+            {
+                gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
+                msg = "回到游戏房间";
+            }
         }
         else if (line.find("QuitLog: game shutdown") != std::string::npos)
         {
