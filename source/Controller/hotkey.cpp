@@ -129,12 +129,12 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    UnregisterHotKey(NULL, 0);
-    UnregisterHotKey(NULL, 1);
-    UnregisterHotKey(NULL, 2);
-    UnregisterHotKey(NULL, 3);
-    UnregisterHotKey(NULL, 4);
-    UnregisterHotKey(NULL, 5);
+    UnregisterHotKey(NULL, '0');
+    UnregisterHotKey(NULL, '1');
+    UnregisterHotKey(NULL, '2');
+    UnregisterHotKey(NULL, '3');
+    UnregisterHotKey(NULL, '4');
+    UnregisterHotKey(NULL, '5');
     // UnregisterHotKey(NULL, 6);
     // UnregisterHotKey(NULL, 7);
     // UnregisterHotKey(NULL, 8);

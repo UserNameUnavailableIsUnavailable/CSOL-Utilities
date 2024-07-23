@@ -48,10 +48,7 @@ function Executor:create_game_room()
     Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 3000)
     Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 3000)
     Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 3000)
-    -- Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 3000)
-    Keyboard:click_several_times(Keyboard.UP, 10, 500)
-    Keyboard:click_several_times(Keyboard.DOWN, Setting.GAME_DIFFICULTY_OPTION, 500)
-    Keyboard:click_on(Keyboard.ENTER, 500)
+    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 3000)
     Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000)
 end
 
