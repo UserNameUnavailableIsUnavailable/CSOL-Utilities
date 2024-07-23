@@ -134,14 +134,15 @@ void CSOL24H::TransferGameState() noexcept
         }
         else if (line.find("Result Confirm") != std::string::npos)
         {
-            return_to_room_times = 0; /* 完整进行一场游戏后清零 */
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "游戏结算，回到房间";
+            return_to_room_times = 0; /* 正常完成一局游戏，清零 */
         }
         else if (line.find("S_ROOM_ENTER") != std::string::npos)
         {
             gs.update(ENUM_GAME_STATE::GS_ROOM, log_timestamp);
             msg = "进入游戏房间";
+            return_to_room_times = 0; /* 进入新房间，清零 */
         }
         // else if (line.find("Start Game Room") != std::string::npos)
         // {
@@ -158,7 +159,7 @@ void CSOL24H::TransferGameState() noexcept
             return_to_room_times++;
             if (return_to_room_times > 3)
             {
-                gs.update(ENUM_GAME_STATE::GS_HALL, current_time);
+                gs.update(ENUM_GAME_STATE::GS_ROOM_ABNORMAL, current_time);
                 msg = "因网络问题返回到房间内次数过多，尝试回到大厅重新创建房间";
             }
             else
@@ -272,6 +273,10 @@ void CSOL24H::DispatchCommand() noexcept
     else if (state == ENUM_GAME_STATE::GS_ROOM)
     {
         cmd = LUA_CMD_START_GAME_ROOM;
+    }
+    else if (state == ENUM_GAME_STATE::GS_ROOM_ABNORMAL)
+    {
+        cmd = LUA_CMD_CREATE_ROOM;
     }
     else if (state == ENUM_GAME_STATE::GS_HALL)
     {

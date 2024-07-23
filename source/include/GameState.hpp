@@ -12,6 +12,7 @@ enum ENUM_GAME_STATE
     GS_ROOM,
     GS_MAP,
     GS_SHUTDOWN,
+    GS_ROOM_ABNORMAL,
     GS_UNKNOWN
 };
 
