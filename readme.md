@@ -9,7 +9,7 @@
 
 ## 先决条件
 
-- Logitech G Hub（无需罗技设备）
+- Logitech G Hub 最新版（无需罗技设备）
 - Powershell 5 及以上（Windows 8 及以上版本 Windows 自带）
 
 ## 说明
