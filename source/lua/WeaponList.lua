@@ -47,27 +47,27 @@ ExtendedWeaponList = {
         purchase_sequence = {Keyboard.B, Keyboard.G},
         attack_button = Mouse.LEFT
     },
-    -- Weapon:new{
-    --     name = "【擎空】突击套装",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.SECONDARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.ONE},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "【天驱】突击套装",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.SECONDARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.TWO},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "冰雪魔咒PB-4",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.SECONDARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.THREE},
-    --     attack_button = Mouse.LEFT
-    -- },
+    Weapon:new{
+        name = "【擎空】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.ONE},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【天驱】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.TWO},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "冰雪魔咒PB-4",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.THREE},
+        attack_button = Mouse.LEFT
+    },
     Weapon:new{
         name = "次元裁决",
         switch_delay = Delay.NORMAL,
@@ -89,41 +89,41 @@ ExtendedWeaponList = {
         purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.FIVE},
         attack_button = Mouse.LEFT
     },
-    -- Weapon:new{
-    --     name = "【黯火】加特林",
-    --     switch_delay = Delay.SHORT,
-    --     number = Weapon.PRIMARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.FIVE, Keyboard.SEVEN},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "【黯影】Hecate II",
-    --     switch_delay = Delay.SHORT,
-    --     number = Weapon.PRIMARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.FOUR, Keyboard.FOUR},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "【恶龙】霰弹炮",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.PRIMARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.TWO, Keyboard.ONE},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "【异噬】暗雷兽",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.PRIMARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.TWO, Keyboard.TWO},
-    --     attack_button = Mouse.LEFT
-    -- },
-    -- Weapon:new{
-    --     name = "暗狱雷魂",
-    --     switch_delay = Delay.NORMAL,
-    --     number = Weapon.PRIMARY,
-    --     purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.ONE},
-    --     attack_button = Mouse.LEFT
-    -- },
+    Weapon:new{
+        name = "【黯火】加特林",
+        switch_delay = Delay.SHORT,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.FIVE, Keyboard.SEVEN},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【黯影】Hecate II",
+        switch_delay = Delay.SHORT,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.FOUR, Keyboard.FOUR},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【恶龙】霰弹炮",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.TWO, Keyboard.ONE},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【异噬】暗雷兽",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.TWO, Keyboard.TWO},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "暗狱雷魂",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.ONE},
+        attack_button = Mouse.LEFT
+    },
     Weapon:new{
         name = "逆界星轮",
         switch_delay = Delay.NORMAL,
