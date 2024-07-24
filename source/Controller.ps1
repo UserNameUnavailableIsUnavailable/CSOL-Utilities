@@ -2,7 +2,7 @@ $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Pri
 if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
     $location = (Get-Location).ToString()
-    Start-Process -FilePath powershell -Verb RunAs -WorkingDirectory $location -ArgumentList "-NoExit -Command `"& {Set-Location $location; .\Controller.exe}`""
+    Start-Process -FilePath powershell -Verb RunAs -WorkingDirectory "$location" -ArgumentList "-NoExit -Command `"& {Set-Location "$location"; .\Controller.exe}`""
 }
 else
 {
