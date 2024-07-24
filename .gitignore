@@ -1,0 +1,5 @@
+build/
+docs/
+manual/
+.vscode/
+Makefile
