@@ -20,7 +20,10 @@
 
 本集成工具需要搭配 GamingTool 工具使用（原因参见使用文档），具体参考 <a href="https://gitee.com/silver1867/gaming-tool">GamingTool</a> 工具，后续考虑将 GamingTool 工具整合到本项目中。
 
-**本软件使用 GPL v2.0 协议，请尊重作者劳动。**
+**本软件开源组件使用 GPL v2.0 协议，请尊重作者劳动。**
+
+为防范别有用心之人，本项目中的 `Makefile` 、配置文件、LaTeX 文档源码不予提供。
+但是，项目中的 C++ 及 LUA 模块仍保持开源并附以完善注释。
 
 B 站 ID：_CoreDump
 
