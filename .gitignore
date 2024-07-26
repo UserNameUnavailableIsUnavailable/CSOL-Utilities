@@ -1,1 +1,6 @@
 build/
+docs/
+manual/
+.vscode/
+.clangd
+Makefile
