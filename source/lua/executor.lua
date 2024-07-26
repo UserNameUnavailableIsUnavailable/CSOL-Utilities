@@ -117,11 +117,11 @@ end
 
 ---购买商店物品。
 function Executor:purchase_item(buy_button_x, buy_button_y)
-    Mouse:click_on(buy_button_x, buy_button_y, 50)
-    Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 50) -- 弹出界面选项
-    Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 50) -- 弹出界面兑换按钮
-    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 100) -- 兑换后确认
-    Keyboard:click(Keyboard.ESCAPE, 50)
+    Mouse:click_on(buy_button_x, buy_button_y, 20)
+    Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 20) -- 弹出界面选项
+    Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 20) -- 弹出界面兑换按钮
+    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 150) -- 兑换后确认
+    Keyboard:click(Keyboard.ESCAPE, 20)
 end
 
 ---上一次定位得到的光标
