@@ -441,5 +441,4 @@ void CSOL24H::Destroy() noexcept
     pwsTCGameExePath = nullptr;
     pwsTCGRunCSOCmd = nullptr;
     // TODO: 静态变量重新初始化
-
 }
