@@ -115,9 +115,15 @@ function Executor:combine_parts()
     )
 end
 
+Executor.buy_button_x = 0
+Executor.buy_button_y = 0
 ---购买商店物品。
+---@param buy_button_x integer|nil 横坐标。
+---@param buy_button_y integer|nil 纵坐标。
 function Executor:purchase_item(buy_button_x, buy_button_y)
-    Mouse:click_on(buy_button_x, buy_button_y, 50)
+    self.buy_button_x = buy_button_x or self.buy_button_x or 0
+    self.buy_button_y = buy_button_y or self.buy_button_y or 0
+    Mouse:click_on(Executor.buy_button_x, Executor.buy_button_y, 50)
     Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 50) -- 弹出界面选项
     Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 50) -- 弹出界面兑换按钮
     Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 100) -- 兑换后确认

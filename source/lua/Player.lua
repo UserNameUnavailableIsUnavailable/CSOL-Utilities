@@ -90,7 +90,7 @@ Player.last_secondary_weapon = nil
 ---@param weapon_list Weapon[] 武器列表。
 ---@return nil
 function Player:play(weapon_list)
-    AC:purchase() -- 购买护甲。
+    if (AC) then AC:purchase() end -- 购买护甲。
     if (not weapon_list or 0 == #weapon_list)
     then
         return
