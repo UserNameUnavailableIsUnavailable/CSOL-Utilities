@@ -66,8 +66,7 @@ function Executor:choose_class()
     then
         Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
     end
-    local option = math.tointeger(Setting.CLASS_OPTION)
-    if (option and option >=0 and option <= 9)
+    if (Setting.CLASS_OPTION and math.type(Setting.CLASS_OPTION) == "integer" and Setting.CLASS_OPTION >= 0 and Setting.CLASS_OPTION <= 9)
     then
         Keyboard:click(tostring(Setting.CLASS_OPTION), Delay.NORMAL)
     else
