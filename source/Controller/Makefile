@@ -5,4 +5,4 @@ OBJECTS := $(addsuffix .obj, $(SUBMODULES))
 all: $(OBJECTS)
 	lld-link /lib /out:$(BUILD)/Controller.obj $(addprefix $(BUILD)/$(MOD)/, $(OBJECTS))
 %.obj: %.cpp
-	clang++ -g -c -o $(BUILD)/$(MOD)/$@ $(SOURCE)/Controller/$< --include-directory=$(SOURCE)/include
+	clang++ -O3 -c -o $(BUILD)/$(MOD)/$@ $(SOURCE)/Controller/$< --include-directory=$(SOURCE)/include
