@@ -76,6 +76,7 @@ static int64_t time_bias; /* 世界标准时间与本地时间之差 UTC - local
 /* 事件句柄 */
 static HANDLE hEnableWatchInGameStateEvent; /* 启动 hWatchInGameStateThread 线程的事件 */
 static HANDLE hEnableWatchGameProcessEvent; /* 启动 hWatchGameProcessStateThread 线程的事件 */
+static HANDLE hGameProcessRunningEvent; /* 游戏进程运行事件 */
 static HANDLE hEnablePurchaseItemEvent; /* 启动 hPurchaseItemThread 线程的事件 */
 static HANDLE hEnableCombinePartsEvent; /* 启动 hCombinePartsThread 线程的事件 */
 static HANDLE hEnableLocateCursorEvent; /* 启动 hLocateCursorThread 线程的事件 */

@@ -102,7 +102,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             }
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING; /* 跳转执行监测游戏进程运行状态的代码块 */
             ConsoleLog("【消息】成功获取游戏进程信息。进程标识符：%lu。\r\n",dwGameProcessId);
-            SetEvent(hEnableWatchInGameStateEvent);
+            SetEvent(hGameProcessRunningEvent);
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_RUNNING) /* 游戏进程正在运行 */
         {
@@ -113,7 +113,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             }
             else if (dwResult == WAIT_OBJECT_0) /* 进程结束 */
             {
-                ResetEvent(hEnableWatchInGameStateEvent); /* 暂停监视游戏内状态 */
+                ResetEvent(hGameProcessRunningEvent); /* 暂停监视游戏内状态 */
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_EXITED;
                 ConsoleLog("【消息】游戏进程退出。执行断线重连。\r\n");
                 CloseHandle(hGameProcess); /* 关闭已经退出的的游戏进程句柄 */
@@ -129,7 +129,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_EXITED) /* 游戏进程退出，重启游戏 */
         {
-            ResetEvent(hEnableWatchInGameStateEvent); /* 停止监视游戏内状态 */
+            ResetEvent(hGameProcessRunningEvent); /* 游戏进程结束 */
             hGameProcess = NULL;
             STARTUPINFOW startup_info_w;
             ZeroMemory(&startup_info_w, sizeof(startup_info_w));
@@ -156,6 +156,12 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             {
                 ConsoleLog("【警告】通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。\r\n", GetLastError());
             }
+            if (tcg_process_info.dwProcessId != 0)
+            {
+                CloseHandle(tcg_process_info.hProcess);
+                CloseHandle(tcg_process_info.hThread);
+                ZeroMemory(&tcg_process_info, sizeof(tcg_process_info));
+            }
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN) /* 游戏进程状态未确定，确定游戏进程状态 */
         {
@@ -166,7 +172,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_EXITED; /* 游戏进程未启动 */
                 continue; /* 跳转至执行启动游戏进程的代码块 */
             }
-            game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING;
             GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (!dwGameProcessId)
             {
@@ -180,7 +185,8 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
                 break;
             }
             ConsoleLog("【消息】成功获取游戏进程信息。游戏进程标识符：%lu。\r\n", dwGameProcessId);
-            SetEvent(hEnableWatchInGameStateEvent);
+            game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING;
+            SetEvent(hGameProcessRunningEvent);
         }
     }
 
@@ -191,11 +197,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
     }
     hGameWindow = 0;
     dwGameProcessId = 0;
-    if (tcg_process_info.dwProcessId != 0)
-    {
-        CloseHandle(tcg_process_info.hProcess);
-        CloseHandle(tcg_process_info.hThread);
-    }
     ConsoleLog("【消息】线程 hWatchGameProcessThread 退出。\r\n");
     return 0;
 }
