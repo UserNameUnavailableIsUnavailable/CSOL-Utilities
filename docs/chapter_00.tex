@@ -1,4 +1,4 @@
-\section{基本介绍}
+\section{基本介绍及安装方法}
 
 本节将一步步展示如何安装配置本集成工具。
 
@@ -10,11 +10,27 @@
 
 \subsection{罗技软件导入 LUA 程序}
 
-将压缩包解压，\textbf{\color{red}解压路径不能包含非英文字符}，否则 LUA 脚本无法运行。
+\textbf{\color{red}Windows 会锁定从网络上下载得到的文件，这会导致 Powershell 文件无法运行，需先对下载得到的压缩包右键并点击“属性”，接着点击“解除锁定”，然后点击“确认”以解除锁定状态。如果压缩包未被锁定（没有“解除锁定”选项），可跳过此步骤。}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/unlock_00.png}
+    \caption{右键后在弹框中点击“属性”}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/unlock_01.png}
+    \caption{点击“解除锁定”并确认}
+\end{figure}
+
+将解除锁定后的压缩包解压。\textbf{\color{red}注意，解压路径不能包含非英文字符}，否则 LUA 脚本无法运行。
+
+\textbf{\color{red}注意，Windows 文件系统不区分文件名的大小写，因此，若您在接下来的步骤中遇到名称相同但大小写不同的文件名，应将其视为完全一样的文件名。}
 
 鼠标右键点击 \lstinline{install.ps1} 点击在 Powershell 中运行，完成对 LUA 程序的配置。
 
-配置完成后，如果变动了安装路径，则需要重新运行一次 \lstinline{install.ps1}，并重新在罗技软件中保存并运行（详见下文）。
+\textbf{\color{red}配置完成后，如果变动了安装路径（移动集成工具文件夹或将集成工具文件夹重命名），则需要重新运行一次 \lstinline{install.ps1}，并重新在罗技软件中保存并运行（详见下文）。}
 
 \begin{figure}[H]
     \Centering
@@ -22,7 +38,7 @@
     \caption{运行 \lstinline{install.ps1}}
 \end{figure}
 
-然后，前往罗技官网下载安装最新版的 Logitech G HUB 软件。\textbf{\color{red}不需要您拥有任何的罗技硬件设备。}
+然后，前往罗技官网下载安装最新版的 Logitech G HUB 软件（以下简称为“罗技软件”）。\textbf{\color{red}本集成工具并不需要您拥有任何的罗技硬件设备。}
 
 安装并\textbf{\color{red}以管理员权限}启动 Logitech G HUB 软件。否则会因为权限问题导致游戏无法正确接收软件发出的键鼠消息。
 
@@ -32,29 +48,58 @@
     \caption{以管理员权限运行 Logitech G HUB}
 \end{figure}
 
-可以右键 Logitech G HUB 快捷方式，点击“属性”。在对话框中点击“高级”，选中“用管理员身份运行”后确认，这样就不必每次都右键以管理员权限启动了。
+\textbf{\color{red}当已经存在罗技软件进程时，运行罗技软件不会再启动新的实例，新打开的进程将会退出以保留旧进程。因此，当存在正以普通权限运行的罗技软件进程时，以管理员权限启动罗技软件是无效的。故在以管理员权限启动罗技软件前，请务必确保罗技软件相关进程处于关闭状态。}
+确认方法为：打开任务管理器，搜索 “logi”，结束\textbf{\color{red}除“Logitech Updater”（罗技软件更新守护进程，无需关闭）}以外的所有与罗技软件相关的进程（参考下图）。
 
 \begin{figure}[H]
     \Centering
-    \includegraphics[width=\textwidth]{docs/assets/lghub_property.png}
-    \caption{点击“属性”}
+    \includegraphics[width=\textwidth]{docs/assets/search_lghub_process.png}
+    \caption{搜索罗技软件进程}
+\end{figure}
+
+然后，将这些进程全部结束。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/terminate_lghub_00.png}
+    \caption{结束罗技软件进程}
 \end{figure}
 
 \begin{figure}[H]
     \Centering
-    \includegraphics[width=\textwidth]{docs/assets/lghub_advanced.png}
-    \caption{点击“高级”，并选中“用管理员身份运行”}
+    \includegraphics[width=\textwidth]{docs/assets/terminate_lghub_01.png}
+    \caption{结束罗技软件进程}
 \end{figure}
 
-需要注意，Logitech G HUB 有时会自动更新。更新后快捷方式需要重新设置为“用管理员身份运行”。
+上述操作完成后，进入罗技软件主界面。
 
 \begin{figure}[H]
     \Centering
     \includegraphics[width=\textwidth]{docs/assets/lghub.png}
-    \caption{Logitech G HUB 软件}
+    \caption{罗技软件主界面}
 \end{figure}
 
-进入界面后，点击软件上方下拉框，选择“管理配置文件”。
+点击左上角展开菜单后再点击“设置”。在设置界面中关闭软件开机自启，防止软件以普通权限自启（设置软件以管理员权限开机自启的方法参见\nameref{section_skills}章节）。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/lghub_menu.png}
+    \caption{展开左上角菜单}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/lghub_setting.png}
+    \caption{点击“设置”}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/disable_login_start.png}
+    \caption{关闭软件自启}
+\end{figure}
+
+返回到主界面，点击软件上方下拉框，选择“管理配置文件”。
 
 \begin{figure}[H]
     \Centering
@@ -106,7 +151,7 @@
 
 保存并运行后，罗技软件在下一次启动时会自动加载上述脚本文件（启动时加载只会执行一次），无需再重复上述操作。
 
-\textbf{\color{red}但是，加载后若对文件夹内的 LUA 任一个源文件进行修改，则还需要重新在此界面中点击保存并运行。}
+\textbf{\color{red}但是，加载后若对文件夹内的任一个源文件进行修改，则还需要重新在此界面中保存运行。}
 
 \subsection{控制器}
 
@@ -169,29 +214,5 @@
 
 \subsection{配置文件}
 
-\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件。
-按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管。
-后续版本更新不会对这两个配置文件内容作出较大的变动。
-更新到新版本时，只需要将这两份文件原样复制到新版本的 \lstinline{lua} 目录下，并在新版本目录下重新运行一次 \lstinline{install.ps1}，在罗技软件中将 \lstinline{main.lua} 重新保存并运行即可。
-
-\subsection{更新方法（初次安装使用可跳过）}
-
-\textbf{\color{red}关闭旧版本控制器和 GamingTool。}
-
-下载新版本压缩包。
-
-\textbf{\color{red}将您在旧版中使用的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 备份。}
-
-打开新版本 \lstinline{lua} 目录下的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}，移动到文件末尾，查看是否有对应版本的更新（更新会注明）。
-如有，将新增的部分复制到备份的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 中并保存。
-上述操作完成后，用备份的两个文件\textbf{\color{red}替换}新版本 \lstinline{lua} 目录中的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}。
-然后，在新版路径下右键在 Powershell 中运行 \lstinline{install.ps1}，并在罗技软件中导入新版 \lstinline{lua} 路径下的 \lstinline{main.lua} 文件，然后点击保存并运行。
-随后，运行控制器和 GamingTool，按照本文所述操作方式即可正常使用各项功能。
-
-解压新版本压缩包\textbf{\color{red}（解压路径不能包含非英文字符）}，将上述两个文件复制到新版本 \lstinline{lua} 路径下，覆盖其中的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}。
-
-在新版本解压路径下右键在 Powershell 中运行 \lstinline{install.ps1}。
-
-然后，阅读更新说明，向 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua} 中追加新内容（原有内容保持不变）。
-
-修改完成后，打开罗技软件，导入并运行新版本 \lstinline{lua} 目录下的 \lstinline{main.lua} 文件。
+\textbf{\color{red}\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件。
+按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管。后续版本更新不会对这两个配置文件内容作出较大的变动。当您修改配置文件内容后，必须在罗技软件中重新导入并保存运行。}

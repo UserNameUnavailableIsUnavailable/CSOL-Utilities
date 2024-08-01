@@ -55,8 +55,7 @@ end
 ---点击“开始游戏”按钮，开始游戏。
 function Executor:start_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
-    Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y)
-    Runtime:sleep(2000) -- 等待两秒，足够控制器更新下条命令
+    Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y, 2000)
 end
 
 ---选定角色。

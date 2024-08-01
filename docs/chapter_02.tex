@@ -23,15 +23,15 @@ TCGame \textbf{\color{red}必须}设置为自动登录，并在本集成工具�
 
 通过 TCGame 启动游戏。
 
-游戏启动完成，进入大厅界面后，按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框，如不去除边框，将导致挂机时使用的游戏按钮坐标不准确。
+游戏启动完成，进入大厅界面后，按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框，如不去除边框，将导致挂机时使用的游戏按钮坐标不准确（例如，窗口位置被意外地移动）。
 
 \subsection{通用设置}
 
 将控制器调到模式 5 进行坐标定位。
 
-打开 lua 目录下的 \lstinline{Setting.lua} 文件，本文件存放所有游戏内按钮的屏幕坐标位置，所有的坐标均通过 5 模式坐标定位功能确定。
+使用记事本打开 \lstinline{lua} 目录下的 \lstinline{Setting.lua} 文件，本文件存放所有游戏内按钮的屏幕坐标位置，所有的坐标均通过 5 模式坐标定位功能确定。
 
-下面，详细介绍 \lstinline{Setting.lua} 文件中各个变量的含义，使用模式 5 耐心配置即可。
+下面，详细介绍 \lstinline{Setting.lua} 文件中各个变量的含义，使用模式 5 坐标定位功能耐心配置即可。
 
 \lstinline{TIME_ZONE} 操作系统时区，东半球为正数，西半球为负数。例如，中国处于东八区（UTC+08:00），则应将其设置为 8（默认配置，一般不需更改）。
 
