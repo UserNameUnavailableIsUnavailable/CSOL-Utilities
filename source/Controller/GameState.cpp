@@ -29,16 +29,20 @@
 
 DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
 {
-    while (
-        WAIT_OBJECT_0 == WaitForSingleObject(
-            hEnableWatchInGameStateEvent,
-            INFINITE
-        )) /* 获取到所有可等待对象才开始运行 */
+    HANDLE hObjectsToWait[] = {
+        hEnableWatchInGameStateEvent,
+        hGameProcessRunningEvent,
+    };
+    while (true)
     {
-        if (bDestroy)
-        {
-            break;
-        }
+        DWORD dwRet = WAIT_OBJECT_0 + ARRAYSIZE(hObjectsToWait) == WaitForMultipleObjects(
+            ARRAYSIZE(hObjectsToWait),
+            hObjectsToWait,
+            TRUE, /* Wait All */
+            INFINITE
+        ); /* 获取到所有可等待对象才开始运行 */
+        if (dwRet >= ARRAYSIZE(hObjectsToWait)) break;
+        if (bDestroy) break;
         UpdateErrorLogBuffer();
         TransferGameState();
         DispatchCommand();

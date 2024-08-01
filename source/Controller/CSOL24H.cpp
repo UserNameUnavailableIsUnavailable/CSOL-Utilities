@@ -30,6 +30,7 @@ int64_t CSOL24H::time_bias = 0;
 /* 事件句柄 */
 HANDLE CSOL24H::hEnableWatchInGameStateEvent = NULL;
 HANDLE CSOL24H::hEnableWatchGameProcessEvent = NULL;
+HANDLE CSOL24H::hGameProcessRunningEvent = NULL;
 HANDLE CSOL24H::hEnablePurchaseItemEvent = NULL;
 HANDLE CSOL24H::hEnableCombinePartsEvent = NULL;
 HANDLE CSOL24H::hEnableLocateCursorEvent = NULL;
@@ -162,6 +163,11 @@ void CSOL24H::InitializeWatchGameProcessThread()
     {
         throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码：%lu。", L"hEnableWatchGameProcessEvent", GetLastError());
     }
+    hGameProcessRunningEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+    if (!hGameProcessRunningEvent)
+    {
+        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hGameProcessRunningEvent", GetLastError());
+    }
     hWatchGameProcessStateThread = CreateThread(
         NULL,
         4096,
@@ -249,8 +255,8 @@ void CSOL24H::Initialize()
     {
         throw CSOL24H_EXCEPT("【错误】初始化模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
     }
-    InitializeWatchInGameStateThread();
     InitializeWatchGameProcessThread();
+    InitializeWatchInGameStateThread();
     InitializeCombinePartsThread();
     InitializePurchaseItemThread();
     InitializeLocateCursorThread();
@@ -262,18 +268,21 @@ void CSOL24H::Initialize()
 
 void CSOL24H::Run()
 {
-    HANDLE hThreads[] = {
+    HANDLE hThreadsToWait[] = {
         hHandleHotKeyMessageThread,
+        hWatchGameProcessStateThread,
         hWatchInGameStateThread,
-        hWatchGameProcessStateThread
+        hCombinePartsThread,
+        hPurchaseItemThread,
+        hLocateCursorThread
     };
     DWORD dwSignaledObjectIndex = WaitForMultipleObjects(
-        sizeof(hThreads) / sizeof(HANDLE),
-        hThreads,
+        ARRAYSIZE(hThreadsToWait),
+        hThreadsToWait,
         FALSE,
         INFINITE
     );
-    if (dwSignaledObjectIndex >= 0 && dwSignaledObjectIndex <= sizeof(hThreads) / sizeof(HANDLE) - 1 && !bDestroy)
+    if (dwSignaledObjectIndex >= 0 && dwSignaledObjectIndex <= ARRAYSIZE(hThreadsToWait) - 1 && !bDestroy)
     {
         throw CSOL24H_EXCEPT("【错误】线程异常退出。");
     }
@@ -284,8 +293,8 @@ void CSOL24H::Run()
     else if (bDestroy) /* 正在由 Destroy() 销毁，则等待所有线程退出 */
     {
         WaitForMultipleObjects(
-            sizeof(hThreads) / sizeof(HANDLE),
-            hThreads,
+            ARRAYSIZE(hThreadsToWait),
+            hThreadsToWait,
             TRUE,
             INFINITE
         );
@@ -367,28 +376,29 @@ void CSOL24H::Destroy() noexcept
     {
         TerminateThread(hHandleHotKeyMessageThread, -1);
     }
-    SetEvent(hEnableWatchInGameStateEvent);
     SetEvent(hEnableWatchGameProcessEvent);
-    SetEvent(hEnableCombinePartsEvent);
-    SetEvent(hEnablePurchaseItemEvent);
-    SetEvent(hEnableLocateCursorEvent);
-    if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchInGameStateThread, 2000))
-    {
-        TerminateThread(hWatchInGameStateThread, -1);
-    }
     if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchGameProcessStateThread, 5000))
     {
         TerminateThread(hWatchInGameStateThread, -1);
     }
-    if (WAIT_OBJECT_0 != WaitForSingleObject(hCombinePartsThread, 1500))
+    SetEvent(hEnableWatchInGameStateEvent);
+    SetEvent(hGameProcessRunningEvent);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hWatchInGameStateThread, 2000))
+    {
+        TerminateThread(hWatchInGameStateThread, -1);
+    }
+    SetEvent(hEnableCombinePartsEvent);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hCombinePartsThread, 2000))
     {
         TerminateThread(hCombinePartsThread, -1);
     }
-    if (WAIT_OBJECT_0 != WaitForSingleObject(hPurchaseItemThread, 1500))
+    SetEvent(hEnablePurchaseItemEvent);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hPurchaseItemThread, 2000))
     {
         TerminateThread(hPurchaseItemThread, -1);
     }
-    if (WAIT_OBJECT_0 != WaitForSingleObject(hLocateCursorThread, 1500))
+    SetEvent(hEnableLocateCursorEvent);
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hLocateCursorThread, 2000))
     {
         TerminateThread(hLocateCursorThread, -1);
     }
@@ -403,6 +413,7 @@ void CSOL24H::Destroy() noexcept
 
     CloseHandle(hWatchInGameStateThread);
     CloseHandle(hWatchGameProcessStateThread);
+    CloseHandle(hGameProcessRunningEvent);
     CloseHandle(hCombinePartsThread);
     CloseHandle(hPurchaseItemThread);
     CloseHandle(hLocateCursorThread);
@@ -430,6 +441,7 @@ void CSOL24H::Destroy() noexcept
     /* 事件句柄 */
     CSOL24H::hEnableWatchInGameStateEvent = NULL;
     CSOL24H::hEnableWatchGameProcessEvent = NULL;
+    CSOL24H::hGameProcessRunningEvent = NULL;
     CSOL24H::hEnablePurchaseItemEvent = NULL;
     CSOL24H::hEnableCombinePartsEvent = NULL;
     CSOL24H::hEnableLocateCursorEvent = NULL;
