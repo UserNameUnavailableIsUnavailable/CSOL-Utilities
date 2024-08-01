@@ -35,7 +35,7 @@ HANDLE CSOL24H::hEnablePurchaseItemEvent = NULL;
 HANDLE CSOL24H::hEnableCombinePartsEvent = NULL;
 HANDLE CSOL24H::hEnableLocateCursorEvent = NULL;
 /* 互斥量句柄 */
-HANDLE CSOL24H::hRunnableMutex = NULL;
+HANDLE CSOL24H::hCmdFileMutex = NULL;
 /* 文件句柄 */
 HANDLE CSOL24H::hGameErrorLogFile = INVALID_HANDLE_VALUE;
 HANDLE CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
@@ -240,10 +240,10 @@ void CSOL24H::Initialize()
         throw CSOL24H_EXCEPT("【错误】获取操作系统时区信息失败。错误代码：%lu。", GetLastError());
     }
     time_bias = tzi.Bias * 60;
-    hRunnableMutex = CreateMutexW(NULL, FALSE, NULL);
-    if (!hRunnableMutex)
+    hCmdFileMutex = CreateMutexW(NULL, FALSE, NULL);
+    if (!hCmdFileMutex)
     {
-        throw CSOL24H_EXCEPT("【错误】创建互斥体 %ls 失败。错误代码：%lu。", L"hRunnableMutex", GetLastError());
+        throw CSOL24H_EXCEPT("【错误】创建互斥体 %ls 失败。错误代码：%lu。", L"hCmdFileMutex", GetLastError());
     }
     hGamingToolModule = LoadLibraryW(L"GamingTool.dll");
     if (!hGamingToolModule)
@@ -409,7 +409,8 @@ void CSOL24H::Destroy() noexcept
     CloseHandle(hEnablePurchaseItemEvent);
     CloseHandle(hEnableLocateCursorEvent);
 
-    CloseHandle(hRunnableMutex);
+    GiveCommand(nullptr);
+    CloseHandle(hCmdFileMutex);
 
     CloseHandle(hWatchInGameStateThread);
     CloseHandle(hWatchGameProcessStateThread);
@@ -418,7 +419,6 @@ void CSOL24H::Destroy() noexcept
     CloseHandle(hPurchaseItemThread);
     CloseHandle(hLocateCursorThread);
     CloseHandle(hHandleHotKeyMessageThread);
-    GiveCommand(nullptr);
     CloseHandle(hLUACommandFile);
     CloseHandle(hGameErrorLogFile);
 
@@ -446,7 +446,7 @@ void CSOL24H::Destroy() noexcept
     CSOL24H::hEnableCombinePartsEvent = NULL;
     CSOL24H::hEnableLocateCursorEvent = NULL;
     /* 互斥量句柄 */
-    CSOL24H::hRunnableMutex = NULL;
+    CSOL24H::hCmdFileMutex = NULL;
     /* 文件句柄 */
     CSOL24H::hGameErrorLogFile = INVALID_HANDLE_VALUE;
     CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
