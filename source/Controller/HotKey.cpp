@@ -61,12 +61,14 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
             {
                 CSOL24H::DisableExtendedMode();
                 SetEvent(hEnableWatchGameProcessEvent);
+                SetEvent(hEnableWatchInGameStateEvent);
                 ConsoleLog("【消息】切换为 1 模式。\r\n");
             }
             else if (msg.wParam == '2')
             {
                 CSOL24H::EnableExtendedMode();
                 SetEvent(hEnableWatchGameProcessEvent);
+                SetEvent(hEnableWatchInGameStateEvent);
                 ConsoleLog("【消息】切换为 2 模式。\r\n");
             }
             else if (msg.wParam == '3') /* 合成配件 */
