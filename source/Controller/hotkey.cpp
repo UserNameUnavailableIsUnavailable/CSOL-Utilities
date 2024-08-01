@@ -47,7 +47,7 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     {
         if (msg.message == WM_HOTKEY && msg.wParam >= '0' && msg.wParam <= '5')
         {
-            ResetEvent(hEnableWatchGameStateEvent);
+            ResetEvent(hEnableWatchInGameStateEvent);
             ResetEvent(hEnableWatchGameProcessEvent);
             ResetEvent(hEnableCombinePartsEvent);
             ResetEvent(hEnablePurchaseItemEvent);
@@ -60,14 +60,12 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
             else if (msg.wParam == '1')
             {
                 CSOL24H::DisableExtendedMode();
-                SetEvent(hEnableWatchGameStateEvent);
                 SetEvent(hEnableWatchGameProcessEvent);
                 ConsoleLog("【消息】切换为 1 模式。\r\n");
             }
             else if (msg.wParam == '2')
             {
                 CSOL24H::EnableExtendedMode();
-                SetEvent(hEnableWatchGameStateEvent);
                 SetEvent(hEnableWatchGameProcessEvent);
                 ConsoleLog("【消息】切换为 2 模式。\r\n");
             }

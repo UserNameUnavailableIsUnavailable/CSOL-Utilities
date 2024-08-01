@@ -4,6 +4,7 @@
 extern HANDLE hConsoleMutex;
 
 bool InitializeConsole() noexcept;
+
 template <typename... ARG>
 int ConsoleLog(const char* fmt, const ARG&... args) noexcept
 {
