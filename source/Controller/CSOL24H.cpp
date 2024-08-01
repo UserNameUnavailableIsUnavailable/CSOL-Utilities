@@ -28,7 +28,7 @@ bool CSOL24H::bAllowExtendedMode = false;
 /* 程序运行所需时间信息 */
 int64_t CSOL24H::time_bias = 0;
 /* 事件句柄 */
-HANDLE CSOL24H::hEnableWatchGameStateEvent = NULL;
+HANDLE CSOL24H::hEnableWatchInGameStateEvent = NULL;
 HANDLE CSOL24H::hEnableWatchGameProcessEvent = NULL;
 HANDLE CSOL24H::hEnablePurchaseItemEvent = NULL;
 HANDLE CSOL24H::hEnableCombinePartsEvent = NULL;
@@ -51,7 +51,7 @@ HANDLE CSOL24H::hPurchaseItemThread = NULL;
 HANDLE CSOL24H::hLocateCursorThread = NULL;
 /* hWatchInGameStateThread 线程所需资源 */
 std::shared_ptr<wchar_t[]> CSOL24H::pwszErrorLogFilePath = nullptr;
-GameState CSOL24H::game_state(ENUM_GAME_STATE::GS_UNKNOWN, 0);
+InGameState CSOL24H::in_game_state(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);
 char* CSOL24H::lpGameErrorLogBuffer = nullptr;
 int64_t CSOL24H::log_buffer_last_modified_time = 0;
 int64_t CSOL24H::cbGameErrorLogSize = 0;
@@ -61,12 +61,15 @@ int64_t CSOL24H::game_error_log_file_date = 0;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGameExePath = nullptr;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGRunCSOCmd = nullptr;
 HANDLE CSOL24H::hGameProcess = NULL;
+DWORD CSOL24H::dwGameProcessId = 0;
+HWND CSOL24H::hGameWindow = NULL;
+ENUM_GAME_PROCESS_STATE CSOL24H::game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN;
 
 void CSOL24H::InitializeWatchInGameStateThread()
 {
     /* 用于触发 hWatchGameStateThread 运行的事件 */
-    hEnableWatchGameStateEvent = CreateEventW(nullptr, true, false, NULL);
-    if (!hEnableWatchGameStateEvent)
+    hEnableWatchInGameStateEvent = CreateEventW(nullptr, true, false, NULL);
+    if (!hEnableWatchInGameStateEvent)
     {
         throw CSOL24H_EXCEPT("【错误】创建事件对象 %ls 失败。错误代码 %lu。", L"hEnableWatchGameStateEvent", GetLastError());
     }
@@ -153,28 +156,7 @@ void CSOL24H::InitializeWatchGameProcessThread()
     wcscpy_s(pwsTCGRunCSOCmd.get(), cchSize, pwsTCGameExePath.get());
     wcscat_s(pwsTCGRunCSOCmd.get(), cchSize, L" cso");
     ConsoleLog("【消息】启动 CSOL 使用的命令行：%ls\r\n", pwsTCGRunCSOCmd.get());
-    hGameProcess = INVALID_HANDLE_VALUE; /* 游戏进程句柄设置为 INVALID_HANDLE_VALUE 将自动创建游戏进程 */
-    HWND hTCGWnd = FindWindowW(NULL, L"TCGames");
-    if (hTCGWnd)
-    {
-        ConsoleLog("【消息】检测到 TCGame 正在运行，为防止登录信息失效，将结束 TCGame。\r\n");
-        DWORD dwProcessId;
-        GetWindowThreadProcessId(hTCGWnd, &dwProcessId);
-        HANDLE hTCGProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwProcessId);
-        if (!hTCGProcess) /* 无法打开句柄 */
-        {
-            ConsoleLog("【警告】无法获取 TCGame 进程信息。\r\n");
-        }
-        else if (!TryStopProcessSafely(hTCGProcess)) /* 句柄打开，但无法结束进程 */
-        {
-            ConsoleLog("【警告】尝试结束 TCGame 失败。TCGame 未结束会导致一段时间后登录信息失效。\r\n");
-            CloseHandle(hTCGProcess);
-        }
-        else /* 打开句柄，且结束进程 */
-        {
-            CloseHandle(hTCGProcess);
-        }
-    }
+    game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN; /* 游戏进程状态设定为未知 */
     hEnableWatchGameProcessEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableWatchGameProcessEvent)
     {
@@ -275,7 +257,7 @@ void CSOL24H::Initialize()
     InitializeHandleHotKeyMessageThread();
     bInitialize = true;
     ConsoleLog("【消息】初始化完成\r\n");
-    ConsoleLog("【消息】本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/gaming-tool。\r\n");
+    ConsoleLog("【消息】本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。\r\n");
 }
 
 void CSOL24H::Run()
@@ -385,7 +367,7 @@ void CSOL24H::Destroy() noexcept
     {
         TerminateThread(hHandleHotKeyMessageThread, -1);
     }
-    SetEvent(hEnableWatchGameStateEvent);
+    SetEvent(hEnableWatchInGameStateEvent);
     SetEvent(hEnableWatchGameProcessEvent);
     SetEvent(hEnableCombinePartsEvent);
     SetEvent(hEnablePurchaseItemEvent);
@@ -411,7 +393,7 @@ void CSOL24H::Destroy() noexcept
         TerminateThread(hLocateCursorThread, -1);
     }
 
-    CloseHandle(hEnableWatchGameStateEvent);
+    CloseHandle(hEnableWatchInGameStateEvent);
     CloseHandle(hEnableWatchGameProcessEvent);
     CloseHandle(hEnableCombinePartsEvent);
     CloseHandle(hEnablePurchaseItemEvent);
@@ -438,8 +420,48 @@ void CSOL24H::Destroy() noexcept
     auto DeinitializeGamingToolDll = (void(*)(void))GetProcAddress(hGamingToolModule, "DeinitializeGamingTool");
     if (DeinitializeGamingToolDll) DeinitializeGamingToolDll();
     FreeLibrary(hGamingToolModule);   
-    pwsTCGameExePath = nullptr;
-    pwsTCGRunCSOCmd = nullptr;
-    // TODO: 静态变量重新初始化
-
+    /* 静态变量初始化 */
+    /* 程序运行标志 */
+    CSOL24H::bInitialize = false;
+    CSOL24H::bDestroy = false;
+    CSOL24H::bAllowExtendedMode = false;
+    /* 程序运行所需时间信息 */
+    CSOL24H::time_bias = 0;
+    /* 事件句柄 */
+    CSOL24H::hEnableWatchInGameStateEvent = NULL;
+    CSOL24H::hEnableWatchGameProcessEvent = NULL;
+    CSOL24H::hEnablePurchaseItemEvent = NULL;
+    CSOL24H::hEnableCombinePartsEvent = NULL;
+    CSOL24H::hEnableLocateCursorEvent = NULL;
+    /* 互斥量句柄 */
+    CSOL24H::hRunnableMutex = NULL;
+    /* 文件句柄 */
+    CSOL24H::hGameErrorLogFile = INVALID_HANDLE_VALUE;
+    CSOL24H::hLUACommandFile = INVALID_HANDLE_VALUE;
+    /* GamingTool 模块 */
+    CSOL24H::hGamingToolModule = NULL;
+    /* 用于屏蔽系统热键的键盘钩子 */
+    CSOL24H::hLLKH = NULL;
+    /* 线程句柄 */
+    CSOL24H::hWatchInGameStateThread = NULL;
+    CSOL24H::hWatchGameProcessStateThread = NULL;
+    CSOL24H::hHandleHotKeyMessageThread = NULL;
+    CSOL24H::hCombinePartsThread = NULL;
+    CSOL24H::hPurchaseItemThread = NULL;
+    CSOL24H::hLocateCursorThread = NULL;
+    /* hWatchInGameStateThread 线程所需资源 */
+    CSOL24H::pwszErrorLogFilePath = nullptr;
+    CSOL24H::in_game_state.update(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);
+    CSOL24H::lpGameErrorLogBuffer = nullptr;
+    CSOL24H::log_buffer_last_modified_time = 0;
+    CSOL24H::cbGameErrorLogSize = 0;
+    CSOL24H::bGameErrorLogBufferResolved = false;
+    CSOL24H::game_error_log_file_date = 0;
+    /* hWatchGameProcessStateThread 线程所需资源 */
+    CSOL24H::pwsTCGameExePath = nullptr;
+    CSOL24H::pwsTCGRunCSOCmd = nullptr;
+    CSOL24H::hGameProcess = NULL;
+    CSOL24H::dwGameProcessId = 0;
+    CSOL24H::hGameWindow = NULL;
+    CSOL24H::game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN;
 }

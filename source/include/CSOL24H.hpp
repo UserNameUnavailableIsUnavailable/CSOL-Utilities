@@ -74,7 +74,7 @@ static bool bAllowExtendedMode; /* 是否允许以扩展模式挂机 */
 /* 程序运行所需的时间信息 */
 static int64_t time_bias; /* 世界标准时间与本地时间之差 UTC - localtime，单位为秒 */
 /* 事件句柄 */
-static HANDLE hEnableWatchGameStateEvent; /* 启动 hWatchInGameStateThread 线程的事件 */
+static HANDLE hEnableWatchInGameStateEvent; /* 启动 hWatchInGameStateThread 线程的事件 */
 static HANDLE hEnableWatchGameProcessEvent; /* 启动 hWatchGameProcessStateThread 线程的事件 */
 static HANDLE hEnablePurchaseItemEvent; /* 启动 hPurchaseItemThread 线程的事件 */
 static HANDLE hEnableCombinePartsEvent; /* 启动 hCombinePartsThread 线程的事件 */
@@ -98,7 +98,7 @@ static HANDLE hPurchaseItemThread; /* 购买物品 */
 static HANDLE hLocateCursorThread; /* 定位光标 */
 /* hWatchInGameStateThread 线程所需资源 */
 static std::shared_ptr<wchar_t[]> pwszErrorLogFilePath; /* 游戏 Error.log 日志路径 */
-static GameState game_state; /* 通过解析日志文件获取到的游戏状态 */
+static InGameState in_game_state; /* 通过解析日志文件获取到的游戏状态 */
 static char* lpGameErrorLogBuffer; /* 游戏日志文件内容读取到此处 */
 static int64_t log_buffer_last_modified_time; /* 游戏日志文件缓冲区修改时间（WINDOWS FILETIME） */
 static int64_t cbGameErrorLogSize; /* 日志文件缓冲区当前读入大小 */
@@ -108,4 +108,7 @@ static int64_t game_error_log_file_date; /* 游戏日志文件中的日期，使
 static std::shared_ptr<wchar_t[]> pwsTCGameExePath; /* TCGame 游戏启动器路径 */
 static std::shared_ptr<wchar_t[]> pwsTCGRunCSOCmd; /* TCGame 启动 CSOL 使用的命令行参数 */
 static HANDLE hGameProcess; /* 游戏进程句柄 */
+static DWORD dwGameProcessId; /* 游戏进程标识符 */
+static HWND hGameWindow; /* 游戏窗口句柄 */
+static ENUM_GAME_PROCESS_STATE game_process_state; /* 游戏进程状态 */
 };
