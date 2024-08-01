@@ -3,9 +3,13 @@
 #include "Command.hpp"
 #include <ctime>
 #include <fileapi.h>
+#include <synchapi.h>
+#include <winerror.h>
 
 void CSOL24H::GiveCommand(const char* cmd) noexcept
 {
+    DWORD dwRet = WaitForSingleObject(hCmdFileMutex, 10);
+    if (dwRet != WAIT_OBJECT_0) return; /* 等待互斥量超时或因为其他原因失败 */
     SetFilePointer(
         hLUACommandFile,
         0,
@@ -34,4 +38,5 @@ void CSOL24H::GiveCommand(const char* cmd) noexcept
         nullptr
     );
     SetEndOfFile(hLUACommandFile);
+    ReleaseMutex(hCmdFileMutex);
 }

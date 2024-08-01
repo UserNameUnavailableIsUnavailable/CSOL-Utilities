@@ -5,15 +5,19 @@ Interpreter_lua = true
 local function expired()
     CmdTime = CmdTime or 0
     local current_time = DateTime:get_local_timestamp() -- 本地时间戳
-    return math.abs(current_time - CmdTime) > 5
+    return math.abs(current_time - CmdTime) > 2
 end
 
 function Interpreter()
     local previous_command = Command.NOP -- 上一次获取到的命令，初始为 NOP
     while (true)
     do
-        Load("$~cmd.lua")
-        Cmd = Cmd or Command.CMD_NOP
+        if (pcall(Load, "$~cmd.lua"))
+        then
+            Cmd = Cmd or Command.CMD_NOP
+        else
+            Cmd = Command.CMD_NOP
+        end
         -- 文件中的命令时间戳与当前时间的差值达到 5 秒认为文件中的命令无效
         if (Cmd == Command.CMD_START_GAME_ROOM and not expired()) -- 开始游戏
         then
