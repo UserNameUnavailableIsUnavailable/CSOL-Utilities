@@ -81,7 +81,7 @@ static HANDLE hEnablePurchaseItemEvent; /* 启动 hPurchaseItemThread 线程的�
 static HANDLE hEnableCombinePartsEvent; /* 启动 hCombinePartsThread 线程的事件 */
 static HANDLE hEnableLocateCursorEvent; /* 启动 hLocateCursorThread 线程的事件 */
 /* 互斥量句柄 */
-static HANDLE hRunnableMutex; /* 使线程运行互斥 */
+static HANDLE hCmdFileMutex; /* 使文件写入互斥 */
 /* 文件句柄 */
 static HANDLE hGameErrorLogFile; /* 游戏日志文件 */
 static HANDLE hLUACommandFile; /* 向罗技 LUA 语言服务器下达命令的脚本文件 */
