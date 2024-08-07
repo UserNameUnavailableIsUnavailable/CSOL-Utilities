@@ -80,18 +80,21 @@ void CSOL24H::TransferGameState() noexcept
         {
             if (IsWindow(hGameWindow))
             {
-                if (SetForegroundWindow(hGameWindow))
+                SetForegroundWindow(hGameWindow);
+                DWORD_PTR _; /* dummy */
+                SendMessageTimeout(hGameWindow, WM_NULL, 0, 0, SMTO_NORMAL, 5000, &_);
+                if (GetForegroundWindow() == hGameWindow)
                 {
-                    ConsoleLog("【消息】将游戏窗口置于前台并激活。\r\n");
+                    ConsoleLog("【消息】成功将游戏窗口置于前台并激活。\r\n");
                 }
                 else
                 {
-                    ConsoleLog("【警告】尝试将游戏窗口置于前台并激活时发生错误。错误代码：%lu。\r\n", GetLastError());
+                    ConsoleLog("【警告】未能成功将游戏窗口置于前台并激活。\r\n");
                 }
                 auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
                 if (MakeWindowBorderless) {
                     MakeWindowBorderless(hGameWindow);
-                    ConsoleLog("【消息】去除窗口标题栏。\r\n");
+                    ConsoleLog("【消息】去除游戏窗口标题栏。\r\n");
                 }
             }
             gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */

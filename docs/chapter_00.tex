@@ -149,7 +149,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
     \caption{点击“编写脚本”}
 \end{figure}
 
-点击“脚本-导入”，将 LUA 源文件 \lstinline{main.lua} 导入软件，点击保存并运行。
+点击“脚本-导入”，将 LUA 源文件 \lstinline{Main.lua} 导入软件，点击保存并运行。
 
 \begin{figure}[H]
     \Centering
@@ -166,7 +166,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 \begin{figure}[H]
     \Centering
     \includegraphics[width=\textwidth]{docs/assets/main.png}
-    \caption{选择 \lstinline{main.lua}}
+    \caption{选择 \lstinline{Main.lua}}
 \end{figure}
 
 \begin{figure}[H]
@@ -220,6 +220,15 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 控制器会在 \lstinline{lua} 目录下创建临时文件，实时向该临时文件中写入命令，指导 LUA 模块执行相应的操作。
 每条命令都有一定的有效期（2 秒），超过有效期的命令不会被 LUA 模块执行。
 每条命令的执行完毕都需要一定的时间，\textbf{\color{red}控制器切换模式不会立即停止当前命令的执行，而是有一定的延迟时间}。
+
+要退出控制器，您可以直接点击右上角的“×”退出。不过，最推荐做法（非强制）是打开控制器窗口，鼠标点击控制器窗口内任意处激活控制器窗口，然后按下 \lstinline{Ctrl} \lstinline{C} 退出窗口内运行的控制器。当您看到下图的信息，即表示控制器成功退出，然后再点击“×”关闭窗口。
+这使得控制器有充足的时间释放资源占用，然后安全地退出。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/exit_controller.png}
+    \caption{退出控制器的最佳做法}
+\end{figure}
 
 \subsection{即时中断功能}
 
