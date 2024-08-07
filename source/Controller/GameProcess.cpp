@@ -83,12 +83,12 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         Sleep(1000); /* 每隔 1 秒运行一次本线程 */
         if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED) /* 等待游戏进程窗口打开 */
         {
-            HWND hWnd = FindWindowW(NULL, L"Counter-Strike Online");
-            if (!hWnd)
+            hGameWindow = FindWindowW(NULL, L"Counter-Strike Online");
+            if (!hGameWindow)
             {
                 continue; /* 游戏窗口未创建 */
             }
-            GetWindowThreadProcessId(hWnd, &dwGameProcessId);
+            GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (dwGameProcessId == 0)
             {
                 ConsoleLog("【错误】获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。\r\n", GetLastError());
@@ -136,7 +136,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             ZeroMemory(&tcg_process_info, sizeof(tcg_process_info));
             startup_info_w.cb = sizeof(startup_info_w);
             PROCESS_INFORMATION process_information;
-            HWND hWnd = FindWindowW(NULL, L"TCGames");
+            // HWND hWnd = FindWindowW(NULL, L"TCGames");
             if (CreateProcessW(
                 NULL,
                 pwsTCGRunCSOCmd.get(),
