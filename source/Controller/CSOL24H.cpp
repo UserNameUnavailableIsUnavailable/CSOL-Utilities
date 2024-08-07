@@ -93,7 +93,7 @@ void CSOL24H::InitializeWatchInGameStateThread()
     );
     if (hGameErrorLogFile == INVALID_HANDLE_VALUE)
     {
-        throw CSOL24H_EXCEPT("打开文件 %ls 失败，错误代码：%lu。", pwszErrorLogFilePath.get(), GetLastError() );
+        throw CSOL24H_EXCEPT("尝试打开日志文件失败，错误代码：%lu。这可能是因游戏安装后尚未运行过导致。", pwszErrorLogFilePath.get(), GetLastError() );
     }
     /* 创建用于下达命令的 LUA 脚本文件 */
     hLUACommandFile = CreateFileW(

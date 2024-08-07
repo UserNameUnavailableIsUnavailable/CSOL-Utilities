@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <cstdio>
 #include <cstdlib>
+#include <errhandlingapi.h>
 #include <iomanip>
 #include <iostream>
 #include <cstddef>
@@ -77,16 +78,23 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
         {
-            HWND hWnd = FindWindowW(NULL, L"Counter-Strike Online");
-            if (hWnd)
+            if (IsWindow(hGameWindow))
             {
-                SetForegroundWindow(hWnd);
-                SetFocus(hWnd);
-                SetCapture(hWnd);
+                SetForegroundWindow(hGameWindow);
+                DWORD_PTR _; /* dummy */
+                SendMessageTimeout(hGameWindow, WM_NULL, 0, 0, SMTO_NORMAL, 5000, &_);
+                if (GetForegroundWindow() == hGameWindow)
+                {
+                    ConsoleLog("【消息】成功将游戏窗口置于前台并激活。\r\n");
+                }
+                else
+                {
+                    ConsoleLog("【警告】未能成功将游戏窗口置于前台并激活。\r\n");
+                }
                 auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
                 if (MakeWindowBorderless) {
-                    MakeWindowBorderless(hWnd);
-                    ConsoleLog("【消息】去除窗口标题栏。\r\n");
+                    MakeWindowBorderless(hGameWindow);
+                    ConsoleLog("【消息】去除游戏窗口标题栏。\r\n");
                 }
             }
             gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */

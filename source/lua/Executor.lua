@@ -38,17 +38,17 @@ end)
 ---创建游戏房间。
 function Executor:create_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on_several_times(Setting.HALL_BACK_X, Setting.HALL_BACK_Y, 10, 100) -- 按 10 次返回，到大厅进入游戏界面
+    Mouse:click_on_several_times(Setting.HALL_BACK_X, Setting.HALL_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 3000)
-    Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 3000)
-    Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 3000)
-    Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 3000)
-    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 3000)
-    Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 3000)
-    Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 3000)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 3000)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 3000)
+    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 2000)
+    Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 2000)
+    Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 2000)
+    Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 2000)
+    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 2000)
+    Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 2000)
+    Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 2000)
+    Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 2000)
+    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 2000)
     Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000)
 end
 
