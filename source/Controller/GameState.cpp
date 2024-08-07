@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <cstdio>
 #include <cstdlib>
+#include <errhandlingapi.h>
 #include <iomanip>
 #include <iostream>
 #include <cstddef>
@@ -77,15 +78,19 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
         {
-            HWND hWnd = FindWindowW(NULL, L"Counter-Strike Online");
-            if (hWnd)
+            if (IsWindow(hGameWindow))
             {
-                SetForegroundWindow(hWnd);
-                SetFocus(hWnd);
-                SetCapture(hWnd);
+                if (SetForegroundWindow(hGameWindow))
+                {
+                    ConsoleLog("【消息】将游戏窗口置于前台并激活。\r\n");
+                }
+                else
+                {
+                    ConsoleLog("【警告】尝试将游戏窗口置于前台并激活时发生错误。错误代码：%lu。\r\n", GetLastError());
+                }
                 auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
                 if (MakeWindowBorderless) {
-                    MakeWindowBorderless(hWnd);
+                    MakeWindowBorderless(hGameWindow);
                     ConsoleLog("【消息】去除窗口标题栏。\r\n");
                 }
             }
