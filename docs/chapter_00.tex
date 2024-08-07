@@ -8,7 +8,7 @@
     \caption{运行效果展示}
 \end{figure}
 
-\subsection{罗技软件导入 LUA 程序}
+\subsection{开始之前}
 
 \textbf{\color{red}Windows 会锁定从网络上下载得到的文件，这会导致 Powershell 文件无法运行，需先对下载得到的压缩包右键并点击“属性”，接着点击“解除锁定”，然后点击“确认”以解除锁定状态。如果压缩包未被锁定（没有“解除锁定”选项），可跳过此步骤。}
 
@@ -28,7 +28,41 @@
 
 \textbf{\color{red}注意，Windows 文件系统不区分文件名的大小写，因此，若您在接下来的步骤中遇到名称相同但大小写不同的文件名，应将其视为完全一样的文件名。}
 
-鼠标右键点击 \lstinline{install.ps1} 点击在 Powershell 中运行，完成对 LUA 程序的配置。
+Windows 默认情况下严格阻止运行任何 Powershell 脚本文件（后缀为 \lstinline{.ps1}），因此若您是第一次使用本工具，需要做如下配置。
+
+对于 Windows 11 23H2 及以上版本的用户：打开“设置”，点击“系统”-“开发者选项”，在“Powershell”下拉选项中打开图示选项即可。下面针对 Windows 11 23H2 以下版本用户的设置步骤可忽略。
+
+对于 Windows 11 23H2 以下版本的用户，按下 \lstinline{Win} \lstinline{R}，输入 \lstinline{powershell} 后，按下 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter} 以管理员权限打开 Powershell 窗口。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/run_pwsh_as_admin.png}
+    \caption{在“运行”中输入 \lstinline{powershell}，并按 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter}}
+\end{figure}
+
+输入下面的命令：
+
+\begin{minted}{powershell}
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+\end{minted}
+
+然后，回车运行上述命令，过程中可能需要您输入“Y”确认。运行完成后即可关闭窗口。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/confirm_execution_policy_00.png}
+    \caption{键入修改执行策略的命令}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/confirm_execution_policy_01.png}
+    \caption{确认修改执行策略}
+\end{figure}
+
+\subsection{罗技软件导入 LUA 程序}
+
+鼠标右键点击集成工具文件夹中的 \lstinline{install.ps1}，点击在 Powershell 中运行，完成对 LUA 主程序 \lstinline{Main.lua} 的配置。
 
 \textbf{\color{red}配置完成后，如果变动了安装路径（移动集成工具文件夹或将集成工具文件夹重命名），则需要重新运行一次 \lstinline{install.ps1}，并重新在罗技软件中保存并运行（详见下文）。}
 
