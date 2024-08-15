@@ -73,7 +73,7 @@ end
 ---移动视角，并执行回合重置。
 ---@return nil
 function Player:turn()
-    local sensitivity = math.random() -- 灵敏度∈(0, 1]
+    local sensitivity = 1 - 0.8 * math.random() -- 灵敏度∈(0.2, 1]
     local direction = Utility:random_direction() -- 随机向左或右
     local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
     repeat
