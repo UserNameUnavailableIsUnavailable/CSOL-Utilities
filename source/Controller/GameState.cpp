@@ -49,7 +49,7 @@ DWORD CALLBACK CSOL24H::WatchInGameState(LPVOID lpParam) noexcept
         DispatchCommand();
         Sleep(100);
     }
-    ConsoleLog("【消息】线程 hWatchInGameStateThread 退出。\r\n");
+    ConsoleLog("线程 hWatchInGameStateThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     return 0;
 }
 
@@ -85,16 +85,16 @@ void CSOL24H::TransferGameState() noexcept
                 SendMessageTimeout(hGameWindow, WM_NULL, 0, 0, SMTO_NORMAL, 5000, &_);
                 if (GetForegroundWindow() == hGameWindow)
                 {
-                    ConsoleLog("【消息】成功将游戏窗口置于前台并激活。\r\n");
+                    ConsoleLog("成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 }
                 else
                 {
-                    ConsoleLog("【警告】未能成功将游戏窗口置于前台并激活。\r\n");
+                    ConsoleLog("未能成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
                 }
                 auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
                 if (MakeWindowBorderless) {
                     MakeWindowBorderless(hGameWindow);
-                    ConsoleLog("【消息】去除游戏窗口标题栏。\r\n");
+                    ConsoleLog("去除游戏窗口标题栏。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 }
             }
             gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
@@ -107,7 +107,7 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (in_game_state.update(gs))
         {
-            ConsoleLog("【消息】%s。游戏日志时间戳更新为当前时间戳：%lld。\r\n", msg, current_time);
+            ConsoleLog("%s。游戏日志时间戳更新为当前时间戳：%lld。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, msg, current_time);
         }
         return;
     }
@@ -201,7 +201,7 @@ void CSOL24H::TransferGameState() noexcept
         }
         if (in_game_state.update(gs))
         {
-            ConsoleLog("【消息】%s。游戏日志时间戳：%lld，当前时间戳：%lld。\r\n", msg, log_timestamp, current_time);
+            ConsoleLog("%s。游戏日志时间戳：%lld，当前时间戳：%lld。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, msg, log_timestamp, current_time);
         }
         bGameErrorLogBufferResolved = true;
         return;

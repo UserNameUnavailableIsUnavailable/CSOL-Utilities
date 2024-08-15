@@ -39,7 +39,7 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     // bSuccess = bSuccess && RegisterHotKey(NULL, 12, MOD_WIN | MOD_NOREPEAT, VK_UP); /* GamingTool 功能 Win UP */
     if (!bSuccess)
     {
-        ConsoleLog("【错误】线程 hHandleHotKeyMessageThread 注册热键时失败。错误代码：%lu。\r\n");
+        ConsoleLog("线程 hHandleHotKeyMessageThread 注册热键时失败，请检查是否存在热键冲突。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
         return -1;
     }
     MSG msg;
@@ -54,7 +54,7 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
             ResetEvent(hEnableLocateCursorEvent);
             if (msg.wParam == '0')
             {
-                ConsoleLog("【消息】切换为 0 模式\r\n");
+                ConsoleLog("切换为 0 模式", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 GiveCommand(LUA_CMD_NOP); /* 写入空命令，LUA 脚本暂停运行 */
             }
             else if (msg.wParam == '1')
@@ -62,30 +62,30 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
                 CSOL24H::DisableExtendedMode();
                 SetEvent(hEnableWatchGameProcessEvent);
                 SetEvent(hEnableWatchInGameStateEvent);
-                ConsoleLog("【消息】切换为 1 模式。\r\n");
+                ConsoleLog("切换为 1 模式。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             }
             else if (msg.wParam == '2')
             {
                 CSOL24H::EnableExtendedMode();
                 SetEvent(hEnableWatchGameProcessEvent);
                 SetEvent(hEnableWatchInGameStateEvent);
-                ConsoleLog("【消息】切换为 2 模式。\r\n");
+                ConsoleLog("切换为 2 模式。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             }
             else if (msg.wParam == '3') /* 合成配件 */
             {
                 SetEvent(hEnableCombinePartsEvent);
-                ConsoleLog("【消息】切换为 3 模式。\r\n");
+                ConsoleLog("切换为 3 模式。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 GiveCommand(LUA_CMD_COMBINE_PARTS);
             }
             else if (msg.wParam == '4') /* 购买物品 */
             {
                 SetEvent(hEnablePurchaseItemEvent);
-                ConsoleLog("【消息】切换为 4 模式。\r\n");
+                ConsoleLog("切换为 4 模式。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             }
             else if (msg.wParam == '5') /* 光标定位 */
             {
                 SetEvent(hEnableLocateCursorEvent);
-                ConsoleLog("【消息】切换为 5 模式。\r\n");
+                ConsoleLog("切换为 5 模式。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             }
         }
         // else if (msg.message == WM_HOTKEY && msg.wParam >= 6 && msg.wParam <= 14)
@@ -145,6 +145,6 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
 
     // UnhookWindowsHookEx(hHook);
 
-    ConsoleLog("【消息】线程 hHandleHotKeyMessageThread 退出。\r\n");
+    ConsoleLog("线程 hHandleHotKeyMessageThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     return 0;
 }

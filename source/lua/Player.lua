@@ -73,9 +73,9 @@ end
 ---移动视角，并执行回合重置。
 ---@return nil
 function Player:turn()
-    local sensitivity = (2 - math.random()) / 2 -- 灵敏度∈(0.5, 1]
+    local sensitivity = math.random() -- 灵敏度∈(0, 1]
     local direction = Utility:random_direction() -- 随机向左或右
-    local start_time = DateTime:get_local_timestamp()
+    local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
     repeat
         Mouse:move_relative(100 * direction * sensitivity, 0, Delay.MINI)
     until (DateTime:get_local_timestamp() - start_time > 6)

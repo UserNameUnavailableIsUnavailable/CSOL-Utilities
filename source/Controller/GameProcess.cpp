@@ -91,17 +91,17 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (dwGameProcessId == 0)
             {
-                ConsoleLog("【错误】获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。\r\n", GetLastError());
+                ConsoleLog("获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
                 return -1;
             }
             hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwGameProcessId);
             if (!hGameProcess)
             {
-                ConsoleLog("【错误】尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。\r\n", GetLastError());
+                ConsoleLog("尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
                 return -1;
             }
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING; /* 跳转执行监测游戏进程运行状态的代码块 */
-            ConsoleLog("【消息】成功获取游戏进程信息。进程标识符：%lu。\r\n",dwGameProcessId);
+            ConsoleLog("成功获取游戏进程信息。进程标识符：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, dwGameProcessId);
             SetEvent(hGameProcessRunningEvent);
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_RUNNING) /* 游戏进程正在运行 */
@@ -115,7 +115,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             {
                 ResetEvent(hGameProcessRunningEvent); /* 暂停监视游戏内状态 */
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_EXITED;
-                ConsoleLog("【消息】游戏进程退出。执行断线重连。\r\n");
+                ConsoleLog("游戏进程退出。执行断线重连。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 CloseHandle(hGameProcess); /* 关闭已经退出的的游戏进程句柄 */
                 hGameProcess = NULL;
                 dwGameProcessId = 0;
@@ -123,7 +123,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             }
             else /* 等待失败 */
             {
-                ConsoleLog("【消息】hWatchGameProcess 线程运行遇到错误。错误代码：%lu。\r\n", GetLastError());
+                ConsoleLog("hWatchGameProcess 线程运行遇到错误。错误代码：%lu。\r\n", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
                 return -1;
             }
         }
@@ -149,12 +149,12 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
                 &startup_info_w,
                 &tcg_process_info
             )) {
-                ConsoleLog("【消息】等待游戏进程启动。\r\n");
+                ConsoleLog("等待游戏进程启动。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 跳转执行等待游戏进程启动的代码块 */
             }
             else 
             {
-                ConsoleLog("【警告】通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。\r\n", GetLastError());
+                ConsoleLog("通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, GetLastError());
             }
             if (tcg_process_info.dwProcessId != 0)
             {
@@ -165,7 +165,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN) /* 游戏进程状态未确定，确定游戏进程状态 */
         {
-            ConsoleLog("【消息】游戏进程状态未知，检测游戏进程状态。\r\n");
+            ConsoleLog("游戏进程状态未知，检测游戏进程状态。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             hGameWindow = FindWindowW(NULL, L"Counter-Strike Online"); /* 尝试获取游戏进程窗口 */
             if (!hGameWindow)
             {
@@ -175,16 +175,16 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (!dwGameProcessId)
             {
-                ConsoleLog("【错误】获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。\r\n", GetLastError());
+                ConsoleLog("获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
                 break;
             }
             hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwGameProcessId);
             if (!hGameProcess)
             {
-                ConsoleLog("【错误】尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。\r\n", GetLastError());
+                ConsoleLog("尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
                 break;
             }
-            ConsoleLog("【消息】成功获取游戏进程信息。游戏进程标识符：%lu。\r\n", dwGameProcessId);
+            ConsoleLog("成功获取游戏进程信息。游戏进程标识符：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, dwGameProcessId);
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING;
             SetEvent(hGameProcessRunningEvent);
         }
@@ -197,6 +197,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
     }
     hGameWindow = 0;
     dwGameProcessId = 0;
-    ConsoleLog("【消息】线程 hWatchGameProcessThread 退出。\r\n");
+    ConsoleLog("线程 hWatchGameProcessThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     return 0;
 }
