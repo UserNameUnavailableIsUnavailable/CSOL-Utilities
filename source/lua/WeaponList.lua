@@ -175,9 +175,10 @@ SpecialWeapon =
 
 ---防弹衣
 AC = Weapon:new({
-    name = "防弹衣",
+    name = "防弹衣+头盔",
     purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.TWO}
 })
 
+----AC = nil --[[如果不需要购买护甲，则将本行最前面四条短横线删掉即可]]
 
 end -- WeaponList_lua

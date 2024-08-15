@@ -123,14 +123,14 @@ end
 function Keyboard:is_modifier_pressed(key) return IsModifierPressed(key) end
 
 
--- keyLockState为3 bits无符号整数，大小范围：0~7，从高位到低位依次表示NUMLOCK，CAPSLOCK，SCROLLLOCK
+-- keyLockState 为 3 bits 无符号整数，大小范围：0 ~ 7，从高位到低位依次表示 `NUMLOCK`，`CAPSLOCK`，`SCROLLLOCK`
 ---   2               1             0
 --- NUM_LOCK       CAPS_LOCK     SCROLL_LOCK
--- 以上排布对应于键盘上指示灯排布，可表示8种状态
--- 例如， keylock = 5 = 0b101，代表NUMLOCK和SCROLLLOCK打开
--- 获取keyLockState值
--- @return number (1~7)
-function Keyboard:getKeyLockState()
+-- 以上排布对应于键盘上指示灯排布，可表示 8 种状态
+-- 例如，5 = 0b101，代表 `NUMLOCK` 和 `SCROLLLOCK` 打开
+-- 获取 keyLockState 值
+--@return integer
+function Keyboard:get_key_lock_state()
     local keyLockState = 0
     if (IsKeyLockOn(self.NUM_LOCK))
     then

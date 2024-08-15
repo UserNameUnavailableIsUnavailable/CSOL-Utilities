@@ -15,6 +15,6 @@ DWORD CSOL24H::LocateCursor(LPVOID lpParam) noexcept
         GiveCommand(LUA_CMD_LOCATE_CURSOR);
         Sleep(1000);
     }
-    ConsoleLog("【消息】线程 hLocateCursorThread 退出。\r\n");
+    ConsoleLog("线程 hLocateCursorThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     return 0;
 }

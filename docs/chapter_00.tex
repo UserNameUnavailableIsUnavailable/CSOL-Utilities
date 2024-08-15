@@ -1,6 +1,6 @@
 \section{基本介绍及安装方法}
 
-本节将一步步展示如何安装配置本集成工具。
+本节将一步步展示如何安装配置本集成工具。\textbf{\color{red} 阅读本文档时，如图片尺寸过小，可以通过您使用的 PDF 阅读器（浏览器或专业 PDF 编辑软件）自带的放大/缩小功能查看本文档中的图片。}
 
 \begin{figure}[H]
     \Centering
@@ -30,9 +30,23 @@
 
 Windows 默认情况下严格阻止运行任何 Powershell 脚本文件（后缀为 \lstinline{.ps1}），因此若您是第一次使用本工具，需要做如下配置。
 
-对于 Windows 11 23H2 及以上版本的用户：打开“设置”，点击“系统”-“开发者选项”，在“Powershell”下拉选项中打开图示选项即可。下面针对 Windows 11 23H2 以下版本用户的设置步骤可忽略。
+对于 Windows 11 23H2 及以上版本的用户修改较为简单：打开“设置”，点击“系统”-“开发者选项”，在“Powershell”下拉选项中打开图示选项即可。下面针对 Windows 11 23H2 以下版本用户的设置步骤可忽略。
 
-对于 Windows 11 23H2 以下版本的用户，按下 \lstinline{Win} \lstinline{R}，输入 \lstinline{powershell} 后，按下 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter} 以管理员权限打开 Powershell 窗口。
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/win11_23h2_00.png}
+    \caption{点击“开发者选项”}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/win11_23h2_01.png}
+    \caption{修改执行策略}
+\end{figure}
+
+对于 Windows 11 23H2 以下版本的用户，需按照以下步骤操作：
+
+按下 \lstinline{Win} \lstinline{R}，输入 \lstinline{powershell} 后，按下 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter} 以管理员权限打开 Powershell 窗口。
 
 \begin{figure}[H]
     \Centering
