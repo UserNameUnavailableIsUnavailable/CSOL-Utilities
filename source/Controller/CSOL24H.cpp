@@ -72,7 +72,7 @@ void CSOL24H::InitializeWatchInGameStateThread()
     hEnableWatchInGameStateEvent = CreateEventW(nullptr, true, false, NULL);
     if (!hEnableWatchInGameStateEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件对象 %ls 失败。错误代码 %lu。", L"hEnableWatchGameStateEvent", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件对象 %ls 失败。错误代码 %lu。", L"hEnableWatchGameStateEvent", GetLastError());
     }
     lpGameErrorLogBuffer = new char[256 * 1024 * 1024];
     /* 获取 Error.log 路径 */
@@ -107,7 +107,7 @@ void CSOL24H::InitializeWatchInGameStateThread()
     );
     if (hLUACommandFile == INVALID_HANDLE_VALUE)
     {
-        throw CSOL24H_EXCEPT("【错误】打开文件 %ls 失败。错误代码 %lu。", CMD_FILE_NAME, GetLastError());
+        throw CSOL24H_EXCEPT("打开文件 %ls 失败。错误代码 %lu。", CMD_FILE_NAME, GetLastError());
     }
     /* 创建 hWatchGameStateThread 线程 */
     hWatchInGameStateThread = CreateThread(
@@ -120,7 +120,7 @@ void CSOL24H::InitializeWatchInGameStateThread()
     );
     if (!hWatchInGameStateThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建用于监测游戏状态的线程时失败。错误代码：%lu。", GetLastError());
+        throw CSOL24H_EXCEPT("创建用于监测游戏状态的线程时失败。错误代码：%lu。", GetLastError());
     }
 }
 
@@ -136,7 +136,7 @@ void CSOL24H::InitializeHandleHotKeyMessageThread()
     );
     if (!hHandleHotKeyMessageThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建用于处理热键事件的线程时失败。错误代码：%lu。", GetLastError());
+        throw CSOL24H_EXCEPT("创建用于处理热键事件的线程时失败。错误代码：%lu。", GetLastError());
     }
 }
 
@@ -150,23 +150,23 @@ void CSOL24H::InitializeWatchGameProcessThread()
     wcscat_s(pwsTCGameExePath.get(), cchSize, setup.get()); /* "C:\Program Files (x86)\TCGame */
     wcscat_s(pwsTCGameExePath.get(), cchSize, L"\\TCGame.exe"); /* "C:\Program Files (x86)\TCGame\TCGame.exe */
     wcscat_s(pwsTCGameExePath.get(), cchSize, L"\""); /* "C:\Program Files (x86)\TCGame\TCGame.exe" */
-    ConsoleLog("【消息】TCGame 所在路径：%ls\r\n", pwsTCGameExePath.get());
+    ConsoleLog("TCGame 所在路径：%ls", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, pwsTCGameExePath.get());
     /* 启动 CSOL 的命令行 */
     cchSize = cchSize + wcslen(L" cso") + 8; /* "C:\Program Files (x86)\TCGame\TCGame.exe" cso */
     pwsTCGRunCSOCmd = std::shared_ptr<wchar_t[]>(new wchar_t[cchSize]);
     wcscpy_s(pwsTCGRunCSOCmd.get(), cchSize, pwsTCGameExePath.get());
     wcscat_s(pwsTCGRunCSOCmd.get(), cchSize, L" cso");
-    ConsoleLog("【消息】启动 CSOL 使用的命令行：%ls\r\n", pwsTCGRunCSOCmd.get());
+    ConsoleLog("启动 CSOL 使用的命令行：%ls", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, pwsTCGRunCSOCmd.get());
     game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN; /* 游戏进程状态设定为未知 */
     hEnableWatchGameProcessEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableWatchGameProcessEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码：%lu。", L"hEnableWatchGameProcessEvent", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件 %ls 失败。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, L"hEnableWatchGameProcessEvent", GetLastError());
     }
     hGameProcessRunningEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hGameProcessRunningEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hGameProcessRunningEvent", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件 %ls 失败。错误代码 %lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, L"hGameProcessRunningEvent", GetLastError());
     }
     hWatchGameProcessStateThread = CreateThread(
         NULL,
@@ -178,7 +178,7 @@ void CSOL24H::InitializeWatchGameProcessThread()
     );
     if (!hWatchGameProcessStateThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建用于监测游戏进程状态的线程时失败。错误代码：%lu。", L"hWatchGameProcessStateThread", GetLastError());
+        throw CSOL24H_EXCEPT("创建用于监测游戏进程状态的线程时失败。错误代码：%lu。", L"hWatchGameProcessStateThread", GetLastError());
     }
 }
 
@@ -187,7 +187,7 @@ void CSOL24H::InitializeCombinePartsThread()
     hEnableCombinePartsEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableCombinePartsEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码：%lu。", L"hEnableCombinePartsEvent", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件 %ls 失败。错误代码：%lu。", L"hEnableCombinePartsEvent", GetLastError());
     }
     hCombinePartsThread = CreateThread(
         NULL,
@@ -199,7 +199,7 @@ void CSOL24H::InitializeCombinePartsThread()
     );
     if (!hCombinePartsThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建合成配件线程失败。错误代码 %lu。", GetLastError());
+        throw CSOL24H_EXCEPT("创建合成配件线程失败。错误代码 %lu。", GetLastError());
     }
 }
 
@@ -208,12 +208,12 @@ void CSOL24H::InitializePurchaseItemThread()
     hEnablePurchaseItemEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableCombinePartsEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hEnablePurchaseItemEvent", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件 %ls 失败。错误代码 %lu。", L"hEnablePurchaseItemEvent", GetLastError());
     }
     hPurchaseItemThread = CreateThread(NULL, 512, PurchaseItem, NULL, 0, NULL);
     if (!hPurchaseItemThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建用于物品购买的线程失败。错误代码 %lu。", GetLastError());
+        throw CSOL24H_EXCEPT("创建用于物品购买的线程失败。错误代码 %lu。", GetLastError());
     }
 }
 
@@ -222,12 +222,12 @@ void CSOL24H::InitializeLocateCursorThread()
     hEnableLocateCursorEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableCombinePartsEvent)
     {
-        throw CSOL24H_EXCEPT("【错误】创建事件 %ls 失败。错误代码 %lu。", L"hEnableLocateCursorThread", GetLastError());
+        throw CSOL24H_EXCEPT("创建事件 %ls 失败。错误代码 %lu。", L"hEnableLocateCursorThread", GetLastError());
     }
     hLocateCursorThread = CreateThread(NULL, 512, LocateCursor, NULL, 0, NULL);
     if (!hLocateCursorThread)
     {
-        throw CSOL24H_EXCEPT("【错误】创建用于获取鼠标光标位置的线程失败。错误代码 %lu。", GetLastError());
+        throw CSOL24H_EXCEPT("创建用于获取鼠标光标位置的线程失败。错误代码 %lu。", GetLastError());
     }
 }
 
@@ -237,23 +237,23 @@ void CSOL24H::Initialize()
     TIME_ZONE_INFORMATION tzi;
     if (TIME_ZONE_ID_INVALID == GetTimeZoneInformation(&tzi))
     {
-        throw CSOL24H_EXCEPT("【错误】获取操作系统时区信息失败。错误代码：%lu。", GetLastError());
+        throw CSOL24H_EXCEPT("获取操作系统时区信息失败。错误代码：%lu。", GetLastError());
     }
     time_bias = tzi.Bias * 60;
     hCmdFileMutex = CreateMutexW(NULL, FALSE, NULL);
     if (!hCmdFileMutex)
     {
-        throw CSOL24H_EXCEPT("【错误】创建互斥体 %ls 失败。错误代码：%lu。", L"hCmdFileMutex", GetLastError());
+        throw CSOL24H_EXCEPT("创建互斥体 %ls 失败。错误代码：%lu。", L"hCmdFileMutex", GetLastError());
     }
     hGamingToolModule = LoadLibraryW(L"GamingTool.dll");
     if (!hGamingToolModule)
     {
-        throw CSOL24H_EXCEPT("【错误】加载模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
+        throw CSOL24H_EXCEPT("加载模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
     }
     auto InitializeGamingToolDll = (BOOL(*)(void))GetProcAddress(hGamingToolModule, "InitializeGamingToolDll");
     if (!InitializeGamingToolDll || !InitializeGamingToolDll())
     {
-        throw CSOL24H_EXCEPT("【错误】初始化模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
+        throw CSOL24H_EXCEPT("初始化模块 GamingTool.dll 时失败。错误代码 %lu。", GetLastError());
     }
     InitializeWatchGameProcessThread();
     InitializeWatchInGameStateThread();
@@ -262,8 +262,8 @@ void CSOL24H::Initialize()
     InitializeLocateCursorThread();
     InitializeHandleHotKeyMessageThread();
     bInitialize = true;
-    ConsoleLog("【消息】初始化完成\r\n");
-    ConsoleLog("【消息】本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。\r\n");
+    ConsoleLog("初始化完成", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+    ConsoleLog("本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
 }
 
 void CSOL24H::Run()
@@ -284,11 +284,11 @@ void CSOL24H::Run()
     );
     if (dwSignaledObjectIndex >= 0 && dwSignaledObjectIndex <= ARRAYSIZE(hThreadsToWait) - 1 && !bDestroy)
     {
-        throw CSOL24H_EXCEPT("【错误】线程异常退出。");
+        throw CSOL24H_EXCEPT("线程异常退出。");
     }
     else if (dwSignaledObjectIndex == WAIT_FAILED)
     {
-        throw CSOL24H_EXCEPT("【错误】等待诸线程时发生错误。错误代码：%lu。", GetLastError());
+        throw CSOL24H_EXCEPT("等待诸线程时发生错误。错误代码：%lu。", GetLastError());
     }
     else if (bDestroy) /* 正在由 Destroy() 销毁，则等待所有线程退出 */
     {
@@ -298,7 +298,7 @@ void CSOL24H::Run()
             TRUE,
             INFINITE
         );
-        ConsoleLog("【消息】各线程退出。\r\n");
+        ConsoleLog("各线程退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     }
 }
 
@@ -359,7 +359,7 @@ std::shared_ptr<wchar_t[]> CSOL24H::QueryRegistryStringItem(HKEY hPredefinedTopD
     ); // 读取字符串
     if (ret != ERROR_SUCCESS)
     {
-        throw CSOL24H_EXCEPT("【错误】获取注册表信息失败。注册表项路径：%s\\%s\\%s。错误代码：%ld。", lpszPredefinedTopDirName, lpSubDir, lpItemName, ret);
+        throw CSOL24H_EXCEPT("获取注册表信息失败。注册表项路径：%s\\%s\\%s。错误代码：%ld。", lpszPredefinedTopDirName, lpSubDir, lpItemName, ret);
     }
     return lpwszResult;
 }

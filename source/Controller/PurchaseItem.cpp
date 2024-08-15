@@ -16,6 +16,6 @@ DWORD CSOL24H::PurchaseItem(LPVOID lpParam) noexcept
         GiveCommand(LUA_CMD_PURCHASE_ITEM);
         Sleep(1000);
     }
-    ConsoleLog("【消息】线程 hPurchaseItemThread 退出。\r\n");
+    ConsoleLog("线程 hPurchaseItemThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
     return 0;
 }

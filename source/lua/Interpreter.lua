@@ -43,8 +43,6 @@ function Interpreter()
             Executor:combine_parts()
         elseif (Cmd == Command.CMD_PURCHASE_ITEM and not expired()) -- 购买物品功能
         then
-            -- local buy_button_x = 0
-            -- local buy_button_y = 0
             if (previous_command ~= Cmd) -- 对于新发出的命令，需要更新鼠标光标位置
             then
                 Executor:purchase_item(Mouse:locate_cursor())

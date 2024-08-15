@@ -48,7 +48,7 @@ function Runtime:sleep(milliseconds)
     end
 end
 
----中断处理函数。只有中断标志位使能时才允许中断。
+---默认的中断处理函数（不进行任何操作）。只有中断标志位使能时才允许中断。
 function Runtime:interrupt_handler()
     return
 end

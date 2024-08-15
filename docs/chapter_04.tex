@@ -6,28 +6,28 @@
 
 首先，在商城中任意点击某一个金币道具的兑换按钮。按下面的描述在 \lstinline{Setting.lua} 中配置下列坐标。
 
-\lstinline{STORE_BUY_OPTION_X}、\lstinline{STORE_BUY_OPTION_Y} 弹出的对话框中兑换的选项。
-
 \begin{figure}[H]
     \Centering
+    \parbox[l]{\textwidth}{\lstinline{STORE_BUY_OPTION_X}、\lstinline{STORE_BUY_OPTION_Y}：弹出的对话框中兑换的选项（图 \ref{ch4fig-store-buy-option}）。}
     \includegraphics[width=\textwidth]{docs/assets/store_buy_option.png}
     \caption{兑换选项}
+    \label{ch4fig-store-buy-option}
 \end{figure}
-
-\lstinline{STORE_BUY_X}、\lstinline{STORE_BUY_Y} 点击兑换按钮后弹出的对话框中的“兑换”按钮。
 
 \begin{figure}[H]
     \Centering
+    \parbox[l]{\textwidth}{\lstinline{STORE_BUY_X}、\lstinline{STORE_BUY_Y}：点击兑换按钮后弹出的对话框中的“兑换”按钮（图 \ref{ch4fig-store-purchase}）。}
     \includegraphics[width=\textwidth]{docs/assets/store_purchase.png}
     \caption{对话框中的“兑换”按钮}
+    \label{ch4fig-store-purchase}
 \end{figure}
-
-\lstinline{STORE_BUY_OPTION_X}、\lstinline{STORE_BUY_CONFIRM_Y} 兑换确认按钮坐标位置。
 
 \begin{figure}[H]
     \Centering
+    \parbox[l]{\textwidth}{\lstinline{STORE_BUY_CONFIRM_X}、\lstinline{STORE_BUY_CONFIRM_Y}：兑换确认按钮坐标位置（图 \ref{ch4fig-buy-confirm}）。}
     \includegraphics[width=\textwidth]{docs/assets/store_buy_confirm.png}
     \caption{兑换“确认”按钮}
+    \label{ch4fig-buy-confirm}
 \end{figure}
 
 配置完成后，在罗技控制台中重新保存并运行脚本，以使配置生效。
