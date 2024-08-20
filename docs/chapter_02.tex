@@ -13,19 +13,39 @@
 
 \subsection{前提条件}
 
-TCGame 在本集成工具启动后\textbf{\color{red}必须}保证登录信息尚未失效，否则将无法使用断线重连功能。
+\begin{itemize}
 
-\textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
+\item TCGame 在本集成工具启动后\textbf{\color{red}必须}保证登录信息尚未失效，否则将无法使用掉线重连功能。
 
-确保 LUA 脚本文件正确保存并运行。
+\item \textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
 
-运行控制器（0 模式）。
+\item 确保 Lua 脚本文件正确保存并运行。
 
-运行 GamingTool.exe。
+\item 运行控制器。
+
+\item 运行 GamingTool.exe。
+
+\end{itemize}
 
 通过 TCGame 启动游戏，挂机期间需保证 TCGame 处于登录状态。2024.7.31 TCGame 更新后，登录信息每隔一段时间会刷新，故登录信息不会失效（除非遇到断网导致登录信息无法刷新），因此不再像 v1.3.9 及之前的版本那样必须选择 TCGame 自动登录。
 
-游戏启动完成，进入大厅界面后，按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框（同时还会将窗口居中），如不去除边框，将可能导致挂机时使用的游戏按钮坐标不准确（例如，窗口位置被意外地移动）。
+游戏启动进入大厅界面后（图 \ref{ch2fig-before-make-borderless}），按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框（图 \ref{ch2fig-after-make-borderless}，同时还会将游戏窗口置于屏幕中央），如不去除边框，将可能导致挂机时使用的游戏按钮坐标不准确（例如，窗口位置被意外地移动）。
+
+\begin{figure}
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/before-make-borderless.png}
+    \caption{无边框窗口化前（窗口可随意移动）}
+    \label{ch2fig-before-make-borderless}
+\end{figure}
+
+\begin{figure}
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/after-make-borderless.png}
+    \caption{无边框窗口化后（窗口居中、标题栏去除、不可随意移动）}
+    \label{ch2fig-after-make-borderless}
+\end{figure}
+
+有关 GamingTool 更多使用方法，参考 \href{https://gitee.com/silver1867/gaming-tool}{GamingTool 项目链接}。
 
 \subsection{通用设置}
 
@@ -258,7 +278,9 @@ purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
 
 \subsubsection{扩展挂机模式}
 
-2 号挂机模式为扩展挂机模式。该模式下玩家会随机购买扩展武器列表中的武器攻击，并使用特殊武器（如圣翼皓印或炽翼魔印）辅助杀敌，适用于野房挂机抢杀敌 MVP 的情形。
+2 号挂机模式为扩展挂机模式。该模式下玩家会随机购买扩展武器列表中的武器攻击，并使用特殊武器（如圣翼皓印或炽翼魔印）辅助杀敌，适用于野房挂机抢杀敌 MVP 的情形（阅读完本节后可根据需要参考\nameref{section-skills}章节中的\nameref{subsection-mode-2-skill-0}进行设置）。
+考虑到购买随机武器需要消耗较多资金，当切换至该模式时，随机武器列表并不会立即启用，而是会在游戏开始后的 120 秒内先使用模式 1 积攒足够资金后再启用随机武器列表。
+除了野房抢杀敌 MVP 外，模式 2 非常适合刷狂戮巨蚊、鹞子风筝等活动任务（阅读完本节后可根据需要参考\nameref{section-skills}章节中的\nameref{subsection-mode-2-skill-1}进行设置）。
 
 该模式需要设置 \lstinline{ExtendedWeaponList}（扩展武器列表）和 \lstinline{SpecialWeapon}（某一件特殊武器，不是列表）。
 \lstinline{ExtendedWeaponList} 为扩展武器列表，不限制武器数量，挂机时随机从中抽取武器进行攻击，其配置方式同 \lstinline{DefaultWeaponList}，您可以根据提供的样例自行修改。

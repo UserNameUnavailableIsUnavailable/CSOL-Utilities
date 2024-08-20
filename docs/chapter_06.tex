@@ -2,6 +2,7 @@
 \label{section_skills}
 
 \subsection{开机自启罗技软件}
+\label{subsection-auto-start-lghub-as-admin}
 
 罗技软件需要\textbf{\color{red}以管理员权限启动}，罗技软件自带的开机自启功能无法做到这一点。较为便捷的方式是使用 Windows 自带的\textbf{“任务计划程序”}。
 
@@ -136,3 +137,107 @@
     \includegraphics[width=\textwidth]{docs/assets/skills/run_task.png}
     \caption{立即运行已经创建的基本任务}
 \end{figure}
+
+
+\subsection{使用模式 2 抢杀敌 MVP}
+\label{subsection-mode-2-skill-0}
+
+如果您拥有逆界星轮，则可以考虑\textbf{在无限制挂机房挂机时}使用模式 2 抢夺杀敌 MVP。配置方式如下（仅供参考，购买按键序列需要自行修改），只需要在随机武器列表中保留一件逆界星轮即可。
+
+\begin{minted}[breakautoindent, breaklines]{lua}
+---扩展武器列表。
+---@type Weapon[]
+ExtendedWeaponList = {
+    Weapon:new{
+        name = "逆界星轮",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.PRIMARY,
+        purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.SIX},
+        attack_button = Mouse.RIGHT
+    }
+}
+\end{minted}
+
+这样，在扩展挂机模式下，游戏开始的前 120 秒使用默认挂机模式积攒充足资金后，便会持续进行逆界星轮刷枪操作，其杀敌效率远超【青鸾】迅风轮等武器。若您还拥有圣翼皓印或炽翼魔印，则配合样例文件中提供的特殊武器使用方式，还可进一步提升杀敌效率。
+
+\subsection{使用模式 2 刷狂戮巨蚊、鹞子风筝任务}
+\label{subsection-mode-2-skill-1}
+
+在拥有【天驱】突击套装、【擎空】突击套装、冰雪魔咒 PB-4 其中之一的情况下，可以使用模式 2 刷狂戮巨蚊、鹞子风筝任务。
+
+这需要您对随机武器列表作如下配置（仅供参考，购买按键序列需要自行修改）。鉴于【天驱】突击套装、【擎空】突击套装没有吸血效果，故在随机武器列表额外加入幻境！光棱剑。
+
+\begin{minted}[breakautoindent, breaklines]{lua}
+---扩展武器列表。
+---@type Weapon[]
+ExtendedWeaponList = {
+    Weapon:new{
+        name = "幻境！光棱剑",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.MELEE,
+        purchase_sequence = {Keyboard.B, Keyboard.G},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【擎空】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.ONE},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【天驱】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.TWO},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "冰雪魔咒PB-4",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.THREE},
+        attack_button = Mouse.LEFT
+    }  attack_button = Mouse.RIGHT
+}
+\end{minted}
+
+需要指出，随机武器列表中的武器是等概率随机选择的，若要提高某一件武器被选中的概率，只需要在武器列表中多次添加改武器即可（重复添加同一件武器时，其名称需要保持相同，否则将被认为是不同的武器，Lua 模块针对重复购买相同武器刷枪的情况有特别优化）。
+例如，刷狂戮巨蚊、鹞子风筝任务时，若您只有【天驱】突击套装（签到可免费领取），要提高【天驱】突击套装被选中的概率（上面的例子中被选中的概率为 25\%），只需要进行下面这样的改动，即可将【天驱】突击套装被选中的概率提高到 75\%。
+
+\begin{minted}[breakautoindent, breaklines]{lua}
+---扩展武器列表。
+---@type Weapon[]
+ExtendedWeaponList = {
+    Weapon:new{
+        name = "幻境！光棱剑",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.MELEE,
+        purchase_sequence = {Keyboard.B, Keyboard.G},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【天驱】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.TWO},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【天驱】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.ONE},
+        attack_button = Mouse.LEFT
+    },
+    Weapon:new{
+        name = "【天驱】突击套装",
+        switch_delay = Delay.NORMAL,
+        number = Weapon.SECONDARY,
+        purchase_sequence = {Keyboard.B, Keyboard.ONE, Keyboard.TWO},
+        attack_button = Mouse.LEFT
+    }  attack_button = Mouse.RIGHT
+}
+\end{minted}
+
+根据实测效果，使用模式 2 进行如上配置后单刷狂戮巨蚊仅需一天。
