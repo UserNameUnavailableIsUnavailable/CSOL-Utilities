@@ -99,17 +99,17 @@ function Player:play(weapon_list)
     math.randomseed(Runtime:get_running_time(), DateTime:get_local_timestamp())
     local weapon = weapon_list[math.random(count)] -- 随机选择一件武器
     ---上次使用与本次随机到的武器相同，丢弃后重新购买
-    if (weapon == self.last_primary_weapon) -- 随机到最近一次使用的主武器相同
+    if (weapon.name == self.last_primary_weapon.name) -- 随机到最近一次使用的主武器相同
     then
         self.last_primary_weapon:switch()
         self.last_primary_weapon:abandon()
-    elseif (weapon == self.last_secondary_weapon) -- 随机到最近一次使用的副武器
+    elseif (weapon.name == self.last_secondary_weapon.name) -- 随机到最近一次使用的副武器
     then
         self.last_secondary_weapon:switch()
         self.last_secondary_weapon:abandon()
     end
-    if (weapon.number == Weapon.PRIMARY) then self.last_primary_weapon = weapon end -- 更新上一次使用的主武器
-    if (weapon.number == Weapon.SECONDARY) then self.last_secondary_weapon = weapon end -- 更新上一次使用的副武器
+    if (weapon.number == Weapon.PRIMARY) then self.last_primary_weapon = weapon -- 更新上一次使用的主武器
+    elseif (weapon.number == Weapon.SECONDARY) then self.last_secondary_weapon = weapon end -- 更新上一次使用的副武器
     weapon:purchase()
     weapon:switch()
     self:start_move()
@@ -167,6 +167,15 @@ function Player:use_special_weapon(weapon)
     then
         self.last_primary_weapon:switch() -- 使用后切换回原来的武器
     end
+end
+
+---重置玩家对象成员变量为初始值。
+function Player:reset()
+    self.last_primary_weapon = nil
+    self.last_secondary_weapon = nil
+    self.last_buy_part_weapon_time = 0
+    self.part_weapon_counter = nil
+    self.last_buy_special_weapon_time = 0
 end
 
 end -- Play_lua

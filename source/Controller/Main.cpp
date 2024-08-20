@@ -22,7 +22,7 @@ int main()
     }
     if (!IsRunningAsAdmin())
     {
-        ConsoleLog("控制器未以管理员权限启动，这会导致断线重连失败。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
+        ConsoleLog("控制器未以管理员权限启动，这会导致掉线重连失败。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
     }
     try
     {
