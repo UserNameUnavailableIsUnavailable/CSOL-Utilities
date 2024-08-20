@@ -58,7 +58,7 @@ function Executor:start_game_room()
     Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y, 2000)
 end
 
----选定角色。
+---选定角色，开始新一轮游戏。
 ---@return nil
 function Executor:choose_class()
     if (Setting.CHOOSE_T_CLASS)
@@ -72,6 +72,7 @@ function Executor:choose_class()
         Console:information("Setting.CLASS_OPTION 设置有误。随机选择角色。")
         Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
     end
+    Player:reset() -- 重置玩家对象成员变量
     Runtime:sleep(500) -- 等待 0.5 秒，足够控制器更新下条命令
 end
 

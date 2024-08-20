@@ -33,10 +33,19 @@ public:
     InGameState() : in_game_state(ENUM_IN_GAME_STATE::IGS_UNKNOWN), timestamp(0) {};
     InGameState(ENUM_IN_GAME_STATE state, int64_t ts) : in_game_state(state), timestamp(ts) {};
     ~InGameState() = default;
-    inline void update(ENUM_IN_GAME_STATE in_game_state, int64_t timestamp) noexcept
+    bool update(ENUM_IN_GAME_STATE in_game_state, int64_t timestamp) noexcept
     {
+        if (this->timestamp > timestamp) /* 不允许用旧状态覆盖新状态 */
+        {
+            return false;
+        }
+        if (in_game_state == this->in_game_state && timestamp == this->timestamp) /* 对于完全相同的状态不执行更新 */
+        {
+            return false;
+        }
         this->in_game_state = in_game_state;
         this->timestamp = timestamp;
+        return true;
     }
     /*
     @brief 更新 `GameState` 对象。
@@ -46,6 +55,7 @@ public:
     bool update(const InGameState& gs) noexcept
     {
         if (gs.timestamp == 0) return false; /* 无效 GameState */
+        if (gs.timestamp > this->timestamp) return false; /* 尝试用旧状态覆盖新状态 */
         if (gs == *this) return false; /* 两个 GameState 相同，无需更新 */
         this->in_game_state = gs.in_game_state;
         this->timestamp = gs.timestamp;

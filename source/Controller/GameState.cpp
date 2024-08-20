@@ -65,18 +65,19 @@ void CSOL24H::TransferGameState() noexcept
     int64_t log_timestamp;
     std::string line;
     const char* msg = nullptr;
-    InGameState gs;
+    bool bHasGameStateUpdated = false;
+    static int64_t last_return_to_room_timestamp = 0; /* 上一次由于异常原因回到游戏房间内的时间戳 */
     static int32_t return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
     /* 例行检查 */
     if (bGameErrorLogBufferResolved)
     {
         current_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
-        if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOADING && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 加载时间达到 30 秒 */
+        if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOADING && std::abs(current_time - in_game_state.get_timestamp()) > 25) /* 加载时间达到 25 秒 */
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_MAP, current_time); /* 状态由 LOADING 转为 MAP，时间戳更新为当前时刻 */
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_MAP, current_time); /* 状态由 LOADING 转为 MAP，时间戳更新为当前时刻 */
             msg =  "预设加载时间已过，认为已经进入游戏场景";
         }
-        if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
+        else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
         {
             if (IsWindow(hGameWindow))
             {
@@ -97,20 +98,26 @@ void CSOL24H::TransferGameState() noexcept
                     ConsoleLog("去除游戏窗口标题栏。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
                 }
             }
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
-            msg = "登陆后等待时间已过，认为游戏客户端已经完全加载";
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
+            msg = "游戏进程启动后等待时间达到 30 秒，认为游戏客户端已经完全加载";
         }
-        if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && std::abs(current_time - in_game_state.get_timestamp()) > 15 * 60) /* 在房间内等待 15 分钟而未开始游戏 */
+        else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && std::abs(current_time - in_game_state.get_timestamp()) > 15 * 60) /* 在房间内等待 15 分钟而未开始游戏 */
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 ROOM 转为 HALL，时间戳更新为当前时刻 */
-            msg = "在房间内久未进入游戏，认为已经回到大厅";
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 ROOM 转为 HALL，时间戳更新为当前时刻 */
+            msg = "在房间内等待时间超过 15 分钟（等待时间过长的房间将自动关闭），认为此房间将要关闭，返回到大厅重新创建房间";
         }
-        if (in_game_state.update(gs))
+        else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && return_to_room_times > 3) /* 因异常原因返回到房间次数过多 */
+        {
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL, current_time);
+            msg = "因异常原因返回到房间内次数过多（如：重连 1 2 3 问题、游戏时网络波动），认为此房间无法正常游戏，返回到大厅重新创建房间";
+        }
+        if (bHasGameStateUpdated)
         {
             ConsoleLog("%s。游戏日志时间戳更新为当前时间戳：%lld。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, msg, current_time);
         }
-        return;
+        return; /* 例行检查结束后直接返回 */
     }
+    /* 日志文件缓冲区更新，则执行解析 */
     /* 自后向前，按照 CRLF 方式划分子串，以文件行为单位解析 buffer 内容 */
     while (begin >= 0)
     {
@@ -137,69 +144,59 @@ void CSOL24H::TransferGameState() noexcept
             continue;
         }
         current_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
-        log_timestamp = ResolveMessageTimestamp(line, nullptr);
+        log_timestamp = ResolveMessageTimestamp(line, nullptr); /* 当前正解析的这条游戏日志时间戳 */
         /* 按行解析日志消息并下达命令 */
         if (line.find("Join HostServer") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_LOADING, log_timestamp);
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_LOADING, log_timestamp);
             msg = "连接到服务器主机，加载游戏场景";
         }
         else if (line.find("Result Confirm") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
             msg = "游戏结算，回到房间";
             return_to_room_times = 0; /* 正常完成一局游戏，清零 */
         }
         else if (line.find("S_ROOM_ENTER") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
             msg = "进入游戏房间";
             return_to_room_times = 0; /* 进入新房间，清零 */
         }
-        // else if (line.find("Start Game Room") != std::string::npos)
-        // {
-        //     gs.update(ENUM_IN_GAME_STATE::GS_LOADING, log_timestamp);
-        //     msg = "开始游戏，即将加载游戏场景";
-        // }
         else if (line.find("Leave Game Room") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, log_timestamp);
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, log_timestamp);
             msg = "返回到游戏大厅";
         }
-        else if (line.find("Return to room") != std::string::npos)
+        else if (line.find("Return to room") != std::string::npos) /* 由于异常原因返回到游戏房间内 */
         {
-            return_to_room_times++;
-            if (return_to_room_times > 3)
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
+            msg = "因异常原因回到游戏房间";
+            if (bHasGameStateUpdated) /* 更新成功，说明此状态是有效的新状态 */
             {
-                gs.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL, current_time);
-                msg = "因网络问题返回到房间内次数过多，尝试回到大厅重新创建房间";
-            }
-            else
-            {
-                gs.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
-                msg = "回到游戏房间";
+                return_to_room_times++; /* 回到房间的次数增加 */
             }
         }
         else if (line.find("QuitLog: game shutdown") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_SHUTDOWN, log_timestamp);
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_SHUTDOWN, log_timestamp);
             msg = "游戏退出";
         }
-        else if (line.find("Game Server Login") != std::string::npos)
+        else if (line.find("Game Server Login Success") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_LOGIN, log_timestamp);
-            msg = "正在登录客户端";
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_LOGIN, log_timestamp);
+            msg = "成功登录游戏";
         }
         else if (line.find("Log File Opened") != std::string::npos)
         {
-            gs.update(ENUM_IN_GAME_STATE::IGS_UNKNOWN, log_timestamp);
-            msg = "未知状态";
+            bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_UNKNOWN, log_timestamp);
+            msg = "等待游戏客户端加载";
         }
         else
         {
             continue;
         }
-        if (in_game_state.update(gs))
+        if (bHasGameStateUpdated)
         {
             ConsoleLog("%s。游戏日志时间戳：%lld，当前时间戳：%lld。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, msg, log_timestamp, current_time);
         }
