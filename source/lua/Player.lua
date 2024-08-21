@@ -84,8 +84,8 @@ end
 
 ---上一次使用的武器。
 ---@type Weapon
-Player.last_primary_weapon = nil
-Player.last_secondary_weapon = nil
+Player.last_primary_weapon = Weapon
+Player.last_secondary_weapon = Weapon
 ---使用武器。
 ---@param weapon_list Weapon[] 武器列表。
 ---@return nil
@@ -171,8 +171,8 @@ end
 
 ---重置玩家对象成员变量为初始值。
 function Player:reset()
-    self.last_primary_weapon = nil
-    self.last_secondary_weapon = nil
+    self.last_primary_weapon = Weapon
+    self.last_secondary_weapon = Weapon
     self.last_buy_part_weapon_time = 0
     self.part_weapon_counter = nil
     self.last_buy_special_weapon_time = 0
