@@ -5,7 +5,7 @@ Setting_lua = true
 Setting = {
     -- 操作系统时区，默认为东八区（UTC+8），此项必须设置正确，否则无法正常运行。
     TIME_ZONE = 8,
----游戏大厅---
+---游戏大厅（手册第 3 章）---
     --- “房间列表”选框
     HALL_ROOM_LIST_X = 36644,
     HALL_ROOM_LIST_Y = 29640,
@@ -39,7 +39,7 @@ Setting = {
     ---“新建房间”按钮
     CREATE_ROOM_X = 30223,
     CREATE_ROOM_Y = 44945,
----游戏内---
+---游戏中（手册第 3 章）---
     -- “开始游戏”按钮
     ROOM_START_GAME_X = 47025,
     ROOM_START_GAME_Y = 42030,
@@ -62,7 +62,7 @@ Setting = {
     -- 游戏结算页面的“确认”按钮
     GAME_ROUND_CONFIRM_X = 44976,
     GAME_ROUND_CONFIRM_Y = 51748,
----制造所---
+---制造所（手册第 4 章）---
     -- 【制造所】自动添加配件按钮
     CRAFT_PARTS_AUTO_FILL_X = 20012,
     CRAFT_PARTS_AUTO_FILL_Y = 50533,
@@ -72,7 +72,7 @@ Setting = {
     -- 【制造所】配件“清空”按钮
     CRAFT_PARTS_CLEAR_X = 33263,
     CRAFT_PARTS_CLEAR_Y = 50594,
----商店---
+---商店（手册第 5 章）---
     -- 【商店】点击兑换后，弹窗中的兑换物品选项
     STORE_BUY_OPTION_X = 22949,
     STORE_BUY_OPTION_Y = 39479,
@@ -82,5 +82,19 @@ Setting = {
     -- 【商店】物品“兑换”->“兑换”->“确认”按钮
     STORE_BUY_CONFIRM_X = 37019,
     STORE_BUY_CONFIRM_Y = 38993,
+---v1.3.14 新增房间上锁功能（手册第 3 章）---
+    -- 密码选项
+    ROOM_USE_PASSWORD_X = 28584,
+    ROOM_USE_PASSWORD_Y = 41180,
+    -- 密码输入框
+    ROOM_PASSWORD_BOX_X = 30496,
+    ROOM_PASSWORD_BOX_Y = 32373,
+    -- 确认密码按钮
+    ROOM_PASSWORD_CONFIRM_X = 30599,
+    ROOM_PASSWORD_CONFIRM_Y = 34863,
+    --- 是否使用自定义密码（默认使用随机密码）
+    ROOM_USE_CUSTOM_PASSWORD = false,
+    --- 自定义密码（大小写字母或数字，用英文引号包括）
+    ROOM_CUSTOM_PASSWORD = "ACCEED1145141919810"
 }
 end -- Setting_lua

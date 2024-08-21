@@ -15,7 +15,7 @@
 
 \begin{itemize}
 
-\item TCGame 在本集成工具启动后\textbf{\color{red}必须}保证登录信息尚未失效，否则将无法使用掉线重连功能。
+\item 通过 TCGame 启动游戏，挂机期间需保证 TCGame 处于登录状态（不勾选“自动登录”的情况下，一段时间后登录信息会失效），否则无法正常使用掉线重连功能。如果您的电脑仅进行单账号挂机，则建议您在 TCGame 中勾选“自动登录”，这样每隔一段时间登录信息就会刷新。
 
 \item \textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
 
@@ -26,8 +26,6 @@
 \item 运行 GamingTool.exe。
 
 \end{itemize}
-
-通过 TCGame 启动游戏，挂机期间需保证 TCGame 处于登录状态。2024.7.31 TCGame 更新后，登录信息每隔一段时间会刷新，故登录信息不会失效（除非遇到断网导致登录信息无法刷新），因此不再像 v1.3.9 及之前的版本那样必须选择 TCGame 自动登录。
 
 游戏启动进入大厅界面后（图 \ref{ch2fig-before-make-borderless}），按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框（图 \ref{ch2fig-after-make-borderless}，同时还会将游戏窗口置于屏幕中央），如不去除边框，将可能导致挂机时使用的游戏按钮坐标不准确（例如，窗口位置被意外地移动）。
 
@@ -152,7 +150,6 @@
     \label{ch2fig-difficulty-option}
 \end{figure}
 
-
 \begin{figure}[H]
     \Centering
     \parbox[l]{\textwidth}{\lstinline{CREATE_ROOM_X}、\lstinline{CREATE_ROOM_Y}：“新建房间”按钮坐标（图 \ref{ch2fig-create-room-1}）。}
@@ -213,6 +210,36 @@
     \label{ch2fig-confirm-round}
 \end{figure}
 
+v1.3.14 引入了创建房间时的锁房功能，锁房可防止有人进入房间恶意举报。
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{ROOM_USE_PASSWORD_X}、\lstinline{ROOM_USE_PASSWORD_Y}：启用密码的选框坐标（图 \ref{ch2fig-use-password}）。}
+    \includegraphics[width=\textwidth]{docs/assets/use_password.png}
+    \caption{启用密码功能选框}
+    \label{ch2fig-use-password}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{ROOM_PASSWORD_BOX_X}、\lstinline{ROOM_PASSWORD_BOX_Y}：密码输入框坐标（图 \ref{ch2fig-password-box}）。}
+    \includegraphics[width=\textwidth]{docs/assets/password_box.png}
+    \caption{密码输入框}
+    \label{ch2fig-password-box}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{ROOM_PASSWORD_CONFIRM_X}、\lstinline{ROOM_PASSWORD_CONFIRM_Y}：确认密码按钮（图 \ref{ch2fig-confirm-password}）。}
+    \includegraphics[width=\textwidth]{docs/assets/confirm_password.png}
+    \caption{密码输入框}
+    \label{ch2fig-confirm-password}
+\end{figure}
+
+\lstinline{ROOM_USE_CUSTOM_PASSWORD}：设置为\lstinline{false} 时，将随机生成 8 \textasciitilde 16 位数字密码输入密码框（默认）；设置为 \lstinline{true} 时，则使用您指定的密码。
+
+\lstinline{ROOM_CUSTOM_PASSWORD}：房间的自定义密码（\lstinline{ROOM_USE_CUSTOM_PASSWORD} 设置为 \lstinline{true} 时启用），由大小写英文字母及数字构成（若包含其他符号，则这些符号在输入密码时会被忽略）。
+
 \subsection{挂机武器列表}
 
 打开 \lstinline{WeaponList.lua} 文件。文件中已经提供了大量样例，根据下述的说明仔细修改即可。
@@ -224,7 +251,7 @@
 
 \lstinline{PartWeaponList} 是挂机过程中需要购买的配件武器，配件武器购买后仅用作辅助，不会切换出来使用。
 
-配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{\color{red}必须}为英文标点符号，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自由的创建和删除武器。
+配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{\color{red}必须}为英文标点符号，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自行创建和删除武器。
 
 \begin{minted}[breaklines, breakautoindent=true]{lua}
 PartWeaponList = {

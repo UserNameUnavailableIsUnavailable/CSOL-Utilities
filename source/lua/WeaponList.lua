@@ -1,3 +1,4 @@
+---有关本文件的配置说明在手册第 3 章---
 if (not WeaponList_lua)
 then
 WeaponList_lua = true

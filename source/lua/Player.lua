@@ -73,11 +73,13 @@ end
 ---移动视角，并执行回合重置。
 ---@return nil
 function Player:turn()
-    local sensitivity = 1 - 0.8 * math.random() -- 灵敏度∈(0.2, 1]
+    local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+    local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
     local direction = Utility:random_direction() -- 随机向左或右
     local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
     repeat
-        Mouse:move_relative(100 * direction * sensitivity, 0, Delay.MINI)
+        local t = Runtime:get_running_time() / 1000
+        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速，竖直方向简谐
     until (DateTime:get_local_timestamp() - start_time > 6)
     Keyboard:click(Keyboard.R, Delay.LONG) -- 回合重置
 end

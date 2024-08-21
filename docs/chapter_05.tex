@@ -1,7 +1,9 @@
-\section{更新方法（初次安装使用可跳过）}
+\section{更新方法（初次阅读使用可跳过）}
 
-\textbf{\color{red}\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件。
-按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管。}
+本节将以更新旧版本工具到 v1.3.9 版本为例向您说明更新本工具的步骤。
+
+\textbf{\color{red}\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件（配置文件一共就这两个）。
+按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管，如若丢失则需要重新配置。}
 
 \textbf{\color{red}在更新开始前，请先关闭旧版本控制器和 GamingTool。}
 
@@ -40,7 +42,7 @@
     \caption{解压新版本压缩包}
 \end{figure}
 
-打开您原先使用的旧版本集成工具目录（图中 \lstinline{CSOL24H-new}）和解压后的新版本集成工具目录（图中 \lstinline{CSOL24H-v1.3.9-x86_64}）。
+打开您原先使用的集成工具（图中 \lstinline{CSOL24H-new}）和解压后的新版本集成工具目录（图中 \lstinline{CSOL24H-v1.3.9-x86_64}）。
 分别打开 \lstinline{lua} 目录。
 
 \begin{figure}[H]
@@ -49,8 +51,24 @@
     \caption{进入新旧版本集成工具的 \lstinline{lua} 目录}
 \end{figure}
 
-然后，按下 \lstinline{Ctrl} 同时选中旧版本集成工具使用的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}，然后拖拽到新版本集成工具的 \lstinline{lua} 目录中进行替换。
-建议在替换前先查看新版集成工具的配置文件中是否有新增的内容（稳定版本一般不会对配置文件作出更新），若有新增内容，则将其根据您的实际情况添加到您的配置文件中。
+\textbf{\color{red} 先对比您的配置文件和新版本压缩包中给出的示例配置文件，查看是否有缺漏的配置。若有新增内容，则将其根据您的实际情况结合文档说明添加到您的原有的配置文件中。}
+
+注意，v1.3.14 及之后的版本提供的配置文件样例中标明了配置时需要参考的手册章节号以便查阅（图 \ref{ch5fig-section-number-in-conf}）。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/update/section_number_in_conf.png}
+    \caption{v1.3.14 配置文件样例中标注了配置时需要参考的手册章节号}
+    \label{ch5fig-section-number-in-conf}
+\end{figure}
+
+以下是对配置文件作出修改的版本更新，请您留意：
+
+v1.3.4 版本中修改了 \lstinline{WeaponList.lua} 文件。
+
+v1.3.14 版本中修改了 \lstinline{Setting.lua} 文件。
+
+按下 \lstinline{Ctrl} 同时选中旧版本集成工具使用的 \lstinline{Setting.lua} 和 \lstinline{WeaponList.lua}，然后拖拽到新版本集成工具的 \lstinline{lua} 目录中进行替换。
 
 \begin{figure}[H]
     \Centering
