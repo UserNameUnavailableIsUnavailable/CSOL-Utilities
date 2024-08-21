@@ -44,11 +44,22 @@ function Executor:create_game_room()
     Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 2000)
     Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 2000)
     Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 2000)
-    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 2000)
+    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 400)
     Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 2000)
     Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 2000)
     Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 2000)
     Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 2000)
+    Mouse:click_on(Setting.ROOM_USE_PASSWORD_X, Setting.ROOM_USE_PASSWORD_Y, 2000)
+    Mouse:click_on(Setting.ROOM_PASSWORD_BOX_X, Setting.ROOM_PASSWORD_BOX_Y, 2000)
+    local password
+    if (not Setting.ROOM_USE_CUSTOM_PASSWORD) -- 不使用自定义密码
+    then
+        password = tostring(math.random(10000000, 9999999999999999)) -- 生成 8 ~ 16 位数字密码
+    else -- 使用自定义密码
+        password = Setting.ROOM_CUSTOM_PASSWORD
+    end
+    Keyboard:puts(password)
+    Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 2000)
     Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000)
 end
 
@@ -134,7 +145,7 @@ Executor.last_location_x = -1
 Executor.last_location_y = -1
 ---光标定位。
 function Executor:locate_cursor()
-    if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT))
+    if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT) and not Keyboard:is_modifier_pressed(Keyboard.SHIFT))
     then
         local x, y = Mouse:locate_cursor()
         if (x ~= self.last_location_x and y ~= self.last_location_y)
