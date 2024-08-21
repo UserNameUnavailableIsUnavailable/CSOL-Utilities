@@ -117,11 +117,50 @@ function Keyboard:click_several_times(key, times, delay)
     end
 end
 
+---通过键盘输入由字母和数字构成的字符串序列
+---@param s string ASCII 字符
+function Keyboard:puts(s)
+    local shift = false -- shift 是否按下
+    for i = 1, #s
+    do
+        local c = string.sub(s, i, i)
+        if (string.byte("0") <= string.byte(c) and string.byte(c) <= string.byte("9"))
+        then
+            Keyboard:click(c, 100)
+        elseif (string.byte("A") <= string.byte(c) and string.byte(c) <= string.byte("Z"))
+        then
+            if (not IsKeyLockOn(Keyboard.CAPS_LOCK)) -- 非大写锁定状态
+            then
+                Keyboard:press(Keyboard.LSHIFT)
+                shift = true
+            end
+            Keyboard:click(c, 100)
+            if (shift)
+            then
+                Keyboard:release(Keyboard.LSHIFT)
+                shift = false
+            end
+        elseif (string.byte("a") <= string.byte(c) and string.byte(c) <= string.byte("z"))
+        then
+            if (IsKeyLockOn(Keyboard.CAPS_LOCK)) -- 大写锁定状态
+            then
+                Keyboard:press(Keyboard.LSHIFT)
+                shift = true
+            end
+            Keyboard:click(c, 100)
+            if (shift)
+            then
+                Keyboard:release(Keyboard.LSHIFT)
+                shift = false
+            end
+        end
+    end
+end
+
 ---判断修饰键（如 `CTRL`，`ALT` 等）是否按下。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param key string 按键名称，如 `Keyboard.LALT`。 
 ---@return boolean # 指定修饰键是否按下
 function Keyboard:is_modifier_pressed(key) return IsModifierPressed(key) end
-
 
 -- keyLockState 为 3 bits 无符号整数，大小范围：0 ~ 7，从高位到低位依次表示 `NUMLOCK`，`CAPSLOCK`，`SCROLLLOCK`
 ---   2               1             0
