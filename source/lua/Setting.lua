@@ -95,6 +95,8 @@ Setting = {
     --- 是否使用自定义密码（默认使用随机密码）
     ROOM_USE_CUSTOM_PASSWORD = false,
     --- 自定义密码（大小写字母或数字，用英文引号包括）
-    ROOM_CUSTOM_PASSWORD = "ACCEED1145141919810"
+    ROOM_CUSTOM_PASSWORD = "ACCEED1145141919810",
+---v1.3.15 新增使用角色技能的功能，需要设置角色技能冷却时间（以秒为单位）。若使用的角色没有技能、只有被动技能（如伊琳娜）或您不想使用角色技能，则设置为 `math.huge`（默认）。
+    CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME = math.huge
 }
 end -- Setting_lua

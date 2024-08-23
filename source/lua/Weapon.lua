@@ -70,8 +70,6 @@ function Weapon:purchase()
     -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
     Keyboard:click_several_times(Keyboard.ESCAPE, 6, Delay.MINI)
     Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
-    -- f:in_case_insufficient_funds()
-    -- self:close_dead_purchase_menu()
 end
 
 ---切换到指定武器。
@@ -104,15 +102,32 @@ end
 function Weapon:use()
 end
 
----开始使用该武器攻击
+---开始使用该武器攻击。
+---@deprecated `此函数功能已经整合到 Weapon.attack` 中
 ---@return nil
 function Weapon:start_attack()
     Mouse:press(self.attack_button)
 end
 
----停止使用该武器攻击
+---停止使用该武器攻击。
+---@deprecated `此函数功能已经整合到 Weapon.attack` 中
 ---@return nil
 function Weapon:stop_attack()
+    Mouse:release(self.attack_button)
+end
+
+---使用武器进行攻击攻击。
+---@return nil
+function Weapon:attack()
+    Mouse:press(self.attack_button)
+    local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+    local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
+    local direction = Utility:random_direction() -- 随机向左或右
+    local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
+    repeat
+        local t = Runtime:get_running_time() / 1000
+        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+    until (DateTime:get_local_timestamp() - start_time > 6)
     Mouse:release(self.attack_button)
 end
 
