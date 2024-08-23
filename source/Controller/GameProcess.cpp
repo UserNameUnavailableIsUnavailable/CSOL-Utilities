@@ -137,7 +137,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             startup_info_w.cb = sizeof(startup_info_w);
             PROCESS_INFORMATION process_information;
             // HWND hWnd = FindWindowW(NULL, L"TCGames");
-            if (CreateProcessW(
+            BOOL bRet = CreateProcessW(
                 NULL,
                 pwsTCGRunCSOCmd.get(),
                 NULL,
@@ -148,14 +148,16 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
                 L"C:\\WINDOWS\\SYSTEM32",
                 &startup_info_w,
                 &tcg_process_info
-            )) {
+            );
+            if (bRet)
+            {
                 ConsoleLog("等待游戏进程启动。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
-                game_process_state = ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 跳转执行等待游戏进程启动的代码块 */
             }
             else 
             {
                 ConsoleLog("通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, GetLastError());
             }
+            game_process_state = ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 跳转执行等待游戏进程启动的代码块 */
             if (tcg_process_info.dwProcessId != 0)
             {
                 CloseHandle(tcg_process_info.hProcess);

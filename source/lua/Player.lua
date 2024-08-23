@@ -71,6 +71,7 @@ function Player:stop_move()
 end
 
 ---移动视角，并执行回合重置。
+---@deprecated 此函数功能已经合并到 `Weapon.attack` 函数中
 ---@return nil
 function Player:turn()
     local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
@@ -81,18 +82,48 @@ function Player:turn()
         local t = Runtime:get_running_time() / 1000
         Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速，竖直方向简谐
     until (DateTime:get_local_timestamp() - start_time > 6)
-    Keyboard:click(Keyboard.R, Delay.LONG) -- 回合重置
 end
 
----上一次使用的武器。
+---回合重置或复活。
+---@return nil
+function Player:reset_round_or_respawn()
+    Keyboard:click(Keyboard.R, Delay.LONG) -- 按 R
+end
+
+---最近一次发动角色技能的时间。
+---@type integer
+Player.last_activate_special_ability_time = 0
+---发动角色技能。
+---@return nil
+function Player:activate_special_ability()
+    if (self.last_activate_special_ability_time == 0) -- 无发动角色技能的记录（一局游戏刚开始）
+    then
+        self.last_activate_special_ability_time = DateTime:get_local_timestamp()
+        return
+    end
+    local current_time = DateTime:get_local_timestamp()
+    if (current_time - self.last_activate_special_ability_time < Setting.CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME) -- 技能尚未冷却
+    then
+        return
+    end
+    Keyboard:click_several_times(Keyboard.SEVEN, 3, 500) -- 按 7 发动角色技能，重复 3 次以保证成功发动
+    self.last_activate_special_ability_time = DateTime:get_local_timestamp() -- 更新最近一次发动角色技能的时间。
+end
+
+---最近一次使用的主武器。
 ---@type Weapon
 Player.last_primary_weapon = Weapon
+---最近一次使用的副武器。
+---@type Weapon
 Player.last_secondary_weapon = Weapon
+---最近一次使用的武器（主武器、副武器、近战武器）。
+---@type Weapon
+Player.last_weapon = Weapon
 ---使用武器。
----@param weapon_list Weapon[] 武器列表。
+---@param weapon_list Weapon[] 常规武器列表。
 ---@return nil
 function Player:play(weapon_list)
-    if (AC) then AC:purchase() end -- 购买护甲。
+    if (AC) then AC:purchase() end
     if (not weapon_list or 0 == #weapon_list)
     then
         return
@@ -110,15 +141,16 @@ function Player:play(weapon_list)
         self.last_secondary_weapon:switch()
         self.last_secondary_weapon:abandon()
     end
-    if (weapon.number == Weapon.PRIMARY) then self.last_primary_weapon = weapon -- 更新上一次使用的主武器
-    elseif (weapon.number == Weapon.SECONDARY) then self.last_secondary_weapon = weapon end -- 更新上一次使用的副武器
+    if (weapon.number == Weapon.PRIMARY) then self.last_primary_weapon = weapon -- 更新最近一次使用的主武器
+    elseif (weapon.number == Weapon.SECONDARY) then self.last_secondary_weapon = weapon end -- 更新最近一次使用的副武器
     weapon:purchase()
     weapon:switch()
     self:start_move()
-    weapon:start_attack()
-    self:turn()
-    weapon:stop_attack()
+    weapon:attack()
     self:stop_move()
+    self:reset_round_or_respawn()
+    self:activate_special_ability()
+    self.last_weapon = weapon --更新最近一次使用的武器
 end
 
 ---上次购买配件武器的时间。
@@ -153,21 +185,19 @@ end
 ---上次购买特殊武器的时间。
 ---@type integer
 Player.last_buy_special_weapon_time = 0
----@param weapon Weapon 特殊武器。
-function Player:use_special_weapon(weapon)
-    if (not weapon) then return end
+---@param special_weapon Weapon 特殊武器。
+function Player:use_special_weapon(special_weapon)
+    if (not special_weapon) then return end
     local current_time = DateTime:get_local_timestamp()
-    if (math.abs(current_time - self.last_buy_special_weapon_time) < 20) -- 每隔 20 秒购买一次
+    if (math.abs(current_time - self.last_buy_special_weapon_time) > 20) -- 每隔 20 秒购买一次特殊武器
     then
-        return
-    else
-        weapon:purchase()
+        special_weapon:purchase()
         self.last_buy_special_weapon_time = current_time
     end
-    weapon:use() -- 使用武器
-    if (self.last_primary_weapon)
+    special_weapon:use() -- 使用武器
+    if (self.last_weapon)
     then
-        self.last_primary_weapon:switch() -- 使用后切换回原来的武器
+        self.last_weapon:switch() -- 使用后切换回原来的武器
     end
 end
 
@@ -178,6 +208,7 @@ function Player:reset()
     self.last_buy_part_weapon_time = 0
     self.part_weapon_counter = nil
     self.last_buy_special_weapon_time = 0
+    self.last_activate_special_ability_time = 0
 end
 
 end -- Play_lua
