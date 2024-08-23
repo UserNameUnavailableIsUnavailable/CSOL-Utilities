@@ -48,7 +48,7 @@ static void InitializePurchaseItemThread();
 static void InitializeLocateCursorThread();
 static void InitializeWatchGameProcessThread();
 static bool IsErrorLogFileModified() noexcept;
-static bool UpdateErrorLogBuffer() noexcept;
+static void UpdateErrorLogBuffer();
 static void DispatchCommand() noexcept;
 [[deprecated("从日志文件中获取到的日期在日期变更（23:59 之后）后可能不准确。")]] static int64_t ResolveLogDate(LPCSTR lpBuffer, INT64 cbLength) noexcept;
 static int64_t ResolveLogDate(FILETIME filetime) noexcept;
@@ -56,6 +56,8 @@ static int64_t ResolveMessageTimestamp(const std::string message, int32_t* lpMil
 static void GiveCommand(const char* cmd) noexcept;
 static DWORD CALLBACK WatchInGameState(LPVOID lpParam) noexcept;
 static DWORD CALLBACK WatchGameProcess(LPVOID lpParam) noexcept; /* 监视游戏进程状态 */
+static void ResolveGameStateFromErrorLog() noexcept;
+static void CheckGameState() noexcept;
 static void TransferGameState() noexcept;
 static DWORD HandleHotKey(LPVOID lpParam) noexcept; /* 监视热键 */
 static DWORD CombineParts(LPVOID lpParam) noexcept; /* 合成配件 */
@@ -101,10 +103,12 @@ static HANDLE hLocateCursorThread; /* 定位光标 */
 static std::shared_ptr<wchar_t[]> pwszErrorLogFilePath; /* 游戏 Error.log 日志路径 */
 static InGameState in_game_state; /* 通过解析日志文件获取到的游戏状态 */
 static char* lpGameErrorLogBuffer; /* 游戏日志文件内容读取到此处 */
+static int64_t cbGameErrorLogBufferSize; /* 当前缓冲区中的日志字符串字节数 */
 static int64_t log_buffer_last_modified_time; /* 游戏日志文件缓冲区修改时间（WINDOWS FILETIME） */
-static int64_t cbGameErrorLogSize; /* 日志文件缓冲区当前读入大小 */
 static bool bGameErrorLogBufferResolved; /* 日志文件缓冲区在更新后是否被解析过 */
 static int64_t game_error_log_file_date; /* 游戏日志文件中的日期，使用该日 00:00:00 时刻的 UNIX 时间戳表示（UTC 时间） */
+static int64_t last_return_to_room_timestamp; /* 上一次由于异常原因回到游戏房间内的时间戳 */
+static int32_t return_to_room_times; /* 因网络问题返回到游戏房间的次数 */
 /* hWatchGameProcessStateThread 线程所需资源 */
 static std::shared_ptr<wchar_t[]> pwsTCGameExePath; /* TCGame 游戏启动器路径 */
 static std::shared_ptr<wchar_t[]> pwsTCGRunCSOCmd; /* TCGame 启动 CSOL 使用的命令行参数 */

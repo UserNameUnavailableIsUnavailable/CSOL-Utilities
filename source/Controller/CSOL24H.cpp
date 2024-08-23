@@ -55,9 +55,11 @@ std::shared_ptr<wchar_t[]> CSOL24H::pwszErrorLogFilePath = nullptr;
 InGameState CSOL24H::in_game_state(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);
 char* CSOL24H::lpGameErrorLogBuffer = nullptr;
 int64_t CSOL24H::log_buffer_last_modified_time = 0;
-int64_t CSOL24H::cbGameErrorLogSize = 0;
+int64_t CSOL24H::cbGameErrorLogBufferSize = 0;
 bool CSOL24H::bGameErrorLogBufferResolved = false;
 int64_t CSOL24H::game_error_log_file_date = 0;
+int64_t CSOL24H::last_return_to_room_timestamp = 0; /* 上一次由于异常原因回到游戏房间内的时间戳 */
+int32_t CSOL24H::return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
 /* hWatchGameProcessStateThread 线程所需资源 */
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGameExePath = nullptr;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGRunCSOCmd = nullptr;
@@ -466,9 +468,11 @@ void CSOL24H::Destroy() noexcept
     CSOL24H::in_game_state.update(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);
     CSOL24H::lpGameErrorLogBuffer = nullptr;
     CSOL24H::log_buffer_last_modified_time = 0;
-    CSOL24H::cbGameErrorLogSize = 0;
+    CSOL24H::cbGameErrorLogBufferSize = 0;
     CSOL24H::bGameErrorLogBufferResolved = false;
     CSOL24H::game_error_log_file_date = 0;
+    CSOL24H::last_return_to_room_timestamp = 0; /* 上一次由于异常原因回到游戏房间内的时间戳 */
+    CSOL24H::return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
     /* hWatchGameProcessStateThread 线程所需资源 */
     CSOL24H::pwsTCGameExePath = nullptr;
     CSOL24H::pwsTCGRunCSOCmd = nullptr;

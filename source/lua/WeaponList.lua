@@ -41,12 +41,39 @@ DefaultWeaponList = {
 ---扩展武器列表。
 ---@type Weapon[]
 ExtendedWeaponList = {
+    -- v1.3.15 新增万钧神威武器对象，只需要修改购买序列就能使用
     Weapon:new{
-        name = "幻境！光棱剑",
-        switch_delay = Delay.NORMAL,
+        name = "万钧神威",
+        switch_delay = Delay.SHORT,
         number = Weapon.MELEE,
-        purchase_sequence = {Keyboard.B, Keyboard.G},
-        attack_button = Mouse.LEFT
+        purchase_sequence = {Keyboard.B, Keyboard.NINE, Keyboard.FOUR},
+        -- 重写 attack 方法，按照下面定义的方式进行攻击
+        -- 若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数
+        attack = function ()
+            Mouse:press(Mouse.RIGHT) -- 按下鼠标右键进行范围攻击
+            local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+            local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
+            local direction = Utility:random_direction() -- 随机向左或右
+            local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+            local first_throw = false
+            local second_throw = false
+            repeat
+                local duration = Runtime:get_running_time() - start_time
+                local t = Runtime:get_running_time() / 1000
+                Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                if (not first_throw and 3000 < duration and duration < 6000)
+                then
+                    Keyboard:click(Keyboard.R, Delay.SHORT)
+                    first_throw = true
+                end
+                if (not second_throw and 6000 < duration)
+                then
+                    Keyboard:click(Keyboard.R, Delay.SHORT)
+                    second_throw = true
+                end
+            until (Runtime:get_running_time() - start_time > 7000)
+            Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
+        end
     },
     Weapon:new{
         name = "【擎空】突击套装",
@@ -137,8 +164,9 @@ ExtendedWeaponList = {
 ---特殊武器。
 ---@type Weapon
 SpecialWeapon =
-    Weapon:new({
-        name = "圣翼皓印",
+    -- 特殊武器圣翼皓印（或炽翼魔印）
+    Weapon:new{
+        name = "圣翼皓印/炽翼魔印",
         switch_delay = Delay.LONG_LONG,
         number = Weapon.GRENADE ,
         purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.NINE},
@@ -168,9 +196,9 @@ SpecialWeapon =
                 Mouse:move_relative(0, -4000, Delay.NORMAL)
             end
         end
-    })
+    }
 
-----SpecialWeapon = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
+----SpecialWeaponList = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
 
 ---- v1.3 版本新增，只将下面的内容根据自身情况复制追加到上一版本 WeaponList.lua 中即可
 
