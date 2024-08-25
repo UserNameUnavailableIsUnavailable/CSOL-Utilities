@@ -9,7 +9,7 @@
 本集成工具支持选择 T 阵营或 CT 阵营角色。通关失败自动回合重置。
 除灾变挂机外，本工具还可用于梦幻之星等荣誉图挂机。
 
-使用挂机功能前，需要自行配置好游戏内各按钮的坐标位置以及挂机使用的武器列表。
+使用挂机功能前，需要自行配置好游戏内各按钮的坐标位置以及挂机使用的武器列表，请耐心阅读本手册。
 
 \subsection{前提条件}
 
@@ -49,7 +49,21 @@
 
 将控制器调到模式 5 进行坐标定位。
 
-使用记事本打开 \lstinline{lua} 目录下的 \lstinline{Setting.lua} 文件，本文件存放所有游戏内按钮的屏幕坐标位置，所有的坐标均通过 5 模式坐标定位功能确定。
+v1.3.16 版本后，要进行配置，有两种方案：
+
+\begin{itemize}
+\item 方法一（推荐）：使用浏览器打开 \lstinline{Setting.html} 网页，在该网页中可进行坐标配置。配置完成后，点击“导出”按钮，将配置导出为名为 \lstinline{Setting.lua} 的文件，覆盖 \lstinline{lua} 目录下原有的 \lstinline{Setting.lua} 配置文件（图 \ref{ch2fig-export-setting}）。
+\item 方法二：使用文本编辑器直接编辑 \lstinline{Setting.lua}。对于没有编程经验的用户，使用此方法配置容易出错。另外，对于有编程经验的用户，需要注意配置文件中的字段可能会在后续版本新增、更改、移除，因此若非必要，仍建议采用方法一。
+\end{itemize}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/export_setting}
+    \caption{导出配置文件}
+    \label{ch2fig-export-setting}
+\end{figure}
+
+配置完成后，使用导出功能，将导出文件保存为 \lstinline{lua} 目录下的 \lstinline{Setting.lua}。所有的坐标均通过 5 模式坐标定位功能确定。
 其中，\lstinline{NAME_X}（\lstinline{NAME} 为某个坐标名称）表示横坐标，\lstinline{NAME_Y} 表示纵坐标。
 
 下面，详细介绍 \lstinline{Setting.lua} 文件中各个变量的含义，使用模式 5 坐标定位功能耐心配置即可。
@@ -69,7 +83,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{HALL_ROOM_LIST_X}、\lstinline{ROOM_LIST_Y}：大厅房间列表选框的坐标（图 \ref{ch2fig-room-list}）。}
     \includegraphics[width=\textwidth]{docs/assets/room_list}
-    \caption{房间列表按钮}
+    \caption{“房间列表”选框}
     \label{ch2fig-room-list}
 \end{figure}
 \clearpage
@@ -78,7 +92,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{HALL_CREATE_ROOM_X}、\lstinline{HALL_CREATE_ROOM_Y}：大厅中的“新建房间”按钮坐标（图 \ref{ch2fig-create-room-0}）。}
     \includegraphics[width=\textwidth]{docs/assets/create_room_0}
-    \caption{大厅中的“新建房间”按钮}
+    \caption{大厅界面“新建房间”按钮}
     \label{ch2fig-create-room-0}
 \end{figure}
 \clearpage
@@ -87,7 +101,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{HALL_BACK_X}、\lstinline{HALL_BACK_Y}：大厅房间列表界面中的“返回”按钮坐标（图 \ref{ch2fig-hall-back}）。}
     \includegraphics[width=\textwidth]{docs/assets/hall_back}
-    \caption{大厅房间列表界面中的“返回”按钮}
+    \caption{房间列表界面“返回”按钮}
     \label{ch2fig-hall-back}
 \end{figure}
 \clearpage
@@ -105,7 +119,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{ZOMBIE_SECNARIO_MODE_X}、\lstinline{ZOMBIE_SCENARIO_MODE_Y}：“大灾变”模式选框（图 \ref{ch2fig-zombie-scenario}，亦可根据自身需要选择其他模式，如娱乐模式）。}
     \includegraphics[width=\textwidth]{docs/assets/zombie_scenario.png}
-    \caption{选择挂机模式}
+    \caption{游戏模式（一般为大灾变）选框}
     \label{ch2fig-zombie-scenario}
 \end{figure}
 \clearpage
@@ -115,8 +129,17 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{MAP_CHOOSE_LEFT_SCROLL_X}、\lstinline{MAP_CHOOSE_LEFT_SCROLL_Y}：地图选择界面中的向左滚动按钮（图 \ref{ch2fig-left-scroll}）。}
     \includegraphics[width=\textwidth]{docs/assets/left_scroll.png}
-    \caption{向左滚动按钮}
+    \caption{地图选择界面向左滚动按钮}
     \label{ch2fig-left-scroll}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{MAP_CHOOSE_RIGHT_SCROLL_X}、\lstinline{MAP_CHOOSE_RIGHT_SCROLL_Y}：地图选择界面中的向右滚动按钮（图 \ref{ch2fig-right-scroll}）。}
+    \includegraphics[width=\textwidth]{docs/assets/right_scroll.png}
+    \caption{地图选择界面向右滚动按钮}
+    \label{ch2fig-right-scroll}
 \end{figure}
 \clearpage
 
@@ -124,7 +147,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{MAP_TRAP_X}、\lstinline{MAP_TRAP_Y}：“地狱围栏”地图按钮坐标（图 \ref{ch2fig-map-trap}，亦可根据自身需要选择其他地图，如用于刷梦幻之星的铁笼蝎斗）。}
     \includegraphics[width=\textwidth]{docs/assets/map_trap.png}
-    \caption{默认挂机的地图}
+    \caption{游戏地图（图中选择为地狱围栏）选框}
     \label{ch2fig-map-trap}
 \end{figure}
 \clearpage
@@ -142,7 +165,7 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{GAME_DIFFICULTY_X}、\lstinline{GAME_DIFFICULTY_Y}：“游戏难度”选框坐标（图 \ref{ch2fig-choose-difficulty}）。}
     \includegraphics[width=\textwidth]{docs/assets/choose_difficulty.png}
-    \caption{“游戏难度”按钮}
+    \caption{“游戏难度”选框}
     \label{ch2fig-choose-difficulty}
 \end{figure}
 \clearpage
@@ -156,74 +179,7 @@
 \end{figure}
 \clearpage
 
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{CREATE_ROOM_X}、\lstinline{CREATE_ROOM_Y}：“新建房间”按钮坐标（图 \ref{ch2fig-create-room-1}）。}
-    \includegraphics[width=\textwidth]{docs/assets/create_room_1.png}
-    \caption{“新建房间”按钮}
-    \label{ch2fig-create-room-1}
-\end{figure}
-\clearpage
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{ROOM_GAME_START_X}、\lstinline{ROOM_GAME_START_Y}：房间内的“开始游戏”按钮坐标（图 \ref{ch2fig-start-game}）。}
-    \includegraphics[width=\textwidth]{docs/assets/start_game.png}
-    \caption{“开始游戏”按钮}
-    \label{ch2fig-start-game}
-\end{figure}
-\clearpage
-
-\lstinline{CHOOSE_T_CLASS}：是否选择 T 阵营角色。如要选择 T 阵营角色，则将其设置为 \lstinline{true}；若要选择 CT 阵营角色，则将其置为 \lstinline{false}。
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{CHOOSE_T_CLASS_X}、\lstinline{CHOOSE_T_CLASS_Y}：切换到 T 阵营选择界面的按钮坐标（图 \ref{ch2fig-choose-t-class}）。只有在您需要选择 T 阵营角色时（\lstinline{CHOOSE_T_CLASS} 为 \lstinline{true}），才会使用到该坐标。}
-    \includegraphics[width=\textwidth]{docs/assets/choose_T_class.png}
-    \caption{“选择 T 阵营”按钮}
-    \label{ch2fig-choose-t-class}
-\end{figure}
-\clearpage
-
-\lstinline{CLASS_OPTION}：角色选项，取值范围为 0 \textasciitilde 9 范围内的整数。
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{ZS_GAME_ESC_MENU_CANCEL_X}、\lstinline{ZS_GAME_ESC_MENU_CANCEL_Y}：“大灾变”模式下按 \lstinline{ESC} 后弹出的窗口中的“取消”按钮（图 \ref{ch2fig-zs-esc-cancel}）。\textbf{\color{red}注意：大灾变模式中取消按钮的位置与其他模式不同。}}
-    \includegraphics[width=\textwidth]{docs/assets/zs_esc_cancel.png}
-    \caption{“大灾变”模式按下 \lstinline{ESC} 后的取消按钮}
-    \label{ch2fig-zs-esc-cancel}
-\end{figure}
-\clearpage
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{GAME_INSUFFICIENT_FUNDS_CONFIRM_X}、\lstinline{GAME_INSUFFICIENT_FUNDS_CONFIRM_Y}：“资金不足，无法购买”对话框中的“确认”按钮坐标（图 \ref{ch2fig-game-insuff-funds-confirm}）。}
-    \includegraphics[width=\textwidth]{docs/assets/game_insuff_funds_confirm.png}
-    \caption{“资金不足”确认按钮}
-    \label{ch2fig-game-insuff-funds-confirm}
-\end{figure}
-\clearpage
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{GAME_DEAD_PURCHASE_MENU_REBUY_X}、\lstinline{GAME_DEAD_PURCHASE_MENU_REBUY_Y}：大灾变死亡后预购买菜单中的“重复购买”按钮（图 \ref{ch2fig-dead-purchase-rebuy}）。}
-    \includegraphics[width=\textwidth]{docs/assets/dead_purchase_rebuy.png}
-    \caption{死亡时预购买界面中的“重复购买按钮”}
-    \label{ch2fig-dead-purchase-rebuy}
-\end{figure}
-\clearpage
-
-\begin{figure}[H]
-    \Centering
-    \parbox[l]{\textwidth}{\lstinline{GAME_ROUND_CONFIRM_X}、\lstinline{GAME_ROUND_CONFIRM_Y}：游戏结算界面的“确认”按钮坐标（图 \ref{ch2fig-confirm-round}）。}
-    \includegraphics[width=\textwidth]{docs/assets/confirm_round.png}
-    \caption{结算界面“确认”按钮}
-    \label{ch2fig-confirm-round}
-\end{figure}
-\clearpage
-
-\textbf{\color{red}v1.3.14 引入了创建房间时的锁房功能，锁房可防止有人进入房间恶意举报。}
+\lstinline{USE_PASSWORD}：是否使用密码。设置为 \lstinline{true} 则启用密码；设置为 \lstinline{false} 则不启用密码。
 
 \begin{figure}[H]
     \Centering
@@ -247,22 +203,45 @@
     \Centering
     \parbox[l]{\textwidth}{\lstinline{ROOM_PASSWORD_CONFIRM_X}、\lstinline{ROOM_PASSWORD_CONFIRM_Y}：确认密码按钮（图 \ref{ch2fig-confirm-password}）。}
     \includegraphics[width=\textwidth]{docs/assets/confirm_password.png}
-    \caption{确认密码}
+    \caption{确认密码按钮}
     \label{ch2fig-confirm-password}
 \end{figure}
 \clearpage
 
-\lstinline{ROOM_USE_CUSTOM_PASSWORD}：设置为\lstinline{false} 时，将随机生成 8 \textasciitilde 16 位数字密码输入密码框（默认）；设置为 \lstinline{true} 时，则使用您指定的密码。
+\lstinline{ROOM_USE_CUSTOM_PASSWORD}：是否使用自定义密码。设置为 \lstinline{true} 时，使用您指定的密码；设置为\lstinline{false} 时，随机生成 8 \textasciitilde 16 位数字密码输入密码框（默认）。
 
-\lstinline{ROOM_CUSTOM_PASSWORD}：房间的自定义密码（\lstinline{ROOM_USE_CUSTOM_PASSWORD} 设置为 \lstinline{true} 时启用），由大小写英文字母及数字构成（若包含其他符号，则这些符号在输入密码时会被忽略）。
+\lstinline{ROOM_CUSTOM_PASSWORD}：房间自定义密码（\lstinline{ROOM_USE_CUSTOM_PASSWORD} 设置为 \lstinline{true} 时启用），由大小写英文字母及数字构成（若包含其他符号，则这些符号在输入密码时会被忽略）。
 
-如果您不需要设置密码，则将 \lstinline{ROOM_USE_CUSTOM_PASSWORD} 设置为 \lstinline{true} 后，将房间自定义密码像下面这样设置为空字符串（引号内没有任何内容）即可。
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{CREATE_ROOM_X}、\lstinline{CREATE_ROOM_Y}：“新建房间”按钮坐标（图 \ref{ch2fig-create-room-1}）。}
+    \includegraphics[width=\textwidth]{docs/assets/create_room_1.png}
+    \caption{“新建房间”按钮}
+    \label{ch2fig-create-room-1}
+\end{figure}
+\clearpage
 
-\begin{minted}[breakautoindent, breaklines]{lua}
-    ROOM_CUSTOM_PASSWORD = ""
-\end{minted}
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{ROOM_GAME_START_X}、\lstinline{ROOM_GAME_START_Y}：房间内的“开始游戏”按钮坐标（图 \ref{ch2fig-start-game}）。}
+    \includegraphics[width=\textwidth]{docs/assets/start_game.png}
+    \caption{“开始游戏”按钮}
+    \label{ch2fig-start-game}
+\end{figure}
+\clearpage
 
-\textbf{\color{red} v1.3.15 中加入了自动使用角色技能的功能，配置角色的技能冷却时间即可使用。}
+\lstinline{CHOOSE_T_CLASS}：是否选择 T 阵营角色，确定角色所属阵营。如要选择 T 阵营角色，则将其设置为 \lstinline{true}；若要选择 CT 阵营角色，则将其置为 \lstinline{false}。
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{CHOOSE_T_CLASS_X}、\lstinline{CHOOSE_T_CLASS_Y}：切换到 T 阵营选择界面的按钮坐标（图 \ref{ch2fig-choose-t-class}）。只有在您需要选择 T 阵营角色时（\lstinline{CHOOSE_T_CLASS} 为 \lstinline{true}），才会使用到该坐标。}
+    \includegraphics[width=\textwidth]{docs/assets/choose_T_class.png}
+    \caption{“T 阵营”选项卡}
+    \label{ch2fig-choose-t-class}
+\end{figure}
+\clearpage
+
+\lstinline{CLASS_OPTION}：角色选项，取值范围为 0 \textasciitilde 9 范围内的整数。
 
 \lstinline{CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME}：角色的技能冷却时间，以秒为单位。若所选角色没有技能或技能是被动技（如【特情】伊琳娜），亦或是您不需要使用该功能，则将其设置为 \lstinline{math.huge}（默认设置，表示无穷大）。
 例如，下面的代码将冷却时间设置为 60 秒。
@@ -271,9 +250,47 @@
 CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME = 60
 \end{minted}
 
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{ZS_GAME_ESC_MENU_CANCEL_X}、\lstinline{ZS_GAME_ESC_MENU_CANCEL_Y}：“大灾变”模式下按 \lstinline{ESC} 后弹出的窗口中的“取消”按钮（图 \ref{ch2fig-zs-esc-cancel}）。\textbf{\color{red}注意：大灾变模式中取消按钮的位置与其他模式不同。}}
+    \includegraphics[width=\textwidth]{docs/assets/zs_esc_cancel.png}
+    \caption{大灾变（或其他您选择的模式） \lstinline{ESC} 弹窗中的取消按钮}
+    \label{ch2fig-zs-esc-cancel}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{GAME_INSUFFICIENT_FUNDS_CONFIRM_X}、\lstinline{GAME_INSUFFICIENT_FUNDS_CONFIRM_Y}：“资金不足，无法购买”对话框中的“确认”按钮坐标（图 \ref{ch2fig-game-insuff-funds-confirm}）。}
+    \includegraphics[width=\textwidth]{docs/assets/game_insuff_funds_confirm.png}
+    \caption{“资金不足，无法购买”确认按钮}
+    \label{ch2fig-game-insuff-funds-confirm}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{GAME_DEAD_PURCHASE_MENU_REBUY_X}、\lstinline{GAME_DEAD_PURCHASE_MENU_REBUY_Y}：大灾变死亡后预购买菜单中的“重复购买”按钮（设置成“取消”按钮亦可，图 \ref{ch2fig-dead-purchase-rebuy}）。}
+    \includegraphics[width=\textwidth]{docs/assets/dead_purchase_rebuy.png}
+    \caption{死亡时预购买界面中的“重复购买按钮”（亦可设置为“取消”按钮）}
+    \label{ch2fig-dead-purchase-rebuy}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+    \Centering
+    \parbox[l]{\textwidth}{\lstinline{GAME_ROUND_CONFIRM_X}、\lstinline{GAME_ROUND_CONFIRM_Y}：游戏结算界面的“确认”按钮坐标（图 \ref{ch2fig-confirm-round}）。}
+    \includegraphics[width=\textwidth]{docs/assets/confirm_round.png}
+    \caption{结算界面“确认”按钮}
+    \label{ch2fig-confirm-round}
+\end{figure}
+\clearpage
+
 \subsection{挂机武器列表}
 
-打开 \lstinline{WeaponList.lua} 文件。文件中已经提供了大量样例，根据下述的说明仔细修改即可。对于有一定编程经验的用户，阅读完本节内容后可以参阅\nameref{section_advanced_usage}了解更多自定义使用方法。
+使用文本编辑器打开 \lstinline{WeaponList.lua} 文件。
+在浏览器中打开 \lstinline{Weapon.html} 网页，该网页可以帮助您生成武器代码。
+对于有一定编程经验的用户，阅读完本节内容后可以参阅\nameref{section_advanced_usage}了解更多自定义使用方法。
 
 \subsubsection{默认挂机模式}
 
@@ -282,23 +299,20 @@ CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME = 60
 
 \lstinline{PartWeaponList} 是挂机过程中需要购买的配件武器，配件武器购买后仅用作辅助，不会切换出来使用。
 
-配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{\color{red}必须}为英文标点符号，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自行创建和删除武器。
+配件武器列表 \lstinline{PartWeaponList} 格式如下（所有的标点符号\textbf{\color{red}必须}为英文标点符号，每件武器之间以逗号隔开，下同），每件武器都通过 \lstinline|Weapon:new({...})| 创建，您可以仿照样例文件自行创建和删除武器。
 
 \begin{minted}[breaklines, breakautoindent=true]{lua}
 PartWeaponList = {
     Weapon:new({
         name = "星战前线·加特林",
-        number = Weapon.PRIMARY,
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.TWO, Keyboard.FOUR}
     }),
     Weapon:new({
         name = "FNP-45战损版",
-        number = Weapon.SECONDARY,
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.ONE, Keyboard.TWO}
     }),
     Weapon:new({
         name = "燃爆Ignite-10",
-        number = Weapon.GRENADE,
         purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
     })
 }
@@ -320,6 +334,17 @@ purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
 \end{minted}
 
 对应于购买按键序列 \textbf{\color{red}B J 8 7}。仿照上面的例子，应该不难自行配置。
+
+您可以使用网页中提供的武器代码生成功能便捷地生成武器，只需要填充输入框中的内容，例如：
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/generate_part_weapon_code}
+    \caption{生成配件武器代码}
+\end{figure}
+
+这样就自动生成了一段武器代码，一键复制后，可将其添加到武器列表中。\textbf{\color{red}注意，添加到武器列表的每件武器代码之间都需要用一个英文逗号隔开。}
+
 \end{itemize}
 
 默认挂机武器列表 \lstinline{DefaultWeaponList} 是挂机过程中购买并使用的武器。
@@ -343,12 +368,19 @@ purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
 该模式需要设置 \lstinline{ExtendedWeaponList}（扩展武器列表）和 \lstinline{SpecialWeapon}（某一件特殊武器，不是列表）。
 \lstinline{ExtendedWeaponList} 为扩展武器列表，不限制武器数量，挂机时随机从中抽取武器进行攻击，其配置方式同 \lstinline{DefaultWeaponList}，您可以根据提供的样例自行修改。
 
+对于使用方式与一般武器显著不同的武器，网页中提供了定制武器代码的选项（定制武器代码的选项会随着版本更新迭代而增加）。例如，您可以生成使用万钧神威的代码。
+
 \begin{figure}
     \Centering
-    \parbox[l]{\textwidth}{v1.3.15 提供了使用万钧神威挂机的武器对象（\lstinline{WeaponList.lua} 样例文件中），您只需要配置购买序列即可正常使用万钧神威进行挂机（图 \ref{ch2fig-use-brionac}，使用方式为两 R 一旋风）。}
+    \includegraphics[width=\textwidth]{docs/assets/generate_brionac_code}
+    \caption{生成万钧神威武器对象}
+\end{figure}
+
+\begin{figure}
+    \Centering
+    \parbox[l]{\textwidth}{将万钧神威武器代码添加到武器列表（默认武器列表或扩展武器列表均可）中，即可使用万钧神威挂机。}
     \includegraphics[width=\textwidth]{docs/assets/brionac.png}
-    \caption{万钧神威武器对象，修改武器购买序列即可正常使用}
-    \label{ch2fig-use-brionac}
+    \caption{将万钧神威武器代码添加到武器列表}
 \end{figure}
 
 \lstinline{SpecialWeapon} 为特殊武器，如【幽浮】控制核心、圣翼皓印、炽翼魔印这类可以在其他武器攻击时辅助攻击的武器。\textbf{\color{red} 如您没有特殊武器，只需要将文件中红框部分的短横线删除即可}（图 \ref{ch2fig-delete-special-weapon}）。
@@ -360,11 +392,15 @@ purchase_sequence = {Keyboard.B, Keyboard.J, Keyboard.EIGHT, Keyboard.SEVEN}
     \label{ch2fig-delete-special-weapon}
 \end{figure}
 
+类似地，您可以使用网页提供的特殊武器代码生成功能生成使用特殊武器的代码。\textbf{\color{red}需要注意的是，\lstinline{SpecialWeapon} 是单件武器，不同于上面武器列表（可容纳多件武器），因此生成的代码后不需要额外添加英文逗号。}
+
 \textbf{\color{red} 在提供的 \lstinline{WeaponList.lua} 样例文件中，已经编写好了圣翼皓印（或炽翼魔印）使用的方式，如需使用特殊武器，只需要将其中的 \lstinline{purchase_sequence} 修改为自己使用的购买按键序列即可。}
 对于有一定编程基础的玩家，可以自定义 \lstinline{SpecialWeapon}，重写 \lstinline{use} 方法（详见 \nameref{section_advanced_usage}）。
 游戏过程中会通过调用 \lstinline{use} 方法使用该特殊武器。
 
-v1.3 中引入了护甲自动购买功能，可大大减少挂机过程中受到的伤害。在 \lstinline{WeaponList.lua} 中找到 \lstinline{AC}， 根据自身情况修改购买按键序列即可使用。
+\subsection{自动购买护甲}
+
+护甲可大大减少挂机过程中受到的伤害。在 \lstinline{WeaponList.lua} 中找到 \lstinline{AC}， 根据自身情况修改购买按键序列即可使用。
 
 \begin{figure}
     \Centering
@@ -372,12 +408,12 @@ v1.3 中引入了护甲自动购买功能，可大大减少挂机过程中受到
     \caption{购买护甲}
 \end{figure}
 
-如果您的装备购买列表已满，无法通过设置按键的方式购买护甲，则可以将购买队列设置为重复购买按键（游戏内默认设置为 \lstinline{F2}），游戏内重复购买操作将会自动购买小甲（没有头盔）。
+如果您的装备购买列表已满，无法通过设置按键的方式购买护甲，则可以将购买按键序列设置为重复购买按键序列 \textbf{\color{red}B R}，游戏内重复购买操作将会自动购买小甲（没有头盔）。
 
 \begin{minted}[breakautoindent, breaklines]{lua}
 AC = Weapon:new({
     name = "防弹衣+头盔",
-    purchase_sequence = {Keyboard.F2}
+    purchase_sequence = {Keyboard.B, Keyboard.R}
 })
 \end{minted}
 

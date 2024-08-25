@@ -8,7 +8,7 @@ export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL24H
 
-MODULES = Controller Test docs lua ps1
+MODULES = Controller Test docs lua ps1 web
 VPATH = source
 TEST_UNIT := check_file
 
@@ -33,5 +33,9 @@ Controller:
 docs:
 	New-Item -Type Directory -Force -Path $(BUILD)/$@
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
+web:
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Web -Recurse -Force
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Setting.html -Force
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Weapon.html -Force
 clean:
 	Remove-Item -Force -Recurse -Path $(BUILD)
