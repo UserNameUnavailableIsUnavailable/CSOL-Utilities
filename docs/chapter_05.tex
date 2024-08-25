@@ -1,6 +1,10 @@
 \section{更新方法（初次阅读使用可跳过）}
 
-本节将以更新旧版本工具到 v1.3.14 版本为例向您说明更新本工具的步骤。
+\subsection{开始之前}
+
+若您想要更新到 v1.3.15 及以下版本（不推荐），请阅读本章第 2 小节。
+若您想要更新到 v1.3.16 及以上版本，请阅读本章第 3 小节。
+v1.3.16 版本自定义功能得到了非常大的提升，更新到 v1.3.16 及以上版本的方法相比于更新到 v1.3.15 之前的版本要简化不少。
 
 \textbf{\color{red}\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件（配置文件一共就这两个）。
 按照本文档介绍的方式配置完毕能够正常使用后，您应当妥善保管，如若丢失则需要重新配置。}
@@ -41,6 +45,10 @@
     \includegraphics[width=\textwidth]{docs/assets/update/extract_new_version.png}
     \caption{解压新版本压缩包}
 \end{figure}
+
+\subsection{从旧版更新到 v1.3.15 及之前版本}
+
+本节将以更新旧版本工具到 v1.3.14 版本为例向您说明更新本工具的步骤。
 
 打开您原先使用的旧版集成工具目录（图中 \lstinline{CSOL24H-old}）和解压后的新版本集成工具目录（图中 \lstinline{CSOL24H-v1.3.14-x86_64}）。
 分别打开它们的 \lstinline{lua} 目录。
@@ -159,4 +167,42 @@
 
 配置完成并保存修改后，勿忘在罗技软件中重新保存使修改后的配置生效（由于 \lstinline{Main.lua} 没有被修改，此时无需重复导入 \lstinline{Main.lua}，只需要点击“保存并运行”即可）。
 
-上述步骤完成后，更新即结束。一般来说，只有万不得已才会对配置文件内容添加更新，故请您务必重视。
+\subsection{更新到 v1.3.16 及以上版本}
+
+在 Powershell 中运行 \lstinline{install.ps1}。
+
+在罗技软件中导入新版本集成工具的 Lua 模块。
+
+在浏览器中打开网页 \lstinline{Setting.html}。
+
+在网页最下方点击“导入”，将您的旧版集成工具使用的 \lstinline{Setting.lua} 文件导入。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/update/import_setting}
+    \caption{导入旧版集成工具使用的 \lstinline{Setting.lua}}
+\end{figure}
+
+然后，点击“导出”，若存在尚未配置的字段，则网页会弹出错误提示，根据提示查阅手册填补缺失的字段即可。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/update/export_error}
+    \caption{根据网页提示的错误信息填补缺失字段}
+\end{figure}
+
+填补完成后，导出 \lstinline{Setting.lua} 到新版集成工具的 \lstinline{lua} 目录下，覆盖原有的 \lstinline{Setting.lua} 文件。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/update/override_setting}
+    \caption{导出 \lstinline{Setting.lua}}
+\end{figure}
+
+然后，将旧版集成工具使用的 \lstinline{WeaponList.lua} 文件移动到新版集成工具的 \lstinline{lua} 目录下，
+覆盖原有的 \lstinline{WeaponList.lua} 文件（建议先对比一下看新版工具提供的 \lstinline{WeaponList.lua} 模板中是否新增了内容，不过一般不会有）。
+如果需要，可以在浏览器中打开 \lstinline{Weapon.html} 进行武器配置。
+
+在罗技软件中重新导入 Lua 模块使您的配置生效。
+
+最后，运行新版工具的 \lstinline{Controller} 和 \lstinline{GamingTool} 即可正常使用。

@@ -51,14 +51,17 @@ function Executor:create_game_room()
     Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 2000)
     Mouse:click_on(Setting.ROOM_USE_PASSWORD_X, Setting.ROOM_USE_PASSWORD_Y, 2000)
     Mouse:click_on(Setting.ROOM_PASSWORD_BOX_X, Setting.ROOM_PASSWORD_BOX_Y, 2000)
-    local password
-    if (not Setting.ROOM_USE_CUSTOM_PASSWORD) -- 不使用自定义密码
+    if (Setting.USE_PASSWORD)
     then
-        password = tostring(math.random(10000000, 9999999999999999)) -- 生成 8 ~ 16 位数字密码
-    else -- 使用自定义密码
-        password = Setting.ROOM_CUSTOM_PASSWORD
+        local password
+        if (not Setting.ROOM_USE_CUSTOM_PASSWORD) -- 不使用自定义密码
+        then
+            password = tostring(math.random(10000000, 9999999999999999)) -- 生成 8 ~ 16 位数字密码
+        else -- 使用自定义密码
+            password = Setting.ROOM_CUSTOM_PASSWORD
+        end
+        Keyboard:puts(password)
     end
-    Keyboard:puts(password)
     Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 2000)
     Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000)
 end
