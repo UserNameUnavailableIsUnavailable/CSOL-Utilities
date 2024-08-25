@@ -24,6 +24,9 @@ Setting = {
     ---地图选择界面中的向左滚动按钮
     MAP_CHOOSE_LEFT_SCROLL_X = 27969,
     MAP_CHOOSE_LEFT_SCROLL_Y = 45249,
+    ---地图选择界面中的向右滚动按钮
+    MAP_CHOOSE_RIGHT_SCROLL_X = 30292,
+    MAP_CHOOSE_RIGHT_SCROLL_Y = 45188,
     ---“地狱围栏”灾变地图
     MAP_TRAP_X = 21788,
     MAP_TRAP_Y = 36017,
@@ -54,8 +57,8 @@ Setting = {
     ZS_GAME_ESC_MENU_CANCEL_X = 32375,
     ZS_GAME_ESC_MENU_CANCEL_Y = 43913,
     -- 【灾变】资金不足，无法购买
-    GAME_INSUFFIENT_FUNDS_CONFIRM_X = 32750,
-    GAME_INSUFFIENT_FUNDS_CONFIRM_Y = 34924,
+    GAME_INSUFFICIENT_FUNDS_CONFIRM_X = 32750,
+    GAME_INSUFFICIENT_FUNDS_CONFIRM_Y = 34924,
     -- 【灾变】死亡状态预购买菜单“重复购买”按钮（不建议点击取消购买，会与大厅界面其他按钮位置冲突）
     GAME_DEAD_PURCHASE_MENU_REBUY_X = 31692,
     GAME_DEAD_PURCHASE_MENU_REBUY_Y = 43123,
@@ -83,6 +86,8 @@ Setting = {
     STORE_BUY_CONFIRM_X = 37019,
     STORE_BUY_CONFIRM_Y = 38993,
 ---v1.3.14 新增房间上锁功能（手册第 3 章）---
+	---是否使用密码
+	USE_PASSWORD = false,
     -- 密码选项
     ROOM_USE_PASSWORD_X = 28584,
     ROOM_USE_PASSWORD_Y = 41180,

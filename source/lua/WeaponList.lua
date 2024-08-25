@@ -41,6 +41,31 @@ DefaultWeaponList = {
 ---扩展武器列表。
 ---@type Weapon[]
 ExtendedWeaponList = {
+    Weapon:new{
+        name = "神鬼开天/魔神开天",
+        switch_delay = Delay.SHORT,
+        number = Weapon.MELEE,
+        purchase_sequence = {Keyboard.B, Keyboard.NINE, Keyboard.FOUR},
+        -- 重写 attack 方法，按照下面定义的方式进行攻击
+        -- 若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数
+        attack = function ()
+            Mouse:press(Mouse.RIGHT)
+            local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+            local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
+            local direction = Utility:random_direction() -- 随机向左或右
+            local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+            repeat
+                local duration = Runtime:get_running_time() - start_time
+                local t = Runtime:get_running_time() / 1000
+                Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+            until (Runtime:get_running_time() - start_time > 7000)
+            Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
+            Mouse:press(Mouse.LEFT, 200)
+            Keyboard:click(Keyboard.R, 100)
+            Mouse:release(Mouse.LEFT)
+        end
+    },
+
     -- v1.3.15 新增万钧神威武器对象，只需要修改购买序列就能使用
     Weapon:new{
         name = "万钧神威",
@@ -49,7 +74,7 @@ ExtendedWeaponList = {
         purchase_sequence = {Keyboard.B, Keyboard.NINE, Keyboard.FOUR},
         -- 重写 attack 方法，按照下面定义的方式进行攻击
         -- 若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数
-        attack = function ()
+        attack = function (self)
             Mouse:press(Mouse.RIGHT) -- 按下鼠标右键进行范围攻击
             local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
             local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
@@ -172,33 +197,33 @@ SpecialWeapon =
         purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.NINE},
         discharging = false, -- 是否在释放光印
         discharge_start_moment = 0, --  光印释放的时刻。
-        charge_start_moment = 0, -- 充能开始的时刻。
+        recharge_start_moment = 0, -- 充能开始的时刻。
         DISCHARGE_TIME = 25, -- 光印释放时间。
         RECHARGE_TIME = 10, -- 充能时间。
         use = function (self)
             local current_time = DateTime:get_local_timestamp() -- 当前时间戳
             -- 当前正在充能，且充能时间超过 `RECHARGE_TIME`。
-            if (not self.discharging and current_time - self.charge_start_moment > self.RECHARGE_TIME)
+            if (not self.discharging and current_time - self.recharge_start_moment > self.RECHARGE_TIME)
             then
-                self.discharging = true
-                self.discharge_start_moment = current_time
                 self:switch()
                 Mouse:click(Mouse.LEFT, 200)
+                self.discharging = true -- 释放状态
+                self.discharge_start_moment = current_time
             -- 当前正在释放，且释放时间超过 `DISCHARGE_TIME`。
-            elseif (self.discharging and current_time - self.charge_start_moment > self.DISCHARGE_TIME)
+            elseif (self.discharging and current_time - self.discharge_start_moment > self.DISCHARGE_TIME)
             then
-                self.discharging = false
-                self.charge_start_moment = current_time
                 self:switch()
                 -- 按 `Keyboard.R` 召唤界徐圣。 
                 Mouse:move_relative(0, 4000, Delay.NORMAL)
                 Keyboard:click(Keyboard.R, 350)
                 Mouse:move_relative(0, -4000, Delay.NORMAL)
+                self.discharging = false -- 充能状态
+                self.recharge_start_moment = current_time
             end
         end
     }
 
-----SpecialWeaponList = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
+----SpecialWeapon = nil --[[如果没有特殊武器，只需要将本行最前面的四条短横线删掉即可]]
 
 ---- v1.3 版本新增，只将下面的内容根据自身情况复制追加到上一版本 WeaponList.lua 中即可
 

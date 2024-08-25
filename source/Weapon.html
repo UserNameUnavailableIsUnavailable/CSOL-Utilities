@@ -1,0 +1,122 @@
+<!DOCTYPE HTML5>
+<html>
+<meta charset="utf-8">
+<title>CSOL 集成工具</title>
+<h1>集成工具武器代码生成面板</h1>
+
+<h2>配件武器/护甲代码生成</h2>
+<table>
+    <tr>
+        <td><label>武器名称</label></td>
+        <td><input type="text" id="part_weapon_name" value="" required /></td>
+    </tr>
+    <tr>
+        <td><label>购买按键序列</label></td>
+        <td> <input type="text" id="part_weapon_purchase_sequence" value="" required /></td>
+    </tr>
+</table>
+
+<button id="generate_part_weapon_code" onclick="GeneratePartWeaponCode();">生成代码</button>
+<button id="copy_part_weapon_code" onclick="Copy(document.getElementById('part_weapon_code'));">一键复制</button>
+<br />
+<textarea id="part_weapon_code" rows="10" cols="50" value="">
+</textarea>
+<br />
+
+<h2>普通武器代码生成</h2>
+<label>使用专门定制的武器代码</label>
+<input type="radio" id="customized_normal_weapon_yes" name="customized_normal_weapon" value="true"
+    onclick="ToggleElement('customized_normal_weapon_config', true); ToggleElement('normal_weapon_config', false);" /><label>是</label>
+<input type="radio" id="customized_normal_weapon_no" name="customized_normal_weapon" value="false" checked
+    onclick="ToggleElement('customized_normal_weapon_config', false); ToggleElement('normal_weapon_config', true);" /><label>否</label>
+<div id="customized_normal_weapon_config" style="display: none;">
+    <table>
+        <tr>
+            <td><label>定制武器选项</label></td>
+            <td>
+                <select id="customized_normal_weapon_option">
+                    <option value="brionac">万钧神威</option>
+                    <option value="twin_axis">神鬼开天/魔神开天</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label>购买按键序列</label></td>
+            <td>
+                <input type="text" id="customized_normal_weapon_purchase_sequence" value="" />
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<table id="normal_weapon_config">
+    <tr>
+        <td><label>武器名称</label></td>
+        <td><input type="text" id="normal_weapon_name" value="" required /></td>
+    </tr>
+    <tr>
+        <td><label>购买按键序列</label></td>
+        <td> <input type="text" id="normal_weapon_purchase_sequence" value="" required /></td>
+    </tr>
+    <tr>
+        <td><label>武器栏位</label></td>
+        <td>
+            <select id="normal_weapon_number">
+                <option value="Weapon.PRIMARY">主武器</option>
+                <option value="Weapon.SECONDARY">副武器</option>
+                <option value="Weapon.MELEE">近身武器</option>
+                <option value="Weapon.GRENADE">作战装备</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><label>攻击按钮</label></td>
+        <td>
+            <select id="normal_weapon_attack_button">
+                <option value="Mouse.LEFT">左键</option>
+                <option value="Mouse.RIGHT">右键</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><label>切换延迟</label></td>
+        <td><input type="text" id="normal_weapon_switch_delay" value="" /> <label>若不配置则默认为 100 <em>ms</em></label></td>
+    </tr>
+</table>
+<button id="generate_normal_weapon_code" onclick="GenerateNormalWeaponCode();">生成代码</button>
+<button id="copy_normal_weapon_code" onclick="Copy(document.getElementById('normal_weapon_code'));">一键复制</button>
+<br />
+<textarea id="normal_weapon_code" rows="10" cols="50" value="">
+</textarea>
+<br />
+
+<h2>特殊武器代码生成</h2>
+<table>
+    <tr>
+        <td><label>特殊武器选项</label></td>
+        <td>
+            <select id="special_weapon_option">
+                <option value="sandalphon_or_belial">圣翼皓印/炽翼魔印</option>
+                <option value="hellhound">【幽浮】控制核心</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><label>购买按键序列</label></td>
+        <td>
+            <input type="text" id="special_weapon_purchase_sequence" value="" />
+        </td>
+    </tr>
+</table>
+<button id="generate_special_weapon_code" onclick="GenerateSpecialWeaponCode();">生成代码</button>
+<button id="copy_special_weapon_code" onclick="Copy(document.getElementById('special_weapon_code'));">一键复制</button>
+<br />
+<textarea id="special_weapon_code" rows="10" cols="50" value="">
+</textarea>
+
+<script type="text/javascript" src="Web/ToggleElement.js"></script>
+<script type="text/javascript" src="Web/Copy.js"></script>
+<script type="text/javascript" src="Web/WeaponCodeGeneration.js"></script>
+
+</html>
