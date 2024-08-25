@@ -48,7 +48,7 @@ ExtendedWeaponList = {
         purchase_sequence = {Keyboard.B, Keyboard.NINE, Keyboard.FOUR},
         -- 重写 attack 方法，按照下面定义的方式进行攻击
         -- 若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数
-        attack = function ()
+        attack = function (self)
             Mouse:press(Mouse.RIGHT)
             local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
             local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
