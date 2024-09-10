@@ -110,6 +110,7 @@ static int64_t game_error_log_file_date; /* 游戏日志文件中的日期，使
 static int64_t last_return_to_room_timestamp; /* 上一次由于异常原因回到游戏房间内的时间戳 */
 static int32_t return_to_room_times; /* 因网络问题返回到游戏房间的次数 */
 /* hWatchGameProcessStateThread 线程所需资源 */
+static bool bWasWatchGameProcessStateThreadPaused; /* hWatchGameProcessStateThread 是否被挂起过 */
 static std::shared_ptr<wchar_t[]> pwsTCGameExePath; /* TCGame 游戏启动器路径 */
 static std::shared_ptr<wchar_t[]> pwsTCGRunCSOCmd; /* TCGame 启动 CSOL 使用的命令行参数 */
 static HANDLE hGameProcess; /* 游戏进程句柄 */

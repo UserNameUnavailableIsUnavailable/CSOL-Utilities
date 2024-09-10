@@ -22,7 +22,7 @@ Runtime:register_interrupt_handler(function (self)
         then
             Console:infomation("开始手动接管，禁用键鼠动作。")
         end
-        Runtime.manual_flag = true -- 暂停执行，中断现场将不会恢复
+        self.manual_flag = true -- 暂停执行，中断现场将不会恢复
     elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
     then
         if (Runtime.manual_flag)
@@ -68,7 +68,7 @@ end
 
 ---点击“开始游戏”按钮，开始游戏。
 function Executor:start_game_room()
-    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI) -- 清除所有可能存在的弹窗
     Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y, 2000)
 end
 
@@ -98,7 +98,7 @@ function Executor:try_confirm()
     then
         return
     end
-    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 10, Delay.MINI) -- 清除所有可能存在的弹窗
     Mouse:click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y)
     self.last_confirm_timestamp = current_timestamp
 end
@@ -139,8 +139,8 @@ function Executor:purchase_item(buy_button_x, buy_button_y)
     Mouse:click_on(Executor.buy_button_x, Executor.buy_button_y, 50)
     Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 50) -- 弹出界面选项
     Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 50) -- 弹出界面兑换按钮
-    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 100) -- 兑换后确认
-    Keyboard:click(Keyboard.ESCAPE, 50)
+    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 400) -- 兑换后确认
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
 end
 
 ---上一次定位得到的光标
