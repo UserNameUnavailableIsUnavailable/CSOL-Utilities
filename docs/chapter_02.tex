@@ -4,7 +4,7 @@
 因此，本集成工具支持游戏掉线以及因为各种原因离开房间（如房间长时间未开始游戏导致关闭、被强制踢出等）后重新创建房间继续挂机。
 不过，需要注意的是本工具提供的掉线重连功能无法保证在所有情况下都能成功（如计算机断网、游戏维护等无法正常启动游戏的情形），但在大部分情况下能够正常工作。
 掉线重连目的在于在发生掉线时尽最大努力恢复挂机。该功能受诸多因素影响，并非完全可靠，因此您不应过分依赖此功能。
-挂机功能共分为两种：单人单件武器挂机（1 号功能）挂机及野房随机武器挂机（2 号功能）。
+挂机功能共分为两种：默认挂机模式（1 号功能）及扩展挂机模式（2 号功能）。
 1 号功能可以搭配配件武器使用。2 号功能可以搭配特殊武器使用（如圣翼皓印）。
 本集成工具支持选择 T 阵营或 CT 阵营角色。通关失败自动回合重置。
 除灾变挂机外，本工具还可用于梦幻之星等荣誉图挂机。
@@ -21,9 +21,9 @@
 
 \item 确保 Lua 脚本文件正确保存并运行。
 
-\item 运行控制器。
+\item 运行 \lstinline{Controller.ps1}。
 
-\item 运行 GamingTool.exe。
+\item 运行 \lstinline{GamingTool.exe}。
 
 \end{itemize}
 
@@ -52,7 +52,7 @@
 v1.3.16 版本后，要进行配置，有两种方案：
 
 \begin{itemize}
-\item 方法一（推荐）：使用浏览器打开 \lstinline{Setting.html} 网页，在该网页中可进行坐标配置。配置完成后，点击“导出”按钮，将配置导出为名为 \lstinline{Setting.lua} 的文件，覆盖 \lstinline{lua} 目录下原有的 \lstinline{Setting.lua} 配置文件（图 \ref{ch2fig-export-setting}）。
+\item 方法一（推荐）：打开集成工具目录下的 \lstinline{Web\Setting.html} 或访问 \href{https://macrohard.fun/CSOL-Utilities/Setting.html}{CSOL 集成工具配置面板}。 在该网页中可进行坐标配置。配置完成后，点击“导出”按钮，将配置导出为名为 \lstinline{Setting.lua} 的文件，覆盖 \lstinline{lua} 目录下原有的 \lstinline{Setting.lua} 配置文件（图 \ref{ch2fig-export-setting}）。
 \item 方法二：使用文本编辑器直接编辑 \lstinline{Setting.lua}。对于没有编程经验的用户，使用此方法配置容易出错。另外，对于有编程经验的用户，需要注意配置文件中的字段可能会在后续版本新增、更改、移除，因此若非必要，仍建议采用方法一。
 \end{itemize}
 
@@ -63,8 +63,9 @@ v1.3.16 版本后，要进行配置，有两种方案：
     \label{ch2fig-export-setting}
 \end{figure}
 
-配置完成后，使用导出功能，将导出文件保存为 \lstinline{lua} 目录下的 \lstinline{Setting.lua}。所有的坐标均通过 5 模式坐标定位功能确定。
+所有的坐标均通过 5 模式坐标定位功能确定。
 其中，\lstinline{NAME_X}（\lstinline{NAME} 为某个坐标名称）表示横坐标，\lstinline{NAME_Y} 表示纵坐标。
+配置完成后，使用导出功能，将导出文件保存为 \lstinline{lua} 目录下的 \lstinline{Setting.lua}。
 
 下面，详细介绍 \lstinline{Setting.lua} 文件中各个变量的含义，使用模式 5 坐标定位功能耐心配置即可。
 
@@ -72,7 +73,7 @@ v1.3.16 版本后，要进行配置，有两种方案：
 
 \begin{figure}[H]
     \Centering
-    \parbox[l]{\textwidth}{\lstinline{TIME_ZONE}：操作系统时区（图 \ref{ch2fig-os-timezone}），东半球为正数，西半球为负数。例如，中国处于东八区（UTC+08:00），则应将其设置为 8（默认配置，一般不需更改）。}
+    \parbox[l]{\textwidth}{\lstinline{TIME_ZONE}：操作系统时区（图 \ref{ch2fig-os-timezone}），东半球为正数，西半球为负数。例如，中国处于东八区（UTC + 08:00），则应将其设置为 8（默认配置，一般不需更改）。}
     \includegraphics[width=\textwidth]{docs/assets/timezone}
     \caption{操作系统时区}
     \label{ch2fig-os-timezone}
@@ -81,7 +82,7 @@ v1.3.16 版本后，要进行配置，有两种方案：
 
 \begin{figure}[H]
     \Centering
-    \parbox[l]{\textwidth}{\lstinline{HALL_ROOM_LIST_X}、\lstinline{ROOM_LIST_Y}：大厅房间列表选框的坐标（图 \ref{ch2fig-room-list}）。}
+    \parbox[l]{\textwidth}{\lstinline{HALL_ROOM_LIST_X}、\lstinline{HALL_ROOM_LIST_Y}：大厅房间列表选框的坐标（图 \ref{ch2fig-room-list}）。}
     \includegraphics[width=\textwidth]{docs/assets/room_list}
     \caption{“房间列表”选框}
     \label{ch2fig-room-list}
@@ -289,7 +290,7 @@ CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME = 60
 \subsection{挂机武器列表}
 
 使用文本编辑器打开 \lstinline{WeaponList.lua} 文件。
-在浏览器中打开 \lstinline{Weapon.html} 网页，该网页可以帮助您生成武器代码。
+打开集成工具目录下的 \lstinline{Web\Weapon.html} 或访问 \href{https://macrohard.fun/CSOL-Utilities/Weapon.html}{集成工具武器代码生成面板}，该网页可以帮助您生成武器代码。
 对于有一定编程经验的用户，阅读完本节内容后可以参阅\nameref{section_advanced_usage}了解更多自定义使用方法。
 
 \subsubsection{默认挂机模式}

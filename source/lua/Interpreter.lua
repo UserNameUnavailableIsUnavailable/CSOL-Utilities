@@ -2,6 +2,7 @@ if (not Interpreter_lua)
 then
 Interpreter_lua = true
 
+---判断命令是否失效。
 local function expired()
     CmdTime = CmdTime or 0
     local current_time = DateTime:get_local_timestamp() -- 本地时间戳
@@ -51,9 +52,8 @@ function Interpreter()
         elseif (Cmd == Command.CMD_LOCATE_CURSOR and not expired()) -- 光标定位功能
         then
             Executor:locate_cursor()
-        else
-            Runtime:sleep(10)
         end
+        Runtime:sleep(10)
         previous_command = Cmd -- 更新上一次命令
     end
 end

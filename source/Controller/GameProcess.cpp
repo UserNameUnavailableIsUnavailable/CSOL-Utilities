@@ -80,6 +80,13 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         {
             break;
         }
+        /* 如果本线程曾被挂起（模式切换），挂起后游戏启动，用户手动结束游戏，那么将导致状态机无法更新，故需要按下述方式处理 */
+        if (bWasWatchGameProcessStateThreadPaused)
+        {
+            if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED)
+                game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN;
+            bWasWatchGameProcessStateThreadPaused = false;
+        }
         Sleep(1000); /* 每隔 1 秒运行一次本线程 */
         if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED) /* 等待游戏进程窗口打开 */
         {
@@ -130,7 +137,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_EXITED) /* 游戏进程退出，重启游戏 */
         {
             ResetEvent(hGameProcessRunningEvent); /* 游戏进程结束 */
-            hGameProcess = NULL;
             STARTUPINFOW startup_info_w;
             ZeroMemory(&startup_info_w, sizeof(startup_info_w));
             ZeroMemory(&tcg_process_info, sizeof(tcg_process_info));
@@ -166,7 +172,12 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             }
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN) /* 游戏进程状态未确定，确定游戏进程状态 */
-        {
+        {            
+            if (hGameProcess)
+            {
+                CloseHandle(hGameProcess);
+                hGameProcess = NULL;
+            }
             ConsoleLog("游戏进程状态未知，检测游戏进程状态。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             hGameWindow = FindWindowW(NULL, L"Counter-Strike Online"); /* 尝试获取游戏进程窗口 */
             if (!hGameWindow)
