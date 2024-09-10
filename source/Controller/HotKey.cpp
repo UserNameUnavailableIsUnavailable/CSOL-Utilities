@@ -24,6 +24,7 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
     //     ConsoleLog("【错误】尝试屏蔽键盘热键失败。错误代码：%lu。", GetLastError());
     //     return -1;
     // }
+    static int32_t mode = '0';
     bSuccess = bSuccess && RegisterHotKey(NULL, '0', MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, '0');
     bSuccess = bSuccess && RegisterHotKey(NULL, '1', MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, '1');
     bSuccess = bSuccess && RegisterHotKey(NULL, '2', MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, '2');
@@ -52,6 +53,10 @@ DWORD CSOL24H::HandleHotKey(LPVOID lpParam) noexcept
             ResetEvent(hEnableCombinePartsEvent);
             ResetEvent(hEnablePurchaseItemEvent);
             ResetEvent(hEnableLocateCursorEvent);
+            if (msg.wParam != '1' && msg.wParam != '2')
+            {
+                bWasWatchGameProcessStateThreadPaused = true;
+            }
             if (msg.wParam == '0')
             {
                 ConsoleLog("切换为 0 模式", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);

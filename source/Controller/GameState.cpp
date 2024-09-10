@@ -176,12 +176,12 @@ void CSOL24H::CheckGameState() noexcept
     const char* msg = nullptr;
     bool bHasGameStateUpdated = false;
     current_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
-    if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOADING && std::abs(current_time - in_game_state.get_timestamp()) > 25) /* 加载时间达到 25 秒 */
+    if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOADING && current_time - in_game_state.get_timestamp() > 25) /* 加载时间达到 25 秒 */
     {
         bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_MAP, current_time); /* 状态由 LOADING 转为 MAP，时间戳更新为当前时刻 */
         msg =  "预设加载时间已过，认为已经进入游戏场景";
     }
-    else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && std::abs(current_time - in_game_state.get_timestamp()) > 30) /* 登陆后等待 30 秒 */
+    else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOGIN && current_time - in_game_state.get_timestamp() > 30) /* 登陆后等待 30 秒 */
     {
         if (IsWindow(hGameWindow))
         {
@@ -205,15 +205,20 @@ void CSOL24H::CheckGameState() noexcept
         bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 LOGIN 转为 HALL，时间戳更新为当前时刻 */
         msg = "游戏进程启动后等待时间达到 30 秒，认为游戏客户端已经完全加载";
     }
-    else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && std::abs(current_time - in_game_state.get_timestamp()) > 15 * 60) /* 在房间内等待 15 分钟而未开始游戏 */
+    else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && current_time - in_game_state.get_timestamp() > 15 * 60) /* 在房间内等待 15 分钟而未开始游戏 */
     {
         bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time); /* 状态由 ROOM 转为 HALL，时间戳更新为当前时刻 */
-        msg = "在房间内等待时间超过 15 分钟（等待时间过长的房间将自动关闭），认为此房间将要关闭，返回到大厅重新创建房间";
+        msg = "在房间内等待时间超过 15 分钟（等待时间过长的房间将自动关闭），认为此房间将要关闭，返回到大厅";
     }
     else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_ROOM && return_to_room_times > 3) /* 因异常原因返回到房间次数过多 */
     {
         bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL, current_time);
-        msg = "因异常原因返回到房间内次数过多（如：重连 1 2 3 问题、游戏时网络波动），认为此房间无法正常游戏，返回到大厅重新创建房间";
+        msg = "因异常原因返回到房间内次数过多（如：重连 1 2 3 问题、游戏时网络波动），认为此房间无法正常游戏，返回到大厅";
+    }
+    else if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_IN_MAP && current_time - in_game_state.get_timestamp() > 30 * 60) /* 在地图中游戏时间超过 30 分钟（异常情形） */
+    {
+        bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_HALL, current_time);
+        msg = "长时间未能进行游戏结算确认，返回到大厅";
     }
     if (bHasGameStateUpdated)
     {

@@ -1,92 +1,95 @@
 <!DOCTYPE HTML5>
 <html>
 <meta charset="utf-8">
+<link rel="stylesheet" href="PopUpImage.css">
 <title>CSOL 集成工具</title>
-<h1>CSOL 集成工具配置面板</h1>
+<image id="PopUpImage" src=""></image>
+<h1>CSOL 集成工具（v1.3.17）配置面板</h1>
+鼠标光标悬停在<b style="color:blue">蓝色</b>标题上方可以查看描述图片。
 <h2>1. 系统设置（手册第三章）</h2>
-<h3>操作系统时区</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/timezone.png')" onmouseleave="HidePopUpImage()">操作系统时区</h3>
 TIME_ZONE <input type="text" id="TIME_ZONE" name="TIME_ZONE" value="8" required />
 单位为小时，<a href="ms-settings:dateandtime">点此查看操作系统时区</a>
 <br />
 <h2>2. 游戏大厅（手册第三章）</h2>
-<h3>房间列表选框</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/room_list.png')" onmouseleave="HidePopUpImage()">房间列表选框</h3>
 HALL_ROOM_LIST_X <input type="text" id="HALL_ROOM_LIST_X" name="HALL_ROOM_LIST_X" value="" required />
 <br />
 HALL_ROOM_LIST_Y <input type="text" id="HALL_ROOM_LIST_Y" name="HALL_ROOM_LIST_X" value="" required />
-<h3>大厅界面新建房间按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/create_room_0.png')" onmouseleave="HidePopUpImage()">大厅界面新建房间按钮</h3>
 HALL_CREATE_ROOM_X <input type="text" id="HALL_CREATE_ROOM_X" name="HALL_CREATE_ROOM_X" value="" required />
 <br />
 HALL_CREATE_ROOM_Y <input type="text" id="HALL_CREATE_ROOM_Y" name="HALL_CREATE_ROOM_Y" value="" required />
 <br />
-<h3>房间列表界面返回按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/hall_back.png')" onmouseleave="HidePopUpImage()">房间列表界面返回按钮</h3>
 HALL_BACK_X <input type="text" id="HALL_BACK_X" name="HALL_BACK_X" value="" required />
 <br />
 HALL_BACK_Y <input type="text" id="HALL_BACK_Y" name="HALL_BACK_Y" value="" required />
 <br />
-<h3>游戏模式选框</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/game_mode.png')" onmouseleave="HidePopUpImage()">游戏模式选框</h3>
 GAME_MODE_X <input type="text" id="GAME_MODE_X" name="GAME_MODE_X" value="" required />
 <br />
 GAME_MODE_Y <input type="text" id="GAME_MODE_Y" name="GAME_MODE_Y" value="" required />
 <br />
-<h3>游戏模式（一般为大灾变）</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/zombie_scenario.png')" onmouseleave="HidePopUpImage()">游戏模式（一般为大灾变）</h3>
 ZOMBIE_SCENARIO_MODE_X <input type="text" id="ZOMBIE_SCENARIO_MODE_X" name="ZOMBIE_SCENARIO_MODE_X" value="" required />
 <br />
 ZOMBIE_SCENARIO_MODE_Y <input type="text" id="ZOMBIE_SCENARIO_MODE_Y" name="ZOMBIE_SCENARIO_MODE_Y" value="" required />
 <br />
-<h3>地图选择界面向左滚动按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/left_scroll.png')" onmouseleave="HidePopUpImage()">地图选择界面向左滚动按钮</h3>
 MAP_CHOOSE_LEFT_SCROLL_X <input type="text" id="MAP_CHOOSE_LEFT_SCROLL_X" name="MAP_CHOOSE_LEFT_SCROLL_X" value=""
     required />
 <br />
 MAP_CHOOSE_LEFT_SCROLL_Y <input type="text" id="MAP_CHOOSE_LEFT_SCROLL_Y" name="MAP_CHOOSE_LEFT_SCROLL_Y" value=""
     required />
 <br />
-<h3>地图选择界面向右滚动按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/right_scroll.png')" onmouseleave="HidePopUpImage()">地图选择界面向右滚动按钮</h3>
 MAP_CHOOSE_RIGHT_SCROLL_X <input type="text" id="MAP_CHOOSE_RIGHT_SCROLL_X" name="MAP_CHOOSE_RIGHT_SCROLL_X" value=""
     required />
 <br />
 MAP_CHOOSE_RIGHT_SCROLL_Y <input type="text" id="MAP_CHOOSE_RIGHT_SCROLL_Y" name="MAP_CHOOSE_RIGHT_SCROLL_Y" value=""
     required />
 <br />
-<h3>游戏地图选框</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/map_trap.png')" onmouseleave="HidePopUpImage()">游戏地图选框</h3>
 MAP_TRAP_X <input type="text" id="MAP_TRAP_X" name="MAP_TRAP_X" value="" required />
 <br />
 MAP_TRAP_Y <input type="text" id="MAP_TRAP_Y" name="MAP_TRAP_Y" value="" required />
 <br />
-<h3>选择完成按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/finish_choose.png')" onmouseleave="HidePopUpImage()">选择完成按钮</h3>
 FINISH_CHOOSE_X <input type="text" id="FINISH_CHOOSE_X" name="FINISH_CHOOSE_X" value="" required />
 <br />
 FINISH_CHOOSE_Y <input type="text" id="FINISH_CHOOSE_Y" name="FINISH_CHOOSE_Y" value="" required />
 <br />
-<h3>游戏难度选框</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/choose_difficulty.png')" onmouseleave="HidePopUpImage()">游戏难度选框</h3>
 GAME_DIFFICULTY_X <input type="text" id="GAME_DIFFICULTY_X" name="GAME_DIFFICULTY_X" value="" required />
 <br />
 GAME_DIFFICULTY_Y <input type="text" id="GAME_DIFFICULTY_Y" name="GAME_DIFFICULTY_Y" value="" required />
 <br />
-<h3>游戏难度选项</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/difficulty_option.png')" onmouseleave="HidePopUpImage()">游戏难度选项</h3>
 GAME_DIFFICULTY_OPTION_X <input type="text" id="GAME_DIFFICULTY_OPTION_X" name="GAME_DIFFICULTY_OPTION_X" value=""
     required />
 <br />
 GAME_DIFFICULTY_OPTION_Y <input type="text" id="GAME_DIFFICULTY_OPTION_Y" name="GAME_DIFFICULTY_OPTION_Y" value=""
     required />
 <br />
-<h3>是否使用密码</h3>
+<h3>启用房间密码</h3>
 <input type="radio" id="USE_PASSWORD_YES" name="USE_PASSWORD" value="true"
     onclick='ToggleElement("use_password", true)' /><label>是</label>
 <input type="radio" id="USE_PASSWORD_NO" name="USE_PASSWORD" value="false"
     onclick='ToggleElement("use_password", false)' checked /><label>否</label>
 <br />
 <div id="use_password" style="display: none;">
-    <h3>启用密码功能选项框</h3>
+    <h3 style="color:blue" onmouseover="ShowPopUpImage('assets/use_password.png')" onmouseleave="HidePopUpImage()">启用密码功能选项框</h3>
     ROOM_USE_PASSWORD_X <input type="text" id="ROOM_USE_PASSWORD_X" name="ROOM_USE_PASSWORD_X" value="" required />
     <br />
     ROOM_USE_PASSWORD_Y <input type="text" id="ROOM_USE_PASSWORD_Y" name="ROOM_USE_PASSWORD_Y" value="" required />
     <br />
-    <h3>密码输入框</h3>
+    <h3 style="color:blue" onmouseover="ShowPopUpImage('assets/password_box.png')" onmouseleave="HidePopUpImage()">密码输入框</h3>
     ROOM_PASSWORD_BOX_X <input type="text" id="ROOM_PASSWORD_BOX_X" name="ROOM_PASSWORD_BOX_X" value="" required />
     <br />
     ROOM_PASSWORD_BOX_Y <input type="text" id="ROOM_PASSWORD_BOX_Y" name="ROOM_PASSWORD_BOX_Y" value="" required />
     <br />
-    <h3>确认密码按钮</h3>
+    <h3 style="color:blue" onmouseover="ShowPopUpImage('assets/confirm_password.png')" onmouseleave="HidePopUpImage()">确认密码按钮</h3>
     ROOM_PASSWORD_CONFIRM_X <input type="text" id="ROOM_PASSWORD_CONFIRM_X" name="ROOM_PASSWORD_CONFIRM_X" value=""
         required />
     <br />
@@ -102,18 +105,18 @@ GAME_DIFFICULTY_OPTION_Y <input type="text" id="GAME_DIFFICULTY_OPTION_Y" name="
     <br />
 
     <div id="custom_password_box" style="display: none;">
-        <h3>房间自定义密码</h3>
+        <h3>房间自定义密码（仅允许字母或数字，其余字符忽略）</h3>
         ROOM_CUSTOM_PASSWORD <input type="text" id="ROOM_CUSTOM_PASSWORD" value="" required />
         <br />
     </div>
 </div>
-<h3>新建房间按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/create_room_1.png')" onmouseleave="HidePopUpImage()">新建房间按钮</h3>
 CREATE_ROOM_X <input type="text" id="CREATE_ROOM_X" name="CREATE_ROOM_X" value="" required />
 <br />
 CREATE_ROOM_Y <input type="text" id="CREATE_ROOM_Y" name="CREATE_ROOM_Y" value="" required />
 <br />
 <h2>3. 游戏房间（手册第三章）</h2>
-<h3>开始游戏按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/start_game.png')" onmouseleave="HidePopUpImage()">开始游戏按钮</h3>
 ROOM_START_GAME_X <input type="text" id="ROOM_START_GAME_X" name="ROOM_START_GAME_X" value="" required />
 <br />
 ROOM_START_GAME_Y <input type="text" id="ROOM_START_GAME_Y" name="ROOM_START_GAME_Y" value="" required />
@@ -125,13 +128,13 @@ ROOM_START_GAME_Y <input type="text" id="ROOM_START_GAME_Y" name="ROOM_START_GAM
     checked /><label>CT 阵营</label>
 <br />
 <div id="choose_t_class" style="display: none;">
-    <h3>T 阵营选项卡</h3>
+    <h3 style="color:blue" onmouseover="ShowPopUpImage('assets/choose_T_class.png')" onmouseleave="HidePopUpImage()">T 阵营选项卡</h3>
     CHOOSE_T_CLASS_X <input type="text" id="CHOOSE_T_CLASS_X" name="CHOOSE_T_CLASS_X" value="" required />
     <br />
     CHOOSE_T_CLASS_Y <input type="text" id="CHOOSE_T_CLASS_Y" name="CHOOSE_T_CLASS_Y" value="" required />
     <br />
 </div>
-<h3>角色选项</h3>
+<h3>角色选项（可取 0 ~ 9）</h3>
 CLASS_OPTION <input type="text" id="CLASS_OPTION" required />
 <br />
 <h3>自动使用角色技能</h3>
@@ -141,67 +144,69 @@ CLASS_OPTION <input type="text" id="CLASS_OPTION" required />
     onclick="ToggleElement('class_special_ability_cd', false)" checked /><label>否</label>
 <br />
 <div id="class_special_ability_cd" style="display: none;">
-    <h3>角色技能冷却时间</h3>
+    <h3>角色技能冷却时间（单位为<b>秒</b>）</h3>
     CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME <input type="text" id="CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME"
         name="CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME" value="" required />
     <br />
 </div>
-<h3>ESC 弹窗 → 取消</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/zs_esc_cancel.png')" onmouseleave="HidePopUpImage()">ESC 弹窗 → 取消</h3>
+<b>注意，大灾变模式 ESC 弹窗中的取消按钮位置与其他模式不同！</b>
+<br />
 ZS_GAME_ESC_MENU_CANCEL_X <input type="text" id="ZS_GAME_ESC_MENU_CANCEL_X" name="ZS_GAME_ESC_MENU_CANCEL_X" value=""
     required />
 <br />
 ZS_GAME_ESC_MENU_CANCEL_Y <input type="text" id="ZS_GAME_ESC_MENU_CANCEL_Y" name="ZS_GAME_ESC_MENU_CANCEL_Y" value=""
     required />
 <br />
-<h3>“资金不足，无法购买”确认按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/game_insuff_funds_confirm.png')" onmouseleave="HidePopUpImage()">“资金不足，无法购买”确认按钮</h3>
 GAME_INSUFFICIENT_FUNDS_CONFIRM_X <input type="text" id="GAME_INSUFFICIENT_FUNDS_CONFIRM_X"
     name="GAME_INSUFFICIENT_FUNDS_CONFIRM_X" value="" required />
 <br />
 GAME_INSUFFICIENT_FUNDS_CONFIRM_Y <input type="text" id="GAME_INSUFFICIENT_FUNDS_CONFIRM_Y"
     name="GAME_INSUFFICIENT_FUNDS_CONFIRM_Y" value="" required />
 <br />
-<h3>死亡状态购买菜单“重复购买”或“取消”按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/dead_purchase_rebuy.png')" onmouseleave="HidePopUpImage()">死亡状态购买菜单“重复购买”或“取消”按钮</h3>
 GAME_DEAD_PURCHASE_MENU_REBUY_X <input type="text" id="GAME_DEAD_PURCHASE_MENU_REBUY_X"
     name="GAME_DEAD_PURCHASE_MENU_REBUY_X" value="" required />
 <br />
 GAME_DEAD_PURCHASE_MENU_REBUY_Y <input type="text" id="GAME_DEAD_PURCHASE_MENU_REBUY_Y"
     name="GAME_DEAD_PURCHASE_MENU_REBUY_Y" value="" required />
 <br />
-<h3>结算界面确认按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/confirm_round.png')" onmouseleave="HidePopUpImage()">结算界面确认按钮</h3>
 GAME_ROUND_CONFIRM_X <input type="text" id="GAME_ROUND_CONFIRM_X" name="GAME_ROUND_CONFIRM_X" value="" required />
 <br />
 GAME_ROUND_CONFIRM_Y <input type="text" id="GAME_ROUND_CONFIRM_Y" name="GAME_ROUND_CONFIRM_Y" value="" required />
 <br />
 <h2>4. 制造所配件批量合成（手册第四章）</h2>
-<h3>自动添加按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/auto_fill.png')" onmouseleave="HidePopUpImage()">自动添加按钮</h3>
 CRAFT_PARTS_AUTO_FILL_X <input type="text" id="CRAFT_PARTS_AUTO_FILL_X" , name="CRAFT_PARTS_AUTO_FILL_X" value=""
     required />
 <br />
 CRAFT_PARTS_AUTO_FILL_Y <input type="text" id="CRAFT_PARTS_AUTO_FILL_Y" , name="CRAFT_PARTS_AUTO_FILL_Y" value=""
     required />
 <br />
-<h3>开始合成按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/combine.png')" onmouseleave="HidePopUpImage()">开始合成按钮</h3>
 CRAFT_PARTS_COMBINE_X <input type="text" id="CRAFT_PARTS_COMBINE_X" name="CRAFT_PARTS_COMBINE_X" value="" required />
 <br />
 CRAFT_PARTS_COMBINE_Y <input type="text" id="CRAFT_PARTS_COMBINE_Y" name="CRAFT_PARTS_COMBINE_Y" value="" required />
 <br />
-<h3>清空配件按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/clear.png')" onmouseleave="HidePopUpImage()">清空配件按钮</h3>
 CRAFT_PARTS_CLEAR_X <input type="text" id="CRAFT_PARTS_CLEAR_X" name="CRAFT_PARTS_CLEAR_X" value="" required />
 <br />
 CRAFT_PARTS_CLEAR_Y <input type="text" id="CRAFT_PARTS_CLEAR_Y" name="CRAFT_PARTS_CLEAR_Y" value="" required />
 <br />
 <h2>5. 商店批量购买（手册第五章）</h2>
-<h3>商品列表兑换按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/store_buy_option.png')" onmouseleave="HidePopUpImage()">商品列表兑换按钮</h3>
 STORE_BUY_OPTION_X <input type="text" id="STORE_BUY_OPTION_X" name="STORE_BUY_OPTION_X" value="" required />
 <br />
 STORE_BUY_OPTION_Y <input type="text" id="STORE_BUY_OPTION_Y" name="STORE_BUY_OPTION_Y" value="" required />
 <br />
-<h3>弹窗中的兑换按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/store_purchase.png')" onmouseleave="HidePopUpImage()">弹窗中的兑换按钮</h3>
 STORE_BUY_X <input type="text" id="STORE_BUY_X" name="STORE_BUY_X" value="" required />
 <br />
 STORE_BUY_Y <input type="text" id="STORE_BUY_Y" name="STORE_BUY_Y" value="" required />
 <br />
-<h3>确认兑换按钮</h3>
+<h3 style="color:blue" onmouseover="ShowPopUpImage('assets/store_buy_confirm.png')" onmouseleave="HidePopUpImage()">确认兑换按钮</h3>
 STORE_BUY_CONFIRM_X <input type="text" id="STORE_BUY_CONFIRM_X" name="STORE_BUY_CONFIRM_X" value="" required />
 <br />
 STORE_BUY_CONFIRM_Y <input type="text" id="STORE_BUY_CONFIRM_Y" name="STORE_BUY_CONFIRM_Y" value="" required />
@@ -215,8 +220,9 @@ STORE_BUY_CONFIRM_Y <input type="text" id="STORE_BUY_CONFIRM_Y" name="STORE_BUY_
 
 <button type="button" onclick="Export()">导出</button>
 
-<script type="text/javascript" src="Web/Import.js"></script>
-<script type="text/javascript" src="Web/Export.js"></script>
-<script type="text/javascript" src="Web/ToggleElement.js"></script>
+<script type="text/javascript" src="Import.js"></script>
+<script type="text/javascript" src="Export.js"></script>
+<script type="text/javascript" src="ToggleElement.js"></script>
+<script type="text/javascript" src="PopUpImage.js"></script>
 
 </html>

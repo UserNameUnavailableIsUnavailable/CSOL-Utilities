@@ -61,6 +61,7 @@ int64_t CSOL24H::game_error_log_file_date = 0;
 int64_t CSOL24H::last_return_to_room_timestamp = 0; /* 上一次由于异常原因回到游戏房间内的时间戳 */
 int32_t CSOL24H::return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
 /* hWatchGameProcessStateThread 线程所需资源 */
+bool CSOL24H::bWasWatchGameProcessStateThreadPaused = false;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGameExePath = nullptr;
 std::shared_ptr<wchar_t[]> CSOL24H::pwsTCGRunCSOCmd = nullptr;
 HANDLE CSOL24H::hGameProcess = NULL;
@@ -97,7 +98,7 @@ void CSOL24H::InitializeWatchInGameStateThread()
     {
         throw CSOL24H_EXCEPT("尝试打开日志文件失败，错误代码：%lu。这可能是因游戏安装后尚未运行过导致。", pwszErrorLogFilePath.get(), GetLastError() );
     }
-    /* 创建用于下达命令的 LUA 脚本文件 */
+    /* 创建用于下达命令的 Lua 脚本文件 */
     hLUACommandFile = CreateFileW(
         CMD_FILE_NAME,
         GENERIC_READ | GENERIC_WRITE,
@@ -474,6 +475,7 @@ void CSOL24H::Destroy() noexcept
     CSOL24H::last_return_to_room_timestamp = 0; /* 上一次由于异常原因回到游戏房间内的时间戳 */
     CSOL24H::return_to_room_times = 0; /* 因网络问题返回到游戏房间的次数 */
     /* hWatchGameProcessStateThread 线程所需资源 */
+    CSOL24H::bWasWatchGameProcessStateThreadPaused = false;
     CSOL24H::pwsTCGameExePath = nullptr;
     CSOL24H::pwsTCGRunCSOCmd = nullptr;
     CSOL24H::hGameProcess = NULL;
