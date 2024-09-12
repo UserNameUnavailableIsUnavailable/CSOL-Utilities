@@ -56,6 +56,7 @@ static int64_t ResolveMessageTimestamp(const std::string message, int32_t* lpMil
 static void GiveCommand(const char* cmd) noexcept;
 static DWORD CALLBACK WatchInGameState(LPVOID lpParam) noexcept;
 static DWORD CALLBACK WatchGameProcess(LPVOID lpParam) noexcept; /* 监视游戏进程状态 */
+static DWORD CALLBACK StopCSOBanner(LPVOID lpParam) noexcept;
 static void ResolveGameStateFromErrorLog() noexcept;
 static void CheckGameState() noexcept;
 static void TransferGameState() noexcept;
@@ -99,6 +100,7 @@ static HANDLE hHandleHotKeyMessageThread; /* 绑定、处理热键消息 */
 static HANDLE hCombinePartsThread; /* 合成配件 */
 static HANDLE hPurchaseItemThread; /* 购买物品 */
 static HANDLE hLocateCursorThread; /* 定位光标 */
+static HANDLE hStopCSOBannerThread; /* 定期结束 CSOBanner */
 /* hWatchInGameStateThread 线程所需资源 */
 static std::shared_ptr<wchar_t[]> pwszErrorLogFilePath; /* 游戏 Error.log 日志路径 */
 static InGameState in_game_state; /* 通过解析日志文件获取到的游戏状态 */

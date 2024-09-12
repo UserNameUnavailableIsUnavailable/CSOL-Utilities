@@ -50,6 +50,7 @@ HANDLE CSOL24H::hHandleHotKeyMessageThread = NULL;
 HANDLE CSOL24H::hCombinePartsThread = NULL;
 HANDLE CSOL24H::hPurchaseItemThread = NULL;
 HANDLE CSOL24H::hLocateCursorThread = NULL;
+HANDLE CSOL24H::hStopCSOBannerThread = NULL;
 /* hWatchInGameStateThread 线程所需资源 */
 std::shared_ptr<wchar_t[]> CSOL24H::pwszErrorLogFilePath = nullptr;
 InGameState CSOL24H::in_game_state(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);
@@ -183,6 +184,18 @@ void CSOL24H::InitializeWatchGameProcessThread()
     {
         throw CSOL24H_EXCEPT("创建用于监测游戏进程状态的线程时失败。错误代码：%lu。", L"hWatchGameProcessStateThread", GetLastError());
     }
+    hStopCSOBannerThread = CreateThread(
+        NULL,
+        4096,
+        StopCSOBanner,
+        NULL,
+        0,
+        NULL
+    );
+    if (!hStopCSOBannerThread)
+    {
+        throw CSOL24H_EXCEPT("创建用于关闭 CSOBanner 的线程时失败。错误代码：%lu。", L"hStopCSOBannerThread", GetLastError());
+    }
 }
 
 void CSOL24H::InitializeCombinePartsThread()
@@ -277,7 +290,8 @@ void CSOL24H::Run()
         hWatchInGameStateThread,
         hCombinePartsThread,
         hPurchaseItemThread,
-        hLocateCursorThread
+        hLocateCursorThread,
+        hStopCSOBannerThread
     };
     DWORD dwSignaledObjectIndex = WaitForMultipleObjects(
         ARRAYSIZE(hThreadsToWait),
@@ -405,6 +419,10 @@ void CSOL24H::Destroy() noexcept
     {
         TerminateThread(hLocateCursorThread, -1);
     }
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hStopCSOBannerThread, 2000))
+    {
+        TerminateThread(hStopCSOBannerThread, -1);
+    }
 
     CloseHandle(hEnableWatchInGameStateEvent);
     CloseHandle(hEnableWatchGameProcessEvent);
@@ -415,6 +433,7 @@ void CSOL24H::Destroy() noexcept
     GiveCommand(nullptr);
     CloseHandle(hCmdFileMutex);
 
+    CloseHandle(hStopCSOBannerThread);
     CloseHandle(hWatchInGameStateThread);
     CloseHandle(hWatchGameProcessStateThread);
     CloseHandle(hGameProcessRunningEvent);
@@ -464,6 +483,7 @@ void CSOL24H::Destroy() noexcept
     CSOL24H::hCombinePartsThread = NULL;
     CSOL24H::hPurchaseItemThread = NULL;
     CSOL24H::hLocateCursorThread = NULL;
+    CSOL24H::hStopCSOBannerThread = NULL;
     /* hWatchInGameStateThread 线程所需资源 */
     CSOL24H::pwszErrorLogFilePath = nullptr;
     CSOL24H::in_game_state.update(ENUM_IN_GAME_STATE::IGS_UNKNOWN, 0);

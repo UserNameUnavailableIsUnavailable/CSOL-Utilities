@@ -1,5 +1,5 @@
 VPATH := $(BUILD)/$(MOD)
-SUBMODULES := Main Command CSOL24H_EXCEPT CSOL24H DateTime HotKey Util GameState GameProcess Console CombineParts PurchaseItem LocateCursor
+SUBMODULES := Main Command CSOL24H_EXCEPT CSOL24H DateTime HotKey Util GameState GameProcess Console CombineParts PurchaseItem LocateCursor StopCSOBanner
 OBJECTS := $(addsuffix .obj, $(SUBMODULES))
 .PHONY: all
 all: $(OBJECTS)
