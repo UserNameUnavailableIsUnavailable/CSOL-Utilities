@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <errhandlingapi.h>
+#include <handleapi.h>
 #include <iomanip>
 #include <iostream>
 #include <cstddef>
@@ -185,19 +186,25 @@ void CSOL24H::CheckGameState() noexcept
     {
         if (IsWindow(hGameWindow))
         {
-            SetForegroundWindow(hGameWindow);
-            DWORD_PTR _; /* dummy */
-            SendMessageTimeout(hGameWindow, WM_NULL, 0, 0, SMTO_NORMAL, 5000, &_);
-            if (GetForegroundWindow() == hGameWindow)
+            ShowWindow(hGameWindow, SW_NORMAL);
+            auto TopmostWindow = reinterpret_cast<void(*)(HWND)>(GetProcAddress(hGamingToolModule, "TopmostWindow"));
+            TopmostWindow(hGameWindow);
+            ConsoleLog("将游戏窗口置顶。使用 GamingTool 可解除（Win + T），详见 GamingTool 使用说明。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+            // SetForegroundWindow(hGameWindow);
+            // DWORD_PTR _; /* dummy */
+            // SendMessageTimeout(hGameWindow, WM_NULL, 0, 0, SMTO_NORMAL, 5000, &_);
+            // if (GetForegroundWindow() == hGameWindow)
+            // {
+            //     ConsoleLog("成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+            // }
+            // else
+            // {
+            //     ConsoleLog("未能成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
+            // }
+            Sleep(500);
+            auto MakeWindowBorderless = reinterpret_cast<void(*)(HWND)>(GetProcAddress(hGamingToolModule, "MakeWindowBorderless"));
+            if (MakeWindowBorderless)
             {
-                ConsoleLog("成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
-            }
-            else
-            {
-                ConsoleLog("未能成功将游戏窗口置于前台并激活。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
-            }
-            auto MakeWindowBorderless = (void(*)(HWND))GetProcAddress(hGamingToolModule, "MakeWindowBorderless");
-            if (MakeWindowBorderless) {
                 MakeWindowBorderless(hGameWindow);
                 ConsoleLog("去除游戏窗口标题栏。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
             }

@@ -20,9 +20,9 @@
 @param `hThread = NULL` 进程的主线程句柄，默认为 `NULL`。
 @return 通过向进程中的所有线程发出 `WM_QUIT` 消息安全地结束进程。如果进程退出成功，则关闭传入的进程和线程句柄并返回 `true`，否则返回 `false`。
 */
-[[deprecated("2024.7.31 更新后，TCGAME 登录信息每隔一段时间刷新一次，不再因为时间过长导致登录信息失效。")]]
 bool CSOL24H::TryStopProcessSafely(HANDLE hProcess, HANDLE hThread) noexcept
 {
+    if (hProcess == NULL || hProcess == INVALID_HANDLE_VALUE) return true;
     HANDLE hThreadSnap;
     THREADENTRY32 thread_entry;
     thread_entry.dwSize = sizeof(THREADENTRY32);
