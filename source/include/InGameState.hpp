@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <chrono>
 
 /* 游戏状态 */
 enum ENUM_IN_GAME_STATE
@@ -14,14 +13,6 @@ enum ENUM_IN_GAME_STATE
     IGS_IN_MAP, /* 在游戏地图中 */
     IGS_SHUTDOWN, /* 游戏关闭 */
     IGS_UNKNOWN /* 未知状态 */
-};
-
-enum ENUM_GAME_PROCESS_STATE
-{
-    GPS_BEING_CREATED, /* 游戏进程正在被创建 */
-    GPS_RUNNING, /* 游戏进程正在运行 */
-    GPS_EXITED, /* 游戏进程退出 */
-    GPS_UNKNOWN, /* 尚未确认游戏进程状态 */
 };
 
 class InGameState

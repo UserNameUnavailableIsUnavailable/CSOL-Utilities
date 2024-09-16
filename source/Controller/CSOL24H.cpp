@@ -14,10 +14,9 @@
 #include <synchapi.h>
 #include <timezoneapi.h>
 #include <winnt.h>
-#include <iostream>
 #include <winreg.h>
 #include "CSOL24H_EXCEPT.hpp"
-#include "GameState.hpp"
+#include "InGameState.hpp"
 #include "Command.hpp"
 #include "Console.hpp"
 
@@ -154,13 +153,13 @@ void CSOL24H::InitializeWatchGameProcessThread()
     wcscat_s(pwsTCGameExePath.get(), cchSize, setup.get()); /* "C:\Program Files (x86)\TCGame */
     wcscat_s(pwsTCGameExePath.get(), cchSize, L"\\TCGame.exe"); /* "C:\Program Files (x86)\TCGame\TCGame.exe */
     wcscat_s(pwsTCGameExePath.get(), cchSize, L"\""); /* "C:\Program Files (x86)\TCGame\TCGame.exe" */
-    ConsoleLog("TCGame 所在路径：%ls", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, pwsTCGameExePath.get());
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "TCGame 所在路径：%ls", pwsTCGameExePath.get());
     /* 启动 CSOL 的命令行 */
     cchSize = cchSize + wcslen(L" cso") + 8; /* "C:\Program Files (x86)\TCGame\TCGame.exe" cso */
     pwsTCGRunCSOCmd = std::shared_ptr<wchar_t[]>(new wchar_t[cchSize]);
     wcscpy_s(pwsTCGRunCSOCmd.get(), cchSize, pwsTCGameExePath.get());
     wcscat_s(pwsTCGRunCSOCmd.get(), cchSize, L" cso");
-    ConsoleLog("启动 CSOL 使用的命令行：%ls", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, pwsTCGRunCSOCmd.get());
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "启动 CSOL 使用的命令行：%ls", pwsTCGRunCSOCmd.get());
     game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN; /* 游戏进程状态设定为未知 */
     hEnableWatchGameProcessEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     if (!hEnableWatchGameProcessEvent)
@@ -278,8 +277,8 @@ void CSOL24H::Initialize()
     InitializeLocateCursorThread();
     InitializeHandleHotKeyMessageThread();
     bInitialize = true;
-    ConsoleLog("初始化完成", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
-    ConsoleLog("本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "初始化完成");
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本集成工具由 _CoreDump 开发。B 站 ID：_CoreDump，联系邮箱：ttyuig@126.com。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。");
 }
 
 void CSOL24H::Run()
@@ -315,7 +314,7 @@ void CSOL24H::Run()
             TRUE,
             INFINITE
         );
-        ConsoleLog("各线程退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+        ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "各线程退出。");
     }
 }
 
