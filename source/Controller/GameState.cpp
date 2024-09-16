@@ -177,7 +177,8 @@ void CSOL24H::ResolveGameStateFromErrorLog() noexcept
         std::strftime(log_time_string, sizeof(log_time_string), "%Y/%m/%d %H:%M:%S", &log_tm);
         std::strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
         ConsoleLog(level, "%s（更新于：%s，记录于：%s）。", msg, current_time_string, log_time_string);
-        if(bShowWindow && hGameWindow) ShowWindow(hGameWindow, SW_SHOW); /* 游戏窗口最小化 */
+        if (bShowWindow) ShowWindow(hGameWindow, SW_NORMAL);
+        else if (!bShowWindow) ShowWindow(hGameWindow, SW_MINIMIZE);
     }
     bGameErrorLogBufferResolved = true;
 }
@@ -191,6 +192,7 @@ void CSOL24H::MaintainGameState() noexcept
     const char* msg = nullptr;
     ENUM_CONSOLE_LOG_LEVEL level;
     bool bHasGameStateUpdated = false;
+    bool bShowWindow = true;
     current_timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
     if (in_game_state.get_state() == ENUM_IN_GAME_STATE::IGS_LOADING 
         && current_timestamp - in_game_state.get_timestamp() > 10
@@ -216,7 +218,7 @@ void CSOL24H::MaintainGameState() noexcept
     {
         if (IsWindow(hGameWindow))
         {
-            ShowWindow(hGameWindow, SW_SHOW);
+            ShowWindow(hGameWindow, SW_NORMAL);
             auto TopmostWindow = reinterpret_cast<void(*)(HWND)>(GetProcAddress(hGamingToolModule, "TopmostWindow"));
             if (TopmostWindow) TopmostWindow(hGameWindow);
             ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "将游戏窗口置顶。");
@@ -257,7 +259,7 @@ void CSOL24H::MaintainGameState() noexcept
         char current_time_string[32];
         std::strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &tm);
         ConsoleLog(level, "%s（更新于：%s）", msg, current_time_string);
-        if (IsWindow(hGameWindow)) ShowWindow(hGameWindow, SW_SHOW);
+        if (bShowWindow) ShowWindow(hGameWindow, SW_NORMAL);
     }
 }
 
