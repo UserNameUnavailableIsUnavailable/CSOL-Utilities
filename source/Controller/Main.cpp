@@ -22,7 +22,7 @@ int main()
     }
     if (!IsRunningAsAdmin())
     {
-        ConsoleLog("控制器未以管理员权限启动，这会导致掉线重连失败。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING);
+        ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, "控制器未以管理员权限启动，这会导致掉线重连失败。");
     }
     try
     {
@@ -32,9 +32,9 @@ int main()
     catch (CSOL24H_EXCEPT e)
     {
         std::cout << e.what() << std::endl;
-        ConsoleLog("%s",ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, e.what());
+        ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "%s", e.what());
         CSOL24H::Destroy();
-        ConsoleLog("程序无法继续运行。按任意键退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+        ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "程序无法继续运行。按任意键退出。");
         std::getchar();
     }
     /* finally */

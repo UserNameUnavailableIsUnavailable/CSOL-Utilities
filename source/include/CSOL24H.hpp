@@ -1,5 +1,4 @@
 #pragma once
-#include "GameState.hpp"
 #include <Windows.h>
 #include <cstdint>
 #include <memory>
@@ -7,16 +6,14 @@
 #include <windef.h>
 #include <winreg.h>
 #include <string>
-#include "GameState.hpp"
+#include "InGameState.hpp"
 
-struct MessageTime
+enum ENUM_GAME_PROCESS_STATE
 {
-    int64_t SecondsSince1970;
-    int32_t MilliSeconds;
-    inline bool operator==(const MessageTime& mt)
-    {
-        return mt.MilliSeconds == this->MilliSeconds && mt.SecondsSince1970 == this->SecondsSince1970;
-    }
+    GPS_BEING_CREATED, /* 游戏进程正在被创建 */
+    GPS_RUNNING, /* 游戏进程正在运行 */
+    GPS_EXITED, /* 游戏进程退出 */
+    GPS_UNKNOWN, /* 尚未确认游戏进程状态 */
 };
 
 class CSOL24H
@@ -58,7 +55,7 @@ static DWORD CALLBACK WatchInGameState(LPVOID lpParam) noexcept;
 static DWORD CALLBACK WatchGameProcess(LPVOID lpParam) noexcept; /* 监视游戏进程状态 */
 static DWORD CALLBACK StopCSOBanner(LPVOID lpParam) noexcept;
 static void ResolveGameStateFromErrorLog() noexcept;
-static void CheckGameState() noexcept;
+static void MaintainGameState() noexcept;
 static void TransferGameState() noexcept;
 static DWORD HandleHotKey(LPVOID lpParam) noexcept; /* 监视热键 */
 static DWORD CombineParts(LPVOID lpParam) noexcept; /* 合成配件 */
