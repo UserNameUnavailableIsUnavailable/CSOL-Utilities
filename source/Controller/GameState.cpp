@@ -177,7 +177,7 @@ void CSOL24H::ResolveGameStateFromErrorLog() noexcept
         std::strftime(log_time_string, sizeof(log_time_string), "%Y/%m/%d %H:%M:%S", &log_tm);
         std::strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
         ConsoleLog(level, "%s（更新于：%s，记录于：%s）。", msg, current_time_string, log_time_string);
-        if(bShowWindow && hGameWindow) ShowWindow(hGameWindow, SW_MINIMIZE); /* 游戏窗口最小化 */
+        if(bShowWindow && hGameWindow) ShowWindow(hGameWindow, SW_SHOW); /* 游戏窗口最小化 */
     }
     bGameErrorLogBufferResolved = true;
 }
@@ -208,7 +208,6 @@ void CSOL24H::MaintainGameState() noexcept
         bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_MAP, current_timestamp); /* 状态由 LOADING 转为 MAP，时间戳更新为当前时刻 */
         msg =  "游戏场景加载达到预设最大时间";
         level = ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE;
-        ShowWindow(hGameWindow, SW_SHOW);
         Sleep(500); /* 预留缓冲时间 */
         auto TopmostWindow = reinterpret_cast<void(*)(HWND)>(GetProcAddress(hGamingToolModule, "TopmostWindow"));
         if (TopmostWindow) TopmostWindow(hGameWindow);
