@@ -1,8 +1,6 @@
 #include "CSOL24H.hpp"
-#include "CSOL24H_EXCEPT.hpp"
 #include <cstddef>
 #include <handleapi.h>
-#include <iostream>
 #include <Windows.h>
 #include <errhandlingapi.h>
 #include <minwinbase.h>
@@ -84,7 +82,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
         if (bWasWatchGameProcessStateThreadPaused)
         {
             if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED)
-                game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN;
+                game_process_state = ENUM_GAME_PROCESS_STATE::GPS_UNKNOWN; /* 重置状态机 */
             bWasWatchGameProcessStateThreadPaused = false;
         }
         Sleep(1000); /* 每隔 1 秒运行一次本线程 */
@@ -98,39 +96,39 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (dwGameProcessId == 0)
             {
-                ConsoleLog("获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", GetLastError());
                 return -1;
             }
-            hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwGameProcessId);
+            hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE |SYNCHRONIZE, FALSE, dwGameProcessId);
             if (!hGameProcess)
             {
-                ConsoleLog("尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", GetLastError());
                 return -1;
             }
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING; /* 跳转执行监测游戏进程运行状态的代码块 */
-            ConsoleLog("成功获取游戏进程信息。进程标识符：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, dwGameProcessId);
+            ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "成功获取游戏进程信息。进程标识符：%lu。", dwGameProcessId);
             SetEvent(hGameProcessRunningEvent);
         }
         else if (game_process_state == ENUM_GAME_PROCESS_STATE::GPS_RUNNING) /* 游戏进程正在运行 */
         {
             DWORD dwResult = WaitForSingleObject(hGameProcess, 0); /* 监测游戏进程状态 */
-            if (dwResult == WAIT_TIMEOUT) /* 本轮等待超时 */
-            {
-                continue;
-            }
-            else if (dwResult == WAIT_OBJECT_0) /* 进程结束 */
+            if (dwResult == WAIT_OBJECT_0) /* 进程结束 */
             {
                 ResetEvent(hGameProcessRunningEvent); /* 暂停监视游戏内状态 */
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_EXITED;
-                ConsoleLog("游戏进程退出。执行掉线重连。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏进程退出。执行掉线重连。");
                 CloseHandle(hGameProcess); /* 关闭已经退出的的游戏进程句柄 */
                 hGameProcess = NULL;
                 dwGameProcessId = 0;
                 hGameWindow = NULL;
             }
+            else if (dwResult == WAIT_TIMEOUT) /* 本轮等待超时 */
+            {
+                continue;
+            }
             else /* 等待失败 */
             {
-                ConsoleLog("hWatchGameProcess 线程运行遇到错误。错误代码：%lu。\r\n", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "hWatchGameProcess 线程运行遇到错误。错误代码：%lu。\r\n", GetLastError());
                 return -1;
             }
         }
@@ -157,11 +155,11 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             );
             if (bRet)
             {
-                ConsoleLog("等待游戏进程启动。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "等待游戏进程启动。");
             }
             else 
             {
-                ConsoleLog("通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。", ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, "通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。", GetLastError());
             }
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 跳转执行等待游戏进程启动的代码块 */
             if (tcg_process_info.dwProcessId != 0)
@@ -178,7 +176,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
                 CloseHandle(hGameProcess);
                 hGameProcess = NULL;
             }
-            ConsoleLog("游戏进程状态未知，检测游戏进程状态。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+            ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏进程状态未知，检测游戏进程状态。");
             hGameWindow = FindWindowW(NULL, L"Counter-Strike Online"); /* 尝试获取游戏进程窗口 */
             if (!hGameWindow)
             {
@@ -188,16 +186,16 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
             if (!dwGameProcessId)
             {
-                ConsoleLog("获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。", GetLastError());
                 break;
             }
-            hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwGameProcessId);
+            hGameProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE | SYNCHRONIZE, FALSE, dwGameProcessId);
             if (!hGameProcess)
             {
-                ConsoleLog("尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, GetLastError());
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_ERROR, "尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", GetLastError());
                 break;
             }
-            ConsoleLog("成功获取游戏进程信息。游戏进程标识符：%lu。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, dwGameProcessId);
+            ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "成功获取游戏进程信息。游戏进程标识符：%lu。", dwGameProcessId);
             game_process_state = ENUM_GAME_PROCESS_STATE::GPS_RUNNING;
             SetEvent(hGameProcessRunningEvent);
         }
@@ -210,6 +208,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
     }
     hGameWindow = 0;
     dwGameProcessId = 0;
-    ConsoleLog("线程 hWatchGameProcessThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 hWatchGameProcessThread 退出。");
     return 0;
 }

@@ -192,7 +192,7 @@ SpecialWeapon =
     -- 特殊武器圣翼皓印（或炽翼魔印）
     Weapon:new{
         name = "圣翼皓印/炽翼魔印",
-        switch_delay = Delay.LONG_LONG,
+        switch_delay = 750,
         number = Weapon.GRENADE ,
         purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.NINE},
         discharging = false, -- 是否在释放光印

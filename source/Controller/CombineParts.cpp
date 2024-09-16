@@ -15,6 +15,6 @@ DWORD CSOL24H::CombineParts(LPVOID lpParam) noexcept
         GiveCommand(LUA_CMD_COMBINE_PARTS);
         Sleep(1000);
     }
-    ConsoleLog("线程 hCombinePartsThread 退出。", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 hCombinePartsThread 退出。");
     return 0;
 }

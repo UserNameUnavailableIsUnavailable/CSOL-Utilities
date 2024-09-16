@@ -75,6 +75,7 @@ end
 ---选定角色，开始新一轮游戏。
 ---@return nil
 function Executor:choose_class()
+    Mouse:click_on(32767, 32767, 100) -- 点击屏幕中央以唤醒窗口
     if (Setting.CHOOSE_T_CLASS)
     then
         Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
@@ -139,7 +140,7 @@ function Executor:purchase_item(buy_button_x, buy_button_y)
     Mouse:click_on(Executor.buy_button_x, Executor.buy_button_y, 50)
     Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 50) -- 弹出界面选项
     Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 50) -- 弹出界面兑换按钮
-    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 400) -- 兑换后确认
+    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 750) -- 兑换后确认
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
 end
 

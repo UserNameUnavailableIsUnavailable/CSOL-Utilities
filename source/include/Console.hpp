@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include <iostream>
+#include <cstdio>
 
 extern HANDLE hConsoleMutex;
 
@@ -12,7 +12,7 @@ enum ENUM_CONSOLE_LOG_LEVEL
     CLL_ERROR
 };
 template <typename... ARG>
-int ConsoleLog(const char* fmt, ENUM_CONSOLE_LOG_LEVEL cll, const ARG&... args) noexcept
+int ConsoleLog(ENUM_CONSOLE_LOG_LEVEL cll, const char* fmt, const ARG&... args) noexcept
 {
     int ret;
     if (WAIT_OBJECT_0 == WaitForSingleObject(hConsoleMutex, INFINITE))

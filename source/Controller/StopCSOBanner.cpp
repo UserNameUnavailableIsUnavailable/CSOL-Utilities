@@ -18,8 +18,8 @@ DWORD CSOL24H::StopCSOBanner(LPVOID lpParam) noexcept
             TerminateProcess(hProc, -1);
             CloseHandle(hProc);
         }
-        Sleep(1500);
+        Sleep(1000);
     }
-    ConsoleLog("线程 hStopCSOBannerThread 退出", ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE);
+    ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 hStopCSOBannerThread 退出");
     return 0;
 }
