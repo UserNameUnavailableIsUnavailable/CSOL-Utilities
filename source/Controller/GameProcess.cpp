@@ -116,7 +116,7 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             {
                 ResetEvent(hGameProcessRunningEvent); /* 暂停监视游戏内状态 */
                 game_process_state = ENUM_GAME_PROCESS_STATE::GPS_EXITED;
-                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏进程退出。执行掉线重连。");
+                ConsoleLog(ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING, "游戏进程退出，执行掉线重连。");
                 CloseHandle(hGameProcess); /* 关闭已经退出的的游戏进程句柄 */
                 hGameProcess = NULL;
                 dwGameProcessId = 0;
