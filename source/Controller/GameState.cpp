@@ -132,7 +132,7 @@ void CSOL24H::ResolveGameStateFromErrorLog() noexcept
         else if (line.find("Return to room") != std::string::npos) /* 由于异常原因返回到游戏房间内 */
         {
             bHasGameStateUpdated = in_game_state.update(ENUM_IN_GAME_STATE::IGS_IN_ROOM, log_timestamp);
-            msg = "返回到游戏房间（异常情况）";
+            msg = "异常返回到游戏房间";
             level = ENUM_CONSOLE_LOG_LEVEL::CLL_WARNING;
             if (bHasGameStateUpdated) /* 更新成功，说明此状态是有效的新状态 */
             {
