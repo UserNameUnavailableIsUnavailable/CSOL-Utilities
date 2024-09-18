@@ -33,5 +33,6 @@
         "SetMouseDPITableIndex",
         "EnablePrimaryMouseButtonEvents",
         "SetSteeringWheelProperty"
-    ]
+    ],
+    "clangd.path": "C:\\toolchain\\MSYS2\\clang64\\bin\\clangd.exe"
 }
