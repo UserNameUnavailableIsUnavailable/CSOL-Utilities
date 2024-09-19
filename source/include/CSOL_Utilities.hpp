@@ -17,4 +17,5 @@ namespace CSOL_Utilities
         PURCHASE_ITEM,
         LOCATE_CURSOR,
     };
+    class CException;
 }

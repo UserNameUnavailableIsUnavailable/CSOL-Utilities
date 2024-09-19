@@ -7,9 +7,6 @@
 #include <filesystem>
 #include <fstream>
 
-/*C
-CCSOLUtilities 类，单例模式。
-C*/
 class CSOL_Utilities::CCommander
 {
 public:
@@ -24,7 +21,7 @@ private:
     CCommander& operator=(CCommander&) = delete;
     CCommander& operator=(CCommander&&) = delete;
 private:
-    static CCommander* s_controller;
+    static CCommander* s_Obj;
     /* 状态标志 */
     static std::mutex s_singletonStateMutex;
     bool m_bExitThreads = false;

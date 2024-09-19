@@ -4,7 +4,7 @@
 using namespace CSOL_Utilities;
 
 std::mutex CCommander::s_singletonStateMutex{ };
-CCommander* CCommander::s_controller{ nullptr };
+CCommander* CCommander::s_Controller{ nullptr };
 
 inline void CCommander::InitializeInstance(std::string sGameRootPath, std::string sGameLauncherPath)
 {
@@ -12,28 +12,28 @@ inline void CCommander::InitializeInstance(std::string sGameRootPath, std::strin
     {
         
     }
-    if (!s_controller)
+    if (!s_Controller)
     {
         std::lock_guard<std::mutex> lock_guard(s_singletonStateMutex); /* lock_guard 防止创建单例时的并发问题 */
-        if (!s_controller)
+        if (!s_Controller)
         {
-            s_controller = new CCommander(sGameRootPath, sGameLauncherPath);
+            s_Controller = new CCommander(sGameRootPath, sGameLauncherPath);
         }
     }
 }
 
 inline CCommander& CCommander::RetrieveObject() noexcept
 {
-    return *s_controller;
+    return *s_Controller;
 }
 
 inline void CCommander::DestroyInstance() noexcept
 {
-    if (s_controller)
+    if (s_Controller)
     {
         std::lock_guard<std::mutex> lock_guard(s_singletonStateMutex);
-        delete s_controller;
-        s_controller = nullptr;
+        delete s_Controller;
+        s_Controller = nullptr;
     }
 }
 
