@@ -1,8 +1,8 @@
-#include "CController.hpp"
+#include "CCommander.hpp"
 
 using namespace CSOL_Utilities;
 
-void CController::WatchInGameState() noexcept
+void CCommander::WatchInGameState() noexcept
 {
-    
+    s_Obj->m_InGameStateWatcherSwitch.lock();   
 }
