@@ -18,24 +18,24 @@ enum ENUM_IN_GAME_STATE
 class InGameState
 {
 private:
-    ENUM_IN_GAME_STATE in_game_state;
-    int64_t timestamp;
+    ENUM_IN_GAME_STATE m_InGameState;
+    int64_t m_Timestamp;
 public:
-    InGameState() : in_game_state(ENUM_IN_GAME_STATE::IGS_UNKNOWN), timestamp(0) {};
-    InGameState(ENUM_IN_GAME_STATE state, int64_t ts) : in_game_state(state), timestamp(ts) {};
+    InGameState() : m_InGameState(ENUM_IN_GAME_STATE::IGS_UNKNOWN), m_Timestamp(0) {};
+    InGameState(ENUM_IN_GAME_STATE state, int64_t timestamp) : m_InGameState(state), m_Timestamp(timestamp) {};
     ~InGameState() = default;
     bool update(ENUM_IN_GAME_STATE in_game_state, int64_t timestamp) noexcept
     {
-        if (this->timestamp > timestamp) /* 不允许用旧状态覆盖新状态 */
+        if (this->m_Timestamp > timestamp) /* 不允许用旧状态覆盖新状态 */
         {
             return false;
         }
-        if (in_game_state == this->in_game_state && timestamp == this->timestamp) /* 对于完全相同的状态不执行更新 */
+        if (in_game_state == this->m_InGameState && timestamp == this->m_Timestamp) /* 对于完全相同的状态不执行更新 */
         {
             return false;
         }
-        this->in_game_state = in_game_state;
-        this->timestamp = timestamp;
+        this->m_InGameState = in_game_state;
+        this->m_Timestamp = timestamp;
         return true;
     }
     /*
@@ -45,29 +45,29 @@ public:
     */
     bool update(const InGameState& gs) noexcept
     {
-        if (gs.timestamp == 0) return false; /* 无效 GameState */
-        if (gs.timestamp > this->timestamp) return false; /* 尝试用旧状态覆盖新状态 */
+        if (gs.m_Timestamp == 0) return false; /* 无效 GameState */
+        if (gs.m_Timestamp > this->m_Timestamp) return false; /* 尝试用旧状态覆盖新状态 */
         if (gs == *this) return false; /* 两个 GameState 相同，无需更新 */
-        this->in_game_state = gs.in_game_state;
-        this->timestamp = gs.timestamp;
+        this->m_InGameState = gs.m_InGameState;
+        this->m_Timestamp = gs.m_Timestamp;
         return true;
     }
     inline bool operator==(const InGameState& gs) const
     {
-        return this->in_game_state == gs.in_game_state && this->timestamp == gs.timestamp;
+        return this->m_InGameState == gs.m_InGameState && this->m_Timestamp == gs.m_Timestamp;
     }
     inline bool operator!=(const InGameState& gs) const
     {
-        return this->timestamp != gs.timestamp || this->in_game_state != gs.in_game_state;
+        return this->m_Timestamp != gs.m_Timestamp || this->m_InGameState != gs.m_InGameState;
     }
     InGameState& operator=(const InGameState& gs)
     {
-        if (gs.timestamp == 0) return *this;
+        if (gs.m_Timestamp == 0) return *this;
         if (gs == *this) return *this; /* 两个 GameState 相同，无需更新 */
-        this->in_game_state = gs.in_game_state;
-        this->timestamp = gs.timestamp;
+        this->m_InGameState = gs.m_InGameState;
+        this->m_Timestamp = gs.m_Timestamp;
         return *this;
     }
-    inline ENUM_IN_GAME_STATE get_state() { return in_game_state; }
-    inline int64_t get_timestamp() { return timestamp; }
+    inline ENUM_IN_GAME_STATE get_state() { return m_InGameState; }
+    inline int64_t get_timestamp() { return m_Timestamp; }
 };

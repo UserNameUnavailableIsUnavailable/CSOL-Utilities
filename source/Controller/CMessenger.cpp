@@ -4,14 +4,14 @@
 CSOL_Utilities::CMessenger::CMessenger(std::filesystem::path file) :
 m_CommandFile(file),
 m_FileStream(m_CommandFile, std::ios::out),
-m_CommandString(QueryCommandString(COMMAND::NOP)),
+m_CommandString(QueryCommandString(COMMAND::CMD_NOP)),
 m_Mutex(),
 m_Buffer(new char[512])
 { }
 
 CSOL_Utilities::CMessenger::~CMessenger() noexcept
 {
-    assign(CSOL_Utilities::COMMAND::NOP).dispatch();
+    assign(CSOL_Utilities::COMMAND::CMD_NOP).dispatch();
     delete m_Buffer;
 }
 
@@ -35,8 +35,8 @@ constexpr const char* CSOL_Utilities::CMessenger::QueryCommandString(CSOL_Utilit
 {
     switch (cmd)
     {
-    case CSOL_Utilities::COMMAND::NOP: return u8"Command.CMD_NOP";
-    case CSOL_Utilities::COMMAND::START_GAME_ROOM: return u8"Command.CMD_START_GAME_ROOM";
+    case CSOL_Utilities::COMMAND::CMD_NOP: return u8"Command.CMD_NOP";
+    case CSOL_Utilities::COMMAND::CMD_START_GAME_ROOM: return u8"Command.CMD_START_GAME_ROOM";
     case CSOL_Utilities::COMMAND::CHOOSE_CLASS: return u8"Command.CMD_CHOOSE_CLASS";
     case CSOL_Utilities::COMMAND::PLAY_GAME_NORMAL: return u8"Command.CMD_PLAY_GAME_NORMAL";
     case CSOL_Utilities::COMMAND::PLAY_GAME_EXTEND: return u8"Command.CMD_PLAY_GAME_EXTEND";
