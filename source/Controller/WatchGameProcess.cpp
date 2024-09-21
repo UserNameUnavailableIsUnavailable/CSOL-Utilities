@@ -1,28 +1,46 @@
-#include "CCommander.hpp"
+#include "CController.hpp"
 #include "CConsole.hpp"
 #include <Windows.h>
 #include <chrono>
 #include <cstddef>
+#include <handleapi.h>
 #include <memory>
 #include <cwchar>
+#include <minwindef.h>
 #include <processthreadsapi.h>
 #include <thread>
+#include <winnt.h>
 
 using namespace CSOL_Utilities;
 
-void CCommander::WatchGameProcess() noexcept
+void CController::WatchGameProcess() noexcept
 {
     thread_local GAME_PROCESS_STATE game_process_state{ GAME_PROCESS_STATE::GPS_UNKNOWN };
     thread_local DWORD dwGameProcessId{ 0 };
-    thread_local HANDLE hGameProcess;
+    thread_local HANDLE hGameProcess{ nullptr };
     const auto& launcher_path = s_Instance->m_GameLauncherPath.wstring();
     std::size_t cmd_length = launcher_path.length() + 32;
     thread_local std::unique_ptr<wchar_t[]> cmd(new wchar_t[cmd_length]);
+    thread_local HWND hCSOBannerWnd{ nullptr };
     _swprintf_p(cmd.get(), cmd_length, L"\"%ls\" cso", launcher_path.c_str());
     while (!s_Instance->m_bExitThreads)
     {
         s_Instance->m_GameProcessWatcherSwitch.Wait();
         s_Instance->m_GameProcessWatcherFinished.Reset();
+        /* 检测 CSOBanner 是否在运行 */
+        hCSOBannerWnd = FindWindowW(NULL, L"CSOBanner");
+        DWORD dwCSOBannerPId{ 0 };
+        HANDLE hCSOBannerProcess{ nullptr };
+        if (hCSOBannerWnd) {
+            GetWindowThreadProcessId(hCSOBannerWnd, &dwCSOBannerPId);
+        }
+        if (dwCSOBannerPId) {   
+            hCSOBannerProcess = OpenProcess(PROCESS_TERMINATE, FALSE, dwCSOBannerPId);
+        }
+        if (hCSOBannerProcess) {
+            TerminateProcess(hCSOBannerProcess, -1);
+            CloseHandle(hCSOBannerProcess);
+        }
         /* 如果本线程曾被挂起（模式切换），挂起后游戏启动，用户手动结束游戏，那么将导致状态机无法更新，故需要按下述方式处理 */
         if (s_Instance->m_bWasGameProcessWatcherInterrupted) {
             if (game_process_state == GAME_PROCESS_STATE::GPS_BEING_CREATED) {
@@ -59,6 +77,7 @@ void CCommander::WatchGameProcess() noexcept
                 hGameProcess = nullptr;
                 dwGameProcessId = 0;
             } else if (dwResult == WAIT_TIMEOUT) { /* 本轮等待超时 */
+                SetWindowPos(s_Instance->m_hGameWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
                 continue;
             } else { /* 等待失败 */
                 CConsole::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "m_GameProcessWatcher 运行遇到错误。错误代码：%lu。\r\n", GetLastError());
@@ -123,4 +142,5 @@ void CCommander::WatchGameProcess() noexcept
         hGameProcess = nullptr;
     }
     CConsole::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 m_GameProcessWatcher 退出。");
+    s_Instance->m_bThreadExit.Set();
 }

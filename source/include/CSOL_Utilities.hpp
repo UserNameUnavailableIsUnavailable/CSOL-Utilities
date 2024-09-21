@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <Windows.h>
+
 namespace CSOL_Utilities
 {
-    class CCommander;
-    class CMessenger;
     enum COMMAND
     {
         CMD_NOP,
@@ -12,7 +13,7 @@ namespace CSOL_Utilities
         CMD_PLAY_GAME_NORMAL,
         CMD_PLAY_GAME_EXTEND,
         CMD_TRY_CONFIRM_RESULT,
-        CMD_CREATE_ROOM,
+        CMD_CREATE_GAME_ROOM,
         CMD_COMBINE_PARTS,
         CMD_PURCHASE_ITEM,
         CMD_LOCATE_CURSOR,
@@ -42,9 +43,8 @@ namespace CSOL_Utilities
         CLL_WARNING,
         CLL_ERROR
     };
-    class CInGameState;
-    class CException;
-    class CDateTime;
-    class CEvent;
-    class CEventList;
+    std::shared_ptr<wchar_t[]> ConvertUtf8ToUtf16(const char* string);
+    std::shared_ptr<char[]> ConvertUtf16ToUtf8(const wchar_t* string);
+    std::shared_ptr<wchar_t[]> QueryRegistryStringItem(HKEY hPredefinedTopDir, LPCWSTR lpSubDir, LPCWSTR lpItemName);
+    BOOL IsRunningAsAdmin() noexcept;
 }

@@ -1,5 +1,6 @@
 #include "CConsole.hpp"
 #include "CException.hpp"
+#include <iostream>
 #include <clocale>
 
 using namespace CSOL_Utilities;
@@ -10,18 +11,15 @@ int CConsole::Log(CONSOLE_LOG_LEVEL level, const char* string) noexcept
 {
     int ret;
     if (level == CONSOLE_LOG_LEVEL::CLL_MESSAGE) {
-        std::puts("【消息】");
-        std::puts(string);
-        std::puts("\r\n");
+        std::cout << "【消息】" << string << std::endl;
     } else if (level == CONSOLE_LOG_LEVEL::CLL_WARNING) {
-        std::puts("\x1b[93m【警告】"); /* 黄色字体打印警告 */
-        ret = std::puts(string);
-        std::puts("\x1b[39m\r\n");
+        std::cout << "\x1b[93m【警告】" /* 黄色字体打印警告 */
+        << string << "x1b[39m" << std::endl;
     } else if (level == CONSOLE_LOG_LEVEL::CLL_ERROR) {
-        std::puts("\x1b[91m【错误】"); /* 红色字体打印错误 */
-        ret = std::puts(string);
-        std::puts("\x1b[39m\r\n");
+        std::cout << "\x1b[91m【错误】" /* 红色字体打印错误 */
+            << string << "\x1b[39m" << std::endl;
     } 
+    std::cout.flush();
     return ret;
 }
 

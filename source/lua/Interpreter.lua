@@ -53,7 +53,7 @@ function Interpreter()
         then
             Executor:locate_cursor()
         end
-        Runtime:sleep(10)
+        Runtime:sleep(50)
         previous_command = Cmd -- 更新上一次命令
     end
 end
