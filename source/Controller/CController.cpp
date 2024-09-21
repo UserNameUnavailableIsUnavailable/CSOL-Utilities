@@ -62,7 +62,7 @@ m_Messenger(std::filesystem::current_path()/"Executor"/"$~cmd.lua")
     _get_timezone(&bias);
     m_Bias = bias;
     /* 线程在构造列表初始化完成后才进行创建（线程运行依赖于大量默认构造的互斥体、条件变量、事件） */
-    // m_HotKeyEventHandler = std::thread(HandleHotKeyEvent);
+    m_HotKeyEventHandler = std::thread(HandleHotKeyEvent);
     m_InGameStateWatcher = std::thread(WatchInGameState);
     m_GameProcessWatcher = std::thread(WatchGameProcess);
     m_FixedCommandDispatcher = std::thread(DispatchFixedCommand, std::ref(m_Command));
