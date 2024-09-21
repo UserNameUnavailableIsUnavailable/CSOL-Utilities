@@ -47,26 +47,26 @@ std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::
         millisecond = std::atoi(match[4].str().c_str());
         std::int32_t time_elapsed_since_midnight = hour * 3600 + minute * 60 + second;
         std::int32_t utc_time_elapsed_since_midnight = time_elapsed_since_midnight - time_bias;
-        if (utc_time_elapsed_since_midnight < 0) /* UTC 比本地少一天 */
-        {
-            utc_time_elapsed_since_midnight += 24 * 60 * 60;
-        }
-        else if (utc_time_elapsed_since_midnight == 0) /* UTC 时间为 00:00:00 */
-        {
+        // if (utc_time_elapsed_since_midnight < 0) /* UTC 比本地少一天 */
+        // {
+        //     utc_time_elapsed_since_midnight += 24 * 60 * 60;
+        // }
+        // else if (utc_time_elapsed_since_midnight == 0) /* UTC 时间为 00:00:00 */
+        // {
 
-        }
-        else if (0 < utc_time_elapsed_since_midnight && utc_time_elapsed_since_midnight < 24 * 60 * 60)
-        {
+        // }
+        // else if (0 < utc_time_elapsed_since_midnight && utc_time_elapsed_since_midnight < 24 * 60 * 60)
+        // {
 
-        }
-        else if (utc_time_elapsed_since_midnight == 24 * 60 * 60) /* UTC 时间为 24:00，取模后为 00:00 */
-        {
-            utc_time_elapsed_since_midnight = 0;
-        }
-        else /* > 24 * 60 * 60，UTC 比本地多一天 */
-        {
-            utc_time_elapsed_since_midnight -= 24 * 60 * 60;
-        }
+        // }
+        // else if (utc_time_elapsed_since_midnight == 24 * 60 * 60) /* UTC 时间为 24:00，取模后为 00:00 */
+        // {
+        //     utc_time_elapsed_since_midnight = 0;
+        // }
+        // else /* > 24 * 60 * 60，UTC 比本地多一天 */
+        // {
+        //     utc_time_elapsed_since_midnight -= 24 * 60 * 60;
+        // }
         ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_time_elapsed_since_midnight /* UTC 自从 00:00:00 以来经过的时间 */;
     }
     if (p_ms) *p_ms = millisecond;

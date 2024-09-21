@@ -3,8 +3,9 @@
 #include "CSOL_Utilities.hpp"
 #include "CInGameState.hpp"
 #include "CMessenger.hpp"
+#ifdef WIN32
 #include <Windows.h>
-#include <minwindef.h>
+#endif
 #include <thread>
 #include <mutex>
 #include <filesystem>
