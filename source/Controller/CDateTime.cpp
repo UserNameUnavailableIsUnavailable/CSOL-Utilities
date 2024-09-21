@@ -25,17 +25,17 @@ bool CDateTime::IsLeap(uint32_t year) noexcept
 /*
 @brief 将消息中的时间解析为 UNIX 时间戳（调整为 UTC 标准时）。
 @param `message` 消息。
-@param `midnight_timestamp` 该消息发送当日午夜时间戳（当日 00:00）。
+@param `midnight_timestamp` 该消息发送当日午夜时间戳（LTC 00:00）。
 @param `p_ms` 消息中包含的毫秒。
-@param `time_bias` 时差，time_bias = UTC - local_time。
+@param `time_bias` 时差，time_bias = LTC - UTC
 @return 成功时返回时间戳，失败时返回 `0`。
 */
 std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
 {
     static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
     std::smatch match;
-    int32_t hour = 0, minute = 0, second = 0, millisecond = 0;
-    int64_t ret;
+    std::int32_t hour = 0, minute = 0, second = 0, millisecond = 0;
+    std::time_t ret{ 0 };
     if (
         std::regex_search(message, match, time_pattern) &&
         match.size() - 1 == 4 /* 时、分、秒、毫秒 */
@@ -45,8 +45,8 @@ std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::
         minute = std::atoi(match[2].str().c_str());
         second = std::atoi(match[3].str().c_str());
         millisecond = std::atoi(match[4].str().c_str());
-        int32_t time_elapsed_since_midnight = hour * 3600 + minute * 60 + second;
-        int32_t utc_time_elapsed_since_midnight = time_elapsed_since_midnight + time_bias;
+        std::int32_t time_elapsed_since_midnight = hour * 3600 + minute * 60 + second;
+        std::int32_t utc_time_elapsed_since_midnight = time_elapsed_since_midnight - time_bias;
         if (utc_time_elapsed_since_midnight < 0) /* UTC 比本地少一天 */
         {
             utc_time_elapsed_since_midnight += 24 * 60 * 60;
@@ -67,7 +67,7 @@ std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::
         {
             utc_time_elapsed_since_midnight -= 24 * 60 * 60;
         }
-        ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_time_elapsed_since_midnight /* UTC 自从00:00:00 以来经过的时间 */;
+        ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_time_elapsed_since_midnight /* UTC 自从 00:00:00 以来经过的时间 */;
     }
     if (p_ms) *p_ms = millisecond;
     return ret;

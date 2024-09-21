@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <cstdio>
 #include <mutex>
+#include <iostream>
+#include <random>
 
 namespace CSOL_Utilities
 {
@@ -29,6 +31,7 @@ namespace CSOL_Utilities
                 ret = std::printf(fmt, args...);
                 std::printf("\x1b[39m\r\n");
             }
+            std::fflush(stdout);
             return ret;
         };
     private:

@@ -29,7 +29,7 @@ Test:
 Controller:
 	New-Item -Type Directory -Path $(BUILD)/$@ -Force
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
-	clang++ -g $(BUILD)/Controller.obj -o $(BUILD)/Controller.exe
+	clang++ -g3 $(BUILD)/Controller.obj -o $(BUILD)/Controller.exe
 docs:
 	New-Item -Type Directory -Force -Path $(BUILD)/$@
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex

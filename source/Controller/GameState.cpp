@@ -336,8 +336,6 @@ void CSOL24H::UpdateErrorLogBuffer()
 void CSOL24H::DispatchCommand() noexcept
 {
     int64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); /* 获取时间戳 */
-    static int64_t last_confirm_time = 0;
-    bool need_confirm = false;
     const char* cmd = LUA_CMD_NOP;
     auto state = in_game_state.get_state();
     if (state == ENUM_IN_GAME_STATE::IGS_LOADING)

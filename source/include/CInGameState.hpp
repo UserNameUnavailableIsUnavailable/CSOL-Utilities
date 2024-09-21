@@ -69,8 +69,8 @@ namespace CSOL_Utilities
         CInGameState& operator=(const CInGameState &gs) {
                 return update(gs);
         }
-        inline auto GetState() { return m_InGameState; }
-        inline auto GetTimestamp() { return m_Timestamp; }
-        inline auto IsLastUpdateSuccessful() { return m_LastUpdateOk; }
+        inline auto GetState() const { return m_InGameState; }
+        inline auto GetTimestamp() const { return m_Timestamp; }
+        inline auto IsLastUpdateSuccessful() const { return m_LastUpdateOk; }
     };
 };
