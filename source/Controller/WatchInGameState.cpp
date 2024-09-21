@@ -4,6 +4,7 @@
 #include "CConsole.hpp"
 #include "CEventList.hpp"
 #include <Windows.h>
+#include <__support/win32/locale_win32.h>
 #include <cctype>
 #include <chrono>
 #include <cstddef>
@@ -172,22 +173,24 @@ CInGameState& CController::ResolveState()
         }
     }
     std::time_t file_time(std::chrono::duration_cast<std::chrono::seconds>(last_resolve_time.time_since_epoch()).count());
-    std::tm file_tm;
     std::time_t utc_midnight_time = file_time / (24 * 60 * 60) * (24 * 60 * 60);
     state_time = updated ? 
     CDateTime::ResolveMessageTimeStamp(line, utc_midnight_time, nullptr, CDateTime::GetTimeBias()) :
     current_time;
-    // CConsole::Log(CLL_MESSAGE, "%lld", state_time);
+    if (updated) CConsole::Log(CLL_MESSAGE, "%lld", state_time);
     if (in_game_state.update(state_literal, state_time).IsLastUpdateSuccessful()) {
         std::tm state_tm;
         std::tm current_tm;
         char state_time_string[32];
         char current_time_string[32];
-        localtime_s(&state_tm, &state_time);
         localtime_s(&current_tm, &current_time);
-        std::strftime(state_time_string, sizeof(state_time_string), "%Y/%m/%d %H:%M:%S", &state_tm);
-        std::strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
-        CConsole::Log(level,"当前时间：%s，状态迁移时间：%s。内容：%s。", current_time_string, state_time_string, message);
+        localtime_s(&state_tm, &state_time);
+        strftime(state_time_string, sizeof(state_time_string), "%Y/%m/%d %H:%M:%S", &state_tm);
+        strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
+        CConsole::Log(level,"当前时间：%lld（%d/%d/%d %d:%d:%d），状态迁移时间：%lld（%d/%d/%d %d:%d:%d）。内容：%s。",
+        current_time, current_tm.tm_year + 1900, current_tm.tm_mon + 1, current_tm.tm_mday, current_tm.tm_hour, current_tm.tm_min, current_tm.tm_sec,
+        state_time, state_tm.tm_year + 1900, state_tm.tm_mon + 1, state_tm.tm_mday, state_tm.tm_hour, state_tm.tm_min, state_tm.tm_sec,
+        message);
     }
     return in_game_state;
 }
