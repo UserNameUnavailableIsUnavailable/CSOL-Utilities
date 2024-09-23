@@ -173,9 +173,9 @@ CInGameState& CController::ResolveState()
         }
     }
     std::time_t file_time(std::chrono::duration_cast<std::chrono::seconds>(last_resolve_time.time_since_epoch()).count());
-    std::time_t utc_midnight_time = file_time / (24 * 60 * 60) * (24 * 60 * 60);
+    std::time_t utc_midnight_time = file_time / (24 * 60 * 60) * (24 * 60 * 60); /* 当日午夜时间 */
     state_time = updated ? 
-    CDateTime::ResolveMessageTimeStamp(line, utc_midnight_time, nullptr, CDateTime::GetTimeBias()) :
+    CDateTime::ResolveMessageTimestamp(line, utc_midnight_time, nullptr, CDateTime::GetTimeBias()) :
     current_time;
     if (updated) CConsole::Log(CLL_MESSAGE, "%lld", state_time);
     if (in_game_state.update(state_literal, state_time).IsLastUpdateSuccessful()) {

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "CSOL_Utilities.hpp"
+#include <string>
 #include <cstdio>
+#include <sal.h>
 #include <exception>
 
 namespace CSOL_Utilities
@@ -11,15 +12,15 @@ namespace CSOL_Utilities
     public:
         CException(const char* detail)
         {
-            strcpy_s(m_Detail, detail);
+            std::strcpy(m_Detail, detail);
         }
         template<typename... VARARG>
-        CException(const char* fmt, VARARG... args)
+        CException(_Printf_format_string_ const char* fmt, VARARG... args)
         {
             std::snprintf(m_Detail, sizeof(m_Detail), fmt, args...);
         }
         const char* what() const noexcept override { return m_Detail; };
     private:
-        char m_Detail[256];
+        char m_Detail[512];
     };
 };

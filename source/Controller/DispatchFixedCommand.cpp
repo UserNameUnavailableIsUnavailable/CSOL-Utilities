@@ -7,7 +7,7 @@
 
 using namespace CSOL_Utilities;
 
-void CController::DispatchFixedCommand(const COMMAND& command) noexcept
+void CController::DispatchFixedCommand(COMMAND& command) noexcept
 {
     while (!s_Instance->m_bExitThreads) {
         s_Instance->m_FixedCommandDispatcherSwitch.Wait();
