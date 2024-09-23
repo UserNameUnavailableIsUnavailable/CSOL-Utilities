@@ -2,6 +2,7 @@
 #include <ctime>
 #include <string>
 #include <regex>
+#include <timezoneapi.h>
 
 using namespace CSOL_Utilities;
 
@@ -27,10 +28,10 @@ bool CDateTime::IsLeap(uint32_t year) noexcept
 @param `message` 消息。
 @param `midnight_timestamp` 该消息发送当日午夜时间戳（LTC 00:00）。
 @param `p_ms` 消息中包含的毫秒。
-@param `time_bias` 时差，time_bias = LTC - UTC
+@param `time_bias` 时差，time_bias = LTC - UTC，如东八区（UTC + 08:00）时差为 8 * 60 * 60 = 28800
 @return 成功时返回时间戳，失败时返回 `0`。
 */
-std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
+std::time_t CDateTime::ResolveMessageTimestamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
 {
     static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
     std::smatch match;
@@ -45,29 +46,17 @@ std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::
         minute = std::atoi(match[2].str().c_str());
         second = std::atoi(match[3].str().c_str());
         millisecond = std::atoi(match[4].str().c_str());
-        std::int32_t time_elapsed_since_midnight = hour * 3600 + minute * 60 + second;
-        std::int32_t utc_time_elapsed_since_midnight = time_elapsed_since_midnight - time_bias;
-        // if (utc_time_elapsed_since_midnight < 0) /* UTC 比本地少一天 */
-        // {
-        //     utc_time_elapsed_since_midnight += 24 * 60 * 60;
-        // }
-        // else if (utc_time_elapsed_since_midnight == 0) /* UTC 时间为 00:00:00 */
-        // {
-
-        // }
-        // else if (0 < utc_time_elapsed_since_midnight && utc_time_elapsed_since_midnight < 24 * 60 * 60)
-        // {
-
-        // }
-        // else if (utc_time_elapsed_since_midnight == 24 * 60 * 60) /* UTC 时间为 24:00，取模后为 00:00 */
-        // {
-        //     utc_time_elapsed_since_midnight = 0;
-        // }
-        // else /* > 24 * 60 * 60，UTC 比本地多一天 */
-        // {
-        //     utc_time_elapsed_since_midnight -= 24 * 60 * 60;
-        // }
-        ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_time_elapsed_since_midnight /* UTC 自从 00:00:00 以来经过的时间 */;
+        std::int32_t ltc_day_time = hour * 3600 + minute * 60 + second;
+        std::int32_t utc_day_time = ltc_day_time - time_bias;
+        if (utc_day_time < 0) /* UTC 比本地少一天 */
+        {
+            utc_day_time += 24 * 60 * 60;
+        }
+        else if (utc_day_time > 24 * 60 * 60) /* > 24 * 60 * 60，UTC 比本地多一天 */
+        {
+            utc_day_time -= 24 * 60 * 60;
+        }
+        ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_day_time /* UTC 自从 00:00:00 以来经过的时间 */;
     }
     if (p_ms) *p_ms = millisecond;
     return ret;
@@ -121,9 +110,12 @@ std::time_t CDateTime::GetUNIXTimestamp(uint32_t year, uint32_t month, uint32_t 
     return ret;
 }
 
+/*
+@brief 获取本地时间与世界标准时的时差
+*/
 std::time_t CDateTime::GetTimeBias() noexcept
 {
-    long bias;
-    _get_timezone(&bias);
-    return bias;
+    TIME_ZONE_INFORMATION tzi{ };
+    GetTimeZoneInformation(&tzi);
+    return tzi.Bias * 60;
 }

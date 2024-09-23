@@ -61,6 +61,6 @@ namespace CSOL_Utilities
         std::thread m_FixedCommandDispatcher;
         COMMAND m_Command{ COMMAND::CMD_NOP };
         CMannualEvent m_FixedCommandDispatcherFinished;
-        static void DispatchFixedCommand(const COMMAND& command) noexcept;
+        static void DispatchFixedCommand(COMMAND& command) noexcept;
     };
 };
