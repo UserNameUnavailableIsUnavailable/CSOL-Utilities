@@ -177,7 +177,6 @@ CInGameState& CController::ResolveState()
     state_time = updated ? 
     CDateTime::ResolveMessageTimestamp(line, utc_midnight_time, nullptr, CDateTime::GetTimeBias()) :
     current_time;
-    if (updated) CConsole::Log(CLL_MESSAGE, "%lld", state_time);
     if (in_game_state.update(state_literal, state_time).IsLastUpdateSuccessful()) {
         std::tm state_tm;
         std::tm current_tm;
@@ -187,9 +186,8 @@ CInGameState& CController::ResolveState()
         localtime_s(&state_tm, &state_time);
         strftime(state_time_string, sizeof(state_time_string), "%Y/%m/%d %H:%M:%S", &state_tm);
         strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
-        CConsole::Log(level,"当前时间：%lld（%d/%d/%d %d:%d:%d），状态迁移时间：%lld（%d/%d/%d %d:%d:%d）。内容：%s。",
-        current_time, current_tm.tm_year + 1900, current_tm.tm_mon + 1, current_tm.tm_mday, current_tm.tm_hour, current_tm.tm_min, current_tm.tm_sec,
-        state_time, state_tm.tm_year + 1900, state_tm.tm_mon + 1, state_tm.tm_mday, state_tm.tm_hour, state_tm.tm_min, state_tm.tm_sec,
+        CConsole::Log(level,"当前时间：%s，状态迁移时间：%s。内容：%s。",
+        current_time_string, state_time_string,
         message);
     }
     return in_game_state;
