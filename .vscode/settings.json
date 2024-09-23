@@ -34,5 +34,6 @@
         "EnablePrimaryMouseButtonEvents",
         "SetSteeringWheelProperty"
     ],
-    "clangd.path": "C:\\toolchain\\MSYS2\\clang64\\bin\\clangd.exe"
+    "clangd.path": "C:\\toolchain\\MSYS2\\clang64\\bin\\clangd.exe",
+    "vscode-neovim.neovimExecutablePaths.win32": "C:\\toolchain\\MSYS2\\clang64\\bin\\nvim.exe"
 }

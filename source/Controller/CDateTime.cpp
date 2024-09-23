@@ -31,7 +31,7 @@ bool CDateTime::IsLeap(uint32_t year) noexcept
 @param `time_bias` 时差，time_bias = LTC - UTC，如东八区（UTC + 08:00）时差为 8 * 60 * 60 = 28800
 @return 成功时返回时间戳，失败时返回 `0`。
 */
-std::time_t CDateTime::ResolveMessageTimestamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
+std::time_t CDateTime::ResolveMessageTimeStamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
 {
     static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
     std::smatch match;
@@ -111,11 +111,11 @@ std::time_t CDateTime::GetUNIXTimestamp(uint32_t year, uint32_t month, uint32_t 
 }
 
 /*
-@brief 获取本地时间与世界标准时的时差
+@brief 获取本地时间与世界标准时的时差 bias = LTC - UTC
 */
 std::time_t CDateTime::GetTimeBias() noexcept
 {
     TIME_ZONE_INFORMATION tzi{ };
     GetTimeZoneInformation(&tzi);
-    return tzi.Bias * 60;
+    return -tzi.Bias * 60;
 }
