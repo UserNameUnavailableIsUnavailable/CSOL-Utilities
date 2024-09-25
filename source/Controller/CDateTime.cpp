@@ -111,11 +111,11 @@ std::time_t CDateTime::GetUNIXTimestamp(uint32_t year, uint32_t month, uint32_t 
 }
 
 /*
-@brief 获取本地时间与世界标准时的时差
+@brief 获取本地时间与世界标准时的时差 bias = LTC - UTC。
 */
 std::time_t CDateTime::GetTimeBias() noexcept
 {
     TIME_ZONE_INFORMATION tzi{ };
     GetTimeZoneInformation(&tzi);
-    return tzi.Bias * 60;
+    return -tzi.Bias * 60;
 }
