@@ -24,7 +24,7 @@ namespace CSOL_Utilities
             m_Signal = false;
         }
         /* 在等待前探测 m_Signal 的值，以确定自身是否将会被挂起 */
-        bool PeekBeforeWait()
+        bool PeekAndWait()
         {
             bool wait_needed{ false };
             std::unique_lock<std::mutex> unique_lock(m_Mutex);
