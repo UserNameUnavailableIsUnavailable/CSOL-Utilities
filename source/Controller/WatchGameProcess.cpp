@@ -10,6 +10,7 @@
 #include <processthreadsapi.h>
 #include <thread>
 #include <winnt.h>
+#include <locale>
 
 using namespace CSOL_Utilities;
 
@@ -18,11 +19,11 @@ void CController::WatchGameProcess() noexcept
     thread_local GAME_PROCESS_STATE game_process_state{ GAME_PROCESS_STATE::GPS_UNKNOWN };
     thread_local DWORD dwGameProcessId{ 0 };
     thread_local HANDLE hGameProcess{ nullptr };
-    const auto& launcher_path = s_Instance->m_GameLauncherPath.wstring();
-    std::size_t cmd_length = launcher_path.length() + 32;
-    thread_local std::unique_ptr<wchar_t[]> cmd(new wchar_t[cmd_length]);
+    std::setlocale(LC_ALL, ".UTF-8");
+    auto launcher_path = "\"" + (s_Instance->m_GameLauncherPath/L"TCGame.exe").u8string() + "\"" + " cso";
+    thread_local auto cmd = ConvertUtf8ToUtf16(launcher_path.c_str());
     thread_local HWND hCSOBannerWnd{ nullptr };
-    _swprintf_p(cmd.get(), cmd_length, L"\"%ls\" cso", launcher_path.c_str());
+    CConsole::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏启动命令：%ls", cmd.get());
     while (!s_Instance->m_bExitThreads)
     {
         s_Instance->m_GameProcessWatcherSwitch.Wait();
