@@ -1,5 +1,5 @@
-#include "CController.hpp"
 #include "CConsole.hpp"
+#include "CController.hpp"
 #include "CMessenger.hpp"
 #include <Windows.h>
 #include <chrono>
@@ -7,15 +7,19 @@
 
 using namespace CSOL_Utilities;
 
-void CController::DispatchFixedCommand(COMMAND& command) noexcept
+void CController::DispatchFixedCommand(COMMAND &command) noexcept
 {
-    while (true) {
+    while (true)
+    {
         s_Instance->m_FixedCommandDispatcherSwitch.Wait();
-        if (s_Instance->m_ExitThreads) {
+        if (s_Instance->m_ExitThreads)
+        {
             break;
         }
         s_Instance->m_FixedCommandDispatcherFinished.Reset();
-        s_Instance->m_Messenger.AssignAndDispatch(command, std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+        s_Instance->m_Messenger.AssignAndDispatch(command, std::chrono::duration_cast<std::chrono::seconds>(
+                                                               std::chrono::system_clock::now().time_since_epoch())
+                                                               .count());
         s_Instance->m_FixedCommandDispatcherFinished.Set();
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

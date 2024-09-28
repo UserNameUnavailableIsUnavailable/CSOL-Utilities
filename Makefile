@@ -36,6 +36,8 @@ Docs:
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
 Web:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/ConfigWebPages -Recurse -Force
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Setting.html -Force
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Weapon.html -Force
 Pack:
 Clean:
 	Remove-Item -Force -Recurse -Path $(BUILD)

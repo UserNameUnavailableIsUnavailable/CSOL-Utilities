@@ -1,7 +1,8 @@
 #include "CDateTime.hpp"
 #include <ctime>
-#include <string>
+#include <filesystem>
 #include <regex>
+#include <string>
 #include <timezoneapi.h>
 
 using namespace CSOL_Utilities;
@@ -31,15 +32,14 @@ bool CDateTime::IsLeap(uint32_t year) noexcept
 @param `time_bias` 时差，time_bias = LTC - UTC，如东八区（UTC + 08:00）时差为 8 * 60 * 60 = 28800
 @return 成功时返回时间戳，失败时返回 `0`。
 */
-std::time_t CDateTime::ResolveMessageTimestamp(const std::string& message, std::time_t midnight_timestamp, uint32_t* p_ms, std::time_t time_bias) noexcept
+std::time_t CDateTime::ResolveMessageTimestamp(const std::string &message, std::time_t midnight_timestamp,
+                                               uint32_t *p_ms, std::time_t time_bias) noexcept
 {
     static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
     std::smatch match;
     std::int32_t hour = 0, minute = 0, second = 0, millisecond = 0;
-    std::time_t ret{ 0 };
-    if (
-        std::regex_search(message, match, time_pattern) &&
-        match.size() - 1 == 4 /* 时、分、秒、毫秒 */
+    std::time_t ret{0};
+    if (std::regex_search(message, match, time_pattern) && match.size() - 1 == 4 /* 时、分、秒、毫秒 */
     )
     {
         hour = std::atoi(match[1].str().c_str());
@@ -58,7 +58,8 @@ std::time_t CDateTime::ResolveMessageTimestamp(const std::string& message, std::
         }
         ret = midnight_timestamp /* UTC 当日 00:00:00 时间戳 */ + utc_day_time /* UTC 自从 00:00:00 以来经过的时间 */;
     }
-    if (p_ms) *p_ms = millisecond;
+    if (p_ms)
+        *p_ms = millisecond;
     return ret;
 }
 
@@ -72,7 +73,8 @@ std::time_t CDateTime::ResolveMessageTimestamp(const std::string& message, std::
 @param `fTimeZone = 0` 时区，东半球为正，西半球为服。如东八区（UTC + 8）对应的 `fTimeZone` 为 `8.0`。
 @return UNIX 时间戳。
 */
-std::time_t CDateTime::GetUNIXTimestamp(uint32_t year, uint32_t month, uint32_t day, uint32_t hour, uint32_t minute, uint32_t second, float time_zone) noexcept
+std::time_t CDateTime::CreateUnixTime(uint32_t year, uint32_t month, uint32_t day, uint32_t hour, uint32_t minute,
+                                      uint32_t second, float time_zone) noexcept
 {
     uint64_t ret = 0ull;
     uint64_t total_days = 0ull;
@@ -115,7 +117,16 @@ std::time_t CDateTime::GetUNIXTimestamp(uint32_t year, uint32_t month, uint32_t 
 */
 std::time_t CDateTime::GetTimeBias() noexcept
 {
-    TIME_ZONE_INFORMATION tzi{ };
+    TIME_ZONE_INFORMATION tzi{};
     GetTimeZoneInformation(&tzi);
     return -tzi.Bias * 60;
+}
+/*
+@brief 将文件时间转换为 UNIX 时间。
+*/
+std::time_t CDateTime::FileTimeToUnixTime(const std::filesystem::file_time_type &file_time_point) noexcept
+{
+    auto system_time_point = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        file_time_point - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+    return std::chrono::system_clock::to_time_t(system_time_point);
 }
