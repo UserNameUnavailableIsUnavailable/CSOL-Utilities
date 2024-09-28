@@ -1,9 +1,10 @@
 #include "CMessenger.hpp"
 #include <filesystem>
+#include <mutex>
 
 CSOL_Utilities::CMessenger::CMessenger(std::filesystem::path file) :
 m_CommandFile(file),
-m_FileStream(m_CommandFile, std::ios::out),
+m_FileStream(m_CommandFile, std::ios::out | std::ios::binary),
 m_CommandString(QueryCommandString(COMMAND::CMD_NOP)),
 m_Mutex(),
 m_Buffer(new char[512])
@@ -11,25 +12,19 @@ m_Buffer(new char[512])
 
 CSOL_Utilities::CMessenger::~CMessenger() noexcept
 {
-    assign(CSOL_Utilities::COMMAND::CMD_NOP, 0).dispatch();
+    AssignAndDispatch(CSOL_Utilities::COMMAND::CMD_NOP, 0);
     delete[] m_Buffer;
 }
 
-CSOL_Utilities::CMessenger& CSOL_Utilities::CMessenger::assign(const CSOL_Utilities::COMMAND cmd, std::time_t cmd_time) noexcept
+void CSOL_Utilities::CMessenger::AssignAndDispatch(const CSOL_Utilities::COMMAND cmd, std::time_t cmd_time) noexcept
 {
+    std::lock_guard<std::mutex> lock_guard(m_Mutex);
     m_CommandString = QueryCommandString(cmd);
     m_CommandTime = cmd_time;
-    return *this;
-}
-
-void CSOL_Utilities::CMessenger::dispatch() noexcept
-{
-    m_Mutex.lock();
     m_FileStream.seekp(0);
-    m_FileStream << "Cmd = " << m_CommandString << std::endl
-        << "CmdTime = " << m_CommandTime << std::endl;
-    m_FileStream.flush();
-    m_Mutex.unlock();
+    m_FileStream << "Cmd = " << m_CommandString << '\n' /* 使用 \n 而非 std::endl，目的是暂时不清空 buffer */
+        << "CmdTime = " << m_CommandTime << std::endl; /* 使用 std::endl 清空 buffer */
+    std::filesystem::resize_file(m_CommandFile, m_FileStream.tellp()); /* 设置文件 EOF */
 }
 
 constexpr const char* CSOL_Utilities::CMessenger::QueryCommandString(CSOL_Utilities::COMMAND cmd) noexcept

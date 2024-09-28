@@ -8,20 +8,20 @@ export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL24H
 
-MODULES = Controller Test docs lua ps1 web
+MODULES = Controller Docs Executor Ps1 ConfigWebPages
 VPATH = source
 TEST_UNIT := check_file
 
 .PHONY: $(MODULES) all
 
 # link everything
-all: Controller lua docs ps1
-ps1:
+all: MODULES
+Ps1:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/install.ps1 -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
-lua:
-	New-Item -Type Directory -Path $(BUILD)/lua -Force
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/lua -Recurse -Force
+Executor:
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Executor -Recurse -Force
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Main.lua
 # compile and link test
 Test:
 	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(SOURCE)/include
@@ -29,11 +29,13 @@ Test:
 Controller:
 	New-Item -Type Directory -Path $(BUILD)/$@ -Force
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
-	clang++ -g3 $(BUILD)/Controller.obj -o $(BUILD)/Controller.exe
-docs:
+	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
+Docs:
 	New-Item -Type Directory -Force -Path $(BUILD)/$@
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
-web:
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Web -Recurse -Force
-clean:
+	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
+Web:
+	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/ConfigWebPages -Recurse -Force
+Pack:
+Clean:
 	Remove-Item -Force -Recurse -Path $(BUILD)

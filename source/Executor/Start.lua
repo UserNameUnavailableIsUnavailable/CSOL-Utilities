@@ -1,7 +1,6 @@
-if (not Interpreter_lua)
+if (not Start_lua)
 then
-Interpreter_lua = true
-
+Start_lua = true
 ---判断命令是否失效。
 local function expired()
     CmdTime = CmdTime or 0
@@ -9,11 +8,11 @@ local function expired()
     return math.abs(current_time - CmdTime) > 2
 end
 
-function Interpreter()
+function Start()
     local previous_command = Command.NOP -- 上一次获取到的命令，初始为 NOP
     while (true)
     do
-        if (pcall(Load, "$~cmd.lua"))
+        if (pcall(Include, "$~cmd.lua"))
         then
             Cmd = Cmd or Command.CMD_NOP
         else
@@ -57,5 +56,4 @@ function Interpreter()
         previous_command = Cmd -- 更新上一次命令
     end
 end
-
-end -- Interpreter_lua
+end -- Start_lua

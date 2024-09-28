@@ -1,7 +1,7 @@
 if (not Mouse_lua)
 then
-Load("Context.lua")
-Load("Runtime.lua")
+Include("Context.lua")
+Include("Runtime.lua")
 Mouse_lua = true
 ---@class Mouse
 ---@field LEFT integer 鼠标左键。
