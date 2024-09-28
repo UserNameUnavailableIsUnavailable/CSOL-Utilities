@@ -1,5 +1,31 @@
-\section{进阶教程（供有编程经验的用户参考）}
+\section{进阶教程（本节部分内容供有编程经验的用户参考）}
 \label{section_advanced_usage}
+
+\subsection{关于控制器}
+
+控制器接收以下命令行参数（视版本而定）。请在 \lstinline{Controller.ps1} 中向 \lstinline{Controller.exe} 传入命令行参数（下面的例子遵循 Powershell 语法）：
+
+\begin{itemize}
+\item \lstinline{--GameRootDirectory} 游戏安装根目录，如不指定则会自动检测（如非必要，不应使用此参数）。路径需要使用引号包含，如：\lstinline{"C:\csol"}。
+\item \lstinline{--LaunchGameCmd} 启动游戏的命令，如不指定则会自动检测（如非必要，不应使用此参数）。启动命令需要使用引号包含，当需要为启动器指定命令行选项时，启动器路径本身还需要额外使用引号以分隔启动器路径和启动器接收的命令行参数。如：\lstinline{"`"C:\TCGame\TCGame.exe`" cso"}。
+\item \lstinline{--MaxWaitTimeInRoom} 在房间内等待的最长时间，单位为秒，如不指定则默认为 900。当房主长时间未开始游戏（房间超过 15 分钟未开始游戏会自动关闭），达到此参数设定的超时时间时，将离开当前房间自行创建新的房间挂机。
+\end{itemize}
+
+例如，图 \ref{ch7fig-change-max-wait-time-in-room-0} 中将在房间内等待的最长时间设置为 300 秒。重新运行 \lstinline{Controller.ps1} 即可生效（图 \ref{ch7fig-change-max-wait-time-in-room-1}）。
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/advanced/change_max_wait_time_in_room_0.png}
+    \caption{修改在房间内等待的最长时间}
+    \label{ch7fig-change-max-wait-time-in-room-0}
+\end{figure}
+
+\begin{figure}[H]
+    \Centering
+    \includegraphics[width=\textwidth]{docs/assets/advanced/change_max_wait_time_in_room_1.png}
+    \caption{在房间内等待的最长时间修改为 300 秒}
+    \label{ch7fig-change-max-wait-time-in-room-1}
+\end{figure}
 
 \subsection{关于武器攻击}
 
