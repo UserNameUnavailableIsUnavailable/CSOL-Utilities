@@ -1,12 +1,12 @@
 if (not Player_lua)
 then
 Player_lua = true
-Load("Keyboard.lua")
-Load("Weapon.lua")
-Load("Mouse.lua")
-Load("Runtime.lua")
-Load("Utility.lua")
-Load("DateTime.lua")
+Include("Keyboard.lua")
+Include("Weapon.lua")
+Include("Mouse.lua")
+Include("Runtime.lua")
+Include("Utility.lua")
+Include("DateTime.lua")
 ---@class Player
 Player = {}
 

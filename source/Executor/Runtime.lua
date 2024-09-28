@@ -1,6 +1,6 @@
 if (not Runtime_lua)
 then
-Load("Context.lua")
+Include("Context.lua")
 Runtime_lua = true
 Runtime = {}
 ---手动接管标志。若置为 `true` 则 `pause_flag` 被屏蔽，且无法由程序自身恢复，必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。

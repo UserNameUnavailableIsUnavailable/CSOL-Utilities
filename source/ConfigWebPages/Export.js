@@ -270,7 +270,6 @@ async function Export() {
     } catch (error) {
         console.log('Failed to save Setting.lua.');
     }
-
 }
 
 function IsFieldValid(field) {

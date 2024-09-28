@@ -3,6 +3,7 @@
 #include "CEvent.hpp"
 #include <initializer_list>
 #include <mutex>
+#include <iostream>
 #include <condition_variable>
 #include <stdexcept>
 #include <vector>
@@ -26,10 +27,13 @@ namespace CSOL_Utilities
         };
         void WaitAll()
         {
-            for (auto i = m_List.begin(); i != m_List.end(); i++) {
-                if (!(*i)->PeekBeforeWait()) {
+            auto i = m_List.begin();
+            while (i != m_List.end()) {
+                if (!(*i)->PeekAndWait()) {
                     i = m_List.begin(); /* 从头开始等待 */
+                    continue;
                 }
+                i++;
             }
         }
     };

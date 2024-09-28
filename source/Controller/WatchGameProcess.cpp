@@ -20,16 +20,17 @@ void CController::WatchGameProcess() noexcept
     thread_local DWORD dwGameProcessId{ 0 };
     thread_local HANDLE hGameProcess{ nullptr };
     std::setlocale(LC_ALL, ".UTF-8");
-    auto launcher_path = "\"" + (s_Instance->m_GameLauncherPath/L"TCGame.exe").u8string() + "\"" + " cso";
-    thread_local auto cmd = ConvertUtf8ToUtf16(launcher_path.c_str());
     thread_local HWND hCSOBannerWnd{ nullptr };
-    CConsole::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏启动命令：%ls", cmd.get());
-    while (!s_Instance->m_bExitThreads)
+    CConsole::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏启动命令：%ls", s_Instance->m_LaunchGameCmd.get());
+    while (true)
     {
         s_Instance->m_GameProcessWatcherSwitch.Wait();
+        if (s_Instance->m_ExitThreads) {
+            break;
+        }
         s_Instance->m_GameProcessWatcherFinished.Reset();
         /* 检测 CSOBanner 是否在运行 */
-        hCSOBannerWnd = FindWindowW(NULL, L"CSOBanner");
+        hCSOBannerWnd = FindWindowW(nullptr, L"CSOBanner");
         DWORD dwCSOBannerPId{ 0 };
         HANDLE hCSOBannerProcess{ nullptr };
         if (hCSOBannerWnd) {
@@ -52,7 +53,7 @@ void CController::WatchGameProcess() noexcept
         if (game_process_state == GAME_PROCESS_STATE::GPS_BEING_CREATED) {
             s_Instance->m_hGameWindow = FindWindowW(nullptr, L"Counter-Strike Online");
             if (!s_Instance->m_hGameWindow) {
-                continue;
+                goto stop_this_round;
             }
             GetWindowThreadProcessId(s_Instance->m_hGameWindow, &dwGameProcessId);
             if (dwGameProcessId == 0) {
@@ -79,7 +80,7 @@ void CController::WatchGameProcess() noexcept
                 dwGameProcessId = 0;
             } else if (dwResult == WAIT_TIMEOUT) { /* 本轮等待超时 */
                 SetWindowPos(s_Instance->m_hGameWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-                continue;
+                goto stop_this_round; /* 不可以简单地使用 continue，否则会导致死锁！ */
             } else { /* 等待失败 */
                 CConsole::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "m_GameProcessWatcher 运行遇到错误。错误代码：%lu。\r\n", GetLastError());
                 break;
@@ -90,7 +91,7 @@ void CController::WatchGameProcess() noexcept
             PROCESS_INFORMATION pi{ };
             BOOL bRet = CreateProcessW(
                 nullptr,
-                cmd.get(),
+                s_Instance->m_LaunchGameCmd.get(),
                 nullptr,
                 nullptr,
                 false,
@@ -119,7 +120,7 @@ void CController::WatchGameProcess() noexcept
             s_Instance->m_hGameWindow = FindWindowW(nullptr, L"Counter-Strike Online"); /* 尝试获取游戏进程窗口 */
             if (!s_Instance->m_hGameWindow) {
                 game_process_state = GAME_PROCESS_STATE::GPS_EXITED; /* 游戏进程未启动 */
-                continue; /* 跳转至执行启动游戏进程的代码块 */
+                goto stop_this_round; /* 跳转至执行启动游戏进程的代码块 */
             }
             GetWindowThreadProcessId(s_Instance->m_hGameWindow, &dwGameProcessId);
             if (!dwGameProcessId) {
@@ -135,6 +136,7 @@ void CController::WatchGameProcess() noexcept
             game_process_state = GAME_PROCESS_STATE::GPS_RUNNING;
             s_Instance->m_GameProcessAlive.Set();
         }
+stop_this_round:
         s_Instance->m_GameProcessWatcherFinished.Set();
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -143,5 +145,5 @@ void CController::WatchGameProcess() noexcept
         hGameProcess = nullptr;
     }
     CConsole::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 m_GameProcessWatcher 退出。");
-    s_Instance->m_bThreadExit.Set();
+    s_Instance->m_ThreadExitEvent.Set();
 }

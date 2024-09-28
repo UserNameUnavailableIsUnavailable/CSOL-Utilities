@@ -1,1 +1,0 @@
-Cmd = Command.CMD_NOP

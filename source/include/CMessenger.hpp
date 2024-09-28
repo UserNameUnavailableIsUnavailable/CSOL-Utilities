@@ -16,8 +16,7 @@ namespace CSOL_Utilities
         CMessenger(const CMessenger&&) = delete;
         CMessenger& operator=(const CMessenger&&) = delete;
         ~CMessenger() noexcept;
-        CMessenger& assign(COMMAND cmd, std::time_t cmd_time) noexcept;
-        void dispatch() noexcept;
+        void AssignAndDispatch(COMMAND cmd, std::time_t cmd_time) noexcept;
     private:
         static constexpr const char* QueryCommandString(COMMAND cmd) noexcept;
         std::filesystem::path m_CommandFile;

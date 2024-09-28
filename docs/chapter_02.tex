@@ -19,7 +19,7 @@
 
 \item \textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
 
-\item 确保 Lua 脚本文件正确保存并运行。
+\item 确保 \lstinline{Main.lua} 文件正确保存并运行。
 
 \item 运行 \lstinline{Controller.ps1}。
 
@@ -52,8 +52,8 @@
 v1.3.16 版本后，要进行配置，有两种方案：
 
 \begin{itemize}
-\item 方法一（推荐）：打开集成工具目录下的 \lstinline{Web\Setting.html} 或访问 \href{https://macrohard.fun/CSOL-Utilities/Setting.html}{CSOL 集成工具配置面板}。 在该网页中可进行坐标配置。配置完成后，点击“导出”按钮，将配置导出为名为 \lstinline{Setting.lua} 的文件，覆盖 \lstinline{lua} 目录下原有的 \lstinline{Setting.lua} 配置文件（图 \ref{ch2fig-export-setting}）。
-\item 方法二：使用文本编辑器直接编辑 \lstinline{Setting.lua}。对于没有编程经验的用户，使用此方法配置容易出错。另外，对于有编程经验的用户，需要注意配置文件中的字段可能会在后续版本新增、更改、移除，因此若非必要，仍建议采用方法一。
+\item 方法一（推荐）：使用浏览器打开集成工具目录下的 \lstinline{Setting.html} 或访问 \href{https://macrohard.fun/CSOL-Utilities/Setting.html}{CSOL 集成工具配置面板}。 在该网页中可进行坐标配置。配置完成后，点击“导出”按钮，将配置导出为名为 \lstinline{Setting.lua} 的文件，覆盖 \lstinline{Executor} 目录下原有的 \lstinline{Setting.lua} 配置文件（图 \ref{ch2fig-export-setting}）。
+\item 方法二（不推荐缺乏编程经验的用户使用）：使用文本编辑器直接编辑 \lstinline{Setting.lua}。对于没有编程经验的用户，使用此方法配置容易出错。另外，对于有编程经验的用户，需要注意配置文件中的字段可能会在后续版本新增、更改、移除，因此若非必要，仍建议采用方法一。
 \end{itemize}
 
 \begin{figure}[H]
@@ -65,7 +65,7 @@ v1.3.16 版本后，要进行配置，有两种方案：
 
 所有的坐标均通过 5 模式坐标定位功能确定。
 其中，\lstinline{NAME_X}（\lstinline{NAME} 为某个坐标名称）表示横坐标，\lstinline{NAME_Y} 表示纵坐标。
-配置完成后，使用导出功能，将导出文件保存为 \lstinline{lua} 目录下的 \lstinline{Setting.lua}。
+配置完成后，使用导出功能，将导出文件保存为 \lstinline{Executor} 目录下的 \lstinline{Setting.lua}。
 
 下面，详细介绍 \lstinline{Setting.lua} 文件中各个变量的含义，使用模式 5 坐标定位功能耐心配置即可。
 
