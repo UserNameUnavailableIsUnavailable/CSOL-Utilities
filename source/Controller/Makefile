@@ -6,4 +6,4 @@ OBJECTS := $(addsuffix .obj, $(IMPLEMENTATIONS))
 all: $(addsuffix .hpp, $(HEADERS)) $(addsufix .cpp, $(IMPLEMENTATIONS)) $(OBJECTS)
 	clang++ -o $(BUILD)/$(MOD)/$(MOD).exe $(addprefix $(BUILD)/$(MOD)/, $(OBJECTS)) -lkernel32 -luser32 -ladvapi32 -lshell32 -municode
 %.obj: %.cpp
-	clang++ -g3 -c -std=c++17 -o $(BUILD)/$(MOD)/$@ $(SOURCE)/$(MOD)/$< --include-directory=$(SOURCE)/include
+	clang++ -O3 -c -std=c++17 -o $(BUILD)/$(MOD)/$@ $(SOURCE)/$(MOD)/$< --include-directory=$(SOURCE)/include

@@ -6,7 +6,7 @@ Runtime = {}
 ---手动接管标志。若置为 `true` 则 `pause_flag` 被屏蔽，且无法由程序自身恢复，必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。
 Runtime.manual_flag = false
 ---暂停标志。若置为 `true`，则所有键鼠操作都将被跳过。
-Runtime.pause_flag = false
+-- Runtime.pause_flag = false
 ---中断标志位，用于开/关中断，避免中断嵌套。
 Runtime.interrupt_flag = true
 ---中断发生时保存的中断现场。
@@ -106,19 +106,24 @@ end
 
 ---判断是否处于停止状态，停止状态下跳过所有键鼠操作。
 function Runtime:is_paused()
-    Runtime:sleep(0)
-    return Runtime.manual_flag or Runtime.pause_flag
+    if (Runtime.manual_flag)
+    then
+        Runtime:sleep(5)
+    else
+        Runtime:sleep(0)
+    end
+    return Runtime.manual_flag
 end
 
----将 `pause_flag` 置为 `true`。
-function Runtime:set_pause_flag()
-    Runtime.pause_flag = true
-end
+-- ---将 `pause_flag` 置为 `true`。
+-- function Runtime:set_pause_flag()
+--     Runtime.pause_flag = true
+-- end
 
----将 `pause_flag` 置为 `false`。
-function Runtime:reset_pause_flag()
-    Runtime.pause_flag = false
-end
+-- ---将 `pause_flag` 置为 `false`。
+-- function Runtime:reset_pause_flag()
+--     Runtime.pause_flag = false
+-- end
 
 ---用于测试 `Runtime`，请勿在程序中使用。
 ---@return nil

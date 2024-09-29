@@ -40,7 +40,7 @@ CInGameState &CController::ResolveState()
     const char *message = "";
     auto level{CONSOLE_LOG_LEVEL::CLL_MESSAGE};
     auto state_literal{IN_GAME_STATE::IGS_UNKNOWN};
-    std::time_t state_unix_time{0};
+    std::time_t state_unix_time{ 0 };
     std::time_t current_unix_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     thread_local std::string line;
     /* 文件修改或强制更新触发对文件的读取 */
@@ -59,8 +59,8 @@ CInGameState &CController::ResolveState()
             if (!file_stream.seekg(begin - std::ios::off_type(1), std::ios::beg))
             {
                 file_stream.clear();
-                std::this_thread::sleep_for(std::chrono::seconds(3));
                 CConsole::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "文件操作失败，将在一段时间后重试。");
+                std::this_thread::sleep_for(std::chrono::seconds(3));
                 break;
             }
             char c = file_stream.get();
@@ -92,19 +92,17 @@ CInGameState &CController::ResolveState()
             {
                 c = std::toupper(c);
             }
-            if (new_line == line)
+            if (new_line == line && !force_update)
             {
                 break;
             }
-            // CConsole::Log(CLL_MESSAGE, new_line);
             /* 解析新得到的串 */
             if (new_line.find("S_ROOM_ENTER") != std::string::npos)
             {
                 message = "进入游戏房间";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_NORMAL;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -115,8 +113,7 @@ CInGameState &CController::ResolveState()
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_LOADING;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -125,8 +122,7 @@ CInGameState &CController::ResolveState()
                 message = "游戏结算完毕";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_NORMAL;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -135,8 +131,7 @@ CInGameState &CController::ResolveState()
                 message = "离开房间返回到游戏大厅";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_HALL;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -145,8 +140,7 @@ CInGameState &CController::ResolveState()
                 message = "异常返回到游戏房间";
                 return_to_room_count++;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -155,8 +149,7 @@ CInGameState &CController::ResolveState()
                 message = "游戏客户端退出";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_SHUTDOWN;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -165,8 +158,7 @@ CInGameState &CController::ResolveState()
                 message = "成功登录游戏客户端";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_LOGIN;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
@@ -176,8 +168,7 @@ CInGameState &CController::ResolveState()
                 level = CONSOLE_LOG_LEVEL::CLL_WARNING;
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_UNKNOWN;
-                state_unix_time = CDateTime::ResolveMessageTimestamp(new_line, utc_midnight_unix_time, nullptr,
-                                                                     CDateTime::GetTimeBias());
+                state_unix_time = file_unix_time;
                 line = std::move(new_line);
                 break;
             }
