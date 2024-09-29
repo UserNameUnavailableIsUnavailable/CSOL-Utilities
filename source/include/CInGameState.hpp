@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CSOL_Utilities.hpp"
+#include <chrono>
 #include <ctime>
 
 namespace CSOL_Utilities
@@ -17,15 +18,23 @@ class CInGameState
         : m_InGameState(CSOL_Utilities::IN_GAME_STATE::IGS_UNKNOWN), m_Timestamp(0), m_LastUpdateOk(true) {};
     CInGameState(CSOL_Utilities::IN_GAME_STATE state, std::time_t timestamp) noexcept
         : m_InGameState(state), m_Timestamp(timestamp), m_LastUpdateOk(true) {};
-    CInGameState &update(CSOL_Utilities::IN_GAME_STATE in_game_state, std::time_t timestamp) noexcept
+    CInGameState &update(CSOL_Utilities::IN_GAME_STATE in_game_state, std::time_t timestamp)
     {
+        /* 不允许用旧状态覆盖新状态 */
         if (this->m_Timestamp > timestamp)
-        { /* 不允许用旧状态覆盖新状态 */
+        {
             m_LastUpdateOk = false;
             return *this;
         }
+        /* 对于完全相同的状态不执行更新 */
         if (in_game_state == this->m_InGameState && timestamp == this->m_Timestamp)
-        { /* 对于完全相同的状态不执行更新 */
+        {
+            m_LastUpdateOk = false;
+            return *this;
+        }
+        /* 不允许更新到当前时间点之后的时间 */
+        if (this->m_Timestamp > std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
+        {
             m_LastUpdateOk = false;
             return *this;
         }
@@ -62,29 +71,35 @@ class CInGameState
         m_LastUpdateOk = true;
         return *this;
     }
-    inline bool operator==(const CInGameState &gs) const
+    inline bool operator==(const CInGameState &gs) const noexcept
     {
         return this->m_InGameState == gs.m_InGameState && this->m_Timestamp == gs.m_Timestamp;
     }
-    inline bool operator!=(const CInGameState &gs) const
+    inline bool operator!=(const CInGameState &gs) const noexcept
     {
         return this->m_Timestamp != gs.m_Timestamp || this->m_InGameState != gs.m_InGameState;
     }
-    CInGameState &operator=(const CInGameState &gs)
+    CInGameState &operator=(const CInGameState &gs) noexcept
     {
         return update(gs);
     }
-    inline auto GetState() const
+    inline auto GetState() const noexcept
     {
         return m_InGameState;
     }
-    inline auto GetTimestamp() const
+    inline auto GetTimestamp() const noexcept
     {
         return m_Timestamp;
     }
-    inline auto IsLastUpdateSuccessful() const
+    inline auto IsLastUpdateSuccessful() const noexcept
     {
         return m_LastUpdateOk;
+    }
+    inline void reset() noexcept
+    {
+        m_InGameState = IN_GAME_STATE::IGS_UNKNOWN;
+        m_Timestamp = 0;
+        m_LastUpdateOk = true;
     }
 };
 }; // namespace CSOL_Utilities
