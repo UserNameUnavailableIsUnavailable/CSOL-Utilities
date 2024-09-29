@@ -4,6 +4,7 @@
 #include <memory>
 #include <synchapi.h>
 #include <windef.h>
+#include <wingdi.h>
 #include <winreg.h>
 #include <string>
 #include "InGameState.hpp"

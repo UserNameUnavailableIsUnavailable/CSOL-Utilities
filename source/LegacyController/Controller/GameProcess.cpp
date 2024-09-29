@@ -70,7 +70,7 @@ close_handles:
 
 DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
 {
-    PROCESS_INFORMATION tcg_process_info {};
+    PROCESS_INFORMATION tcg_process_info{};
     while (WAIT_OBJECT_0 == WaitForSingleObject(hEnableWatchGameProcessEvent, INFINITE))
     {
         /* 是否退出 */
@@ -140,7 +140,6 @@ DWORD CALLBACK CSOL24H::WatchGameProcess(LPVOID lpParam) noexcept
             ZeroMemory(&tcg_process_info, sizeof(tcg_process_info));
             startup_info_w.cb = sizeof(startup_info_w);
             PROCESS_INFORMATION process_information;
-            // HWND hWnd = FindWindowW(NULL, L"TCGames");
             BOOL bRet = CreateProcessW(
                 NULL,
                 pwsTCGRunCSOCmd.get(),

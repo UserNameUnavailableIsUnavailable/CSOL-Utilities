@@ -100,10 +100,3 @@ bool InitializeConsole() noexcept
     }
     return true;
 }
-
-
-void DestroyConsole() noexcept
-{
-    WaitForSingleObject(hConsoleMutex, 500);
-    CloseHandle(hConsoleMutex);
-}

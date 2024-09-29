@@ -1,7 +1,7 @@
 if (not Mouse_lua)
 then
-Load("Context.lua")
-Load("Runtime.lua")
+Include("Context.lua")
+Include("Runtime.lua")
 Mouse_lua = true
 ---@class Mouse
 ---@field LEFT integer 鼠标左键。
@@ -46,13 +46,12 @@ end
 ---@param delay integer | nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:press(button, delay)
-    if (Runtime:is_paused())
+    if (not Runtime:is_paused())
     then
-        return
+        PressMouseButton(button)
+        self.unreleased[button] = true
+        delay = delay or Delay.SHORT
     end
-    PressMouseButton(button)
-    self.unreleased[button] = true
-    delay = delay or Delay.SHORT
     Runtime:sleep(delay)
 end
 
@@ -61,13 +60,12 @@ end
 ---@param delay integer | nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:release(button, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
+    if (not Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
     then
-        return
+        ReleaseMouseButton(button)
+        self.unreleased[button] = nil
+        delay = delay or Delay.SHORT
     end
-    ReleaseMouseButton(button)
-    self.unreleased[button] = nil
-    delay = delay or Delay.SHORT
     Runtime:sleep(delay)
 end
 
@@ -82,7 +80,7 @@ end
 ---@param delay integer | nil 释放每个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:release_all (delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
+    if (not Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
     then
         return
     end

@@ -1,11 +1,11 @@
 if (not Weapon_lua)
 then
 Weapon_lua = true
-Load("Runtime.lua")
-Load("Delay.lua")
-Load("Console.lua")
-Load("Mouse.lua")
-Load("Keyboard.lua")
+Include("Runtime.lua")
+Include("Delay.lua")
+Include("Console.lua")
+Include("Mouse.lua")
+Include("Keyboard.lua")
 
 ---@class Weapon
 Weapon = {}
@@ -126,7 +126,7 @@ function Weapon:attack()
     local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
     repeat
         local t = Runtime:get_running_time() / 1000
-        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
     until (DateTime:get_local_timestamp() - start_time > 6)
     Mouse:release(self.attack_button)
 end
