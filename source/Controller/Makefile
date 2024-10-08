@@ -1,6 +1,6 @@
 VPATH := $(SOURCE)/include $(SOURCE)/$(MOD) $(BUILD)/$(MOD)
 HEADERS := CConsole CController CDateTime CEvent CEventList CException CInGameState CMessenger CSOL_Utilities CLI11
-IMPLEMENTATIONS := main Win32Util WatchInGameState WatchGameProcess HandleHotKeyEvent DispatchFixedCommand CMessenger CDateTime CController CConsole
+IMPLEMENTATIONS := Main Win32Util WatchInGameState WatchGameProcess HandleHotKeyEvent DispatchFixedCommand CMessenger CDateTime CController CConsole
 OBJECTS := $(addsuffix .obj, $(IMPLEMENTATIONS))
 .PHONY: all
 all: $(addsuffix .hpp, $(HEADERS)) $(addsufix .cpp, $(IMPLEMENTATIONS)) $(OBJECTS)
