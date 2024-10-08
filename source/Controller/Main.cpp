@@ -88,8 +88,8 @@ int wmain(int argc, wchar_t **argv)
     catch (std::exception &e)
     {
         CConsole::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, e.what());
-        CConsole::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "程序运行时遇到严重错误，无法继续运行，按任意键退出。");
         CController::DestroyInstance();
+        CConsole::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。");
         std::getchar();
         return GetLastError();
     }

@@ -4,6 +4,7 @@
 #include "CEventList.hpp"
 #include "CInGameState.hpp"
 #include "CSOL_Utilities.hpp"
+#include "CException.hpp"
 #include <Windows.h>
 #include <cctype>
 #include <chrono>
@@ -16,97 +17,91 @@
 #include <fstream>
 #include <libloaderapi.h>
 #include <memory>
+#include <cassert>
 #include <thread>
 #include <utility>
 
 using namespace CSOL_Utilities;
 
-CInGameState &CController::ResolveState()
+const CInGameState &CController::ResolveState()
 {
-    thread_local CInGameState in_game_state{};
-    thread_local auto log_path{std::move(s_Instance->m_GameRootPath / L"Bin" / L"Error.log")};
+    thread_local CInGameState in_game_state{}; /* 游戏内状态 */
+    thread_local auto log_path{std::move(s_Instance->m_GameRootPath / L"Bin" / L"Error.log")}; /* 日志文件路径 */
     thread_local std::ifstream file_stream(log_path,
-                                           std::ios::in | std::ios::ate); /* 创建线程时构造流，线程退出时流自动析构 */
-    thread_local std::size_t line_buf_capacity{64};
-    thread_local std::unique_ptr<char[]> line_buffer(new char[line_buf_capacity]);
-    thread_local uint32_t return_to_room_count{0};
-    thread_local auto last_resolve_file_time =
-        std::filesystem::file_time_type{}; /* 最近一次解析时获取到的文件修改时间 */
-    thread_local auto force_update{false};
-    std::string new_line;
-
-    auto current_file_time = std::filesystem::last_write_time(log_path); /* 当前文件修改时间 */
-    bool file_modified{current_file_time != last_resolve_file_time};
-    const char *message = "";
-    auto level{CONSOLE_LOG_LEVEL::CLL_MESSAGE};
-    auto state_literal{IN_GAME_STATE::IGS_UNKNOWN};
+                                           std::ios::in | std::ios::ate); /* 创建线程时构造文件流，线程退出时流自动析构 */
+    thread_local uint32_t return_to_room_count{ 0 }; /* 异常返回到房间计数器 */
+    thread_local auto force_read{ false }; /* 强制读取 */
+    std::string line;
+    const char* message = "";
+    auto level{ CONSOLE_LOG_LEVEL::CLL_MESSAGE };
+    auto state_literal{ IN_GAME_STATE::IGS_UNKNOWN };
     std::time_t state_unix_time{ 0 };
     std::time_t current_unix_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    thread_local std::string line;
+    thread_local std::vector<char> file_content;
     /* 文件修改或强制更新触发对文件的读取 */
-    if (file_modified || force_update)
+    thread_local auto last_resolve_file_time =
+        std::filesystem::file_time_type{}; /* 最近一次解析时获取到的文件修改时间 */
+    auto current_file_time = std::filesystem::last_write_time(log_path); /* 当前文件修改时间 */
+    bool file_modified{ current_file_time != last_resolve_file_time };
+    if (file_modified || force_read)
     {
-        /* begin, end 初始都指向文件末尾，自后向前开始解析 */
         last_resolve_file_time = current_file_time;
-        force_update = false;
+        force_read = false;
+        /* begin, end 初始都指向文件末尾，自后向前开始解析 */
         auto begin{std::filesystem::file_size(log_path)};
-        auto end{begin};
+        auto end{ begin };
         std::time_t file_unix_time(CDateTime::FileTimeToUnixTime(current_file_time));
         std::time_t utc_midnight_unix_time = file_unix_time / (24 * 60 * 60) * (24 * 60 * 60); /* 当日午夜时间 */
-        while (begin > std::ios::pos_type(0))
+        while (begin > static_cast<std::ios::pos_type>(0))
         {
+            thread_local auto io_error_count{ 0 }; /* 读取文件错误计数器 */
+            char c;
             /* 倒序按行读取文件，解析得到 new_line */
-            if (!file_stream.seekg(begin - std::ios::off_type(1), std::ios::beg))
+            if (!file_stream.seekg(begin - std::ios::off_type(1), std::ios::beg) || !file_stream.get(c)) /* try lookahead(1) */
             {
-                file_stream.clear();
+                io_error_count++;
+                if (io_error_count == 9)
+                {
+                    throw CException("文件 IO 错误次数过多，当前线程无法正常运行。");
+                }
+                file_stream.clear(); /* clear error flags on error */
                 CConsole::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "文件操作失败，将在一段时间后重试。");
                 std::this_thread::sleep_for(std::chrono::seconds(3));
-                break;
+                break; /* break 后状态不发生任何更新 */
             }
-            char c = file_stream.get();
-            /* now file_ptr = begin */
+            io_error_count = 0;
+            // assert(file_stream.tellg() == static_cast<std::ios::pos_type>(begin)); /* begin 为文件指针指向的位置 */
             if ((c == '\r' || c == '\n') && begin == end)
             {
-                end = begin = begin - std::ios::off_type(1);
+                end = begin = begin - static_cast<std::ios::off_type>(1);
                 continue;
             }
             else if (!(c == '\r' || c == '\n'))
             {
-                begin -= std::ios::off_type(1);
+                begin -= static_cast<std::ios::off_type>(1);
+                file_content.push_back(c);
                 continue;
             }
             else if ((c == '\r' || c == '\n') && begin != end)
             {
-                if (line_buf_capacity < end - begin)
-                {
-                    line_buf_capacity = 2 * (end - begin);
-                    line_buffer = std::unique_ptr<char[]>(new char[line_buf_capacity]);
-                }
-                file_stream.read(line_buffer.get(), end - begin);
-                line_buffer[end - begin] = 0;
-                end = begin = begin - std::ios::off_type(1);
+                line = std::string(file_content.rbegin(), file_content.rend());
+                file_content.clear(); /* set size = 0 */
+                end = begin = begin - static_cast<std::ios::off_type>(1);
             }
-            new_line = std::string(line_buffer.get());
             /* 将字符全部转为大写 */
-            for (auto &c : new_line)
+            for (auto &c : line)
             {
                 c = std::toupper(c);
             }
-            if (new_line == line && !force_update)
-            {
-                break;
-            }
-            /* 解析新得到的串 */
-            if (new_line.find("S_ROOM_ENTER") != std::string::npos)
+            if (line.find("S_ROOM_ENTER") != std::string::npos)
             {
                 message = "进入游戏房间";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_NORMAL;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("JOIN HOSTSERVER") != std::string::npos)
+            else if (line.find("JOIN HOSTSERVER") != std::string::npos)
             {
                 message = "加载游戏场景，将窗口暂时最小化";
                 ShowWindow(s_Instance->m_hGameWindow, SW_MINIMIZE);
@@ -114,62 +109,55 @@ CInGameState &CController::ResolveState()
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_LOADING;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("RESULT CONFIRM") != std::string::npos)
+            else if (line.find("RESULT CONFIRM") != std::string::npos)
             {
                 message = "游戏结算完毕";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_NORMAL;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("LEAVE GAME ROOM") != std::string::npos)
+            else if (line.find("LEAVE GAME ROOM") != std::string::npos)
             {
                 message = "离开房间返回到游戏大厅";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_HALL;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("RETURN TO ROOM") != std::string::npos)
+            else if (line.find("RETURN TO ROOM") != std::string::npos)
             {
                 message = "异常返回到游戏房间";
                 return_to_room_count++;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("GAME SHUTDOWN") != std::string::npos)
+            else if (line.find("GAME SHUTDOWN") != std::string::npos)
             {
                 message = "游戏客户端退出";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_SHUTDOWN;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("GAME SERVER LOGIN SUCCESS") != std::string::npos)
+            else if (line.find("GAME SERVER LOGIN SUCCESS") != std::string::npos)
             {
                 message = "成功登录游戏客户端";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_LOGIN;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
-            else if (new_line.find("LOG FILE OPENED") != std::string::npos)
+            else if (line.find("LOG FILE OPENED") != std::string::npos)
             {
                 message = "状态未知";
                 level = CONSOLE_LOG_LEVEL::CLL_WARNING;
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_UNKNOWN;
                 state_unix_time = file_unix_time;
-                line = std::move(new_line);
                 break;
             }
             else
@@ -251,7 +239,7 @@ CInGameState &CController::ResolveState()
         else if (in_game_state.GetState() == IN_GAME_STATE::IGS_UNKNOWN &&
                  current_unix_time - in_game_state.GetTimestamp() > 10)
         {
-            force_update = true;
+            force_read = true;
             message = "再次尝试确定状态";
             state_unix_time = current_unix_time;
         }

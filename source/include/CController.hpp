@@ -59,7 +59,7 @@ class CController
         m_ExtendedAutoPlayMode = toggle;
     };
     static void WatchInGameState() noexcept;                                 /* 监测游戏内状态 */
-    static CInGameState &ResolveState();                                     /* 解析状态 */
+    static const CInGameState& ResolveState();                                     /* 解析状态 */
     static void DispatchCommand(const CInGameState &in_game_state) noexcept; /* 下达命令 */
     static void TransferState() noexcept;                                    /* 状态迁移 */
     std::thread m_InGameStateWatcher{};                                      /* 监测游戏内状态的线程对象 */

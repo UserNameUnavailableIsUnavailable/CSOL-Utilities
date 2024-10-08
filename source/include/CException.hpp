@@ -7,7 +7,7 @@
 
 namespace CSOL_Utilities
 {
-class CException : std::exception
+class CException : public std::exception
 {
   public:
     CException(const char *detail)
