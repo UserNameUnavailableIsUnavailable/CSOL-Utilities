@@ -8,7 +8,7 @@ export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL24H
 
-MODULES = Controller Docs Executor Ps1 ConfigWebPages
+MODULES = Controller Docs Executor Ps1 Web
 VPATH = source
 TEST_UNIT := check_file
 
@@ -27,11 +27,11 @@ Test:
 	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(SOURCE)/include
 # compile Controller
 Controller:
-	New-Item -Type Directory -Path $(BUILD)/$@ -Force
+	(New-Item -Type Directory -Path $(BUILD)/$@ -Force).Attributes += "Hidden"
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
 	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
 Docs:
-	New-Item -Type Directory -Force -Path $(BUILD)/$@
+	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/docs $(DOCS)/main.tex
 Web:

@@ -78,6 +78,12 @@ function Weapon:switch()
     Keyboard:click(self.number, self.switch_delay)
 end
 
+---切换到指定武器，不考虑切枪延迟。
+---@return nil
+function Weapon:switch_without_delay()
+    Keyboard:click(self.number, 10)
+end
+
 ---按下 `Keyboard.G` 键丢弃武器。
 ---@return nil
 function Weapon:abandon()
@@ -123,11 +129,17 @@ function Weapon:attack()
     local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
     local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
     local direction = Utility:random_direction() -- 随机向左或右
-    local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
+    local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+    local last_switch_time = Runtime:get_running_time()
     repeat
-        local t = Runtime:get_running_time() / 1000
-        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
-    until (DateTime:get_local_timestamp() - start_time > 6)
+        local current_time = Runtime:get_running_time()
+        if (current_time - last_switch_time > 1000)
+        then
+            self:switch_without_delay()
+            last_switch_time = current_time
+        end
+        Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+    until (Runtime:get_running_time() - start_time > 6000)
     Mouse:release(self.attack_button)
 end
 

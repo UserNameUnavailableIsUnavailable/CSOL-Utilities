@@ -71,7 +71,7 @@ const NUMBERS = {
     '9': "Keyboard.NINE"
 }
 function ResolvePurchaseSequence(sequence) {
-    let purchase_sequence = "{";
+    let purchase_sequence = "{ ";
     sequence = sequence.toUpperCase();
     for (let i = 0; i < sequence.length; i++) {
         j = sequence[i];
@@ -88,7 +88,7 @@ function ResolvePurchaseSequence(sequence) {
             purchase_sequence += ", ";
         }
     }
-    purchase_sequence += "}";
+    purchase_sequence += " }";
     return purchase_sequence;
 }
 
@@ -97,25 +97,30 @@ function IsFieldValid(field) {
 }
 
 var twin_axis =
-    `Weapon:new{
+`\tWeapon:new{
     name = "神鬼开天/魔神开天",
     switch_delay = Delay.SHORT,
     number = Weapon.MELEE,
     purchase_sequence = {}--[[purchase_sequence]],
-    -- 重写 attack 方法，按照下面定义的方式进行攻击
-    -- 若您使用神鬼开天/魔神开天进行挂机且没有编程经验，则请勿修改此函数
+    ---重写 attack 方法，按照下面定义的方式进行攻击。
+    ---若您使用神鬼开天/魔神开天进行挂机且没有编程经验，则请勿修改此函数。
+    ---@param self Weapon
     attack = function (self)
         Mouse:press(Mouse.RIGHT)
         local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
         local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
         local direction = Utility:random_direction() -- 随机向左或右
         local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+        local last_switch_time = 0
         repeat
-            local duration = Runtime:get_running_time() - start_time
-            local t = Runtime:get_running_time() / 1000
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+            local current_time = Runtime:get_running_time()
+            if (current_time - last_switch_time > 1000)
+            then
+                self:switch_without_delay()
+            end
+            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
         until (Runtime:get_running_time() - start_time > 6000)
-        Mouse:release(Mouse.RIGHT, 200) -- 松开鼠标右键释放旋风
+        Mouse:release(Mouse.RIGHT, 200)
         Mouse:press(Mouse.LEFT, 1000)
         Keyboard:press(Keyboard.R, 200)
         Keyboard:release(Keyboard.R)
@@ -124,51 +129,59 @@ var twin_axis =
 }`;
 
 var brionac =
-    `Weapon:new{
-    name = "万钧神威",
-    switch_delay = Delay.SHORT,
-    number = Weapon.MELEE,
-    purchase_sequence = {}--[[purchase_sequence]],
-    -- 重写 attack 方法，按照下面定义的方式进行攻击
-    -- 若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数
-    attack = function (self)
-        Mouse:press(Mouse.RIGHT) -- 按下鼠标右键进行范围攻击
-        local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
-        local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
-        local direction = Utility:random_direction() -- 随机向左或右
-        local start_time = Runtime:get_running_time() -- 本次转圈开始时间
-        local first_throw = false
-        local second_throw = false
-        repeat
-            local duration = Runtime:get_running_time() - start_time
-            local t = Runtime:get_running_time() / 1000
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
-            if (not first_throw and 3000 < duration and duration < 6000)
-            then
-                Keyboard:click(Keyboard.R, Delay.SHORT)
-                first_throw = true
-            end
-            if (not second_throw and 6000 < duration)
-            then
-                Keyboard:click(Keyboard.R, Delay.SHORT)
-                second_throw = true
-            end
-        until (Runtime:get_running_time() - start_time > 7000)
-        Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
-    end
-}`;
+`\tWeapon:new{
+        name = "万钧神威",
+        switch_delay = Delay.SHORT,
+        number = Weapon.MELEE,
+        purchase_sequence = {}--[[purchase_sequence]],
+        ---重写 attack 方法，按照下面定义的方式进行攻击。
+        ---若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数。
+        ---@param self Weapon
+        attack = function (self)
+            Mouse:press(Mouse.RIGHT) -- 按下鼠标右键进行范围攻击
+            local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+            local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
+            local direction = Utility:random_direction() -- 随机向左或右
+            local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+            local last_switch_time = 0
+            local first_throw = false
+            local second_throw = false
+            repeat
+                local current_time = Runtime:get_running_time()
+                if (current_time - last_switch_time > 1000)
+                then
+                    self:switch_without_delay()
+                end
+                Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                local duration = Runtime:get_running_time() - start_time
+                if (not first_throw and 3000 < duration and duration < 6000)
+                then
+                    Keyboard:click(Keyboard.R, Delay.SHORT)
+                    first_throw = true
+                end
+                if (not second_throw and 6000 < duration)
+                then
+                    Keyboard:click(Keyboard.R, Delay.SHORT)
+                    second_throw = true
+                end
+            until (Runtime:get_running_time() - start_time > 7000)
+            Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
+        end
+    }`;
 
 var sandalphon_or_belial =
-    `Weapon:new{
+`\tWeapon:new{
     name = "圣翼皓印/炽翼魔印",
     switch_delay = Delay.LONG_LONG,
     number = Weapon.GRENADE ,
-    purchase_sequence = {Keyboard.B, Keyboard.EIGHT, Keyboard.NINE},
+    purchase_sequence = {}--[[purchase_sequence]],
     discharging = false, -- 是否在释放光印
     discharge_start_moment = 0, --  光印释放的时刻。
     charge_start_moment = 0, -- 充能开始的时刻。
     DISCHARGE_TIME = 25, -- 光印释放时间。
     RECHARGE_TIME = 10, -- 充能时间。
+    ---为该武器重写 \`use\` 方法。
+    ---@param self Weapon
     use = function (self)
         local current_time = DateTime:get_local_timestamp() -- 当前时间戳
         -- 当前正在充能，且充能时间超过 \`RECHARGE_TIME\`。
@@ -193,13 +206,15 @@ var sandalphon_or_belial =
 }`;
 
 var hellhound =
-    `Weapon:new{
+`\tWeapon:new{
     name = "【幽浮】控制核心",
     purchase_sequence = {}--[[purchase_sequence]],
     switch_delay = 500,
     number = Weapon.GRENADE,
     COOL_DOWN_TIME = 60,
     last_start_moment = 0,
+    ---为该武器重写 \`use\` 方法。
+    ---@param self Weapon
     use = function (self)
         local current_time = DateTime:get_local_timestamp()
         if (current_time - self.last_start_moment > self.COOL_DOWN_TIME)
