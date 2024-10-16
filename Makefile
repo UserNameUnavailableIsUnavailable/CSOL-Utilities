@@ -19,7 +19,7 @@ all: MODULES
 Ps1:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/install.ps1 -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
-Executor:
+Exector:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Executor -Recurse -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Main.lua
 # compile and link test
@@ -28,6 +28,7 @@ Test:
 # compile Controller
 Controller:
 	(New-Item -Type Directory -Path $(BUILD)/$@ -Force).Attributes += "Hidden"
+	Write-Host $(MAKE)
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
 	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
 Docs:
