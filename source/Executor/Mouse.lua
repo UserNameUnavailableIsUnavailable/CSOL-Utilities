@@ -19,11 +19,43 @@ Mouse = {
 ---@type {[integer]: boolean}
 Mouse.unreleased = {}
 
+---@param button integer
+local function press_button_safe(button)
+    if (not Runtime:is_paused())
+    then
+        pcall(PressMouseButton, button)
+    end
+end
+
+---@param button integer
+local function release_button_safe(button)
+    if (not Runtime:is_paused())
+    then
+        pcall(ReleaseMouseButton, button)
+    end
+end
+
+---@param button integer
+local function press_and_release_button_safe(button)
+    if (not Runtime:is_paused())
+    then
+        pcall(PressAndReleaseMouseButton, button)
+    end
+end
+
+---@param x integer
+---@param y integer
+local function move_mouse_to(x, y)
+    if (not Runtime:is_paused())
+    then
+        pcall(MoveMouseTo, x, y)
+    end
+end
+
 ---获取鼠标光标位置
 ---@return integer x, integer y 横、纵坐标。
 function Mouse:locate_cursor()
-    local x, y = GetMousePosition()
-    return x, y
+    return GetMousePosition()
 end
 
 ---移动鼠标光标到某位置。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
@@ -32,12 +64,8 @@ end
 ---@param delay integer | nil 移动鼠标光标后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:move_cursor_to(x, y, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
-    MoveMouseTo(x, y)
     delay = delay or Delay.SHORT
+    move_mouse_to(x, y)
     Runtime:sleep(delay)
 end
 
@@ -46,11 +74,11 @@ end
 ---@param delay integer | nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:press(button, delay)
-    if (not Runtime:is_paused())
+    delay = delay or Delay.SHORT
+    if (button)
     then
-        PressMouseButton(button)
+        press_button_safe(button)
         self.unreleased[button] = true
-        delay = delay or Delay.SHORT
     end
     Runtime:sleep(delay)
 end
@@ -60,11 +88,11 @@ end
 ---@param delay integer | nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:release(button, delay)
-    if (not Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
+    delay = delay or Delay.SHORT
+    if (button)
     then
-        ReleaseMouseButton(button)
+        release_button_safe(button)
         self.unreleased[button] = nil
-        delay = delay or Delay.SHORT
     end
     Runtime:sleep(delay)
 end
@@ -80,16 +108,10 @@ end
 ---@param delay integer | nil 释放每个按钮后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:release_all (delay)
-    if (not Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
     delay = delay or Delay.SHORT
     for button, _ in pairs(self.unreleased)
     do
-        ReleaseMouseButton(button)
-        self.unreleased[button] = nil
-        Runtime:sleep(delay)
+        self:release(button, delay)
     end
 end
 
@@ -98,12 +120,8 @@ end
 ---@param delay integer | nil 单击某个按钮后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:click(button, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
-    then
-        return
-    end
-    PressAndReleaseMouseButton(button)
     delay = delay or Delay.SHORT
+    press_and_release_button_safe(button)
     Runtime:sleep(delay)
 end
 
@@ -112,14 +130,10 @@ end
 ---@param delay integer | nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
 ---@return nil
 function Mouse:double_click(button, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
-    PressAndReleaseMouseButton(button)
-    Sleep(Mouse.DOUBLE_CLICK_INTERVAL)
-    PressAndReleaseMouseButton(button)
     delay = delay or Delay.SHORT
+    press_and_release_button_safe(button)
+    Sleep(Mouse.DOUBLE_CLICK_INTERVAL)
+    press_and_release_button_safe(button)
     Runtime:sleep(delay)
 end
 
@@ -130,12 +144,8 @@ end
 ---@see Mouse.locate_cursor 获取 `(x, y)` 。
 ---@return nil
 function Mouse:click_on(x, y, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
-    Mouse:move_cursor_to(x, y, Delay.SHORT)
     delay = delay or Delay.SHORT
+    Mouse:move_cursor_to(x, y, Delay.SHORT)
     Mouse:click(Mouse.LEFT, delay)
 end
 
@@ -146,13 +156,11 @@ end
 ---@return nil
 ---@remark 
 function Mouse:move_relative(rightward, downward, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
+    if (not Runtime:is_paused() and rightward and downward) -- 当下达退出指令时，不进行任何操作
     then
-        return
+        MoveMouseRelative(math.ceil(rightward), math.ceil(downward))
     end
-    MoveMouseRelative(math.ceil(rightward), math.ceil(downward))
-    delay = delay or Delay.SHORT
-    Runtime:sleep(delay)
+    Runtime:sleep(delay or Delay.SHORT)
 end
 
 ---使用鼠标双击屏幕上某个位置。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
@@ -162,12 +170,8 @@ end
 ---@return nil
 ---@see Mouse.locate_cursor 获取 `(x, y)` 。
 function Mouse:double_click_on(x, y, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
-    Mouse:move_cursor_to(x, y, Delay.SHORT)
     delay = delay or Delay.SHORT
+    Mouse:move_cursor_to(x, y, Delay.SHORT)
     Mouse:double_click(Mouse.LEFT, delay)
 end
 
@@ -177,21 +181,13 @@ end
 ---@param n integer 重复次数。
 ---@param delay integer | nil 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
 function Mouse:click_on_several_times(x, y, n, delay)
-    if (Runtime:is_paused())
-    then
-        return
-    end
-    if (type(n) ~= "number")
-    then
-        return
-    end
+    delay = delay or Delay.SHORT
     n = math.floor(n) or 0
     while (n > 0)
     do
         Mouse:click_on(x, y, Delay.NORMAL)
         n = n - 1
     end
-    delay = delay or Delay.SHORT
     Runtime:sleep(delay)
 end
 
