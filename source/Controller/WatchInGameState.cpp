@@ -70,7 +70,6 @@ const CInGameState &CController::ResolveState()
                 break; /* break 后状态不发生任何更新 */
             }
             io_error_count = 0;
-            // assert(file_stream.tellg() == static_cast<std::ios::pos_type>(begin)); /* begin 为文件指针指向的位置 */
             if ((c == '\r' || c == '\n') && begin == end)
             {
                 end = begin = begin - static_cast<std::ios::off_type>(1);
@@ -103,9 +102,9 @@ const CInGameState &CController::ResolveState()
             }
             else if (line.find("JOIN HOSTSERVER") != std::string::npos)
             {
-                message = "加载游戏场景，将窗口暂时最小化";
                 ShowWindow(s_Instance->m_hGameWindow, SW_MINIMIZE);
                 std::this_thread::sleep_for(std::chrono::seconds(1));
+                message = "加载游戏场景，将窗口暂时最小化";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_LOADING;
                 state_unix_time = file_unix_time;
@@ -113,6 +112,8 @@ const CInGameState &CController::ResolveState()
             }
             else if (line.find("RESULT CONFIRM") != std::string::npos)
             {
+                ShowWindow(s_Instance->m_hGameWindow, SW_NORMAL);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
                 message = "游戏结算完毕";
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_NORMAL;
@@ -129,8 +130,11 @@ const CInGameState &CController::ResolveState()
             }
             else if (line.find("RETURN TO ROOM") != std::string::npos)
             {
+                ShowWindow(s_Instance->m_hGameWindow, SW_NORMAL);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
                 message = "异常返回到游戏房间";
                 return_to_room_count++;
+                level = CONSOLE_LOG_LEVEL::CLL_WARNING;
                 state_literal = IN_GAME_STATE::IGS_IN_ROOM_ABNORMAL;
                 state_unix_time = file_unix_time;
                 break;
@@ -138,6 +142,7 @@ const CInGameState &CController::ResolveState()
             else if (line.find("GAME SHUTDOWN") != std::string::npos)
             {
                 message = "游戏客户端退出";
+                level = CONSOLE_LOG_LEVEL::CLL_WARNING;
                 return_to_room_count = 0;
                 state_literal = IN_GAME_STATE::IGS_SHUTDOWN;
                 state_unix_time = file_unix_time;
@@ -174,9 +179,9 @@ const CInGameState &CController::ResolveState()
             current_unix_time - in_game_state.GetTimestamp() > 10 && IsWindow(s_Instance->m_hGameWindow) &&
             !(WS_MINIMIZE & GetWindowLongW(s_Instance->m_hGameWindow, GWL_STYLE)))
         { /* 游戏窗口加载完毕将刷新并恢复显示 */
-            message = "游戏场景加载完成";
             ShowWindow(s_Instance->m_hGameWindow, SW_NORMAL);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            message = "游戏场景加载完成";
             SetWindowPos(s_Instance->m_hGameWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             state_literal = IN_GAME_STATE::IGS_IN_MAP;
@@ -185,10 +190,10 @@ const CInGameState &CController::ResolveState()
         else if (in_game_state.GetState() == IN_GAME_STATE::IGS_LOADING &&
                  current_unix_time - in_game_state.GetTimestamp() > 40)
         { /* 40 秒为场景加载的超时时间 */
-            message = "游戏场景加载超过预设最长时间";
-            level = CONSOLE_LOG_LEVEL::CLL_WARNING; /* 加载时间过长，发出警告 */
             ShowWindow(s_Instance->m_hGameWindow, SW_NORMAL);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            message = "游戏场景加载超过预设最长时间";
+            level = CONSOLE_LOG_LEVEL::CLL_WARNING; /* 加载时间过长，发出警告 */
             SetWindowPos(s_Instance->m_hGameWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             state_literal = IN_GAME_STATE::IGS_IN_MAP;
@@ -197,9 +202,9 @@ const CInGameState &CController::ResolveState()
         else if (in_game_state.GetState() == IN_GAME_STATE::IGS_LOGIN &&
                  current_unix_time - in_game_state.GetTimestamp() > 30)
         { /* 登陆后，等待半分钟，以使窗口完全加载 */
-            message = "登陆成功后等待时间达到 30 秒";
             ShowWindow(s_Instance->m_hGameWindow, SW_NORMAL);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            message = "登陆成功后等待时间达到 30 秒";
             SetWindowPos(s_Instance->m_hGameWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             auto MakeWindowBorderless =
