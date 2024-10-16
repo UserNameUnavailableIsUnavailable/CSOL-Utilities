@@ -19,7 +19,7 @@ all: MODULES
 Ps1:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/install.ps1 -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
-Exector:
+Executor:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Executor -Recurse -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Main.lua
 # compile and link test
