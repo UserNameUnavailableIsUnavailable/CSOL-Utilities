@@ -106,33 +106,8 @@ end
 
 ---判断是否处于停止状态，停止状态下跳过所有键鼠操作。
 function Runtime:is_paused()
-    if (Runtime.manual_flag)
-    then
-        Runtime:sleep(5)
-    else
-        Runtime:sleep(0)
-    end
+    Runtime:sleep(0)
     return Runtime.manual_flag
-end
-
--- ---将 `pause_flag` 置为 `true`。
--- function Runtime:set_pause_flag()
---     Runtime.pause_flag = true
--- end
-
--- ---将 `pause_flag` 置为 `false`。
--- function Runtime:reset_pause_flag()
---     Runtime.pause_flag = false
--- end
-
----用于测试 `Runtime`，请勿在程序中使用。
----@return nil
-function Runtime:test()
-    while (true)
-    do
-        Runtime:sleep(1000)
-        Sleep(10)
-    end
 end
 
 end -- Runtime_lua

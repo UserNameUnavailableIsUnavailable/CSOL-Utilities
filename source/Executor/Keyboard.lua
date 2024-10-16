@@ -40,6 +40,27 @@ Keyboard = {
     SCROLLLOCK_ON = 0x1
 }
 
+local function press_key_safe(key)
+    if (not Runtime:is_paused())
+    then
+        pcall(PressKey, key)
+    end
+end
+
+local function release_key_safe(key)
+    if (not Runtime:is_paused())
+    then
+        pcall(ReleaseKey, key)
+    end
+end
+
+local function press_and_release_key_safe(key)
+    if (not Runtime:is_paused())
+    then
+        pcall(PressAndReleaseKey, key)
+    end
+end
+
 ---通过 `press` 按下但尚未通过 `release` 释放的按键。
 ---@type { [string]: boolean }
 Keyboard.unreleased = {}
@@ -49,12 +70,11 @@ Keyboard.unreleased = {}
 ---@return nil
 ---按下按键。
 function Keyboard:press(key, delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作。
+    if (key)
     then
-        return
+        press_key_safe(key)
+        self.unreleased[key] = true
     end
-    PressKey(key)
-    self.unreleased[key] = true
     Runtime:sleep(delay)
 end
 
@@ -63,12 +83,12 @@ end
 ---@param delay integer | nil 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release(key, delay)
-    if (Runtime:is_paused())
+    if (key)
     then
-        return
+        release_key_safe(key)
+        self.unreleased[key] = nil
     end
-    ReleaseKey(key)
-    self.unreleased[key] = nil
+    return
     Runtime:sleep(delay)
 end
 
@@ -77,11 +97,10 @@ end
 ---@param delay integer | nil 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click(key, delay)
-    if (Runtime:is_paused())
+    if (key)
     then
-        return
+        press_and_release_key_safe(key)
     end
-    PressAndReleaseKey(key)
     Runtime:sleep(delay)
 end
 
@@ -89,14 +108,9 @@ end
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:release_all(delay)
-    if (Runtime:is_paused()) -- 当下达退出指令时，不进行任何操作
-    then
-        return
-    end
     for key, _ in pairs(self.unreleased)
     do
         Keyboard:release(key, delay)
-        self.unreleased[key] = false
     end
 end
 
@@ -106,10 +120,6 @@ end
 ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@return nil
 function Keyboard:click_several_times(key, times, delay)
-    if (Runtime:is_paused())
-    then
-        return
-    end
     while (times > 0)
     do
         Keyboard:click(key, delay)
@@ -162,13 +172,14 @@ end
 ---@return boolean # 指定修饰键是否按下
 function Keyboard:is_modifier_pressed(key) return IsModifierPressed(key) end
 
--- keyLockState 为 3 bits 无符号整数，大小范围：0 ~ 7，从高位到低位依次表示 `NUMLOCK`，`CAPSLOCK`，`SCROLLLOCK`
+---keyLockState 为 3 bits 无符号整数，大小范围：0 ~ 7，从高位到低位依次表示 `NUMLOCK`，`CAPSLOCK`，`SCROLLLOCK`
 ---   2               1             0
 --- NUM_LOCK       CAPS_LOCK     SCROLL_LOCK
--- 以上排布对应于键盘上指示灯排布，可表示 8 种状态
--- 例如，5 = 0b101，代表 `NUMLOCK` 和 `SCROLLLOCK` 打开
--- 获取 keyLockState 值
---@return integer
+---以上排布对应于键盘上指示灯排布，可表示 8 种状态
+---例如，5 = 0b101，代表 `NUMLOCK` 和 `SCROLLLOCK` 打开
+---获取 keyLockState 值
+---@deprecated 此函数已废弃，不应使用。
+---@return integer
 function Keyboard:get_key_lock_state()
     local keyLockState = 0
     if (IsKeyLockOn(self.NUM_LOCK))

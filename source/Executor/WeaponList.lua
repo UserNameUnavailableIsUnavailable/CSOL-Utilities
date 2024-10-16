@@ -61,6 +61,7 @@ ExtendedWeaponList = {
                 if (current_time - last_switch_time > 1000)
                 then
                     self:switch_without_delay()
+                    last_switch_time = current_time
                 end
                 Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
             until (Runtime:get_running_time() - start_time > 6000)
@@ -93,6 +94,7 @@ ExtendedWeaponList = {
                 if (current_time - last_switch_time > 1000)
                 then
                     self:switch_without_delay()
+                    last_switch_time = current_time
                 end
                 Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
                 local duration = Runtime:get_running_time() - start_time
