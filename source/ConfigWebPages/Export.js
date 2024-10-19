@@ -103,7 +103,7 @@ async function Export() {
     if (!IsFieldValid(CREATE_ROOM_Y)) { alert(`字段 CREATE_ROOM_Y 未配置！`); return; }
     lua_snippet += `\tCREATE_ROOM_Y = ${CREATE_ROOM_Y},\r\n`;
 
-    let USE_PASSWORD = document.querySelector('input[name="USE_PASSWORD"]').value == "true" ? true : false;
+    let USE_PASSWORD = document.querySelector('input[name="USE_PASSWORD"]:checked').value == "true" ? true : false;
     lua_snippet += `\tUSE_PASSWORD = ${USE_PASSWORD},\r\n`;
 
     let ROOM_USE_PASSWORD_X = document.getElementById("ROOM_USE_PASSWORD_X").value;
