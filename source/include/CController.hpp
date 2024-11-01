@@ -4,9 +4,8 @@
 #include "CMessenger.hpp"
 #include "CSOL_Utilities.hpp"
 #include <memory>
-#ifdef WIN32
+#include <vector>
 #include <Windows.h>
-#endif
 #include <filesystem>
 #include <mutex>
 #include <thread>
@@ -52,6 +51,7 @@ class CController
     static void HandleHotKeyEvent() noexcept; /* 处理热键 */
     std::thread m_HotKeyEventHandler{};       /* 热键处理线程 */
     /* 挂机 */
+    CInGameState m_InGameState; /* 游戏内状态 */
     uint32_t m_MaxWaitTimeInGameRoom{15 * 60};
     bool m_ExtendedAutoPlayMode{false};
     inline void SetExtendedAutoPlayMode(bool toggle) noexcept
@@ -59,6 +59,7 @@ class CController
         m_ExtendedAutoPlayMode = toggle;
     };
     static void WatchInGameState() noexcept;                                 /* 监测游戏内状态 */
+    static bool AnalyzeInGameState(std::string str, std::time_t unix_time); /* 分析状态字符串，并尝试使用给定时间更新状态 */
     static const CInGameState& ResolveState();                                     /* 解析状态 */
     static void DispatchCommand(const CInGameState &in_game_state) noexcept; /* 下达命令 */
     static void TransferState() noexcept;                                    /* 状态迁移 */
