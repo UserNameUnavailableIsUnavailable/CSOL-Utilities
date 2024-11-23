@@ -63,7 +63,7 @@ end
 ---@param y integer 纵坐标。
 ---@param delay integer | nil 移动鼠标光标后的延迟时间，默认为 `Delay.SHORT`。
 ---@return nil
-function Mouse:move_cursor_to(x, y, delay)
+function Mouse:place(x, y, delay)
     delay = delay or Delay.SHORT
     move_mouse_to(x, y)
     Runtime:sleep(delay)
@@ -145,7 +145,7 @@ end
 ---@return nil
 function Mouse:click_on(x, y, delay)
     delay = delay or Delay.SHORT
-    Mouse:move_cursor_to(x, y, Delay.SHORT)
+    Mouse:place(x, y, Delay.SHORT)
     Mouse:click(Mouse.LEFT, delay)
 end
 
@@ -171,7 +171,7 @@ end
 ---@see Mouse.locate_cursor 获取 `(x, y)` 。
 function Mouse:double_click_on(x, y, delay)
     delay = delay or Delay.SHORT
-    Mouse:move_cursor_to(x, y, Delay.SHORT)
+    Mouse:place(x, y, Delay.SHORT)
     Mouse:double_click(Mouse.LEFT, delay)
 end
 

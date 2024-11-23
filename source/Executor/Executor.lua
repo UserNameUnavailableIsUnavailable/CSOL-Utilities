@@ -75,7 +75,7 @@ end
 ---选定角色，开始新一轮游戏。
 ---@return nil
 function Executor:choose_class()
-    Mouse:click_on(32767, 32767, 100) -- 点击屏幕中央以唤醒窗口
+    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_X , 100) -- 点击屏幕上某一处，唤醒窗口（此处取为取消按钮处防止冲突）
     if (Setting.CHOOSE_T_CLASS)
     then
         Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
@@ -144,20 +144,17 @@ function Executor:purchase_item(buy_button_x, buy_button_y)
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
 end
 
----上一次定位得到的光标
-Executor.last_location_x = -1
-Executor.last_location_y = -1
 ---光标定位。
 function Executor:locate_cursor()
     if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT) and not Keyboard:is_modifier_pressed(Keyboard.SHIFT))
     then
         local x, y = Mouse:locate_cursor()
-        if (x ~= self.last_location_x and y ~= self.last_location_y)
-        then
-            Console:infomation("光标位置：(%d, %d)", x, y)
-        end
+        Console:infomation("光标位置：(%d, %d)", x, y)
         Runtime:sleep(500)
     end
 end
 
+function Executor:clear_popups()
+    Keyboard:click_several_times(Keyboard.ESCAPE, 1, 5000)
+end
 end -- Executor_lua
