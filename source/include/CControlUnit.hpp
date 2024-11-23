@@ -1,4 +1,4 @@
-#include "CException.hpp"
+﻿#include "CException.hpp"
 #include <Windows.h>
 #include <cstddef>
 #include <errhandlingapi.h>
