@@ -54,8 +54,8 @@ Setting = {
     -- 角色选项
     CLASS_OPTION = 3, -- 可取 0 ~ 9
     -- ESC菜单的“取消”按钮
-    ZS_GAME_ESC_MENU_CANCEL_X = 32375,
-    ZS_GAME_ESC_MENU_CANCEL_Y = 43913,
+    ZS_GAME_ESC_MENU_CANCEL_X = 32341,
+    ZS_GAME_ESC_MENU_CANCEL_Y = 45735,
     -- 【灾变】资金不足，无法购买
     GAME_INSUFFICIENT_FUNDS_CONFIRM_X = 32750,
     GAME_INSUFFICIENT_FUNDS_CONFIRM_Y = 34924,
@@ -87,7 +87,7 @@ Setting = {
     STORE_BUY_CONFIRM_Y = 38993,
 ---v1.3.14 新增房间上锁功能（手册第 3 章）---
 	---是否使用密码
-	USE_PASSWORD = false,
+	USE_PASSWORD = true,
     -- 密码选项
     ROOM_USE_PASSWORD_X = 28584,
     ROOM_USE_PASSWORD_Y = 41180,
