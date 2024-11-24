@@ -46,7 +46,7 @@ B 站 ID：_CoreDump
 
 # 捐赠（自愿）
 
-本项目用爱发电，如您感觉本项目对您有帮助，欢迎向作者捐赠 😃😃😃。
+本项目用爱发电，如您感觉本项目对您有帮助，可以点点 star 支持一下，也欢迎向作者捐赠，让作者更新更有动力 😃😃😃。
 
 <img src="https://macrohard.fun/assets/donate/donate_alipay.jpg" width=300/>
 <img src="https://macrohard.fun/assets/donate/donate_wepay.jpg" width=300/>
