@@ -26,18 +26,18 @@ bool DateTime::IsLeap(uint32_t year) noexcept
 
 /*
 @brief 将消息中的时间解析为 UNIX 时间戳（调整为 UTC 标准时）。
-@param `message` 消息。
+@param `messageQuick launch` 消息。
 @param `midnight_timestamp` 该消息发送当日午夜时间戳（LTC 00:00）。
 @param `p_ms` 消息中包含的毫秒。
 @param `time_bias` 时差，time_bias = LTC - UTC，如东八区（UTC + 08:00）时差为 8 * 60 * 60 = 28800
 @return 成功时返回时间戳，失败时返回 `0`。
 */
 std::time_t DateTime::ResolveMessageTimestamp(const std::string &message, std::time_t midnight_timestamp,
-                                               uint32_t *p_ms, std::time_t time_bias) noexcept
+                                               uint64_t *p_ms, std::time_t time_bias) noexcept
 {
     static std::regex time_pattern("(\\d{1,2}):(\\d{2}):(\\d{2})\\.(\\d{3})"); /* 忽略毫秒 */
     std::smatch match;
-    std::int32_t hour = 0, minute = 0, second = 0, millisecond = 0;
+    std::int64_t hour = 0, minute = 0, second = 0, millisecond = 0;
     std::time_t ret{0};
     if (std::regex_search(message, match, time_pattern) && match.size() - 1 == 4 /* 时、分、秒、毫秒 */
     )
@@ -46,8 +46,8 @@ std::time_t DateTime::ResolveMessageTimestamp(const std::string &message, std::t
         minute = std::atoi(match[2].str().c_str());
         second = std::atoi(match[3].str().c_str());
         millisecond = std::atoi(match[4].str().c_str());
-        std::int32_t ltc_day_time = hour * 3600 + minute * 60 + second;
-        std::int32_t utc_day_time = ltc_day_time - time_bias;
+        std::int64_t ltc_day_time = hour * 3600 + minute * 60 + second;
+        std::int64_t utc_day_time = ltc_day_time - time_bias;
         if (utc_day_time < 0) /* UTC 比本地少一天 */
         {
             utc_day_time += 24 * 60 * 60;
@@ -77,23 +77,21 @@ std::time_t DateTime::CreateUnixTime(uint32_t year, uint32_t month, uint32_t day
                                       uint32_t second, float time_zone) noexcept
 {
     uint64_t ret = 0ull;
-    uint64_t total_days = 0ull;
-    uint64_t i;
-    for (i = 1970; i < year; i++)
+    uint32_t total_days = 0ull;
+    for (uint32_t j = 1970; j < year; j++)
     {
-        if (IsLeap(i))
+        if (IsLeap(j))
             total_days += 366;
         else
             total_days += 365;
     }
-    i = 1;
-    for (i = 1; i < month; i++)
+    for (uint32_t j = 1; j < month; j++)
     {
-        if (i == 1 || i == 3 || i == 5 || i == 7 || i == 8 || i == 10 || i == 12)
+        if (j == 1 || j == 3 || j == 5 || j == 7 || j == 8 || j == 10 || j == 12)
         {
             total_days += 31;
         }
-        else if (i == 2)
+        else if (j == 2)
         {
             total_days += 28;
         }

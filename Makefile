@@ -8,7 +8,8 @@ export DOCS = $(ROOT)/docs
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL_Utilities
-VERSION = v1.4.5
+VERSION = v1.4.5-preview
+
 ARCH = x86_64
 
 MODULES = Controller Docs Executor Ps1 Web
@@ -23,6 +24,8 @@ Ps1:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Install.ps1 -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
 Executor:
+	if (Test-Path $(BUILD)/Executor) { Remove-Item $(BUILD)/Executor -Recurse }
+	if (Test-Path $(BUILD)/Main.lua) { Remove-Item $(BUILD)/Main.lua }
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Executor -Recurse -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Main.lua
 # compile and link test

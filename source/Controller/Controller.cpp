@@ -75,8 +75,8 @@ Controller::Controller(std::string game_root_path, std::string launch_game_cmd)
     }
     SYSTEM_INFO si;
     GetSystemInfo(&si);
-    DWORD dwNumOfThreads = max(si.dwNumberOfProcessors, 1);
-    m_hOcr = OcrInit(DET_MODEL_FILE, CLS_MODEL_FILE, REC_MODEL_FILE, KEY_FILE, dwNumOfThreads);
+    DWORD dwNumberOfThreads = 1; /* 经过测试，开多个线程并不能显著减少识别时间 */
+    m_hOcr = OcrInit(DET_MODEL_FILE, CLS_MODEL_FILE, REC_MODEL_FILE, KEY_FILE, dwNumberOfThreads);
     if (!m_hOcr)
     {
         throw Exception("初始化 OCR 遇到致命错误。");
