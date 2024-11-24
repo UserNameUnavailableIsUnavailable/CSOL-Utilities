@@ -7,24 +7,22 @@
 - **配件自动合成**
 - **商店自动重复购买**
 
-## 先决条件
+## 运行环境要求
 
 - Windows 10/11
-- Logitech G Hub 最新版（无需罗技设备）
+- Logitech G Hub 最新版 **（无需任何罗技设备！！！）**
 
 ## 说明
 
-本项目功能目前均已实现完毕，使用文档也已经发布，详细使用文档在 `releases` 提供的压缩包中，请下载最新版本使用。
+**本软件使用 GPL v2.0 开源协议，请尊重作者劳动。**
 
-<a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a>
-
-**本软件使用 GPL v2.0 协议，请尊重作者劳动。**
+👉👉👉<a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a> 👈👈👈发布的集成工具压缩包及使用手册。
 
 B 站 ID：_CoreDump
 
 作者邮箱：ttyuig@126.com
 
-项目中的 C++ 及 Lua 原码开源并附以完善注释，供参考交流。
+项目中的 C++ 及 Lua 源码公开并附以完善注释，供参考交流。
 为防止二次传播，本项目公开的源代码不包含 Makefile 及使用手册的 $\LaTeX$ 源代码。
 后续还会将旧版工具代码整理后开源于 `legacy` 分支下。
 
@@ -48,7 +46,7 @@ B 站 ID：_CoreDump
 
 # 捐赠（自愿）
 
-本项目用爱发电，如您感觉本项目对您有帮助，欢迎向作者捐赠。
+本项目用爱发电，如您感觉本项目对您有帮助，欢迎向作者捐赠 😃😃😃。
 
 ![](https://macrohard.fun/assets/donate_alipay.bmp)
 
