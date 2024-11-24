@@ -61,13 +61,8 @@ class Controller
     };
     InGameState m_CurrentState;
     static void WatchInGameState() noexcept;                                 /* 监测游戏内状态 */
-    static void CheckInGameState() noexcept;
-    static bool AnalyzeInGameState(std::string str, std::time_t unix_time); /* 分析状态字符串，并尝试使用给定时间更新状态 */
     static void AnalyzeInGameState() noexcept;
-    static const InGameState& ResolveState();                                     /* 解析状态 */
-    static void DispatchCommand(const InGameState &in_game_state) noexcept; /* 下达命令 */
     static void DispatchAutoPlayCommand();
-    static void TransferState() noexcept;                                    /* 状态迁移 */
     std::thread m_InGameStateWatcher{};                                      /* 监测游戏内状态的线程对象 */
     Event m_InGameStateWatcherSwitch{};   /* 当 m_InGameStateWatcher 持有此对象时才能运行 */
     Event m_GameProcessAlive{};           /* 当 m_InGameStateWatcher 持有此对象时才能运行 */
