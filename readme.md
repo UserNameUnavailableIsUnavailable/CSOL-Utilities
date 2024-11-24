@@ -24,11 +24,11 @@ B 站 ID：_CoreDump
 
 作者邮箱：ttyuig@126.com
 
-为防止二次传播，本项目中的 `Makefile` 、配置文件、LaTeX 文档源码不予提供。原有的 `master`、`dev` 分支已经删除，并替换为唯一的 `main` 分支对外开放。
+项目中的 C++ 及 Lua 原码开源并附以完善注释，供参考交流。
+为防止二次传播，本项目公开的源代码不包含 Makefile 及使用手册的 $\LaTeX$ 源代码。
 后续还会将旧版工具代码整理后开源于 `legacy` 分支下。
-项目中的 C++ 及 Lua 模块仍保持开源并附以完善注释，供参考交流。
 
-## 功能概览
+## 主要功能概览
 
 ### 24 H 挂机
 
@@ -45,3 +45,11 @@ B 站 ID：_CoreDump
 ### 商店自动重复购买
 
 自动批量购买金币道具，如期限金币角色用于探索升级。
+
+# 捐赠（自愿）
+
+本项目用爱发电，如您感觉本项目对您有帮助，欢迎向作者捐赠。
+
+![](https://macrohard.fun/assets/donate_alipay.bmp)
+
+![](https://macrohard.fun/assets/donate_wepay.bmp)
