@@ -1,7 +1,8 @@
 build/
 test/
+.vs/
 .vscode/
 Makefile
-docs/
+Docs/
 manual/
 .clangd
