@@ -106,8 +106,7 @@ end
 
 ---判断是否处于停止状态，停止状态下跳过所有键鼠操作。
 function Runtime:is_paused()
-    Runtime:sleep(0)
-    return Runtime.manual_flag
+    return self.manual_flag
 end
 
 end -- Runtime_lua

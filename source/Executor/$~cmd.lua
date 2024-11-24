@@ -1,2 +1,2 @@
-Cmd = Command.CMD_NOP
-CmdTime = 0
+CmdType = Command.CMD_NOP
+CmdTimepoint = 0

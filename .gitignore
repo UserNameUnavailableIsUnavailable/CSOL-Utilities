@@ -1,3 +1,5 @@
+.vs/
+dependencies/
 build/
 test/
 .vs/
@@ -6,3 +8,7 @@ Makefile
 Docs/
 manual/
 .clangd
+CSOL-Utilities.sln
+CSOL-Utilities.vcxproj
+CSOL-Utilities.vcxproj.user
+CSOL-Utilities.vcxproj.filters
