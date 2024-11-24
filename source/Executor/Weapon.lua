@@ -48,7 +48,7 @@ Weapon.purchase_sequence = {}
 
 ---创建一个武器对象
 ---@param obj table 初始化列表。
----@return table 武器对象
+---@return table # 武器对象
 function Weapon:new(obj)
     obj = obj or {}
     self.__index = self
@@ -68,7 +68,7 @@ function Weapon:purchase()
     end
     Keyboard:click(Weapon.MELEE, Delay.NORMAL) -- 购买完成后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
     -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
-    Keyboard:click_several_times(Keyboard.ESCAPE, 6, Delay.MINI)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 8, Delay.MINI)
     Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
 end
 
@@ -101,7 +101,7 @@ end
 ---关闭死亡状态下的预购买菜单（点击“重复购买”按钮，不点击“取消购买”以避免与大厅界面按钮冲突）。
 ---@return nil
 function Weapon:close_dead_purchase_menu()
-    Mouse:click_on(Setting.GAME_DEAD_PURCHASE_MENU_REBUY_X, Setting.GAME_DEAD_PURCHASE_MENU_REBUY_Y)
+    Mouse:click_on(Setting.GAME_DEAD_PURCHASE_MENU_REBUY_X, Setting.GAME_DEAD_PURCHASE_MENU_REBUY_Y, Delay.NORMAL)
 end
 
 ---使用特殊武器的函数，在创建特殊武器对象时重写此函数。
