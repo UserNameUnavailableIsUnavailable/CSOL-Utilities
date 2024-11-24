@@ -37,20 +37,20 @@ end)
 
 ---创建游戏房间。
 function Executor:create_game_room()
-    Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+    Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
     Mouse:click_on_several_times(Setting.HALL_BACK_X, Setting.HALL_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
-    Keyboard:click_several_times(Keyboard.ESCAPE, 10, 500) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 2000)
-    Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 2000)
-    Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 2000)
-    Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 2000)
-    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 400)
-    Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 2000)
-    Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 2000)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 2000)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 2000)
-    Mouse:click_on(Setting.ROOM_USE_PASSWORD_X, Setting.ROOM_USE_PASSWORD_Y, 2000)
-    Mouse:click_on(Setting.ROOM_PASSWORD_BOX_X, Setting.ROOM_PASSWORD_BOX_Y, 2000)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 500)
+    Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 500)
+    Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 500)
+    Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 500)
+    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 100)
+    Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 200)
+    Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 200)
+    Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 500)
+    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 500)
+    Mouse:click_on(Setting.ROOM_USE_PASSWORD_X, Setting.ROOM_USE_PASSWORD_Y, 500)
+    Mouse:click_on(Setting.ROOM_PASSWORD_BOX_X, Setting.ROOM_PASSWORD_BOX_Y, 500)
     if (Setting.USE_PASSWORD)
     then
         local password
@@ -62,7 +62,7 @@ function Executor:create_game_room()
         end
         Keyboard:puts(password)
     end
-    Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 2000)
+    Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 500)
     Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000)
 end
 
@@ -75,7 +75,7 @@ end
 ---选定角色，开始新一轮游戏。
 ---@return nil
 function Executor:choose_class()
-    Mouse:click_on(32767, 32767, 100) -- 点击屏幕中央以唤醒窗口
+    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_X , 100) -- 点击屏幕上某一处，唤醒窗口（此处取为取消按钮处防止冲突）
     if (Setting.CHOOSE_T_CLASS)
     then
         Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
@@ -144,20 +144,17 @@ function Executor:purchase_item(buy_button_x, buy_button_y)
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
 end
 
----上一次定位得到的光标
-Executor.last_location_x = -1
-Executor.last_location_y = -1
 ---光标定位。
 function Executor:locate_cursor()
     if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT) and not Keyboard:is_modifier_pressed(Keyboard.SHIFT))
     then
         local x, y = Mouse:locate_cursor()
-        if (x ~= self.last_location_x and y ~= self.last_location_y)
-        then
-            Console:infomation("光标位置：(%d, %d)", x, y)
-        end
+        Console:infomation("光标位置：(%d, %d)", x, y)
         Runtime:sleep(500)
     end
 end
 
+function Executor:clear_popups()
+    Keyboard:click_several_times(Keyboard.ESCAPE, 1, 5000)
+end
 end -- Executor_lua

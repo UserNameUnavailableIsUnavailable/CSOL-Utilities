@@ -63,7 +63,10 @@ ExtendedWeaponList = {
                     self:switch_without_delay()
                     last_switch_time = current_time
                 end
-                Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                if (Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                then
+                    break;
+                end
             until (Runtime:get_running_time() - start_time > 6000)
             Mouse:release(Mouse.RIGHT, 200)
             Mouse:press(Mouse.LEFT, 1000)
@@ -96,7 +99,10 @@ ExtendedWeaponList = {
                     self:switch_without_delay()
                     last_switch_time = current_time
                 end
-                Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                if (not Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                then
+                    break
+                end
                 local duration = Runtime:get_running_time() - start_time
                 if (not first_throw and 3000 < duration and duration < 6000)
                 then
@@ -109,7 +115,7 @@ ExtendedWeaponList = {
                     second_throw = true
                 end
             until (Runtime:get_running_time() - start_time > 7000)
-            Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
+            return Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
         end
     },
     Weapon:new{
@@ -215,7 +221,7 @@ SpecialWeapon =
         ---为该武器重写 `use` 方法。
         ---@param self Weapon
         use = function (self)
-            local current_time = DateTime:get_local_timestamp() -- 当前时间戳
+            local current_time = DateTime:get_unix_timestamp() -- 当前时间戳
             -- 当前正在充能，且充能时间超过 `RECHARGE_TIME`。
             if (not self.discharging and current_time - self.recharge_start_moment > self.RECHARGE_TIME)
             then
