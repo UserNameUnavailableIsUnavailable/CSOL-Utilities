@@ -49,4 +49,4 @@ B 站 ID：_CoreDump
 本项目用爱发电，如您感觉本项目对您有帮助，欢迎向作者捐赠 😃😃😃。
 
 <img src="https://macrohard.fun/assets/donate/donate_alipay.jpg" width=300/>
-<img src="https://macrohard.fun/assets/donate/donate_wepay.bmp" width=300/>
+<img src="https://macrohard.fun/assets/donate/donate_wepay.jpg" width=300/>
