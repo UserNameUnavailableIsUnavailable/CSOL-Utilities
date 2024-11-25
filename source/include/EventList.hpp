@@ -1,10 +1,7 @@
 ﻿#pragma once
 
 #include "Event.hpp"
-#include <condition_variable>
 #include <initializer_list>
-#include <iostream>
-#include <mutex>
 #include <stdexcept>
 #include <vector>
 

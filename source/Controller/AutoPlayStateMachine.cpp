@@ -11,8 +11,10 @@
 #include <ctime>
 #include <memory>
 #include <array>
+#include <climits>
 
 // #define _RECOGNITION_RESULT
+#define _DEBUG
 
 namespace CSOL_Utilities
 {
@@ -76,7 +78,7 @@ void Controller::AnalyzeInGameState() noexcept
 #ifdef _DEBUG
         auto capture_end = std::chrono::system_clock::now();
         auto capture_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(capture_end - capture_start);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次截图耗时：%llu。", capture_elapse);
+        Console::Log(CONSOLE_LOG_LEVEL::CLL_DEBUG, "本次截图耗时：%llu。", capture_elapse);
 #endif // _DEBUG
     }
     /* 截取游戏界面图像 */
@@ -93,7 +95,7 @@ void Controller::AnalyzeInGameState() noexcept
 #ifdef _DEBUG
     auto recognition_end = std::chrono::system_clock::now();
     auto recognition_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(recognition_end - recognition_start);
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次识别耗时：%llu", recognition_elapse);
+    Console::Log(CONSOLE_LOG_LEVEL::CLL_DEBUG, "本次识别耗时：%llu", recognition_elapse);
 #endif
     thread_local std::int64_t buffer_size{ 8192 };
     assert(buffer_size > 0);
@@ -112,12 +114,12 @@ void Controller::AnalyzeInGameState() noexcept
         buffer_size = static_cast<size_t>(len) + len / 2;
         pBuffer = std::unique_ptr<char>(new char[buffer_size]);
     }
-    assert(buffer_size < std::intmax_t);
+    assert(buffer_size < INT_MAX);
     if (!OcrGetResult(hOcr, pBuffer.get(), buffer_size))
     {
         return;
     }
-#ifdef _RECOGNITION_RESULT
+#if  defined(_RECOGNITION_RESULT) && defined (_DEBUG)
 	printf("%s\r\n", pBuffer.get());
 #endif // _RECOGNITION_RESULT
     /* 分析当前游戏内情况 */
@@ -141,7 +143,7 @@ void Controller::AnalyzeInGameState() noexcept
                 ++occurrences;
                 return *this;
             }
-            InGameStatistics& operator++(int) noexcept
+            InGameStatistics operator++(int) noexcept
             {
                 auto tmp = *this;
                 operator++();
@@ -180,7 +182,7 @@ void Controller::AnalyzeInGameState() noexcept
 #ifdef _DEBUG
     auto parse_end = std::chrono::system_clock::now();
     auto parse_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(parse_end - parse_start);
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次解析耗时：%llu", parse_elapse);
+    Console::Log(CONSOLE_LOG_LEVEL::CLL_DEBUG, "本次解析耗时：%llu", parse_elapse);
 #endif
     thread_local int abnormal_back_to_room = 0;
     /* 合法状态迁移 */
@@ -237,6 +239,7 @@ void Controller::AnalyzeInGameState() noexcept
         case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏地图。"); break;
         case IN_GAME_STATE::IGS_LOADING: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏加载界面。"); break;
         case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏房间。"); break;
+        default: break;
         }
     }
     /* 非法状态迁移，4 种 */
@@ -281,8 +284,10 @@ void Controller::AnalyzeInGameState() noexcept
         case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏地图。"); break;
         case IN_GAME_STATE::IGS_LOADING: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏加载界面。"); break;
         case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏房间。"); break;
+        default: break;
         }
     }
+
     /* 超时检查 */
     if (state.GetState() == IN_GAME_STATE::IGS_IN_ROOM && current_time - state.GetTimestamp() > s_Instance->GetMaxWaitTimeInGameRoom())
     {
