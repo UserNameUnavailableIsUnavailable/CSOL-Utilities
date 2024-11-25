@@ -1,7 +1,7 @@
 VPATH := $(SOURCE)/include $(DEPENDENCIES) $(SOURCE)/$(MOD) $(BUILD)/$(MOD)
-HEADERS := CConsole CController CDateTime CEvent CEventList CException CInGameState CMessenger CSOL_Utilities ExecutorCommand CLI11 aho_corasick/aho_corasick
+HEADERS := aho_corasick/aho_corasick CLI11 Console Controller CSOL_Utilities DateTime Event EventList Exception ExecutorCommand InGmeState Messenger
 C_HEADERS := OCR/OcrLiteCApi
-IMPLEMENTATIONS := Main Win32Util AutoPlayStateMachine WatchGameProcess HandleHotKeyEvent DispatchFixedCommand CMessenger CDateTime CController CConsole ExecutorCommand
+IMPLEMENTATIONS := Main AutoPlayStateMachine Console Controller DateTime DispatchFixedCommand EventHandler ExecutorCommand Messenger WatchGameProcess Win32Util
 LIBS := RapidOcrOnnx.lib
 OBJECTS := $(addsuffix .obj, $(IMPLEMENTATIONS))
 .PHONY: all

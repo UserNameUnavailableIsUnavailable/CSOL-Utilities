@@ -43,4 +43,4 @@ class Event
         return m_Signal;
     }
 };
-}; // namespace CSOL_Utilities
+};
