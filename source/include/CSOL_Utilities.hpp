@@ -2,7 +2,6 @@
 
 #include <Windows.h>
 #include <memory>
-#include <mutex>
 
 namespace CSOL_Utilities
 {
@@ -95,6 +94,7 @@ enum class CONSOLE_LOG_LEVEL
 {
     CLL_MESSAGE,
     CLL_WARNING,
+    CLL_DEBUG,
     CLL_ERROR
 };
 constexpr const char* DET_MODEL_FILE = "models/ch_PP-OCRv4_det_infer.onnx";

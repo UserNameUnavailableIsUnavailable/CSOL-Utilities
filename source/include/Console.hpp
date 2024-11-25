@@ -33,19 +33,23 @@ class Console
             std::printf("\x1b[39m"
                         "\r\n");
         }
-        else if (level == CONSOLE_LOG_LEVEL::CLL_ERROR)
+        else if (level == CONSOLE_LOG_LEVEL::CLL_DEBUG)
         {
-            std::printf("\x1b[91m%s【错误】", current_time_string); /* 红色字体打印错误 */
-            std::printf(fmt, args...);
-            std::printf("\x1b[39m"
-                        "\r\n");
+            std::printf("\x1b[94m%s【调试】", current_time_string);
+            std::printf(_Printf_format_string_ fmt, args...);
+            std::printf("\x1b[39m\r\n");
         }
         else if (level == CONSOLE_LOG_LEVEL::CLL_WARNING)
         {
             std::printf("\x1b[93m%s【警告】", current_time_string); /* 黄色字体打印警告 */
             std::printf(_Printf_format_string_ fmt, args...);
-            std::printf("\x1b[39m"
-                        "\r\n");
+            std::printf("\x1b[39m\r\n");
+        }
+        else if (level == CONSOLE_LOG_LEVEL::CLL_ERROR)
+        {
+            std::printf("\x1b[91m%s【错误】", current_time_string); /* 红色字体打印错误 */
+            std::printf(fmt, args...);
+            std::printf("\x1b[39m\r\n");
         }
         std::fflush(stdout);
     };

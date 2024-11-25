@@ -5,7 +5,6 @@
 #include "CSOL_Utilities.hpp"
 #include "OCR/OcrLiteCApi.h"
 #include <memory>
-#include <vector>
 #include <Windows.h>
 #include <filesystem>
 #include <mutex>
@@ -72,7 +71,7 @@ class Controller
     Event m_GameProcessWatcherSwitch{};   /* 当 m_GameProcessWatcher 持有此对象时才能运行 */
     Event m_GameProcessWatcherFinished{}; /* 用于告知热键处理例程挂起状态 */
     bool m_bWasGameProcessWatcherInterrupted{};   /* m_GameProcessWatcher 是否曾被中断 */
-    CMessenger m_Messenger;                       /* 向 Lua Executor 下达命令 */
+    Messenger m_Messenger;                       /* 向 Lua Executor 下达命令 */
     std::mutex m_GameInfoMutex;
     HWND m_hGameWindow = nullptr;                 /* 游戏窗口句柄 */
     UniqueHandle m_hGameProcess;
