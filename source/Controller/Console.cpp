@@ -8,7 +8,7 @@ using namespace CSOL_Utilities;
 
 std::mutex Console::m_Mutex{};
 
-void Console::Log(CONSOLE_LOG_LEVEL level, std::string s) noexcept
+void Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL level, std::string s) noexcept
 {
     std::lock_guard<std::mutex> lock_guard(m_Mutex);
     std::time_t current_time =
@@ -17,16 +17,21 @@ void Console::Log(CONSOLE_LOG_LEVEL level, std::string s) noexcept
     localtime_s(&current_tm, &current_time);
     char current_time_string[32];
     strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
-    if (level == CONSOLE_LOG_LEVEL::CLL_MESSAGE)
+    if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE)
     {
         std::cout << "\x1b[92m" << current_time_string << "【消息】" << s << "\x1b[39m" << std::endl;
     }
-    else if (level == CONSOLE_LOG_LEVEL::CLL_WARNING)
+    else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING)
     {
         std::cout << "\x1b[93m" << current_time_string << "【警告】" /* 黄色字体打印警告 */
                   << s << "\x1b[39m" << std::endl;
     }
-    else if (level == CONSOLE_LOG_LEVEL::CLL_ERROR)
+    else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG)
+    {
+        std::cout << "\x1b[94m" << current_time_string << "【调试】"
+            << s << "\x1b[39m" << std::endl;
+    }
+    else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR)
     {
         std::cout << "\x1b[91m" << current_time_string << "【错误】" /* 红色字体打印错误 */
                   << s << "\x1b[39m" << std::endl;

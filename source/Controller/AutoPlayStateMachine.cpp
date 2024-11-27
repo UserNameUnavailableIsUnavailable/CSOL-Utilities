@@ -11,13 +11,16 @@
 #include <ctime>
 #include <memory>
 #include <array>
+#include <climits>
+#include <WindowCapture.hpp>
+#include <Exception.hpp>
 
 // #define _RECOGNITION_RESULT
 
 namespace CSOL_Utilities
 {
-constexpr const char* GAME_IMAGE_FILE_NAME_UTF8 = "~$capture.bmp";
-constexpr const wchar_t* GAME_IMAGE_FILE_NAME_UTF16 = L"~$capture.bmp";
+constexpr const char* GAME_IMAGE_FILE_NAME_UTF8 = "$~capture.bmp";
+constexpr const wchar_t* GAME_IMAGE_FILE_NAME_UTF16 = L"$~capture.bmp";
 /* 关键字 */
 /* 大厅中可能被检测到的文本 */
 const char* HALL_TEXT[]{ "公告栏", "教程大纲", "通过好友", "返回", "新建房间", "进入房间", "输入房间号", "搜索" };
@@ -30,7 +33,7 @@ const char* MAP_TEXT[]{ "录制", "录像", "视频", "取消", "选择角色", 
 	"重新购买", "开启提示", "僵尸的战利品", "无法携带更多", "连续杀敌", "全员杀敌", "无法丢弃该武器", "通关失败",
     "使用回合重置道具", "购买菜单", "金币总计", "胜率", "成功通关", "通关时间", "已成功完成一局游戏", "胜率", "当前关数", "联赛积分", "武器喜好调查"
 };
-void Controller::AnalyzeInGameState() noexcept
+void Controller::AnalyzeInGameState()
 {
     thread_local aho_corasick::trie trie;
     thread_local bool hasTrieInitialized{ false };
@@ -69,15 +72,36 @@ void Controller::AnalyzeInGameState() noexcept
         }
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-#ifdef _DEBUG
-        auto capture_start = std::chrono::system_clock::now();
-#endif
-        if (!CaptureWindowAsBmpW(GAME_IMAGE_FILE_NAME_UTF16, hWnd)) return;
-#ifdef _DEBUG
-        auto capture_end = std::chrono::system_clock::now();
-        auto capture_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(capture_end - capture_start);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次截图耗时：%llu。", capture_elapse);
-#endif // _DEBUG
+//#ifdef _DEBUG
+//        auto capture_start = std::chrono::system_clock::now();
+//#endif
+        thread_local WindowCapture wc;
+        thread_local int successive_error_count = 0;
+        try
+        {
+			UniqueHandle hFile = CreateFileW(GAME_IMAGE_FILE_NAME_UTF16, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (!hFile)
+            {
+                throw Exception("创建文件失败。错误代码：%lu。", GetLastError());
+            }
+			wc.Capture(hWnd).Save(hFile.get());
+        }
+        catch (Exception& e)
+        {
+            Console::Log(e.GetLevel(), e.what());
+            successive_error_count++;
+            if (successive_error_count > 9)
+            {
+                throw Exception("错误次数过多。");
+            }
+			return;
+        }
+        successive_error_count = 0; /* 本次未出现错误，则将错误计数置为 0 */
+//#ifdef _DEBUG
+//        auto capture_end = std::chrono::system_clock::now();
+//        auto capture_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(capture_end - capture_start);
+//        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG, "本次截图耗时：%llu。", capture_elapse);
+//#endif // _DEBUG
     }
     /* 截取游戏界面图像 */
     thread_local OCR_PARAM param{ 0 };
@@ -93,9 +117,9 @@ void Controller::AnalyzeInGameState() noexcept
 #ifdef _DEBUG
     auto recognition_end = std::chrono::system_clock::now();
     auto recognition_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(recognition_end - recognition_start);
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次识别耗时：%llu", recognition_elapse);
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG, "本次识别耗时：%llu", recognition_elapse);
 #endif
-    thread_local std::int64_t buffer_size{ 8192 };
+    thread_local std::int32_t buffer_size{ 8192 };
     assert(buffer_size > 0);
     thread_local std::unique_ptr<char> pBuffer(new char[buffer_size]);
     if (!bRet)
@@ -109,15 +133,15 @@ void Controller::AnalyzeInGameState() noexcept
     }
     if (len >= buffer_size)
     {
-        buffer_size = static_cast<size_t>(len) + len / 2;
+        buffer_size = len + len / 2; /* 扩大 1.5 倍 */
         pBuffer = std::unique_ptr<char>(new char[buffer_size]);
     }
-    assert(buffer_size < std::intmax_t);
+    assert(buffer_size < INT_MAX);
     if (!OcrGetResult(hOcr, pBuffer.get(), buffer_size))
     {
         return;
     }
-#ifdef _RECOGNITION_RESULT
+#if  defined(_RECOGNITION_RESULT) && defined (_DEBUG)
 	printf("%s\r\n", pBuffer.get());
 #endif // _RECOGNITION_RESULT
     /* 分析当前游戏内情况 */
@@ -141,7 +165,7 @@ void Controller::AnalyzeInGameState() noexcept
                 ++occurrences;
                 return *this;
             }
-            InGameStatistics& operator++(int) noexcept
+            InGameStatistics operator++(int) noexcept
             {
                 auto tmp = *this;
                 operator++();
@@ -180,7 +204,7 @@ void Controller::AnalyzeInGameState() noexcept
 #ifdef _DEBUG
     auto parse_end = std::chrono::system_clock::now();
     auto parse_elapse = std::chrono::duration_cast<std::chrono::milliseconds>(parse_end - parse_start);
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "本次解析耗时：%llu", parse_elapse);
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG, "本次解析耗时：%llu", parse_elapse);
 #endif
     thread_local int abnormal_back_to_room = 0;
     /* 合法状态迁移 */
@@ -194,27 +218,27 @@ void Controller::AnalyzeInGameState() noexcept
     else if (state.GetState() == IN_GAME_STATE::IGS_LOGIN && current_state_typename == IN_GAME_STATE::IGS_IN_HALL) /* 登陆成功，进入大厅 */
     {
         state.update(current_state_typename, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "登陆成功，进入大厅。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "登陆成功，进入大厅。");
     }
     else if (state.GetState() == IN_GAME_STATE::IGS_IN_HALL && current_state_typename == IN_GAME_STATE::IGS_IN_ROOM) /* 创建房间 */
     {
         state.update(current_state_typename, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "进入游戏房间。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "进入游戏房间。");
     }
     else if (state.GetState() == IN_GAME_STATE::IGS_IN_ROOM && current_state_typename == IN_GAME_STATE::IGS_LOADING) /* 开始游戏 */
     {
         state.update(current_state_typename, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "开始游戏，加载游戏场景。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "开始游戏，加载游戏场景。");
     }
     else if (state.GetState() == IN_GAME_STATE::IGS_LOADING && current_state_typename == IN_GAME_STATE::IGS_IN_MAP) /* 场景加载完成 */
     {
         state.update(current_state_typename, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏场景加载完成。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "游戏场景加载完成。");
     }
     else if (state.GetState() == IN_GAME_STATE::IGS_IN_MAP && current_state_typename == IN_GAME_STATE::IGS_IN_ROOM) /* 结算确认 */
     {
         state.update(current_state_typename, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "结算确认，回到游戏房间。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "结算确认，回到游戏房间。");
     }
     /* 消除未知状态迁移，不计入迁移种类 */
     else if (current_state_typename == IN_GAME_STATE::IGS_UNKNOWN)
@@ -233,10 +257,11 @@ void Controller::AnalyzeInGameState() noexcept
         state.update(current_state_typename, current_time);
         switch (current_state_typename)
         {
-        case IN_GAME_STATE::IGS_IN_HALL: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏大厅。"); break;
-        case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏地图。"); break;
-        case IN_GAME_STATE::IGS_LOADING: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏加载界面。"); break;
-        case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏房间。"); break;
+        case IN_GAME_STATE::IGS_IN_HALL: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏大厅。"); break;
+        case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏地图。"); break;
+        case IN_GAME_STATE::IGS_LOADING: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏加载界面。"); break;
+        case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏房间。"); break;
+        default: break;
         }
     }
     /* 非法状态迁移，4 种 */
@@ -246,15 +271,15 @@ void Controller::AnalyzeInGameState() noexcept
         if (abnormal_back_to_room == 3)
         {
             state.update(IN_GAME_STATE::IGS_IN_HALL, current_time); /* 直接离开房间回到大厅 */
-            Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "异常回到游戏房间次数过多，离开当前房间重新创建。");
+            Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "异常回到游戏房间次数过多，离开当前房间重新创建。");
             abnormal_back_to_room = 0;
         }
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "游戏场景加载失败（可能为网络问题，一般表现为重连 1 2 3）。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "游戏场景加载失败（可能为网络问题，一般表现为重连 1 2 3）。");
     }
     else if (state.GetState() == IN_GAME_STATE::IGS_IN_MAP && current_state_typename == IN_GAME_STATE::IGS_IN_HALL) /* 从游戏场景返回到大厅，原因一般为：强制踢出、长时间没有有效操作 */
     {
         state.update(IN_GAME_STATE::IGS_IN_HALL, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "从游戏场景返回到大厅（可能是被强踢或长时间没有有效操作，若是自行退出请忽略）。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "从游戏场景返回到大厅（可能是被强踢或长时间没有有效操作，若是自行退出请忽略）。");
     }
     //else if (state.GetState() == IN_GAME_STATE::IGS_IN_MAP && current_state_typename == IN_GAME_STATE::IGS_IN_ROOM) /* 从游戏场景返回到房间，原因一般为连接游戏服务器超时 */
     //{
@@ -270,33 +295,35 @@ void Controller::AnalyzeInGameState() noexcept
     else if (state.GetState() == IN_GAME_STATE::IGS_IN_ROOM && current_state_typename == IN_GAME_STATE::IGS_IN_HALL) /* 从游戏房间返回到大厅，原因可能是：强制踢出、房间等待时间过长 */
     {
         state.update(IN_GAME_STATE::IGS_IN_HALL, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "从游戏房间返回到大厅（可能是被强踢或房间等待时间过长，若是自行离开请忽略）。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "从游戏房间返回到大厅（可能是被强踢或房间等待时间过长，若是自行离开请忽略）。");
     }
     else /* 其他情形，除非手动操作，否则应该不会出现 */
     {
         state.update(current_state_typename, current_time);
         switch (current_state_typename)
         {
-        case IN_GAME_STATE::IGS_IN_HALL: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏大厅。"); break;
-        case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏地图。"); break;
-        case IN_GAME_STATE::IGS_LOADING: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏加载界面。"); break;
-        case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "当前场景确定为游戏房间。"); break;
+        case IN_GAME_STATE::IGS_IN_HALL: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏大厅。"); break;
+        case IN_GAME_STATE::IGS_IN_MAP: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏地图。"); break;
+        case IN_GAME_STATE::IGS_LOADING: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏加载界面。"); break;
+        case IN_GAME_STATE::IGS_IN_ROOM: Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "当前场景确定为游戏房间。"); break;
+        default: break;
         }
     }
+
     /* 超时检查 */
     if (state.GetState() == IN_GAME_STATE::IGS_IN_ROOM && current_time - state.GetTimestamp() > s_Instance->GetMaxWaitTimeInGameRoom())
     {
         state.update(IN_GAME_STATE::IGS_IN_HALL, current_time);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "在房间内等待时间超过预设 %u 秒，回到大厅重新创建房间。", s_Instance->GetMaxWaitTimeInGameRoom());
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "在房间内等待时间超过预设 %u 秒，回到大厅重新创建房间。", s_Instance->GetMaxWaitTimeInGameRoom());
     }
 	else if (state.GetState() == IN_GAME_STATE::IGS_LOGIN && current_time - state.GetTimestamp() > 60) /* 登录时间超过 60 秒 */
 	{
         state.update(IN_GAME_STATE::IGS_UNKNOWN, current_time);
-		Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "等待游戏登录达到超时时间（60 秒）。");
+		Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "等待游戏登录达到超时时间（60 秒）。");
 	}
     else if (state.GetState() == IN_GAME_STATE::IGS_LOADING && current_time - state.GetTimestamp() > 150) /* 游戏加载超时 2 */
     {
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "等待游戏加载达到超时时间（超时设定为 150 秒，超过该时间可能是游戏失去响应），结束游戏进程以重新启动。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "等待游戏加载达到超时时间（超时设定为 150 秒，超过该时间可能是游戏失去响应），结束游戏进程以重新启动。");
 		std::lock_guard lk(s_Instance->m_GameInfoMutex);
 		TerminateProcess(s_Instance->m_hGameProcess.get(), 0);
     }
@@ -319,7 +346,7 @@ void Controller::DispatchAutoPlayCommand()
     std::time_t current_time = std::time(nullptr);
     if (m_CurrentState.GetState() == IN_GAME_STATE::IGS_UNKNOWN)
     {
-        thread_local ExecutorCommand cmd(5);
+        thread_local ExecutorCommand cmd(5, true);
         cmd.Set(EXECUTOR_COMMAND::CMD_CLEAR_POPUPS, current_time);
         s_Instance->m_Messenger.Dispatch(cmd);
     }
@@ -329,14 +356,14 @@ void Controller::DispatchAutoPlayCommand()
     }
     else if (m_CurrentState.GetState() == IN_GAME_STATE::IGS_IN_HALL) /* 大厅内 */
     {
-        thread_local ExecutorCommand cmd(15);
+        thread_local ExecutorCommand cmd(15, false);
         cmd.Set(EXECUTOR_COMMAND::CMD_CREATE_GAME_ROOM, current_time);
         remove_game_window_border();
         s_Instance->m_Messenger.Dispatch(cmd);
     }
     else if (m_CurrentState.GetState() == IN_GAME_STATE::IGS_IN_ROOM) /* 房间内（正常） */
     {
-        thread_local ExecutorCommand cmd(3);
+        thread_local ExecutorCommand cmd(3, true);
         cmd.Set(EXECUTOR_COMMAND::CMD_START_GAME_ROOM, current_time);
         remove_game_window_border();
         s_Instance->m_Messenger.Dispatch(cmd);
@@ -347,7 +374,7 @@ void Controller::DispatchAutoPlayCommand()
     }
     else if (m_CurrentState.GetState() == IN_GAME_STATE::IGS_IN_MAP) /* 游戏中 */
     {
-        thread_local ExecutorCommand cmd(3);
+        thread_local ExecutorCommand cmd(3, true);
         if (s_Instance->m_ExtendedAutoPlayMode && current_time - m_CurrentState.GetTimestamp() > 60)
         {
 			cmd.Set(EXECUTOR_COMMAND::CMD_PLAY_GAME_EXTEND, current_time);
@@ -375,6 +402,7 @@ void Controller::WatchInGameState() noexcept
         };
         while (true)
         {
+            auto start = std::chrono::system_clock::now();
             event_list.WaitAll();
             if (s_Instance->m_ExitThreads)
             {
@@ -384,14 +412,17 @@ void Controller::WatchInGameState() noexcept
             AnalyzeInGameState();
             DispatchAutoPlayCommand();
             s_Instance->m_InGameStateWatcherFinished.Set();
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            auto end = std::chrono::system_clock::now();
+            auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            auto sleep_time = elapse > std::chrono::seconds(6) ? std::chrono::milliseconds(500) : std::chrono::seconds(6) - elapse;
+            std::this_thread::sleep_for(sleep_time);
         };
     }
-    catch (const std::exception &e)
+    catch (Exception &e)
     {
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, e.what());
+        Console::Log(e.GetLevel(), e.what());
     }
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 m_InGameStateWatcher 退出。");
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "线程 m_InGameStateWatcher 退出。");
     s_Instance->m_ThreadExitEvent.Set();
 }
 }

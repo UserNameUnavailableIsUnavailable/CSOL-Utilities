@@ -8,15 +8,15 @@
 
 namespace CSOL_Utilities
 {
-class CMessenger
+class Messenger
 {
   public:
-    explicit CMessenger(std::filesystem::path file);
-    CMessenger(const CMessenger &) = delete;
-    CMessenger &operator=(const CMessenger &) = delete;
-    CMessenger(const CMessenger &&) = delete;
-    CMessenger &operator=(const CMessenger &&) = delete;
-    ~CMessenger() noexcept;
+    explicit Messenger(std::filesystem::path file);
+    Messenger(const Messenger &) = delete;
+    Messenger &operator=(const Messenger &) = delete;
+    Messenger(const Messenger &&) = delete;
+    Messenger &operator=(const Messenger &&) = delete;
+    ~Messenger() noexcept;
     void Dispatch(const ExecutorCommand& ec) noexcept;
     void DispatchNOP() noexcept;
   private:
