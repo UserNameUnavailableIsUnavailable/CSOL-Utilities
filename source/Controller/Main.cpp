@@ -42,7 +42,7 @@ int wmain(int argc, wchar_t **argv)
     }
     if (!IsRunningAsAdmin())
     {
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。");
     }
     CLI::App app{"CSOL 集成工具"};
     std::string game_root_dir;
@@ -74,23 +74,23 @@ int wmain(int argc, wchar_t **argv)
                     QueryRegistryStringItem(HKEY_CURRENT_USER, L"Software\\TCGame\\csol", L"gamepath").get())
                     .get();
         }
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE,
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE,
                       "本工具由 _CoreDump 开发。联系邮箱：ttyuig@126.com，B 站 "
                       "ID：_CoreDump。本工具开源免费，请注意甄别。项目地址：https://gitee.com/silver1867/csol-24-h。"
         );
         Controller::InitializeInstance(std::move(game_root_dir), std::move(launch_game_cmd));
         Controller &instance = Controller::RetrieveInstance();
         instance.SetMaxWaitTimeInGameRoom(max_wait_time_in_room);
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "在房间内等待最长时间设定为 %u 秒",
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "在房间内等待最长时间设定为 %u 秒",
                       instance.GetMaxWaitTimeInGameRoom());
         instance.RunInstance();
         Controller::DestroyInstance();
     }
     catch (std::exception &e)
     {
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, e.what());
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, e.what());
         Controller::DestroyInstance();
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。");
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。");
         std::getchar();
         return GetLastError();
     }

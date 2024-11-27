@@ -8,7 +8,7 @@ export DOCS = $(ROOT)/docs
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL_Utilities
-VERSION = v1.4.5-preview
+VERSION = v1.4.5
 
 ARCH = x86_64
 
@@ -48,6 +48,7 @@ Web:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Setting.html -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Weapon.html -Force
 Pack:
+	if (Test-Path $(BUILD)/pack) { Remove-Item -Force -Recurse $(BUILD)/pack }
 	New-Item -Type Directory -Path $(BUILD)/pack -Force
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Install.ps1"
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/ConfigWebPages","$(BUILD)/Setting.html","$(BUILD)/Weapon.html" -Recurse

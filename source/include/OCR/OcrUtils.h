@@ -29,24 +29,21 @@ static double getStdev(std::vector<T> &input, double mean) {
     return stdev;
 }
 
+template<class T>
+inline T clamp(T x, T min, T max) {
+    if (x > max)
+        return max;
+    if (x < min)
+        return min;
+    return x;
+}
+
 double getCurrentTime();
 
 inline bool isFileExists(const std::string &name) {
     struct stat buffer;
     return (stat(name.c_str(), &buffer) == 0);
 }
-
-/*#ifdef _WIN32
-#define my_strtol wcstol
-#define my_strrchr wcsrchr
-#define my_strcasecmp _wcsicmp
-#define my_strdup _strdup
-#else
-#define my_strtol strtol
-#define my_strrchr strrchr
-#define my_strcasecmp strcasecmp
-#define my_strdup strdup
-#endif*/
 
 std::wstring strToWstr(std::string str);
 
@@ -72,11 +69,11 @@ cv::Mat getRotateCropImage(const cv::Mat &src, std::vector<cv::Point> box);
 
 cv::Mat adjustTargetImg(cv::Mat &src, int dstWidth, int dstHeight);
 
-std::vector<cv::Point> getMinBoxes(const std::vector<cv::Point> &inVec, float &minSideLen, float &allEdgeSize);
+std::vector<cv::Point2f> getMinBoxes(const cv::RotatedRect &boxRect, float &maxSideLen);
 
-float boxScoreFast(const cv::Mat &inMat, const std::vector<cv::Point> &inBox);
+float boxScoreFast(const std::vector<cv::Point2f> &boxes, const cv::Mat &pred);
 
-std::vector<cv::Point> unClip(const std::vector<cv::Point> &inBox, float perimeter, float unClipRatio);
+cv::RotatedRect unClip(std::vector<cv::Point2f> box, float unClipRatio);
 
 std::vector<float> substractMeanNormalize(cv::Mat &src, const float *meanVals, const float *normVals);
 

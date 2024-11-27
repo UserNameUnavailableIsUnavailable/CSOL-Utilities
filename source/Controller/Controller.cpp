@@ -11,15 +11,16 @@
 using namespace CSOL_Utilities;
 
 std::mutex Controller::s_SingletonStateMutex{};
-Controller *Controller::s_Instance{nullptr};
+Controller* Controller::s_Instance{ nullptr };
 
 void Controller::InitializeInstance(std::string game_root, std::string cmd)
 {
-    std::filesystem::path Executor(std::filesystem::current_path() / "Executor");
-    if (!std::filesystem::exists(Executor) || !std::filesystem::is_directory(Executor))
+    std::filesystem::path Lua_Executor(std::filesystem::current_path() / L"Executor");
+    if (!std::filesystem::exists(Lua_Executor) || !std::filesystem::is_directory(Lua_Executor))
     {
-        throw Exception("目录 %s 不存在。", Executor.u8string().c_str());
+        throw Exception("目录 %s 不存在。", Lua_Executor.u8string().c_str());
     }
+    /* Double check */
     if (!s_Instance)
     {
         std::lock_guard<std::mutex> lock_guard(s_SingletonStateMutex); /* lock_guard 防止创建单例时的并发问题 */
@@ -63,12 +64,12 @@ Controller::Controller(std::string game_root_path, std::string launch_game_cmd)
          置位，否则会导致热键处理线程死锁 */
       m_GameProcessWatcherFinished(true), m_InGameStateWatcherFinished(true), m_FixedCommandDispatcherFinished(true),
       m_LaunchGameCmd(ConvertUtf8ToUtf16(launch_game_cmd.c_str())),
-      m_Messenger(std::filesystem::current_path() / "Executor" / "$~cmd.lua")
+      m_Messenger(std::filesystem::current_path() / L"Executor" / L"$~cmd.lua")
 {
     long bias;
     _get_timezone(&bias);
     m_Bias = bias;
-    m_hDllMod = LoadLibraryW(L".\\GamingTool.dll");
+    m_hDllMod = LoadLibraryW(L"GamingTool.dll");
     if (!m_hDllMod)
     {
         throw Exception("加载 GamingTool.dll 失败，错误代码：%lu。", GetLastError());
@@ -109,6 +110,6 @@ Controller::~Controller() noexcept
     }
     catch (std::exception &e)
     {
-        Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, e.what());
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, e.what());
     }
 }
