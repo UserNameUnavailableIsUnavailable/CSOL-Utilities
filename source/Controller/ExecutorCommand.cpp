@@ -1,4 +1,4 @@
-﻿#include "ExecutorCommand.hpp"
+#include "ExecutorCommand.hpp"
 #include <cstdint>
 
 namespace CSOL_Utilities

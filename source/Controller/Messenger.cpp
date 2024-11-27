@@ -1,30 +1,31 @@
 ﻿#include "Messenger.hpp"
-#include <atomic>
 #include <filesystem>
 #include <mutex>
 namespace CSOL_Utilities
 {
-CMessenger::CMessenger(std::filesystem::path file)
+Messenger::Messenger(std::filesystem::path file)
     : m_CommandFile(file), m_FileStream(m_CommandFile, std::ios::out | std::ios::binary),
       m_CommandString(QueryCommandString(EXECUTOR_COMMAND::CMD_NOP)), m_Mutex(), m_Buffer(new char[512])
 {
 }
 
-CMessenger::~CMessenger() noexcept
+Messenger::~Messenger() noexcept
 {
     DispatchNOP();
     delete[] m_Buffer;
 }
 
-void CMessenger::DispatchNOP() noexcept
+void Messenger::DispatchNOP() noexcept
 {
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = 0\n"
-        << "CmdType = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
-        << "CmdTimepoint = 0" << std::endl;
+                 << "CmdType = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
+                 << "CmdTimepoint = 0\n"
+                 << "CmdRepeatable = false\n"
+                 << std::endl;
     std::filesystem::resize_file(m_CommandFile, m_FileStream.tellp()); /* 设置文件 EOF */
 }
-void CMessenger::Dispatch(const ExecutorCommand& ec) noexcept
+void Messenger::Dispatch(const ExecutorCommand& ec) noexcept
 {
     std::lock_guard<std::mutex> lk(m_Mutex);
     static std::uint64_t id_record = 0;
@@ -36,12 +37,13 @@ void CMessenger::Dispatch(const ExecutorCommand& ec) noexcept
     m_CommandTimepoint = ec.GetCmdTimepoint();
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = " << ec.GetId() << '\n'
-        << "CmdType = " << m_CommandString << '\n'
-        << "CmdTimepoint = " << m_CommandTimepoint << std::endl;
+                 << "CmdType = " << m_CommandString << '\n'
+                 << "CmdTimepoint = " << m_CommandTimepoint << '\n'
+                 << "CmdRepeatable = " << (ec.IsRepeatable() ? "true" : "false") << std::endl;
     std::filesystem::resize_file(m_CommandFile, m_FileStream.tellp()); /* 设置文件 EOF */
 }
 
-constexpr const char* CMessenger::QueryCommandString(EXECUTOR_COMMAND cmd) noexcept
+constexpr const char* Messenger::QueryCommandString(EXECUTOR_COMMAND cmd) noexcept
 {
     switch (cmd)
     {

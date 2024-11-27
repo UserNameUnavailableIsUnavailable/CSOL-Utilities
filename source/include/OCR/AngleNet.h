@@ -7,11 +7,12 @@
 
 class AngleNet {
 public:
-    AngleNet();
 
     ~AngleNet();
 
     void setNumThread(int numOfThread);
+
+    void setGpuIndex(int gpuIndex);
 
     void initModel(const std::string &pathStr);
 
@@ -32,7 +33,7 @@ private:
     const float meanValues[3] = {127.5, 127.5, 127.5};
     const float normValues[3] = {1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5};
     const int dstWidth = 192;
-    const int dstHeight = 32;
+    const int dstHeight = 48;
 
     Angle getAngle(cv::Mat &src);
 };
