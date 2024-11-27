@@ -24,16 +24,16 @@ void Controller::HandleHotKeyEvent() noexcept
         {
             if (!RegisterHotKey(nullptr, idHotKeyEnd, MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, idHotKeyEnd))
             {
-                Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "注册热键 {Ctrl Alt Shift %c} 失败，请检查是否存在热键冲突。错误代码：%lu。", idHotKeyEnd, GetLastError());
+                Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "注册热键 {Ctrl Alt Shift %c} 失败，请检查是否存在热键冲突。错误代码：%lu。", idHotKeyEnd, GetLastError());
                 break;
             }
-			Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "成功注册热键 {Ctrl Alt Shift %c}。", idHotKeyEnd);
+			Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "成功注册热键 {Ctrl Alt Shift %c}。", idHotKeyEnd);
         }
 		SetUserObjectInformationW(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bObjInfo, sizeof(BOOL));
         idTimer = SetTimer(nullptr, 0, 5, nullptr);
         if (idTimer == 0)
         {
-            Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "创建定时器失败。错误代码：%lu。", GetLastError());
+            Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "创建定时器失败。错误代码：%lu。", GetLastError());
             break;
         }
 		MSG msg;
@@ -56,7 +56,7 @@ void Controller::HandleHotKeyEvent() noexcept
 				if (hCSOBannerProcess)
 				{
 					TerminateProcess(hCSOBannerProcess, 0);
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "检测到 CSOBanner 正在运行，结束 CSOBanner。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "检测到 CSOBanner 正在运行，结束 CSOBanner。");
 					CloseHandle(hCSOBannerProcess);
 				}
 			}
@@ -92,7 +92,7 @@ void Controller::HandleHotKeyEvent() noexcept
 				/* 切换状态 */
 				if (msg.wParam == '0')
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 0 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 0 号模式。");
 					s_Instance->m_Messenger.DispatchNOP();
 				}
 				else if (msg.wParam == '1')
@@ -101,7 +101,7 @@ void Controller::HandleHotKeyEvent() noexcept
 					s_Instance->m_InGameStateWatcherSwitch.Set();
 					s_Instance->m_GameProcessWatcherSwitch.Set();
 					s_Instance->ToggleExtendedAutoPlayMode(false);
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 1 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 1 号模式。");
 				}
 				else if (msg.wParam == '2')
 				{
@@ -109,25 +109,25 @@ void Controller::HandleHotKeyEvent() noexcept
 					s_Instance->m_InGameStateWatcherSwitch.Set();
 					s_Instance->m_GameProcessWatcherSwitch.Set();
 					s_Instance->ToggleExtendedAutoPlayMode(true);
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 2 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 2 号模式。");
 				}
 				else if (msg.wParam == '3')
 				{ /* 合成配件 */
 					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_COMBINE_PARTS;
 					s_Instance->m_FixedCommandDispatcherSwitch.Set();
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 3 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 3 号模式。");
 				}
 				else if (msg.wParam == '4')
 				{ /* 购买物品 */
 					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_PURCHASE_ITEM;
 					s_Instance->m_FixedCommandDispatcherSwitch.Set();
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 4 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 4 号模式。");
 				}
 				else if (msg.wParam == '5')
 				{ /* 光标定位 */
 					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_LOCATE_CURSOR;
 					s_Instance->m_FixedCommandDispatcherSwitch.Set();
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "切换为 5 号模式。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 5 号模式。");
 				}
 				mode = msg.wParam;
 			}
@@ -143,6 +143,6 @@ void Controller::HandleHotKeyEvent() noexcept
 	{
 		KillTimer(nullptr, idTimer);
 	}
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 m_HotKeyEventHandler 退出。");
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "线程 m_HotKeyEventHandler 退出。");
     s_Instance->m_ThreadExitEvent.Set();
 }

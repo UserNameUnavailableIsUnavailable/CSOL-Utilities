@@ -14,9 +14,9 @@ class Console
 {
   public:
     static bool Configure(DESTROY_CALLBACK on_destroy) noexcept;
-    static void Log(CONSOLE_LOG_LEVEL level, std::string s) noexcept;
+    static void Log(CSOL_UTILITIES_MESSAGE_LEVEL level, std::string s) noexcept;
     template <typename... VARARG>
-    static void Log(CONSOLE_LOG_LEVEL level, _Printf_format_string_ const char *fmt, const VARARG &...args) noexcept
+    static void Log(CSOL_UTILITIES_MESSAGE_LEVEL level, _Printf_format_string_ const char *fmt, const VARARG &...args) noexcept
     {
         std::lock_guard<std::mutex> lock_guard(m_Mutex);
         std::time_t current_time =
@@ -26,26 +26,26 @@ class Console
         localtime_s(&current_tm, &current_time);
         char current_time_string[32];
         strftime(current_time_string, sizeof(current_time_string), "%Y/%m/%d %H:%M:%S", &current_tm);
-        if (level == CONSOLE_LOG_LEVEL::CLL_MESSAGE)
+        if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE)
         {
             std::printf("\x1b[92m%s【消息】", current_time_string);
             std::printf(_Printf_format_string_ fmt, args...);
             std::printf("\x1b[39m"
                         "\r\n");
         }
-        else if (level == CONSOLE_LOG_LEVEL::CLL_DEBUG)
+        else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG)
         {
             std::printf("\x1b[94m%s【调试】", current_time_string);
             std::printf(_Printf_format_string_ fmt, args...);
             std::printf("\x1b[39m\r\n");
         }
-        else if (level == CONSOLE_LOG_LEVEL::CLL_WARNING)
+        else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING)
         {
             std::printf("\x1b[93m%s【警告】", current_time_string); /* 黄色字体打印警告 */
             std::printf(_Printf_format_string_ fmt, args...);
             std::printf("\x1b[39m\r\n");
         }
-        else if (level == CONSOLE_LOG_LEVEL::CLL_ERROR)
+        else if (level == CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR)
         {
             std::printf("\x1b[91m%s【错误】", current_time_string); /* 红色字体打印错误 */
             std::printf(fmt, args...);

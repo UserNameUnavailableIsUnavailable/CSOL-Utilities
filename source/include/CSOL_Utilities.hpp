@@ -5,60 +5,18 @@
 
 namespace CSOL_Utilities
 {
-    class UniqueHandle {
-    public:
-        friend void swap(UniqueHandle& uh1, UniqueHandle& uh2) noexcept
-        {
-            auto tmp = uh1.m_h;
-            uh1.m_h = uh2.m_h;
-            uh2.m_h = tmp;
-        }
-        UniqueHandle() noexcept : m_h(nullptr) {}
-        UniqueHandle(HANDLE h) noexcept : m_h(h) {}
-        ~UniqueHandle() noexcept
-        {
-            if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE)
-            {
-                CloseHandle(m_h);
-            }
-        }
-        UniqueHandle(const UniqueHandle&) = delete;
-        UniqueHandle& operator=(const UniqueHandle&) = delete;
-        UniqueHandle(UniqueHandle&& other) noexcept : m_h(nullptr)
-        {
-            swap(*this, other);
-        }
-        UniqueHandle& operator=(UniqueHandle&& other) noexcept
-        {
-            swap(*this, other);
-            return *this;
-        }
-        explicit operator bool() const noexcept
-        {
-            return m_h != nullptr && m_h != INVALID_HANDLE_VALUE;
-        }
-        HANDLE get() const noexcept
-        {
-            return m_h;
-        }
-        HANDLE release() noexcept
-        {
-            HANDLE temp = m_h;
-            m_h = nullptr;
-            return temp;
-        }
-        void reset(HANDLE h = nullptr) noexcept
-        {
-            if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE)
-            {
-                CloseHandle(m_h);
-            }
-            m_h = h;
-        }
-
-    private:
-        HANDLE m_h;
+constexpr const char* DET_MODEL_FILE = "models/ch_PP-OCRv4_det_infer.onnx";
+constexpr const char* CLS_MODEL_FILE = "models/ch_ppocr_mobile_v2.0_cls_infer_model.onnx";
+constexpr const char* REC_MODEL_FILE = "models/ch_PP-OCRv4_rec_infer.onnx";
+constexpr const char* KEY_FILE = "models/ppocr_keys_v1.txt";
+enum class CSOL_UTILITIES_MESSAGE_LEVEL
+{
+    CUML_MESSAGE,
+    CUML_WARNING,
+    CUML_DEBUG,
+    CUML_ERROR
 };
+
 enum class EXECUTOR_COMMAND
 {
     CMD_NOP,
@@ -90,20 +48,66 @@ enum class GAME_PROCESS_STATE
     GPS_EXITED,        /* 游戏进程退出 */
     GPS_UNKNOWN,       /* 尚未确认游戏进程状态 */
 };
-enum class CONSOLE_LOG_LEVEL
-{
-    CLL_MESSAGE,
-    CLL_WARNING,
-    CLL_DEBUG,
-    CLL_ERROR
-};
-constexpr const char* DET_MODEL_FILE = "models/ch_PP-OCRv4_det_infer.onnx";
-constexpr const char* CLS_MODEL_FILE = "models/ch_ppocr_mobile_v2.0_cls_infer_model.onnx";
-constexpr const char* REC_MODEL_FILE = "models/ch_PP-OCRv4_rec_infer.onnx";
-constexpr const char* KEY_FILE = "models/ppocr_keys_v1.txt";
-BOOL CaptureWindowAsBmpW(const wchar_t* filename, HWND hWnd);
+using BITMAPBODY = uint8_t;
 std::shared_ptr<wchar_t[]> ConvertUtf8ToUtf16(const char *string);
 std::shared_ptr<char[]> ConvertUtf16ToUtf8(const wchar_t *string);
 std::shared_ptr<wchar_t[]> QueryRegistryStringItem(HKEY hPredefinedTopDir, LPCWSTR lpSubDir, LPCWSTR lpItemName);
 BOOL IsRunningAsAdmin() noexcept;
+
+/* 自动用于自动释放 Win32 handles */
+template <typename ContentType = VOID, typename DeleterType = decltype(&CloseHandle)>
+class UniqueHandle
+{
+public:
+	friend void swap(UniqueHandle& uh1, UniqueHandle& uh2) noexcept
+	{
+		auto tmp = uh1.m_h;
+		uh1.m_h = uh2.m_h;
+		uh2.m_h = tmp;
+	}
+	UniqueHandle(ContentType* h = nullptr, DeleterType deleter = &CloseHandle) noexcept : m_h(h), m_Deleter(deleter) {}
+	~UniqueHandle() noexcept
+	{
+		if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE)
+		{
+			m_Deleter(m_h);
+		}
+	}
+	UniqueHandle(const UniqueHandle&) = delete;
+	UniqueHandle& operator=(const UniqueHandle&) = delete;
+	UniqueHandle(UniqueHandle&& other) noexcept : m_h(nullptr)
+	{
+		swap(*this, other);
+	}
+	UniqueHandle& operator=(UniqueHandle&& other) noexcept
+	{
+		swap(*this, other);
+		return *this;
+	}
+	explicit operator bool() const noexcept
+	{
+		return m_h != nullptr && m_h != INVALID_HANDLE_VALUE;
+	}
+	auto get() const noexcept
+	{
+		return m_h;
+	}
+	auto release() noexcept
+	{
+		auto temp = m_h;
+		m_h = nullptr;
+		return temp;
+	}
+	void reset(HANDLE h = nullptr) noexcept
+	{
+		if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE)
+		{
+			m_Deleter(m_h);
+		}
+		m_h = h;
+	}
+private:
+	ContentType* m_h = nullptr;
+	DeleterType m_Deleter = &CloseHandle;
+};
 } // namespace CSOL_Utilities
