@@ -1,6 +1,7 @@
 ﻿#include "Console.hpp"
 #include "Controller.hpp"
 #include <Windows.h>
+#include <CSOL_Utilities.hpp>
 #include <chrono>
 #include <cstddef>
 #include <handleapi.h>
@@ -17,7 +18,7 @@ void Controller::WatchGameProcess() noexcept
     thread_local GAME_PROCESS_STATE game_process_state{GAME_PROCESS_STATE::GPS_UNKNOWN};
     thread_local DWORD dwGameProcessId{ 0 };
     std::setlocale(LC_ALL, ".UTF-8");
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏启动命令：%ls", s_Instance->m_LaunchGameCmd.get());
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "游戏启动命令：%ls", s_Instance->m_LaunchGameCmd.get());
     while (true)
     {
         s_Instance->m_GameProcessWatcherSwitch.Wait();
@@ -51,7 +52,7 @@ void Controller::WatchGameProcess() noexcept
 				GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
 				if (dwGameProcessId == 0)
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。",
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。",
 								  GetLastError());
 					break;
 				}
@@ -59,12 +60,12 @@ void Controller::WatchGameProcess() noexcept
 										   dwGameProcessId);
 				if (!hGameProcess)
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR,
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR,
 								  "尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", GetLastError());
 					break;
 				}
 				game_process_state = GAME_PROCESS_STATE::GPS_RUNNING; /* 跳转执行监测游戏进程运行状态的代码块 */
-				Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "成功获取游戏进程信息。进程标识符：%lu。", dwGameProcessId);
+				Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "成功获取游戏进程信息。进程标识符：%lu。", dwGameProcessId);
 				s_Instance->m_GameProcessAlive.Set();
 			}
 			else if (game_process_state == GAME_PROCESS_STATE::GPS_RUNNING)
@@ -74,7 +75,7 @@ void Controller::WatchGameProcess() noexcept
 				{                                           /* 进程结束 */
 					s_Instance->m_GameProcessAlive.Reset(); /* 暂停监视游戏内状态 */
 					game_process_state = GAME_PROCESS_STATE::GPS_UNKNOWN;
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING, "游戏进程退出。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "游戏进程退出。");
 					hGameWindow = nullptr;
 					hGameProcess = nullptr;
 					dwGameProcessId = 0;
@@ -86,7 +87,7 @@ void Controller::WatchGameProcess() noexcept
 				}
 				else
 				{ /* 等待失败 */
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "m_GameProcessWatcher 运行遇到错误。错误代码：%lu。\r\n",
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "m_GameProcessWatcher 运行遇到错误。错误代码：%lu。\r\n",
 								  GetLastError());
 					break;
 				}
@@ -100,11 +101,11 @@ void Controller::WatchGameProcess() noexcept
 										   NORMAL_PRIORITY_CLASS, nullptr, L"C:\\WINDOWS\\SYSTEM32", &si, &pi);
 				if (bRet)
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "等待游戏进程启动。");
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "等待游戏进程启动。");
 				}
 				else
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_WARNING,
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING,
 								  "通过 TCGame 自动创建游戏进程失败。错误代码：%lu。请尝试手动运行游戏。", GetLastError());
 				}
 				game_process_state = GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 跳转执行等待游戏进程启动的代码块 */
@@ -118,7 +119,7 @@ void Controller::WatchGameProcess() noexcept
 			{ /* 游戏进程状态未确定，确定游戏进程状态 */
 				s_Instance->m_CurrentState.reset();
 				s_Instance->m_CurrentState.update(IN_GAME_STATE::IGS_LOGIN, std::time(nullptr));
-				Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "游戏进程状态未知，检测游戏进程状态。");
+				Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "游戏进程状态未知，检测游戏进程状态。");
 				hGameWindow = FindWindowW(nullptr, L"Counter-Strike Online"); /* 尝试获取游戏进程窗口 */
 				if (!hGameWindow)
 				{
@@ -128,7 +129,7 @@ void Controller::WatchGameProcess() noexcept
 				GetWindowThreadProcessId(hGameWindow, &dwGameProcessId);
 				if (!dwGameProcessId)
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。",
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "获取反恐精英 Online 进程标识符时发生错误。错误代码：%lu。",
 								  GetLastError());
 					break;
 				}
@@ -136,11 +137,11 @@ void Controller::WatchGameProcess() noexcept
 										   dwGameProcessId);
 				if (!hGameProcess)
 				{
-					Console::Log(CONSOLE_LOG_LEVEL::CLL_ERROR,
+					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR,
 								  "尝试获取反恐精英 Online 进程信息时发生错误。错误代码：%lu。", GetLastError());
 					break;
 				}
-				Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "成功获取游戏进程信息。游戏进程标识符：%lu。",
+				Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "成功获取游戏进程信息。游戏进程标识符：%lu。",
 							  dwGameProcessId);
 				game_process_state = GAME_PROCESS_STATE::GPS_RUNNING;
 				s_Instance->m_GameProcessAlive.Set();
@@ -149,6 +150,6 @@ void Controller::WatchGameProcess() noexcept
         s_Instance->m_GameProcessWatcherFinished.Set();
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    Console::Log(CONSOLE_LOG_LEVEL::CLL_MESSAGE, "线程 m_GameProcessWatcher 退出。");
+    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "线程 m_GameProcessWatcher 退出。");
     s_Instance->m_ThreadExitEvent.Set();
 }

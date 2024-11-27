@@ -1,23 +1,38 @@
 if (not Start_lua)
 then
 Start_lua = true
+---最近一次执行的命令 id，用于防止重复执行
+local last_command_id = 0
+-- 上一次获取到的命令，初始为 NOP
+local last_command = Command.NOP
 ---判断命令是否失效。
 local function valid()
-    CmdTimepoint = CmdTimepoint or 0
     local current_time = DateTime:get_local_timestamp() -- 本地时间戳
-    return math.abs(current_time - CmdTimepoint) < 5 and not Runtime:is_paused() -- 命令未失效、未即时暂停
+    local expired = current_time - CmdTimepoint < 5 -- 命令是否过期
+    local repeatable = CmdRepeatable -- 命令是否为可重复类型
+    local changed = CmdId == last_command_id -- 命令是否改变
+    local paused = Runtime:is_paused() -- 是否暂停
+
+    if expired or paused
+    then
+        return false
+	end
+    -- 命令未过期，且当前没有暂停
+    if not repeatable and not changed
+    then
+        return false
+	end
+    return true
 end
 
 function Start()
-    local previous_command = Command.NOP -- 上一次获取到的命令，初始为 NOP
     while (true)
     do
-        if (pcall(Include, "$~cmd.lua"))
-        then
-            CmdType = CmdType or Command.CMD_NOP
-        else
-            CmdType = Command.CMD_NOP
-        end
+        pcall(Include, "$~cmd.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
+		CmdId = CmdId or 0
+		CmdType = CmdType or Command.CMD_NOP
+		CmdTimepoint = CmdTimepoint or 0
+		-- CmdRepeatable 无需确认是否为 nil，nil 与 false 等价
         -- 文件中的命令时间戳与当前时间的差值达到 5 秒认为文件中的命令无效
         if (CmdType == Command.CMD_START_GAME_ROOM and valid()) -- 开始游戏
         then
@@ -43,7 +58,7 @@ function Start()
             Executor:combine_parts()
         elseif (CmdType == Command.CMD_PURCHASE_ITEM and valid()) -- 购买物品功能
         then
-            if (previous_command ~= CmdType) -- 对于新发出的命令，需要更新鼠标光标位置
+            if (last_command ~= CmdType) -- 对于新发出的命令，需要更新鼠标光标位置
             then
                 Executor:purchase_item(Mouse:locate_cursor())
             end
@@ -56,7 +71,8 @@ function Start()
             Executor:clear_popups()
         end
         Runtime:sleep(50)
-        previous_command = CmdType -- 更新上一次命令
+        last_command_id = CmdId -- 更新最近一次执行的命令 Id
+        last_command = CmdType -- 更新上一次命令内容
     end
 end
 end -- Start_lua

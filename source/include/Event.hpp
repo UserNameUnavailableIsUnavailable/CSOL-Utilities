@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <condition_variable>
 #include <mutex>
+
 namespace CSOL_Utilities
 {
 class Event
@@ -10,7 +11,6 @@ class Event
     std::mutex m_Mutex;
     std::unique_lock<std::mutex> m_Lock;
     std::condition_variable m_CondVar;
-
   public:
     explicit Event(bool bInitialState = false) : m_Signal(bInitialState), m_Lock(m_Mutex, std::defer_lock) {};
     void Set()
