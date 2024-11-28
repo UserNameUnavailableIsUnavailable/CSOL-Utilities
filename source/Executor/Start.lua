@@ -8,11 +8,12 @@ local last_command = Command.NOP
 ---判断命令是否失效。
 local function valid()
     local current_time = DateTime:get_local_timestamp() -- 本地时间戳
-    local expired = current_time - CmdTimepoint < 5 -- 命令是否过期
+    local expired = math.abs(current_time - CmdTimepoint) > 5 -- 命令是否过期
     local repeatable = CmdRepeatable -- 命令是否为可重复类型
     local changed = CmdId == last_command_id -- 命令是否改变
     local paused = Runtime:is_paused() -- 是否暂停
 
+    -- 命令过期或者处于暂停状态
     if expired or paused
     then
         return false

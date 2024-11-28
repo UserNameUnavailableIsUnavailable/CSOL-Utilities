@@ -20,14 +20,14 @@ Runtime:register_interrupt_handler(function (self)
         -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
         if (not Runtime.manual_flag)
         then
-            Console:infomation("开始手动接管，禁用键鼠动作。")
+            Console:information("开始手动接管，禁用键鼠动作。")
         end
         self.manual_flag = true -- 暂停执行，中断现场将不会恢复
     elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
     then
         if (Runtime.manual_flag)
         then
-            Console:infomation("中止手动接管，允许键鼠动作。")
+            Console:information("中止手动接管，允许键鼠动作。")
         end
         Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
     end
@@ -149,7 +149,7 @@ function Executor:locate_cursor()
     if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT) and not Keyboard:is_modifier_pressed(Keyboard.SHIFT))
     then
         local x, y = Mouse:locate_cursor()
-        Console:infomation("光标位置：(%d, %d)", x, y)
+        Console:information("光标位置：(%d, %d)", x, y)
         Runtime:sleep(500)
     end
 end
