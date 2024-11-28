@@ -22,7 +22,7 @@ end
 ---@param fmt string 
 ---@param ... any
 ---@return nil
-function Console:infomation(fmt, ...)
+function Console:information(fmt, ...)
     self:println("【信息】" .. fmt, ...)
 end
 
