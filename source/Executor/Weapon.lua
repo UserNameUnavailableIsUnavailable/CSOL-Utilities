@@ -53,7 +53,7 @@ function Weapon:new(obj)
     obj = obj or {}
     self.__index = self
     setmetatable(obj, self)
-    Console:infomation(
+    Console:information(
         "创建武器对象：" .. obj.name
     )
     return obj
