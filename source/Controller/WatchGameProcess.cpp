@@ -1,4 +1,4 @@
-﻿#include "Console.hpp"
+#include "Console.hpp"
 #include "Controller.hpp"
 #include <Windows.h>
 #include <CSOL_Utilities.hpp>

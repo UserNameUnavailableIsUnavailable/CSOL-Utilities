@@ -1,4 +1,4 @@
-﻿#include "Console.hpp"
+#include "Console.hpp"
 #include "Controller.hpp"
 #include "CLI11.hpp"
 #include <Windows.h>
