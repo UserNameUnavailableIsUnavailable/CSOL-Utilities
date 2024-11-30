@@ -1,4 +1,4 @@
-﻿#include "Controller.hpp"
+#include "Controller.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"
 #include <Windows.h>

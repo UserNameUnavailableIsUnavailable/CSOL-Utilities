@@ -1,4 +1,4 @@
-﻿#include "Messenger.hpp"
+#include "Messenger.hpp"
 #include <filesystem>
 #include <mutex>
 namespace CSOL_Utilities

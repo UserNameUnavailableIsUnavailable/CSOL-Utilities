@@ -1,4 +1,4 @@
-﻿#include "Console.hpp"
+#include "Console.hpp"
 #include <chrono>
 #include <ctime>
 #include <iostream>
