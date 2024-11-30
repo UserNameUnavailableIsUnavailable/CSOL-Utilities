@@ -1,10 +1,11 @@
-﻿#include "EventList.hpp"
+#include "EventList.hpp"
 #include "Console.hpp"
 #include "InGameState.hpp"
 #include "CSOL_Utilities.hpp"
 #include "OCR/OcrLiteCApi.h"
 #include "Controller.hpp"
 #undef max
+#undef min
 #include "aho_corasick/aho_corasick.hpp"
 #include <cassert>
 #include <chrono>
