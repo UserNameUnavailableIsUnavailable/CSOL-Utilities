@@ -1,4 +1,4 @@
-﻿#include "DateTime.hpp"
+#include "DateTime.hpp"
 #include <ctime>
 #include <filesystem>
 #include <regex>

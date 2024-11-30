@@ -1,4 +1,4 @@
-﻿#include <WindowCapture.hpp>
+#include <WindowCapture.hpp>
 #include <cinttypes>
 #include <algorithm>
 #include <Exception.hpp>
