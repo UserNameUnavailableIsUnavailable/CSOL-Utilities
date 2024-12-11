@@ -16,7 +16,7 @@
 
 **本软件使用 GPL v2.0 开源协议，请尊重作者劳动。**
 
-👉👉👉<a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a> 👈👈👈发布的集成工具压缩包及使用手册。
+👉👉👉<a href="releases">点此下载</a> 👈👈👈发布的集成工具压缩包及使用手册。
 
 B 站 ID：_CoreDump
 
