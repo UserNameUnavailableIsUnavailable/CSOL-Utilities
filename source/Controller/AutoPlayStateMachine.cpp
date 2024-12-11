@@ -76,6 +76,7 @@ void Controller::AnalyzeInGameState()
 //#ifdef _DEBUG
 //        auto capture_start = std::chrono::system_clock::now();
 //#endif
+        /* 截取游戏界面图像 */
         thread_local WindowCapture wc;
         thread_local int successive_error_count = 0;
         try
@@ -104,7 +105,6 @@ void Controller::AnalyzeInGameState()
 //        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_DEBUG, "本次截图耗时：%llu。", capture_elapse);
 //#endif // _DEBUG
     }
-    /* 截取游戏界面图像 */
     thread_local OCR_PARAM param{ 0 };
     thread_local auto hOcr = s_Instance->m_hOcr;
     if (!std::filesystem::is_regular_file(GAME_IMAGE_FILE_NAME_UTF16))
@@ -422,6 +422,10 @@ void Controller::WatchInGameState() noexcept
     catch (Exception &e)
     {
         Console::Log(e.GetLevel(), e.what());
+    }
+    catch (std::exception& e)
+    {
+        Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR, "%s", e.what());
     }
     Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "线程 m_InGameStateWatcher 退出。");
     s_Instance->m_ThreadExitEvent.Set();
