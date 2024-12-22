@@ -48,15 +48,13 @@ int wmain(int argc, wchar_t **argv)
     std::string game_root_dir;
     std::string launch_game_cmd;
     uint32_t max_wait_time_in_room{15 * 60};
-    app.add_option<std::string>("--GameRootDirectory", game_root_dir, "Game root path, e.g., \"C:\\csol\"");
+    app.add_option<std::string>("--GameRootDirectory", game_root_dir, "游戏根目录。例如：\"C:\\csol\"。");
     app.add_option<std::string>(
         "--LaunchGameCmd", launch_game_cmd,
-        "Command line to launch the game, e.g., \"C:\\TCGAME\\tcgame.exe\" cso. Note that the program path must be "
-        "parenthesized, otherwise the controller will fail to auto-restart the game.");
+        "启动游戏的命令（含命令行参数）。例如：\"C:\\TCGAME\\tcgame.exe\" cso。注意，若启动命令含有命令行参数，则启动器路径必须用双引号包含，否则掉线自动重连将失败。");
     app.add_option<uint32_t>(
         "--MaxWaitTimeInRoom", max_wait_time_in_room,
-        "Maximum time to wait in a room, in seconds, 900 seconds by default. Once the in-room waiting time exceeds "
-        "this value, controller will instruct the executor to leave the game room and create a new room.");
+        "在房间中最长等待时间（单位为秒）。当等待时间超过该时间，将自动离开当前房间并创建新房间挂机。");
     CLI11_PARSE(app, argc, argv);
     try
     {
