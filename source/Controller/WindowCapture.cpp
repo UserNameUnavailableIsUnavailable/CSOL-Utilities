@@ -43,7 +43,12 @@ WindowCapture& WindowCapture::operator=(WindowCapture wc)
 	swap(*this, wc);
 	return *this;
 }
-
+/*
+ *@brief 截取指定窗口的图像。
+ *@param `hWnd` 窗口句柄
+ *@return `WindowCapture` 对象
+ *@remark `hWnd` 可以为 `nullptr`，此时本函数将截取桌面窗口（覆盖整个屏幕）的图像。
+ */
 WindowCapture& WindowCapture::Capture(HWND hWnd)
 {
     if (!hWnd)
@@ -73,19 +78,26 @@ WindowCapture& WindowCapture::Capture(HWND hWnd)
     {
         throw Exception("WindowCapture::Capture(HWND)：窗口处于最小化状态，无法捕获。");
     }
+
+    /* 获取窗口的相对区域 */
     RECT rcClient;
     if (!GetClientRect(hWnd, &rcClient))
     {
         throw Exception("WindowCapture::Capture(HWND)：GetClientRect 失败。错误代码：%lu。", GetLastError());
     }
+
+    /* 获取窗口左上角绝对坐标 */
+    POINT ptLeftTopOfClient{ 0, 0 }; /* 需要将各字段坐标初始化为 0，表示左上角坐标 */
+    ClientToScreen(hWnd, &ptLeftTopOfClient);
+
+    /* 从整个屏幕截图中裁剪出客户端窗口部分 */
     SetStretchBltMode(hdcWindow.get(), HALFTONE);
-    if (!StretchBlt(hdcWindow.get(),
+    if (!StretchBlt(hdcWindow.get(), /* 窗口部分 */
         0, 0,
         rcClient.right, rcClient.bottom,
-        hdcScreen.get(),
-        0, 0,
-        GetSystemMetrics(SM_CXSCREEN),
-        GetSystemMetrics(SM_CYSCREEN),
+        hdcScreen.get(), /* 整个屏幕 */
+        ptLeftTopOfClient.x, ptLeftTopOfClient.y,
+        rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
         SRCCOPY))
     {
 		throw Exception("WindowCapture::Capture(HWND)：SetStretchBltMode 失败。错误代码：%lu。", GetLastError());
@@ -108,14 +120,15 @@ WindowCapture& WindowCapture::Capture(HWND hWnd)
     {
         throw Exception("WindowCapture::Capture(const RECT&)：BitBlt 失败。错误代码：%lu。", GetLastError());
     }
+
     BITMAP bmpScreen{};
-    GetObject(hbmScreen.get(), sizeof(BITMAP), &bmpScreen);
+    GetObjectW(hbmScreen.get(), sizeof(BITMAP), &bmpScreen); /* 获取位图信息 */
 
     m_BitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
     m_BitmapInfoHeader.biWidth = bmpScreen.bmWidth;
     m_BitmapInfoHeader.biHeight = bmpScreen.bmHeight;
     m_BitmapInfoHeader.biPlanes = 1;
-    m_BitmapInfoHeader.biBitCount = 32;
+    m_BitmapInfoHeader.biBitCount = 32; /* 每个像素 32 位 */
     m_BitmapInfoHeader.biCompression = BI_RGB;
     m_BitmapInfoHeader.biSizeImage = 0;
     m_BitmapInfoHeader.biXPelsPerMeter = 0;
@@ -123,7 +136,7 @@ WindowCapture& WindowCapture::Capture(HWND hWnd)
     m_BitmapInfoHeader.biClrUsed = 0;
     m_BitmapInfoHeader.biClrImportant = 0;
 
-    dwBmpSize = ((bmpScreen.bmWidth * m_BitmapInfoHeader.biBitCount + 31) / 32) * 4 * bmpScreen.bmHeight;
+    dwBmpSize = ((bmpScreen.bmWidth * m_BitmapInfoHeader.biBitCount + 31) / 32) /* 宽度向上取整 */ * 4 * bmpScreen.bmHeight;
     
     if (dwBmpSize > m_BufferCapacity)
     {
@@ -132,16 +145,16 @@ WindowCapture& WindowCapture::Capture(HWND hWnd)
     }
     
     if (!GetDIBits(hdcWindow.get(), hbmScreen.get(), 0,
-        (UINT)bmpScreen.bmHeight,
+        static_cast<UINT>(bmpScreen.bmHeight),
         m_pData,
-        (BITMAPINFO*)&m_BitmapInfoHeader, DIB_RGB_COLORS))
+        reinterpret_cast<BITMAPINFO*>(&m_BitmapInfoHeader), DIB_RGB_COLORS))
     {
         throw Exception("WindowCapture::Capture(const RECT&)：GetDIBits 失败。错误代码：%lu。", GetLastError());
     }
 
     dwSizeofDIB = dwBmpSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
-    m_BitmapFileHeader.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER);
+    m_BitmapFileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
     m_BitmapFileHeader.bfSize = dwSizeofDIB;
     m_BitmapFileHeader.bfType = 0x4D42; // BM.
     m_BitmapFileHeader.bfReserved1 = 0;
@@ -156,18 +169,9 @@ void WindowCapture::Save(std::filesystem::path p)
 	{
 		throw Exception("WindowCapture::Save(std::filesystem::path)：CreateFileW 失败。错误代码：%lu。", GetLastError());
 	}
-	/* mandatory in Windows 7 */
-	//DWORD dwBytesWritten1;
-	//DWORD dwBytesWritten2;
-	//DWORD dwBytesWritten3;
-	//if (WriteFile(hFile.get(), &m_BitmapFileHeader, sizeof(BITMAPFILEHEADER), &dwBytesWritten1, NULL) &&
-	//	WriteFile(hFile.get(), &m_BitmapInfoHeader, sizeof(BITMAPINFOHEADER), &dwBytesWritten2, NULL) &&
-	//	WriteFile(hFile.get(), m_pData, m_BitmapFileHeader.bfSize, &dwBytesWritten3, NULL)
-	//)
-	//{
-	//	throw Exception("WindowCapture::Save(std::filesystem::path)：WriteFile 失败。错误代码：%lu。", GetLastError());
-	//}
+    Save(hFile.get());
 }
+
 void WindowCapture::Save(HANDLE hFile)
 {
     if (!hFile || hFile == INVALID_HANDLE_VALUE)
