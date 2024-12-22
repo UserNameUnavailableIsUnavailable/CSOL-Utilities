@@ -52,7 +52,7 @@ int wmain(int argc, wchar_t **argv)
     app.add_option<std::string>(
         "--LaunchGameCmd", launch_game_cmd,
         "Command line to launch the game, e.g., \"C:\\TCGAME\\tcgame.exe\" cso. Note that the program path must be "
-        "parenthesized, otherwise the controller will fail to aoto-restart the game.");
+        "parenthesized, otherwise the controller will fail to auto-restart the game.");
     app.add_option<uint32_t>(
         "--MaxWaitTimeInRoom", max_wait_time_in_room,
         "Maximum time to wait in a room, in seconds, 900 seconds by default. Once the in-room waiting time exceeds "
