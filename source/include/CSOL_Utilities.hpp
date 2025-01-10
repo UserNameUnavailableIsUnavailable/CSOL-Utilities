@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Windows.h>
 #include <memory>
@@ -9,6 +9,7 @@ constexpr const char* DET_MODEL_FILE = "models/ch_PP-OCRv4_det_infer.onnx";
 constexpr const char* CLS_MODEL_FILE = "models/ch_ppocr_mobile_v2.0_cls_infer_model.onnx";
 constexpr const char* REC_MODEL_FILE = "models/ch_PP-OCRv4_rec_infer.onnx";
 constexpr const char* KEY_FILE = "models/ppocr_keys_v1.txt";
+constexpr const DWORD WM_GAME_PROCESS_EXIT = WM_APP; /* 用于报告游戏进程退出事件 */
 enum class CSOL_UTILITIES_MESSAGE_LEVEL
 {
     CUML_MESSAGE,

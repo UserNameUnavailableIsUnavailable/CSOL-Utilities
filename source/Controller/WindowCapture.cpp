@@ -100,7 +100,7 @@ WindowCapture& WindowCapture::Capture(HWND hWnd)
         rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
         SRCCOPY))
     {
-		throw Exception("WindowCapture::Capture(HWND)：SetStretchBltMode 失败。错误代码：%lu。", GetLastError());
+		throw Exception("WindowCapture::Capture(HWND)：StretchBltMode 失败。错误代码：%lu。", GetLastError());
     }
 
     UniqueHandle hbmScreen(CreateCompatibleBitmap(hdcWindow.get(), rcClient.right - rcClient.left, rcClient.bottom - rcClient.top), &DeleteObject);

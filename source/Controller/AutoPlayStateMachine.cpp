@@ -357,7 +357,11 @@ void Controller::DispatchAutoPlayCommand()
     }
     else if (m_CurrentState.GetState() == IN_GAME_STATE::IGS_IN_HALL) /* 大厅内 */
     {
-        thread_local ExecutorCommand cmd(15, false);
+        /* 创建一个房间的耗时在 15 秒左右，进行一次状态判定的耗时从 2 ~ 6 秒不等，具体取决于硬件配置 */
+        /* 假定某一段时间内状态判定耗时均为 τ 秒，那么为了使申请到新 ID 时的判定的状态是准确的，则： */
+        /* 申请分配新命令 ID 的间隔时间应为 15 + τ */
+        /* 保守起见，这里将申请新 ID 的间隔设置为 24 秒 */
+        thread_local ExecutorCommand cmd(24, false);
         cmd.Set(EXECUTOR_COMMAND::CMD_CREATE_GAME_ROOM, current_time);
         remove_game_window_border();
         s_Instance->m_Messenger.Dispatch(cmd);

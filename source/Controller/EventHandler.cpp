@@ -1,5 +1,6 @@
 #include "Console.hpp"
 #include "Controller.hpp"
+#include "Console.hpp"
 #include <CSOL_Utilities.hpp>
 #include <Windows.h>
 #include <cassert>
@@ -10,7 +11,7 @@ using namespace CSOL_Utilities;
 void Controller::HandleHotKeyEvent() noexcept
 {
     BOOL bSuccess = TRUE;
-    thread_local int64_t mode = '0';
+    thread_local int64_t mode = '0'; /* 当前控制器的模式 */
     const char* conflict_hotkey{ nullptr };
     uint32_t error_code{ 0 };
     BOOL bObjInfo{ FALSE };
@@ -97,7 +98,10 @@ void Controller::HandleHotKeyEvent() noexcept
 				}
 				else if (msg.wParam == '1')
 				{
-					s_Instance->m_CurrentState.reset();
+                    if (mode != '2') /* 如果是从 2 模式切换到 1 模式，则不对状态机进行重置 */
+                    {
+                        s_Instance->m_CurrentState.reset();
+                    }
 					s_Instance->m_InGameStateWatcherSwitch.Set();
 					s_Instance->m_GameProcessWatcherSwitch.Set();
 					s_Instance->ToggleExtendedAutoPlayMode(false);
@@ -105,7 +109,10 @@ void Controller::HandleHotKeyEvent() noexcept
 				}
 				else if (msg.wParam == '2')
 				{
-					s_Instance->m_CurrentState.reset();
+                    if (mode != '1') /* 如果是从 1 模式切换到 2 模式，则不对状态机进行重置 */
+                    {
+                        s_Instance->m_CurrentState.reset();
+                    }
 					s_Instance->m_InGameStateWatcherSwitch.Set();
 					s_Instance->m_GameProcessWatcherSwitch.Set();
 					s_Instance->ToggleExtendedAutoPlayMode(true);
@@ -131,6 +138,15 @@ void Controller::HandleHotKeyEvent() noexcept
 				}
 				mode = msg.wParam;
 			}
+            else if (msg.message == WM_GAME_PROCESS_EXIT)
+            {
+                if (mode == '2')
+                {
+                    mode = '1'; /* 变更为 1 号模式 */
+                    s_Instance->ToggleExtendedAutoPlayMode(false); /* 禁用扩展模式 */
+                    Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "发生掉线，挂机模式切换为默认 1 号模式。");
+                }
+            }
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
