@@ -76,6 +76,9 @@ void Controller::WatchGameProcess() noexcept
 					s_Instance->m_GameProcessAlive.Reset(); /* 暂停监视游戏内状态 */
 					game_process_state = GAME_PROCESS_STATE::GPS_UNKNOWN;
 					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "游戏进程退出。");
+                    /* 掉线重连后，向 EventHandler 发送消息告知该情况 */
+                    auto hThread = static_cast<HANDLE>(s_Instance->m_HotKeyEventHandler.native_handle());
+                    PostThreadMessageW(GetThreadId(hThread), WM_GAME_PROCESS_EXIT, 0, 0);
 					hGameWindow = nullptr;
 					hGameProcess = nullptr;
 					dwGameProcessId = 0;

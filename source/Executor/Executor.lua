@@ -63,7 +63,6 @@ function Executor:create_game_room()
         Keyboard:puts(password)
     end
     Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 500)
-    Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 6000)
 end
 
 ---点击“开始游戏”按钮，开始游戏。
