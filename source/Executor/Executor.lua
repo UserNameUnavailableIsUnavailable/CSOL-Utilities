@@ -63,6 +63,7 @@ function Executor:create_game_room()
         Keyboard:puts(password)
     end
     Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 500)
+    Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000) -- 创建房间
 end
 
 ---点击“开始游戏”按钮，开始游戏。
@@ -74,10 +75,10 @@ end
 ---选定角色，开始新一轮游戏。
 ---@return nil
 function Executor:choose_class()
-    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_X , 100) -- 点击屏幕上某一处，唤醒窗口（此处取为取消按钮处防止冲突）
+    Mouse:click_on_several_times(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_X, 2, 200) -- 点击屏幕上某一处，唤醒窗口（此处点击取消按钮处防止冲突）
     if (Setting.CHOOSE_T_CLASS)
     then
-        Mouse:click_on(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 500)
+        Mouse:click_on_several_times(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 2, 500) -- 点击 T 阵营选项卡
     end
     if (Setting.CLASS_OPTION and math.type(Setting.CLASS_OPTION) == "integer" and Setting.CLASS_OPTION >= 0 and Setting.CLASS_OPTION <= 9)
     then
@@ -87,7 +88,6 @@ function Executor:choose_class()
         Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
     end
     Player:reset() -- 重置玩家对象成员变量
-    Runtime:sleep(500) -- 等待 0.5 秒，足够控制器更新下条命令
 end
 
 ---上一次尝试确认结算界面的时间戳。

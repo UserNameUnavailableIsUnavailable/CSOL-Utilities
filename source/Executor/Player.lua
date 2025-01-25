@@ -201,7 +201,7 @@ function Player:use_special_weapon(special_weapon)
     end
 end
 
----重置玩家对象成员变量为初始值。
+---在新一局游戏开始时重置玩家状态。
 function Player:reset()
     self.last_primary_weapon = Weapon
     self.last_secondary_weapon = Weapon
