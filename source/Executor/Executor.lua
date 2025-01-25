@@ -3,37 +3,54 @@ then
 Executor_lua = true
 Executor = {}
 
----注册中断处理函数。必须在 `Keyboard` 加载之后执行。
-Runtime:register_interrupt_handler(function (self)
-    if (not self.interrupt_flag) -- 未关中断才会触发中断
-    then
-        return
-    end
-    -- 中断开始时，中断标志位使能以屏蔽后续中断
-    self.interrupt_flag = false -- 关中断
-    -- 现场切换，保护中断现场
-    -- 是否暂停执行
-    if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
-    then
-        Keyboard:release_all()
-        Mouse:release_all()
-        -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
-        if (not Runtime.manual_flag)
+Executor.command_in_execution = Command.CMD_NOP
+
+---注册暂停事件处理函数，处理用户手动接管事件。
+Runtime:register_interrupt_handler(
+    function ()
+        if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
         then
-            Console:information("开始手动接管，禁用键鼠动作。")
-        end
-        self.manual_flag = true -- 暂停执行，中断现场将不会恢复
-    elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
-    then
-        if (Runtime.manual_flag)
+            Keyboard:release_all()
+            Mouse:release_all()
+            -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
+            if (not Runtime.manual_flag)
+            then
+                Console:information("开始手动接管，禁用键鼠动作。")
+            end
+            Runtime.manual_flag = true -- 暂停执行，中断现场将不会恢复
+        elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
         then
-            Console:information("中止手动接管，允许键鼠动作。")
+            if (Runtime.manual_flag)
+            then
+                Console:information("中止手动接管，允许键鼠动作。")
+            end
+            Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
         end
-        Runtime.manual_flag = false -- 恢复执行，后续中断现场可正常恢复
     end
-    -- 中断处理完毕
-    self.interrupt_flag = true -- 开中断
-end)
+)
+
+Executor.last_reset_or_respawn_time = 0
+---注册回合重置检查函数，游戏开始后每隔 8 秒进行回合重置。
+Runtime:register_interrupt_handler(
+    function ()
+        -- 当前未在挂机
+        if (Executor.command_in_execution ~= Command.CMD_PLAY_GAME_NORMAL and Executor.command_in_execution ~= Command.CMD_PLAY_GAME_EXTEND)
+        then
+            return
+        end
+        -- 当前正在操作，则等到操作完全结束再重置，防止对操作逻辑造成不必要的干扰
+        if (Player:is_playing())
+        then
+            return
+        end
+        local time= Runtime:get_running_time()
+        if (time - Executor.last_reset_or_respawn_time > 8000)
+        then
+            Player:reset_round_or_respawn()
+            Executor.last_reset_or_respawn_time = time
+        end
+    end
+)
 
 ---创建游戏房间。
 function Executor:create_game_room()

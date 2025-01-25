@@ -87,7 +87,9 @@ end
 ---回合重置或复活。
 ---@return nil
 function Player:reset_round_or_respawn()
-    Keyboard:click_several_times(Keyboard.R, 4, Delay.NORMAL) -- 按 R
+    Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
+    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20)
+    Keyboard:click_several_times(Keyboard.R, 2, Delay.SHORT) -- 按 R
 end
 
 ---最近一次发动角色技能的时间。
@@ -119,10 +121,19 @@ Player.last_secondary_weapon = Weapon
 ---最近一次使用的武器（主武器、副武器、近战武器）。
 ---@type Weapon
 Player.last_weapon = Weapon
+
+---玩家对象是否正在操作。
+Player.playing_flag = false
+
+function Player:is_playing()
+    return self.playing_flag
+end
+
 ---使用武器。
 ---@param weapon_list Weapon[] 常规武器列表。
 ---@return nil
 function Player:play(weapon_list)
+    self.playing_flag = true
     if (AC) then AC:purchase() end
     if (not weapon_list or 0 == #weapon_list)
     then
@@ -148,9 +159,9 @@ function Player:play(weapon_list)
     self:start_move()
     weapon:attack()
     self:stop_move()
-    self:reset_round_or_respawn()
     self:activate_special_ability()
     self.last_weapon = weapon --更新最近一次使用的武器
+    self.playing_flag = false
 end
 
 ---上次购买配件武器的时间。
@@ -187,6 +198,7 @@ end
 Player.last_buy_special_weapon_time = 0
 ---@param special_weapon Weapon 特殊武器。
 function Player:use_special_weapon(special_weapon)
+    Player.playing_flag = true
     if (not special_weapon) then return end
     local current_time = DateTime:get_local_timestamp()
     if (math.abs(current_time - self.last_buy_special_weapon_time) > 20) -- 每隔 20 秒购买一次特殊武器
@@ -199,6 +211,7 @@ function Player:use_special_weapon(special_weapon)
     then
         self.last_weapon:switch() -- 使用后切换回原来的武器
     end
+    Player.playing_flag = false
 end
 
 ---在新一局游戏开始时重置玩家状态。

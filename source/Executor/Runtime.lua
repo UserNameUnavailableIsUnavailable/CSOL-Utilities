@@ -48,16 +48,42 @@ function Runtime:sleep(milliseconds)
     end
 end
 
+---中断处理函数列表。
+Runtime.interrupt_handler_list = {}
+
 ---默认的中断处理函数（不进行任何操作）。只有中断标志位使能时才允许中断。
 function Runtime:interrupt_handler()
-    return
+    if (not Runtime.interrupt_flag) -- 未关中断才会触发中断
+    then
+        return
+    end
+    -- 中断开始时，中断标志位使能以屏蔽后续中断
+    self.interrupt_flag = false -- 关中断
+    for i = 1, #self.interrupt_handler_list
+    do
+        self.interrupt_handler_list[i]()
+    end
+    -- 中断处理完毕
+    self.interrupt_flag = true -- 开中断
 end
 
----注册中断处理函数。
+---注册中断处理函数。若 `f` 类型非 `function`，则返回值为 0。
 ---@param f function 中断处理函数。
----return nil
+---@return integer index 中断处理函数索引。
 function Runtime:register_interrupt_handler(f)
-    self.interrupt_handler = f
+    if (type(f) ~= "function")
+    then
+        return 0
+    end
+    local index = #self.interrupt_handler_list + 1
+    self.interrupt_handler_list[index] = f
+    return index
+end
+
+---注销中断处理函数。
+---@param index integer
+function Runtime:unregister_interrput_handler(index)
+    table.remove(self.interrupt_handler_list, index)
 end
 
 ---注册中断现场，中断发生时保存。

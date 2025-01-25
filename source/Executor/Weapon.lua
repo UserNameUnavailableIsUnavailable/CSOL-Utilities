@@ -136,7 +136,7 @@ function Weapon:attack()
     local last_switch_time = Runtime:get_running_time()
     repeat
         local current_time = Runtime:get_running_time()
-        if (current_time - last_switch_time > 1000)
+        if (current_time - last_switch_time > math.random(1000, 2000))
         then
             self:switch_without_delay()
             last_switch_time = current_time
