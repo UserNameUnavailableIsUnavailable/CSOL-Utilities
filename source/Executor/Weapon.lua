@@ -66,9 +66,12 @@ function Weapon:purchase()
     do
         Keyboard:click(key, Delay.NORMAL)
     end
-    Keyboard:click(Weapon.MELEE, Delay.NORMAL) -- 购买完成后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
+    if (self.number == Weapon.GRENADE)
+    then
+        Keyboard:click(Weapon.MELEE, Delay.SHORT) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
+    end
     -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
-    Keyboard:click_several_times(Keyboard.ESCAPE, 8, Delay.MINI)
+    Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
     Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
 end
 
@@ -133,13 +136,13 @@ function Weapon:attack()
     local last_switch_time = Runtime:get_running_time()
     repeat
         local current_time = Runtime:get_running_time()
-        if (current_time - last_switch_time > 1000)
+        if (current_time - last_switch_time > math.random(1000, 2000))
         then
             self:switch_without_delay()
             last_switch_time = current_time
         end
         Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
-    until (Runtime:get_running_time() - start_time > 6000)
+    until (Runtime:get_running_time() - start_time > 7000)
     Mouse:release(self.attack_button)
 end
 

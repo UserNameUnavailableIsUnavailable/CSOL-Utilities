@@ -37,28 +37,35 @@ function Start()
         -- 文件中的命令时间戳与当前时间的差值达到 5 秒认为文件中的命令无效
         if (CmdType == Command.CMD_START_GAME_ROOM and valid()) -- 开始游戏
         then
+            Executor.command_in_execution = Command.CMD_START_GAME_ROOM
             Executor:start_game_room()
         elseif (CmdType == Command.CMD_CHOOSE_CLASS and valid()) -- 选定角色
         then
+            Executor.command_in_execution = Command.CMD_CHOOSE_CLASS
             Executor:choose_class()
         elseif (CmdType == Command.CMD_PLAY_GAME_NORMAL and valid()) -- 24H 挂机模式（常规）
         then
+            Executor.command_in_execution = Command.CMD_PLAY_GAME_NORMAL
             Executor:try_confirm()
             Player:buy_part_weapon(PartWeaponList)
             Player:play(DefaultWeaponList)
         elseif (CmdType == Command.CMD_PLAY_GAME_EXTEND and valid()) -- 24H 挂机模式（扩展）
         then
+            Executor.command_in_execution = Command.CMD_PLAY_GAME_EXTEND
             Executor:try_confirm()
             Player:use_special_weapon(SpecialWeapon)
             Player:play(ExtendedWeaponList)
         elseif (CmdType == Command.CMD_CREATE_ROOM and valid()) -- 创建房间功能
         then
+            Executor.command_in_execution = Command.CMD_CREATE_ROOM
             Executor:create_game_room()
         elseif (CmdType == Command.CMD_COMBINE_PARTS and valid()) -- 合成配件功能
         then
+            Executor.command_in_execution = Command.CMD_COMBINE_PARTS
             Executor:combine_parts()
         elseif (CmdType == Command.CMD_PURCHASE_ITEM and valid()) -- 购买物品功能
         then
+            Executor.command_in_execution = Command.CMD_PURCHASE_ITEM
             if (last_command ~= CmdType) -- 对于新发出的命令，需要更新鼠标光标位置
             then
                 Executor:purchase_item(Mouse:locate_cursor())
@@ -66,10 +73,14 @@ function Start()
             Executor:purchase_item() -- 仍使用上次坐标
         elseif (CmdType == Command.CMD_LOCATE_CURSOR and valid()) -- 光标定位功能
         then
+            Executor.command_in_execution = Command.CMD_LOCATE_CURSOR
             Executor:locate_cursor()
         elseif (CmdType == Command.CMD_CLEAR_POPUPS and valid())
         then
+            Executor.command_in_execution = Command.CMD_CLEAR_POPUPS
             Executor:clear_popups()
+        else
+            Executor.command_in_execution = Command.CMD_NOP
         end
         Runtime:sleep(50)
         last_command_id = CmdId -- 更新最近一次执行的命令 Id
