@@ -8,7 +8,7 @@ export DOCS = $(ROOT)/docs
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL_Utilities
-VERSION = v1.4.7
+VERSION = v1.4.8
 
 ARCH = x86_64
 
