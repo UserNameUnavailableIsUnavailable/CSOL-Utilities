@@ -5,7 +5,6 @@ Weapon:new{
     purchase_sequence = {},
     template_name = "魔神开天",
     ---重写 attack 方法，按照下面定义的方式进行攻击。
-    ---若您使用神鬼开天/魔神开天进行挂机且没有编程经验，则请勿修改此函数。
     ---@param self Weapon
     attack = function (self)
         Mouse:press(Mouse.RIGHT)
@@ -25,8 +24,8 @@ Weapon:new{
         until (Runtime:get_running_time() - start_time > 6000)
         Mouse:release(Mouse.RIGHT, 200)
         Mouse:press(Mouse.LEFT, 1000)
-        Keyboard:press(Keyboard.R, 200)
-        Keyboard:release(Keyboard.R)
+        Keyboard:press(Weapon.RELOAD_KEY, 200)
+        Keyboard:release(Weapon.RELOAD_KEY)
         Mouse:release(Mouse.LEFT)
     end
 }

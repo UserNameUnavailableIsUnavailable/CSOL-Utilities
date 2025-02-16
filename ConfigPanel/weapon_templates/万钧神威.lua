@@ -27,12 +27,12 @@ Weapon:new{
             local duration = Runtime:get_running_time() - start_time
             if (not first_throw and 3000 < duration and duration < 6000)
             then
-                Keyboard:click(Keyboard.R, Delay.SHORT)
+                Keyboard:click(Weapon.RELOAD_KEY, Delay.SHORT)
                 first_throw = true
             end
             if (not second_throw and 6000 < duration)
             then
-                Keyboard:click(Keyboard.R, Delay.SHORT)
+                Keyboard:click(Weapon.RELOAD_KEY, Delay.SHORT)
                 second_throw = true
             end
         until (Runtime:get_running_time() - start_time > 7000)

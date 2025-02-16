@@ -8,7 +8,7 @@ export DOCS = $(ROOT)/docs
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL_Utilities
-VERSION = v1.4.8
+VERSION = v1.5.1-preview
 
 ARCH = x86_64
 
@@ -42,15 +42,12 @@ Docs:
 	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
-Web:
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/ConfigWebPages -Recurse -Force
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Setting.html -Force
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Weapon.html -Force
+Panel:
+	Copy-Item -Destination $(BUILD) -Path ConfigPanel -Recurse -Force
 Pack:
 	if (Test-Path $(BUILD)/pack) { Remove-Item -Force -Recurse $(BUILD)/pack }
 	New-Item -Type Directory -Path $(BUILD)/pack -Force
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Install.ps1"
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/ConfigWebPages","$(BUILD)/Setting.html","$(BUILD)/Weapon.html" -Recurse
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Executor","$(BUILD)/Main.lua" -Recurse
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Controller.exe","$(BUILD)/Controller.ps1"
 	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/GamingTool.dll","$(BUILD)/GamingTool.exe"

@@ -34,11 +34,15 @@ Keyboard = {
     F1 = "f1", F2 = "f2", F3 = "f3", F4 = "f4", F5 = "f5", F6 = "f6",
     F7 = "f7", F8 = "f8", F9 = "f9", F10 = "f10", F11 = "f11", F12 = "f12",
     F13 = "f13", F14 = "f14", F15 = "f15", F16 = "f16", F17 = "f17", F18 = "f18",
-    F19 = "f19", F20 = "f20", F21 = "f21", F22 = "f22", F23 = "f23", F24 = "f24",
-    NUMLOCK_ON = 0x4,
-    CAPSLOCK_ON = 0x2,
-    SCROLLLOCK_ON = 0x1
+    F19 = "f19", F20 = "f20", F21 = "f21", F22 = "f22", F23 = "f23", F24 = "f24"
 }
+
+local valid_keynames = {}
+
+for k, v in pairs(Keyboard)
+do
+    valid_keynames[k] = v
+end
 
 local function press_key_safe(key)
     if (not Runtime:is_paused())
@@ -125,6 +129,19 @@ function Keyboard:click_several_times(key, times, delay)
         Keyboard:click(key, delay)
         times = times - 1
     end
+end
+
+---检查给定的按键名是否有效。
+---@param keyname string 按键名
+function Keyboard:is_keyname_valid(keyname)
+    for _, v in pairs(valid_keynames)
+    do
+        if (v == keyname)
+        then
+            return true
+        end
+    end
+    return false
 end
 
 ---通过键盘输入由字母和数字构成的字符串序列

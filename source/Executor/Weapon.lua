@@ -6,6 +6,7 @@ Include("Delay.lua")
 Include("Console.lua")
 Include("Mouse.lua")
 Include("Keyboard.lua")
+Include("Setting.lua")
 
 ---@class Weapon
 Weapon = {}
@@ -49,6 +50,19 @@ Weapon.switch_delay = Delay.MEDIUM
 ---购买该武器的键盘按键序列。
 ---@type table
 Weapon.purchase_sequence = {}
+
+Weapon.RELOAD_KEY = Keyboard.R
+
+if (Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY and
+    #Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY > 0 and
+    Keyboard:is_keyname_valid(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1])
+)
+then
+    Weapon.RELOAD_KEY = Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]
+else
+    Console:warning("换弹按键未正确配置，使用默认设定。")
+end
+
 
 ---创建一个武器对象
 ---@param obj table 初始化列表。

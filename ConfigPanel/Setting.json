@@ -1,7 +1,7 @@
 {
     "id": "GeneralSettings",
     "type": "SECTION",
-    "title": "CSOL 集成工具通用设定",
+    "title": "通用设定",
     "annotation": "鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。⏺️ 为录制按键按钮，⏹️ 为结束录制按钮。",
     "components": [
         {
@@ -405,23 +405,20 @@
                     "image": "assets/game_purchase_before_respawn.avif"
                 },
                 {
+                    "id": "GAME_RESET_ROUND_KEY",
+                    "title": "换弹按键",
+                    "annotation": "默认为 R。如果修改了换弹按钮，则需要修改此项。回合重置、复活、使用特殊武器（如神鬼开天、圣翼皓印等）的按键均受此影响。",
+                    "type": "KEYSTROKES",
+                    "values": ["Keyboard.R"],
+                    "label": "按键"
+                },
+                {
                     "id": "GAME_RESET_ROUND_ON_FAILURE",
                     "title": "在通关失败时重置当前回合。",
                     "type": "SWITCH",
                     "labels": ["是", "否"],
                     "true_option": 0,
                     "checked": 0
-                },
-                {
-                    "id": "GAME_RESET_ROUND_KEY",
-                    "title": "回合重置按键",
-                    "annotation": "与换弹按键相同，默认为 R。如果修改了换弹按钮，则需要修改此项。",
-                    "type": "KEYSTROKES",
-                    "values": ["Keyboard.R"],
-                    "label": "按键",
-                    "depends_on": [
-                        "GAME_RESET_ROUND_ON_FAILURE"
-                    ]
                 },
                 {
                     "id": "GAME_CONFIRM_RESULTS",

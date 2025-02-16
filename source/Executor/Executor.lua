@@ -1,5 +1,11 @@
 if (not Executor_lua)
 then
+Include("Delay.lua")
+Include("Console.lua")
+Include("Runtime.lua")
+Include("Keyboard.lua")
+Include("Mouse.lua")
+Include("Setting.lua")
 Executor_lua = true
 Executor = {}
 

@@ -84,14 +84,27 @@ function Player:turn()
     until (DateTime:get_local_timestamp() - start_time > 6)
 end
 
+
+Player.RESPAWN_KEY = Keyboard.R
+
+if (Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY and
+    #Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY > 0 and
+    Keyboard:is_keyname_valid(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1])
+)
+then
+    Player.RESPAWN_KEY = Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]
+else
+    Console:warning("复活/回合重置按键未正确配置，使用默认设定。")
+end
+
 ---回合重置或复活。
 ---@return nil
 function Player:reset_round_or_respawn()
     Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
     Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20)
-    if (Setting.KEYSTROKES_GAME_RESET_ROUND_KEY and #Setting.KEYSTROKES_GAME_RESET_ROUND_KEY > 0)
+    if (Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY and #Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY > 0)
     then
-        Keyboard:click_several_times(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1], 2, Delay.SHORT) -- 回合重置
+        Keyboard:click_several_times(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1], 2, Delay.SHORT) -- 回合重置
     end
 end
 
