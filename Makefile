@@ -4,7 +4,7 @@ export ROOT := $(shell (Get-Location).ToString() -replace("\\", "/"))
 export SOURCE = $(ROOT)/source
 export DEPENDENCIES := $(ROOT)/dependencies
 export TEST= $(ROOT)/test
-export DOCS = $(ROOT)/docs
+export DOCS = $(ROOT)/documents
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL_Utilities
@@ -12,7 +12,7 @@ VERSION = v1.5.1-preview
 
 ARCH = x86_64
 
-MODULES = Controller Docs Executor Ps1 Web
+MODULES = Controller Documents Executor Ps1 Web
 VPATH = source
 TEST_UNIT := check_file
 
@@ -37,11 +37,11 @@ Controller:
 	Write-Host $(MAKE)
 	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
 	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
-Docs:
-	New-Item -Type Directory -Path $(BUILD)/Docs -Force
+Documents:
+	New-Item -Type Directory -Path $(BUILD)/Documents -Force
 	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
-	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
-	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
+	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
+	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
 Panel:
 	Copy-Item -Destination $(BUILD) -Path ConfigPanel -Recurse -Force
 Pack:
