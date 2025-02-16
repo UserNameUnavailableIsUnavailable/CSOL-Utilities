@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles/Setting.css" />
+    <link rel="stylesheet" href="./styles/import.css" />
+    <link rel="stylesheet" href="./styles/export.css" />
+    <link rel="stylesheet" href="./styles/PopUpImage.css" />
+    <link rel="stylesheet" href="./styles/Glimmer.css" />
+    <title>Document</title>
+</head>
+<body>
+    <button id="ImportSetting" class="import" onclick="document.getElementById('__impl_ImportSetting').click()">导入</button>
+    <input id="__impl_ImportSetting" type="file" style="display: none;" />
+    <button id="ExportSetting" class="export">导出</button>
+</body>
+<script src="./scripts/luaparse.js"></script>
+<script type="module">
+import * as LuaASTUtil from "./scripts/LuaASTUtil.js"
+import * as Widget from "./scripts/Widget.js"
+let response = await fetch("./Setting.json")
+if (response.status !== 200) {
+    throw Error("Failed to fetch `Setting.json`")
+}
+
+let text = await response.text()
+let json = JSON.parse(text)
+let main_widget = Widget.WidgetFactory(json, 1)
+document.body.append(main_widget.element)
+window.main_widget = main_widget
+Widget.SwitchEventPublisher.bootstrap()
+
+document.getElementById("__impl_ImportSetting").addEventListener('change', (event) => {
+    const file = event.target.files[0]
+    if (!file) {
+        throw "指定了非法的文件对象。"
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        const content = e.target.result
+        let ast = luaparse.parse(content)
+        let setting = Widget.ImportSetting(ast)
+        main_widget.collect(setting)
+    }
+    reader.readAsText(file)
+})
+document.getElementById("ExportSetting").onclick = async () => {
+    const setting = Widget.ExportSetting(main_widget)
+    if (!setting) {
+        return
+    }
+    try {
+        const hFile = await window.showSaveFilePicker({
+            suggestedName: "Setting",
+            types: [{
+                description: "Lua source file",
+                accept: {
+                    'text/plain': ['.lua']
+                }
+            }]
+        });
+        const ofstream = await hFile.createWritable();
+        await ofstream.write(setting);
+        await ofstream.close();
+    } catch (e) {
+        console.log(e);
+    }
+}
+</script>
+</html>

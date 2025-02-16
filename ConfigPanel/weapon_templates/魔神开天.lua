@@ -1,0 +1,32 @@
+Weapon:new{
+    name = "魔神开天",
+    switch_delay = Delay.SHORT,
+    number = Weapon.MELEE,
+    purchase_sequence = {},
+    template_name = "魔神开天",
+    ---重写 attack 方法，按照下面定义的方式进行攻击。
+    ---若您使用神鬼开天/魔神开天进行挂机且没有编程经验，则请勿修改此函数。
+    ---@param self Weapon
+    attack = function (self)
+        Mouse:press(Mouse.RIGHT)
+        local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
+        local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
+        local direction = Utility:random_direction() -- 随机向左或右
+        local start_time = Runtime:get_running_time() -- 本次转圈开始时间
+        local last_switch_time = 0
+        repeat
+            local current_time = Runtime:get_running_time()
+            if (current_time - last_switch_time > 1000)
+            then
+                self:switch_without_delay()
+                last_switch_time = current_time
+            end
+            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+        until (Runtime:get_running_time() - start_time > 6000)
+        Mouse:release(Mouse.RIGHT, 200)
+        Mouse:press(Mouse.LEFT, 1000)
+        Keyboard:press(Keyboard.R, 200)
+        Keyboard:release(Keyboard.R)
+        Mouse:release(Mouse.LEFT)
+    end
+}

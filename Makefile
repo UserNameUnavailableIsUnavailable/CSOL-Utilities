@@ -42,7 +42,6 @@ Docs:
 	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Docs $(DOCS)/main.tex
-	Rename-Item -NewName "$(BUILD)/Docs/`u{4F7F}`u{7528}`u{624B}`u{518C}.pdf" -Path $(BUILD)/Docs/main.pdf
 Web:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/ConfigWebPages -Recurse -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Setting.html -Force

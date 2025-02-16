@@ -10,6 +10,10 @@ Include("Keyboard.lua")
 ---@class Weapon
 Weapon = {}
 
+---配件武器（不会被使用）
+---@type string
+Weapon.NULL = Keyboard.ZERO
+
 ---主武器。
 ---@type string
 Weapon.PRIMARY = Keyboard.ONE
@@ -54,7 +58,7 @@ function Weapon:new(obj)
     self.__index = self
     setmetatable(obj, self)
     Console:information(
-        "创建武器对象：" .. obj.name
+        "新增武器/装备：" .. obj.name
     )
     return obj
 end
@@ -72,7 +76,7 @@ function Weapon:purchase()
     end
     -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
     Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
-    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
+    Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
 end
 
 ---切换到指定武器。
@@ -104,7 +108,7 @@ end
 ---关闭死亡状态下的预购买菜单（点击“重复购买”按钮，不点击“取消购买”以避免与大厅界面按钮冲突）。
 ---@return nil
 function Weapon:close_dead_purchase_menu()
-    Mouse:click_on(Setting.GAME_DEAD_PURCHASE_MENU_REBUY_X, Setting.GAME_DEAD_PURCHASE_MENU_REBUY_Y, Delay.NORMAL)
+    Mouse:click_on(Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_X, Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_Y, Delay.NORMAL)
 end
 
 ---使用特殊武器的函数，在创建特殊武器对象时重写此函数。

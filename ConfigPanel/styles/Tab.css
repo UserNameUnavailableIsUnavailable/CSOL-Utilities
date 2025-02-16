@@ -1,0 +1,27 @@
+#Container {
+	display: grid;
+	grid-template-columns: 100px auto;
+	grid-template-rows: 800px 50px;
+	grid-column-gap: 0px;
+	grid-row-gap: 0px;
+}
+#TabList {
+	grid-area: 1 / 1 / 2 / 2;
+}
+#ConfigPanel {
+	grid-area: 1 / 2 / 2/ 3;
+	border: solid 1px;
+}
+.InactiveTab {
+	border-radius: 10px 0px 0px 10px;
+	padding: 10px 20px 10px 20px;
+	text-decoration: none;
+	background-color: #2421212b;
+}
+ 
+.ActiveTab {
+	border-radius: 10px 0px 0px 10px;
+	padding: 10px 20px 10px 20px;
+	text-decoration: none;
+	background-color: white;
+}

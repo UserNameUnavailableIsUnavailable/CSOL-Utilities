@@ -1,0 +1,16 @@
+.export {
+    content: "导出配置文件";
+    position: fixed;
+    bottom: 20px;
+    right: 100px;
+    padding: 10px 20px;
+    background-color: #34ad34;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.export:hover {
+    background-color: #208a00;
+}

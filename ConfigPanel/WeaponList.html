@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8">
+<html>
+<head>
+    <link rel="stylesheet" href="./styles/import.css" />
+    <link rel="stylesheet" href="./styles/export.css" />
+    <title>CSOL 集成工具</title>
+</head>
+<body>
+
+<h1>挂机武器配置面板</h1>
+
+<div>
+<h2>挂机模式</h2>
+<p>说明：集成工具支持两种挂机模式：默认模式和扩展模式。在本配置面板中，可以同时针对这两种挂机模式进行配置，最后以 Lua 源码形式导出一份武器列表配置文件，其中包含对默认模式和扩展模式的配置。</p>
+<input type="radio" name="idle_mode" value="default" onclick="SelectMode('default')" checked /><label>默认模式</label>
+<input type="radio" name="idle_mode" value="extended" onclick="SelectMode('extended')" /><label>扩展模式</label>
+</div>
+
+<div id="armor">
+<h2>护甲</h2>
+<button id="add_armor">添加护甲</button>
+</div>
+
+<div id="default_idle">
+    <div id="default_part_weapons">
+    <h2>配件武器（默认）</h2>
+    <button id="add_default_part_weapon">新增武器</button>
+    </div>
+
+    <div id="default_conventional_weapons">
+    <h2>常规武器（默认）</h2>
+    <p>
+    <button id="add_default_conventional_weapon">新增普通武器</button>
+    <button id="add_default_customized_weapon">新增定制武器</button>
+    </p>
+    </div>
+    <div id="default_special_weapons">
+    <h2>特殊武器（默认）</h2>
+    <p>
+    <button id="add_default_special_weapon">新增特殊武器</button>
+    </p>
+    </div>    
+</div>
+
+<div id="extended_idle" style="display: none;">
+    <div id="extended_part_weapons">
+    <h2>配件武器（扩展）</h2>
+    <button id="add_extended_part_weapon">新增武器</button>
+    </div>
+
+    <div id="extended_conventional_weapons">
+    <h2>常规武器（扩展）</h2>
+    <p>
+    <button id="add_extended_conventional_weapon">新增普通武器</button>
+    <button id="add_extended_customized_weapon">新增定制武器</button>
+    </p>
+    </div>
+    <div id="extended_special_weapons">
+    <h2>特殊武器（扩展）</h2>
+    <p>
+    <button id="add_extended_special_weapon">新增特殊武器</button>
+    </p>
+    </div>    
+</div>
+<button id="import" class="import" onclick="document.getElementById('__impl_import').click()">导入</button>
+<input id="__impl_import" type="file" style="display: none;" />
+<button id="export" class="export">导出</button>
+
+</body>
+<script src="scripts/luaparse.js"></script>
+<script>
+    function SelectMode(mode) {
+        switch (mode) {
+        case "default": 
+            document.getElementById("default_idle").style.display = "block"
+            document.getElementById("extended_idle").style.display = "none"
+            break
+        case "extended":
+            document.getElementById("default_idle").style.display = "none"
+            document.getElementById("extended_idle").style.display = "block"
+            break
+        default:
+            throw new Error(`${mode} 不是有效的模式！`)
+        }
+    }
+</script>
+<script type="module">
+let response = await fetch("./WeaponTemplateList.json")
+if (response.status == 200) {
+    window.g_WeaponTemplateList = JSON.parse(await response.text())
+} else {
+    alert("无法正确加载武器模板列表，定制武器功能将不可用。")
+}
+import { Weapon, PartWeapon, Armor, ConventionalWeapon, CustomizedWeapon, ResolveWeaponList } from "./scripts/Weapon.js"
+
+let g_Armor = undefined
+let g_DefaultConventionalWeapons = new Map()
+let g_DefaultPartWeapons = new Map()
+let g_DefaultSpecialWeapons = new Map()
+let g_ExtendedPartWeapons = new Map()
+let g_ExtendedConventionalWeapons = new Map()
+let g_ExtendedSpecialWeapons = new Map()
+
+function AddArmor(armor) {
+    g_Armor = armor
+    let container = document.getElementById("armor")
+    let add_btn = document.getElementById("add_armor")
+    container.insertBefore(armor.m_Element, add_btn) // 将组件添加到 DOM
+    add_btn.style.display = "none"
+    add_btn.onclick = undefined
+    armor.append_remove_button(() => {
+        armor.m_Element.remove() // 从 DOM 移除组件
+        add_btn.style.display = "block" // 允许继续添加
+        add_btn.onclick = () => { AddArmor() } // 重新为添加按钮注册添加武器功能
+        armor = undefined
+    })
+}
+
+function AddWeapon(arsenal, container, weapon) {
+    arsenal.set(weapon.m_Id, weapon)
+    container.insertBefore(weapon.m_Element, container.lastElementChild)
+    weapon.append_remove_button(() => {
+        arsenal.delete(weapon.m_Id)
+        weapon.m_Element.remove()
+    })
+}
+
+document.getElementById("add_armor").onclick = () => {
+    AddArmor(new Armor())
+}
+
+document.getElementById("add_default_part_weapon").onclick = () => {
+    let container = document.getElementById("default_part_weapons")
+    AddWeapon(g_DefaultPartWeapons, container, new PartWeapon())
+}
+
+document.getElementById("add_default_conventional_weapon").onclick = () => {
+    let container = document.getElementById("default_conventional_weapons")
+    AddWeapon(g_DefaultConventionalWeapons, container, new ConventionalWeapon())
+}
+
+document.getElementById("add_default_customized_weapon").onclick = () => {
+    let container = document.getElementById("default_conventional_weapons")
+    AddWeapon(g_DefaultConventionalWeapons, container, new CustomizedWeapon("常规"))
+}
+
+document.getElementById("add_default_special_weapon").onclick = () => {
+    let container = document.getElementById("default_special_weapons")
+    AddWeapon(g_DefaultSpecialWeapons, container, new CustomizedWeapon("特殊"))
+}
+
+document.getElementById("add_extended_part_weapon").onclick = () => {
+    let container = document.getElementById("extended_part_weapons")
+    AddWeapon(g_ExtendedPartWeapons, container, new PartWeapon())
+}
+
+document.getElementById("add_extended_conventional_weapon").onclick = () => {
+    let container = document.getElementById("extended_conventional_weapons")
+    AddWeapon(g_ExtendedConventionalWeapons, container, new ConventionalWeapon())
+}
+
+document.getElementById("add_extended_customized_weapon").onclick = () => {
+    let container = document.getElementById("extended_conventional_weapons")
+    AddWeapon(g_ExtendedConventionalWeapons, container, new CustomizedWeapon("常规"))
+}
+
+document.getElementById("add_extended_special_weapon").onclick = () => {
+    let container = document.getElementById("extended_special_weapons")
+    AddWeapon(g_ExtendedSpecialWeapons, container, new CustomizedWeapon("特殊"))
+}
+
+document.getElementById("__impl_import").addEventListener('change', (event) => {
+    const file = event.target.files[0]
+    if (!file) {
+        throw new Error("指定了非法的文件对象。")
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        const content = e.target.result
+        __impl_import(content)
+    }
+    reader.readAsText(file)
+})
+
+function __impl_import(content) {
+    let ast = luaparse.parse(content)
+    let obj = ResolveWeaponList(ast)
+
+    if (g_Armor) {
+        g_Armor.m_DeleteButtonElement.click()
+    }
+    g_DefaultPartWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+    g_DefaultConventionalWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+    g_DefaultSpecialWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+    g_ExtendedPartWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+    g_ExtendedConventionalWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+    g_ExtendedSpecialWeapons.forEach((v) => {
+        v.m_DeleteButtonElement.click()
+    })
+
+    if (obj.armor) {
+        AddArmor(obj.armor)
+        obj.armor.update()
+    }
+    
+    let container = document.getElementById("default_part_weapons")
+    obj.default_part_weapons.forEach(w => {
+        AddWeapon(g_DefaultPartWeapons, container, w)
+        w.update()
+    })
+
+    container = document.getElementById("default_conventional_weapons")
+    obj.default_conventional_weapons.forEach(w => {
+        AddWeapon(g_DefaultConventionalWeapons, container, w)
+        w.update()
+    })
+    container = document.getElementById("default_special_weapons")
+    obj.default_special_weapons.forEach(w => {
+        AddWeapon(g_DefaultSpecialWeapons, container, w)
+        w.update()
+    })
+    container = document.getElementById("extended_part_weapons")
+    obj.extended_part_weapons.forEach(w => {
+        AddWeapon(g_ExtendedPartWeapons, container, w)
+        w.update()
+    })
+    container = document.getElementById("extended_conventional_weapons")
+    obj.extended_conventional_weapons.forEach(w => {
+        AddWeapon(g_ExtendedConventionalWeapons, container, w)
+        w.update()
+    })
+    container = document.getElementById("extended_special_weapons")
+    obj.extended_special_weapons.forEach(w => {
+        AddWeapon(g_ExtendedSpecialWeapons, container, w)
+        w.update()
+    })
+}
+
+document.getElementById("export").onclick = async () => {
+    let lua_snippet = "if not WeaponList_lua\n" +
+        "then\n" +
+        "\tWeaponList_lua = true\n"
+    if (g_Armor) {
+        lua_snippet += `\tArmor = ${g_Armor.generate('\t', 1, false)}\n`
+    }
+
+    let DefaultPartWeapons = []
+    g_DefaultPartWeapons.forEach((v) => {
+        DefaultPartWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tDefaultPartWeapons = {\n` +
+        `${DefaultPartWeapons.join(",\n")}\n` +
+        `\t}\n`
+
+    let DefaultConventionalWeapons = []
+    g_DefaultConventionalWeapons.forEach((v) => {
+        DefaultConventionalWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tDefaultConventionalWeapons = {\n` +
+        `${DefaultConventionalWeapons.join(",\n")}\n` +
+        `\t}\n`
+    
+    let DefaultSpecialWeapons = []
+    g_DefaultSpecialWeapons.forEach((v) => {
+        DefaultSpecialWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tDefaultSpecialWeapons = {\n` +
+        `${DefaultSpecialWeapons.join(",\n")}\n` +
+        `\t}\n`
+
+
+    let ExtendedPartWeapons = []
+    g_ExtendedPartWeapons.forEach((v) => {
+        ExtendedPartWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tExtendedPartWeapons = {\n` +
+        `${ExtendedPartWeapons.join(",\n")}\n` +
+        `\t}\n`
+
+    let ExtendedConventionalWeapons = []
+    g_ExtendedConventionalWeapons.forEach((v) => {
+        ExtendedConventionalWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tExtendedConventionalWeapons = {\n` +
+        `${ExtendedConventionalWeapons.join(",\n")}\n` +
+        `\t}\n`
+
+    let ExtendedSpecialWeapons = []
+    g_ExtendedSpecialWeapons.forEach((v) => {
+        ExtendedSpecialWeapons.push(v.generate('\t', 2, true))
+    })
+    lua_snippet += `\tExtendedSpecialWeapons = {\n` +
+        `${ExtendedSpecialWeapons.join(",\n")}\n` +
+        `\t}\n`
+
+    lua_snippet += "end"
+    try {
+        const hFile = await window.showSaveFilePicker({
+            suggestedName: "WeaponList",
+            types: [{
+                description: "Lua source file",
+                accept: {
+                    'text/plain': ['.lua']
+                }
+            }]
+        });
+        const ofstream = await hFile.createWritable();
+        await ofstream.write(lua_snippet);
+        await ofstream.close();
+    } catch (e) {
+        console.log(e);
+    }
+
+}
+</script>
+</html>
