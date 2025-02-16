@@ -1,0 +1,9 @@
+@keyframes Glimmer {
+    0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
+    50% { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
+    100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
+}
+.Glimmer {
+    animation: glimmer 1.25s ease-in-out;
+    border: 1px solid red;
+}

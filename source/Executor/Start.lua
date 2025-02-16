@@ -42,19 +42,23 @@ function Start()
         elseif (CmdType == Command.CMD_CHOOSE_CLASS and valid()) -- 选定角色
         then
             Executor.command_in_execution = Command.CMD_CHOOSE_CLASS
-            Executor:choose_class()
+            Executor:choose_character()
         elseif (CmdType == Command.CMD_PLAY_GAME_NORMAL and valid()) -- 24H 挂机模式（常规）
         then
             Executor.command_in_execution = Command.CMD_PLAY_GAME_NORMAL
             Executor:try_confirm()
-            Player:buy_part_weapon(PartWeaponList)
-            Player:play(DefaultWeaponList)
+            Executor:choose_golden_zombie_reward()
+            Player:use_special_weapon(DefaultSpecialWeapons)
+            Player:buy_part_weapon(DefaultPartWeapons)
+            Player:play(DefaultConventionalWeapons)
         elseif (CmdType == Command.CMD_PLAY_GAME_EXTEND and valid()) -- 24H 挂机模式（扩展）
         then
             Executor.command_in_execution = Command.CMD_PLAY_GAME_EXTEND
             Executor:try_confirm()
-            Player:use_special_weapon(SpecialWeapon)
-            Player:play(ExtendedWeaponList)
+            Executor:choose_golden_zombie_reward()
+            Player:use_special_weapon(ExtendedSpecialWeapons)
+            Player:buy_part_weapon(ExtendedPartWeapons)
+            Player:play(ExtendedConventionalWeapons)
         elseif (CmdType == Command.CMD_CREATE_ROOM and valid()) -- 创建房间功能
         then
             Executor.command_in_execution = Command.CMD_CREATE_ROOM

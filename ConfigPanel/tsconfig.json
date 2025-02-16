@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "allowJs": true,
+    "outDir": "scripts/"
+  },
+  "files": [
+    "scripts/Widget.ts",
+    "scripts/Weapon.ts",
+    "scripts/LuaASTUtil.ts"
+  ]
+}

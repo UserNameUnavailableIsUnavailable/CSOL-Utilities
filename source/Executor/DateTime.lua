@@ -74,7 +74,7 @@ function DateTime:get_local_timestamp()
 		hour--[[@as integer]],
 		minute--[[@as integer]],
 		second--[[@as integer]],
-		Setting.TIME_ZONE
+		Setting.FIELD_TIME_ZONE
 	)
 end
 

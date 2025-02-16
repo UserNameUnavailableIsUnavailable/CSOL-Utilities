@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="styles/Tab.css">
+        <title>CSOL 集成工具</title>
+        <link rel="icon" href="https://www.macrohard.fun/assets/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="https://www.macrohard.fun/assets/favicon.ico" type="image/x-icon" />
+    </head>
+    <body>
+        <div id="Container">
+            <div id="TabList">
+                <input id="Setting" class="ActiveTab" type="button" name="Setting" value="通用设置" index="0" onclick="DisplayTab(this, 'Setting.html')" />
+                <br />
+                <input id="WeaponLists" class="InactiveTab" type="button" name="WeaponLists" value="武器列表" index="1" onclick="DisplayTab(this, 'WeaponList.html')" />
+                <br/>
+            </div>
+            <div id="ConfigPanel">
+
+            </div>
+        </div>
+    </body>
+    <script src="scripts/DisplayTab.js"></script>
+    <script>
+        document.getElementById("Setting").click()
+    </script>
+</html>

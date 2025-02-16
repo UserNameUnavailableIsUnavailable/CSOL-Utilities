@@ -28,7 +28,7 @@ const char* HALL_TEXT[]{ "公告栏", "教程大纲", "通过好友", "返回", 
 /* 等候房间内可能被检测到的文本 */
 const char* ROOM_TEXT[] { "房间信息", "设置视角", "玩家列表", "添加技能插件", "技能插件目录", "邀请", "游戏难度说明", "强制踢出", "屏蔽列表添加", "观战", "等待中", "游戏进行中", "自动添加", "详细设定" };
 /* 游戏加载过程中可能被检测到的文本 */
-const char* LOADING_TEXT[]{ "自定义游戏","TIP", "与服务器连接中", "认证游戏资源", "预缓存资源", "游戏信息读取", "最佳奖励", "正在下载" };
+const char* LOADING_TEXT[]{ "自定义游戏", "与服务器连接中", "认证游戏资源", "预缓存资源", "游戏信息读取", "最佳奖励", "正在下载" };
 /* 游戏进行中可能被检测到的文本 */
 const char* MAP_TEXT[]{ "录制", "录像", "视频", "取消", "选择角色", "剩余时间", "自动选择", "下一个", "延迟时间", "选择武器",
 	"重新购买", "开启提示", "僵尸的战利品", "无法携带更多", "连续杀敌", "全员杀敌", "无法丢弃该武器", "通关失败",
@@ -322,7 +322,7 @@ void Controller::AnalyzeInGameState()
         state.update(IN_GAME_STATE::IGS_UNKNOWN, current_time);
 		Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "等待游戏登录达到超时时间（60 秒）。");
 	}
-    else if (state.GetState() == IN_GAME_STATE::IGS_LOADING && current_time - state.GetTimestamp() > 150) /* 游戏加载超时 2 */
+    else if (state.GetState() == IN_GAME_STATE::IGS_LOADING && current_time - state.GetTimestamp() > 150) /* 游戏加载超时 */
     {
         Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_WARNING, "等待游戏加载达到超时时间（超时设定为 150 秒，超过该时间可能是游戏失去响应），结束游戏进程以重新启动。");
 		std::lock_guard lk(s_Instance->m_GameInfoMutex);

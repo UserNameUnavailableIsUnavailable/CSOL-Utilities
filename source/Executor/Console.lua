@@ -26,7 +26,15 @@ function Console:information(fmt, ...)
     self:println("【信息】" .. fmt, ...)
 end
 
----在控制台上按照固定格式打印错误信息
+---在控制台上按照固定格式打印警告
+---@param fmt string 
+---@param ... any
+---@return nil
+function Console:warning(fmt, ...)
+    self:println("【警告】" .. fmt, ...)
+end
+
+---在控制台上按照固定格式打印错误
 ---@param fmt string
 ---@return nil
 function Console:error(fmt, ...)

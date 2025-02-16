@@ -1,5 +1,11 @@
 if (not Executor_lua)
 then
+Include("Delay.lua")
+Include("Console.lua")
+Include("Runtime.lua")
+Include("Keyboard.lua")
+Include("Mouse.lua")
+Include("Setting.lua")
 Executor_lua = true
 Executor = {}
 
@@ -54,54 +60,88 @@ Runtime:register_interrupt_handler(
 
 ---创建游戏房间。
 function Executor:create_game_room()
+    if (not Setting.SWITCH_CREATE_ROOM_ON_EXCEPTION)
+    then
+        return
+    end
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on_several_times(Setting.HALL_BACK_X, Setting.HALL_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
+    Mouse:click_on_several_times(Setting.POSITION_LOBBY_BACK_X, Setting.POSITION_LOBBY_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
-    Mouse:click_on(Setting.HALL_ROOM_LIST_X, Setting.HALL_ROOM_LIST_Y, 500)
-    Mouse:click_on(Setting.HALL_CREATE_ROOM_X, Setting.HALL_CREATE_ROOM_Y, 500)
-    Mouse:click_on(Setting.GAME_MODE_X, Setting.GAME_MODE_Y, 500)
-    Mouse:click_on(Setting.ZOMBIE_SCENARIO_MODE_X, Setting.ZOMBIE_SCENARIO_MODE_Y, 500)
-    Mouse:click_on_several_times(Setting.MAP_CHOOSE_LEFT_SCROLL_X, Setting.MAP_CHOOSE_LEFT_SCROLL_Y, 20, 100)
-    Mouse:click_on(Setting.MAP_TRAP_X, Setting.MAP_TRAP_Y, 200)
-    Mouse:click_on(Setting.FINISH_CHOOSE_X, Setting.FINISH_CHOOSE_Y, 200)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_X, Setting.GAME_DIFFICULTY_Y, 500)
-    Mouse:click_on(Setting.GAME_DIFFICULTY_OPTION_X, Setting.GAME_DIFFICULTY_OPTION_Y, 500)
-    Mouse:click_on(Setting.ROOM_USE_PASSWORD_X, Setting.ROOM_USE_PASSWORD_Y, 500)
-    Mouse:click_on(Setting.ROOM_PASSWORD_BOX_X, Setting.ROOM_PASSWORD_BOX_Y, 500)
-    if (Setting.USE_PASSWORD)
+    Mouse:click_on(Setting.POSITION_LOBBY_LIST_ROOMS_X, Setting.POSITION_LOBBY_LIST_ROOMS_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_1_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_Y, 500)
+    Mouse:click_on_several_times(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y, 20, 100)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_Y, 200)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH_Y, 200)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_1_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_2_X, Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_2_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_CHECKBOX_X, Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_CHECKBOX_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_TEXTBOX_X, Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_TEXTBOX_Y, 500)
+    if (Setting.SWITCH_LOBBY_CREATE_ROOM_LOCK)
     then
         local password
-        if (not Setting.ROOM_USE_CUSTOM_PASSWORD) -- 不使用自定义密码
+        if (not Setting.SWITCH_LOBBY_CREATE_ROOM_CUSTOMIZE_PASSWORD) -- 不使用自定义密码
         then
             password = tostring(math.random(10000000, 9999999999999999)) -- 生成 8 ~ 16 位数字密码
         else -- 使用自定义密码
-            password = Setting.ROOM_CUSTOM_PASSWORD
+            password = Setting.FIELD_LOBBY_CREATE_ROOM_CUSTOM_PASSWORD
         end
         Keyboard:puts(password)
     end
-    Mouse:click_on(Setting.ROOM_PASSWORD_CONFIRM_X, Setting.ROOM_PASSWORD_CONFIRM_Y, 500)
-    Mouse:click_on(Setting.CREATE_ROOM_X, Setting.CREATE_ROOM_Y, 5000) -- 创建房间
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_CONFIRM_X, Setting.POSITION_LOBBY_CREATE_ROOM_PASSWORD_CONFIRM_Y, 500)
+    Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_2_X, Setting.POSITION_LOBBY_CREATE_ROOM_2_Y, 5000) -- 创建房间
 end
 
 ---点击“开始游戏”按钮，开始游戏。
 function Executor:start_game_room()
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI) -- 清除所有可能存在的弹窗
-    Mouse:click_on(Setting.ROOM_START_GAME_X, Setting.ROOM_START_GAME_Y, 2000)
+    Mouse:click_on(Setting.POSITION_ROOM_START_GAME_X, Setting.POSITION_ROOM_START_GAME_Y, 2000)
+end
+
+Executor.last_choose_golden_zombie_reward_time = 0
+function Executor:choose_golden_zombie_reward()
+    if (not Setting.SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS)
+    then
+        return
+    end
+    local t = DateTime:get_local_timestamp()
+    if (Executor.last_choose_golden_zombie_reward_time - t > 45)
+    then
+        return
+    end
+    Mouse:click_on(
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_X,
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_Y,
+        300
+    )
+    Mouse:click_on(
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_SELECT_X,
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_SELECT_Y,
+        300
+    )
+    Mouse:click_on(
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_X,
+        Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_Y,
+        300
+    )
+    Keyboard:click_several_times(Keyboard.ESCAPE, 4, 10)
+    Executor.last_choose_golden_zombie_reward_time = t
 end
 
 ---选定角色，开始新一轮游戏。
 ---@return nil
-function Executor:choose_class()
-    Mouse:click_on_several_times(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_X, 2, 200) -- 点击屏幕上某一处，唤醒窗口（此处点击取消按钮处防止冲突）
-    if (Setting.CHOOSE_T_CLASS)
+function Executor:choose_character()
+    Mouse:click_on_several_times(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, 2, 200) -- 点击屏幕上某一处，唤醒窗口（此处点击取消按钮处防止冲突）
+    if (Setting.SWITCH_GAME_CHOOSE_TERRORISTS)
     then
-        Mouse:click_on_several_times(Setting.CHOOSE_T_CLASS_X, Setting.CHOOSE_T_CLASS_Y, 2, 500) -- 点击 T 阵营选项卡
+        Mouse:click_on_several_times(Setting.POSITION_GAME_CHOOSE_TERRORISTS_TAB_X, Setting.POSITION_GAME_CHOOSE_TERRORISTS_TAB_Y, 2, 500) -- 点击 T 阵营选项卡
     end
-    if (Setting.CLASS_OPTION and math.type(Setting.CLASS_OPTION) == "integer" and Setting.CLASS_OPTION >= 0 and Setting.CLASS_OPTION <= 9)
+    if (Setting.FIELD_GAME_CHARACTER_OPTION and math.type(Setting.FIELD_GAME_CHARACTER_OPTION) == "integer" and Setting.FIELD_GAME_CHARACTER_OPTION >= 0 and Setting.FIELD_GAME_CHARACTER_OPTION <= 9)
     then
-        Keyboard:click(tostring(Setting.CLASS_OPTION), Delay.NORMAL)
+        Keyboard:click(tostring(Setting.FIELD_GAME_CHARACTER_OPTION), Delay.NORMAL)
     else
-        Console:information("Setting.CLASS_OPTION 设置有误。随机选择角色。")
+        Console:information("角色选项设置有误。随机选择角色。")
         Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
     end
     Player:reset() -- 重置玩家对象成员变量
@@ -116,31 +156,35 @@ function Executor:try_confirm()
         return
     end
     Keyboard:click_several_times(Keyboard.ESCAPE, 10, Delay.MINI) -- 清除所有可能存在的弹窗
-    Mouse:click_on(Setting.GAME_ROUND_CONFIRM_X, Setting.GAME_ROUND_CONFIRM_Y)
+    Mouse:click_on(Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y)
     self.last_confirm_timestamp = current_timestamp
 end
 
 ---合成配件。
 function Executor:combine_parts()
+    if (not Setting.SWITCH_CRAFT_PARTS_BATCH_COMBINE)
+    then
+        return
+    end
     local counter = 20
     Keyboard:press(Keyboard.ENTER, 10)
     repeat
         Mouse:click_on(
-            Setting.CRAFT_PARTS_AUTO_FILL_X,
-            Setting.CRAFT_PARTS_AUTO_FILL_Y,
+            Setting.POSITION_CRAFT_PARTS_FILL_X,
+            Setting.POSITION_CRAFT_PARTS_FILL_Y,
             10
         )
         Mouse:click_on(
-            Setting.CRAFT_PARTS_COMBINE_X,
-            Setting.CRAFT_PARTS_COMBINE_Y,
+            Setting.POSITION_CRAFT_PARTS_COMBINE_X,
+            Setting.POSITION_CRAFT_PARTS_COMBINE_Y,
             10
         )
         counter = counter - 1
     until (counter == 0)
     Keyboard:release(Keyboard.ENTER, 10)
     Mouse:click_on(
-        Setting.CRAFT_PARTS_CLEAR_X,
-        Setting.CRAFT_PARTS_CLEAR_Y,
+        Setting.POSITION_CRAFT_PARTS_CLEAR_X,
+        Setting.POSITION_CRAFT_PARTS_CLEAR_Y,
         20
     )
 end
@@ -151,12 +195,16 @@ Executor.buy_button_y = 0
 ---@param buy_button_x integer|nil 横坐标。
 ---@param buy_button_y integer|nil 纵坐标。
 function Executor:purchase_item(buy_button_x, buy_button_y)
+    if (not Setting.SWITCH_STORE_BATCH_PURCHASE)
+    then
+        return
+    end
     self.buy_button_x = buy_button_x or self.buy_button_x or 0
     self.buy_button_y = buy_button_y or self.buy_button_y or 0
     Mouse:click_on(Executor.buy_button_x, Executor.buy_button_y, 50)
-    Mouse:click_on(Setting.STORE_BUY_OPTION_X, Setting.STORE_BUY_OPTION_Y, 50) -- 弹出界面选项
-    Mouse:click_on(Setting.STORE_BUY_X, Setting.STORE_BUY_Y, 50) -- 弹出界面兑换按钮
-    Mouse:click_on(Setting.STORE_BUY_CONFIRM_X, Setting.STORE_BUY_CONFIRM_Y, 600) -- 兑换后确认
+    Mouse:click_on(Setting.POSITION_STORE_PURCHASE_OPTION_X, Setting.POSITION_STORE_PURCHASE_OPTION_Y, 50) -- 弹出界面选项
+    Mouse:click_on(Setting.POSITION_STORE_PURCHASE_X, Setting.POSITION_STORE_PURCHASE_Y, 50) -- 弹出界面兑换按钮
+    Mouse:click_on(Setting.POSITION_STORE_CONFIRM_PURCHASE_X, Setting.POSITION_STORE_CONFIRM_PURCHASE_Y, 600) -- 兑换后确认
     Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
 end
 

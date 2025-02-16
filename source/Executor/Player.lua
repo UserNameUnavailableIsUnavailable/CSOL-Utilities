@@ -84,12 +84,28 @@ function Player:turn()
     until (DateTime:get_local_timestamp() - start_time > 6)
 end
 
+
+Player.RESPAWN_KEY = Keyboard.R
+
+if (Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY and
+    #Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY > 0 and
+    Keyboard:is_keyname_valid(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1])
+)
+then
+    Player.RESPAWN_KEY = Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]
+else
+    Console:warning("复活/回合重置按键未正确配置，使用默认设定。")
+end
+
 ---回合重置或复活。
 ---@return nil
 function Player:reset_round_or_respawn()
     Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
-    Mouse:click_on(Setting.ZS_GAME_ESC_MENU_CANCEL_X, Setting.ZS_GAME_ESC_MENU_CANCEL_Y, 20)
-    Keyboard:click_several_times(Keyboard.R, 2, Delay.SHORT) -- 按 R
+    Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20)
+    if (Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY and #Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY > 0)
+    then
+        Keyboard:click_several_times(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1], 2, Delay.SHORT) -- 回合重置
+    end
 end
 
 ---最近一次发动角色技能的时间。
@@ -104,7 +120,7 @@ function Player:activate_special_ability()
         return
     end
     local current_time = DateTime:get_local_timestamp()
-    if (current_time - self.last_activate_special_ability_time < Setting.CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME) -- 技能尚未冷却
+    if (current_time - self.last_activate_special_ability_time < Setting.FIELD_GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN) -- 技能尚未冷却
     then
         return
     end
@@ -129,12 +145,12 @@ function Player:is_playing()
     return self.playing_flag
 end
 
----使用武器。
+---随机使用常规武器列表中的武器。
 ---@param weapon_list Weapon[] 常规武器列表。
 ---@return nil
 function Player:play(weapon_list)
     self.playing_flag = true
-    if (AC) then AC:purchase() end
+    if (Armor) then Armor:purchase() end
     if (not weapon_list or 0 == #weapon_list)
     then
         return
@@ -170,9 +186,12 @@ Player.last_buy_part_weapon_time = 0
 ---循环计数器，用于记录配件武器购买序号。
 ---@type function | nil
 Player.part_weapon_counter = nil
+---上次购买的配件武器。
+---@type integer
+Player.last_part_weapon_index = 0
 ---按序购买配件武器。
----@param weapon_list Weapon[] 配件武器列表。
-function Player:buy_part_weapon(weapon_list)
+---@param weapons Weapon[] 配件武器列表。
+function Player:buy_part_weapon(weapons)
     local current_time = DateTime:get_local_timestamp()
     if (math.abs(current_time - self.last_buy_part_weapon_time) < 20) -- 每隔 20 秒购买一次
     then
@@ -180,33 +199,48 @@ function Player:buy_part_weapon(weapon_list)
     else
         self.last_buy_part_weapon_time = current_time
     end
-    if (not weapon_list or #weapon_list == 0)
+    if (not weapons or #weapons == 0) -- 非空且至少有一件武器
     then
         return
     end
-    if (not self.part_weapon_counter)
+    local index = Player.last_part_weapon_index + 1
+    if (index > #weapons)
     then
-        self.part_weapon_counter = Utility:create_counter(1, #weapon_list)
+        index = 1
     end
-    local weapon_index = self.part_weapon_counter()
-    local weapon = weapon_list[weapon_index]
+    local weapon = weapons[index]
     weapon:purchase() -- 购买配件武器
+    Player.last_part_weapon_index = index
 end
 
 ---上次购买特殊武器的时间。
 ---@type integer
 Player.last_buy_special_weapon_time = 0
----@param special_weapon Weapon 特殊武器。
-function Player:use_special_weapon(special_weapon)
+Player.last_special_weapon_index = 0
+---@param special_weapons Weapon[] 特殊武器。
+function Player:use_special_weapon(special_weapons)
     Player.playing_flag = true
-    if (not special_weapon) then return end
-    local current_time = DateTime:get_local_timestamp()
-    if (math.abs(current_time - self.last_buy_special_weapon_time) > 20) -- 每隔 20 秒购买一次特殊武器
+    if (not special_weapons or #special_weapons == 0) -- 非空且至少有一件武器
     then
-        special_weapon:purchase()
+        return
+    end
+
+    local current_time = DateTime:get_local_timestamp()
+    local index = Player.last_special_weapon_index + 1 -- 下一件武器
+
+    if (index > #special_weapons)
+    then
+        index = 1
+    end
+
+    if (current_time - self.last_buy_special_weapon_time > 20) -- 每隔 20 秒购买一次特殊武器
+    then
+        special_weapons[index]:purchase()
         self.last_buy_special_weapon_time = current_time
     end
-    special_weapon:use() -- 使用武器
+
+    special_weapons[index]:use() -- 使用武器
+    Player.last_part_weapon_index = index
     if (self.last_weapon)
     then
         self.last_weapon:switch() -- 使用后切换回原来的武器
