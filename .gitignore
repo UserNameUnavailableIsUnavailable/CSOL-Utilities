@@ -1,4 +1,5 @@
 .vs/
+.VSCodeCounter/
 dependencies/
 build/
 test/
