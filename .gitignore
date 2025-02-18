@@ -3,6 +3,7 @@
 dependencies/
 build/
 test/
+.venv/
 .vs/
 .vscode/
 Makefile

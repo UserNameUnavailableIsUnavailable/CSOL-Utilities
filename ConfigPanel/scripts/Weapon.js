@@ -281,6 +281,7 @@ export class ConventionalWeapon extends Weapon {
         this.m_AttackButton = attack_button.value;
     }
     generate(indent, indent_level = 0, first_line_indent = true) {
+        this.gather();
         return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new{\n` +
             `${indent.repeat(indent_level + 1)}name = "${this.m_Name}",\n` +
             `${indent.repeat(indent_level + 1)}number = ${this.m_Number},\n` +
