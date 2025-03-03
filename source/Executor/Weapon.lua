@@ -39,7 +39,7 @@ then
     function Weapon:set_reload_key(key)
         if (not Keyboard:is_key_name_valid(key))
         then
-            error("Invalid key name.")
+            self("Invalid key name.")
         end
         self.RELOAD_KEY = key
     end
@@ -63,7 +63,7 @@ then
         -- 参数列表有效性校验
         if (type(weapon.name) ~= "string")
         then
-            error("Invalid paramter `name`.", 2)
+            self("Invalid paramter `name`.", 2)
         end
         if (type(weapon.number) ~= "string" or
             not (weapon.number == Weapon.NULL
@@ -73,26 +73,26 @@ then
                 or weapon.number == Weapon.GRENADE)
         )
         then
-            error("Invalid paramter `number`.", 2)
+            self("Invalid paramter `number`.", 2)
         end
         if (Mouse:valid_button_name(weapon.attack_button))
         then
-            error("Invalid paramter `attack_button`.", 2)
+            self("Invalid paramter `attack_button`.", 2)
         end
         if (type(weapon.purchase_sequence) ~= "table")
         then
-            error("Invalid paramter `purchase_sequence`.", 2)
+            self("Invalid paramter `purchase_sequence`.", 2)
         end
         for i = 1, #weapon.purchase_sequence
         do
             if (not Keyboard:is_key_name_valid(weapon.purchase_sequence[i]))
             then
-                error("`purchase_sequence` contains invalid key name.", 2)
+                self("`purchase_sequence` contains invalid key name.", 2)
             end
         end
         if (math.floor(weapon.switch_delay) ~= weapon.switch_delay or weapon.switch_delay < 0)
         then
-            error("Invalid paramter `switch_delay`.", 2)
+            self("Invalid paramter `switch_delay`.", 2)
         end
         Console:information(
             "新增武器/装备：" .. weapon.name

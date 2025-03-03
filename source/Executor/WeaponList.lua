@@ -47,6 +47,7 @@ then
 				Keyboard.NINE,
 				Keyboard.SIX
 			},
+			template_name = "魔神开天",
 			attack = function (self)
 				Mouse:press(Mouse.RIGHT)
 				local sensitivity_x = 1 - 0.8 * math.random()
@@ -60,15 +61,12 @@ then
 						self:switch_without_delay()
 						last_switch_time = current_time
 					end
-					if Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)
-					then
-						break
-					end
+					Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)
 				until Runtime:get_running_time() - start_time > 6000
 				Mouse:release(Mouse.RIGHT, 200)
 				Mouse:press(Mouse.LEFT, 1000)
-				Keyboard:press(Keyboard.R, 200)
-				Keyboard:release(Keyboard.R)
+				Keyboard:press(Weapon.RELOAD_KEY, 200)
+				Keyboard:release(Weapon.RELOAD_KEY)
 				Mouse:release(Mouse.LEFT)
 			end
 		},
@@ -81,38 +79,23 @@ then
 				Keyboard.NINE,
 				Keyboard.FOUR
 			},
+			template_name = "万钧神威",
 			attack = function (self)
 				Mouse:press(Mouse.RIGHT)
 				local sensitivity_x = 1 - 0.8 * math.random()
 				local sensitivity_y = 1 - 0.8 * math.random()
 				local direction = Utility:random_direction()
 				local start_time = Runtime:get_running_time()
-				local last_switch_time = 0
-				local first_throw = false
-				local second_throw = false
+				local last_throw_time = Runtime:get_running_time()
 				repeat					local current_time = Runtime:get_running_time()
-					if current_time - last_switch_time > 1000
+					Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)
+					if Runtime:get_running_time() - last_throw_time > 4000
 					then
-						self:switch_without_delay()
-						last_switch_time = current_time
+						Keyboard:click(Weapon.RELOAD_KEY, Delay.MINI)
+						last_throw_time = Runtime:get_running_time()
 					end
-					if not Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI)
-					then
-						break
-					end
-					local duration = Runtime:get_running_time() - start_time
-					if not first_throw and 3000 < duration and duration < 6000
-					then
-						Keyboard:click(Keyboard.R, Delay.SHORT)
-						first_throw = true
-					end
-					if not second_throw and 6000 < duration
-					then
-						Keyboard:click(Keyboard.R, Delay.SHORT)
-						second_throw = true
-					end
-				until Runtime:get_running_time() - start_time > 7000
-				return Mouse:release(Mouse.RIGHT)
+				until Runtime:get_running_time() - start_time > 9000
+				Mouse:release(Mouse.RIGHT)
 			end
 		},
 		Weapon:new{
@@ -202,7 +185,7 @@ then
 	}
 	ExtendedSpecialWeapons = {
 		Weapon:new{
-			name = "圣翼皓印/炽翼魔印",
+			name = "圣翼皓印",
 			switch_delay = 650,
 			number = Weapon.GRENADE,
 			purchase_sequence = {
@@ -210,27 +193,28 @@ then
 				Keyboard.EIGHT,
 				Keyboard.NINE
 			},
+			template_name = "圣翼皓印",
 			discharging = false,
 			discharge_start_moment = 0,
-			recharge_start_moment = 0,
+			charge_start_moment = 0,
 			DISCHARGE_TIME = 27,
 			RECHARGE_TIME = 13,
 			use = function (self)
 				local current_time = DateTime:get_local_timestamp()
-				if not self.discharging and current_time - self.recharge_start_moment > self.RECHARGE_TIME
+				if not self.discharging and current_time - self.charge_start_moment > self.RECHARGE_TIME
 				then
-					self:switch()
-					Mouse:click(Mouse.LEFT, Delay.LONG)
 					self.discharging = true
 					self.discharge_start_moment = current_time
-				elseif self.discharging and current_time - self.discharge_start_moment > self.DISCHARGE_TIME
+					self:switch()
+					Mouse:click(Mouse.LEFT, Delay.LONG)
+				elseif self.discharging and current_time - self.charge_start_moment > self.DISCHARGE_TIME
 				then
+					self.discharging = false
+					self.charge_start_moment = current_time
 					self:switch()
 					Mouse:move_relative(0, 4000, Delay.NORMAL)
-					Keyboard:click(Keyboard.R, Delay.LONG_LONG)
+					Keyboard:click(Weapon.RELOAD_KEY, Delay.LONG_LONG)
 					Mouse:move_relative(0, - 4000, Delay.NORMAL)
-					self.discharging = false
-					self.recharge_start_moment = current_time
 				end
 			end
 		}

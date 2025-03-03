@@ -13,29 +13,16 @@ Weapon:new{
         local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
         local direction = Utility:random_direction() -- 随机向左或右
         local start_time = Runtime:get_running_time() -- 本次转圈开始时间
-        local last_switch_time = 0
-        local first_throw = false
-        local second_throw = false
+        local last_throw_time = Runtime:get_running_time()
         repeat
             local current_time = Runtime:get_running_time()
-            if (current_time - last_switch_time > 1000)
-            then
-                self:switch_without_delay()
-                last_switch_time = current_time
-            end
             Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
-            local duration = Runtime:get_running_time() - start_time
-            if (not first_throw and 3000 < duration and duration < 6000)
+            if (Runtime:get_running_time() - last_throw_time > 4000)
             then
-                Keyboard:click(Weapon.RELOAD_KEY, Delay.SHORT)
-                first_throw = true
+                Keyboard:click(Weapon.RELOAD_KEY, Delay.MINI)
+                last_throw_time = Runtime:get_running_time()
             end
-            if (not second_throw and 6000 < duration)
-            then
-                Keyboard:click(Weapon.RELOAD_KEY, Delay.SHORT)
-                second_throw = true
-            end
-        until (Runtime:get_running_time() - start_time > 7500)
+        until (Runtime:get_running_time() - start_time > 9000)
         Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
     end
 }

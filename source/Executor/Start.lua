@@ -24,8 +24,10 @@ then
                 Mouse:reset()
                 Keyboard:reset()
                 Player:reset()
-                local e = Error:new{
+                local e = {
                     type = "COMMAND_CHANGED",
+                    message = "命令变更",
+                    parameters = {}
                 }
                 Error:throw(e) -- 主动触发运行时错误
             end
@@ -82,10 +84,10 @@ then
     function Start()
         while (true)
         do
-            local status, err = pcall(interpret)
-            if (not status)
+            local ok, err_msg = pcall(interpret)
+            if (not ok)
             then
-                Error:catch(err)
+                Error:catch(err_msg --[[@as string]])
             end
         end
     end
