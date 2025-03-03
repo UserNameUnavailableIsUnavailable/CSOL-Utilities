@@ -8,7 +8,7 @@ Runtime.manual_flag = false
 ---暂停标志。若置为 `true`，则所有键鼠操作都将被跳过。
 -- Runtime.pause_flag = false
 ---中断标志位，用于开/关中断，避免中断嵌套。`true` 允许中断，`false` 不允许中断。
-Runtime.interrupt_flag = true
+Runtime.interrupt_flag = false
 ---中断发生时保存的中断现场。
 ---@type Context[]
 Runtime.interrupt_context = {}
@@ -23,13 +23,30 @@ Runtime.expected_sleep_time = 10
 ---实际睡眠时间粒度
 Runtime.actual_sleep_time = 10
 
+Runtime.interrupt_flag_stack = {}
+
+---将中断标志位压栈。
+function Runtime:push_interrupt_flag()
+    self.interrupt_flag_stack[#self.interrupt_flag_stack + 1] = self.interrupt_flag_stack
+end
+
+---从栈中恢复最近一次的中断标志位。
+function Runtime:pop_interrupt_flag()
+    if (#self.interrupt_flag_stack < 1)
+    then
+        return
+    end
+    self.interrupt_flag = self.interrupt_flag_stack[#self.interrupt_flag_stack]
+    self.interrupt_flag_stack[#self.interrupt_flag_stack] = nil
+end
+
 ---开中断。
 function Runtime:sti()
     Runtime.interrupt_flag = true
 end
 
 ---关中断。
-function Runtime:sti()
+function Runtime:cli()
     Runtime.interrupt_flag = false
 end
 
@@ -38,27 +55,26 @@ end
 ---@param precise boolean | nil 是否需要尽力保证精度。
 ---@return nil
 function Runtime:sleep(milliseconds, precise)
-    -- 罗技 API 不支持真正的中断，故而当某个过程主动将自己挂起时（即调用Runtime:sleep)视为自发中断，此时可以处理外部事件
-    local before_int = Runtime:get_running_time()
-    -- 先执行中断处理
-    self:interrupt_handler()
-    -- 中断处理结束后，再校验参数（无论如何都要进行中断处理，即便参数非法）
     milliseconds = milliseconds or 0
     milliseconds = math.floor(milliseconds) -- 防止提供小数时间，若类型非 `number` 会返回 `nil`
-    if (type(milliseconds) ~= "number" or milliseconds < 0)
-    then
-        return
-    end
-
-    -- 预测下一次休眠会消耗的时间
-    local expected_sleep_time = 0.5 * self.expected_sleep_time + 0.5 * self.actual_sleep_time
-    local after_int = Runtime:get_running_time()
-    local int_time = after_int - before_int
-
-    milliseconds = milliseconds - int_time -- 去除中断处理耗时
     -- 将长时间的休眠拆分为若干短时间休眠，确保 `Runtime` 常常保持对程序的控制权
-    while (milliseconds > 0)
+    while (true)
     do
+        local expected_sleep_time = 0.5 * self.expected_sleep_time + 0.5 * self.actual_sleep_time
+        -- 罗技 API 不支持真正的中断，故而当某个过程主动将自己挂起时（即调用Runtime:sleep)视为自发中断，此时可以处理外部事件
+        local before_int = Runtime:get_running_time()
+        -- 先执行中断处理
+        self:interrupt_handler()
+        -- 中断处理结束后，再校验参数（无论如何都要进行中断处理，即便参数非法）
+        if (type(milliseconds) ~= "number" or milliseconds < 0)
+        then
+            return
+        end
+        -- 预测下一次休眠会消耗的时间
+        local after_int = Runtime:get_running_time()
+        local int_time = after_int - before_int
+        milliseconds = milliseconds - int_time -- 去除中断处理耗时
+
         if (milliseconds > expected_sleep_time) -- 大于预计休眠时间
         then
             local start_timepoint = Runtime:get_running_time()
@@ -68,7 +84,8 @@ function Runtime:sleep(milliseconds, precise)
             milliseconds = milliseconds - real_sleep_time -- 减去实际睡眠时间
             -- 更新预测值和实际值
             self.expected_sleep_time, self.actual_sleep_time = expected_sleep_time, real_sleep_time
-        else -- 0 < milliseconds ≤ expected_sleep_time
+        elseif (milliseconds > 0) -- 0 ＜ milliseconds ≤ expected_sleep_time
+        then
             if (precise) -- 需要较高精度，剩余时间采用忙等
             then
                 local begin = Runtime:get_running_time()
@@ -77,6 +94,8 @@ function Runtime:sleep(milliseconds, precise)
             else
                 Sleep(milliseconds) -- 不考虑精度，按照剩余时间直接休眠
             end
+            break
+        else -- milliseconds ≤ 0
             break
         end
     end
@@ -93,6 +112,7 @@ function Runtime:interrupt_handler()
     end
     local int_status, int_error
     -- 中断开始时，中断标志位使能以屏蔽后续中断
+    self:push_interrupt_flag()
     self:cli() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
     for i = 1, #self.interrupt_handlers
     do
@@ -103,10 +123,10 @@ function Runtime:interrupt_handler()
         end
     end
     -- 中断处理完毕
-    self:sti() -- 开中断
+    self:pop_interrupt_flag() -- 开中断
     if (not int_status) -- 中断处理出现错误
     then
-        error(int_error) -- 将中断处理过程中引发的错误上抛
+        error(int_error:__tostring()) -- 将中断处理过程中引发的错误上抛
     end
 end
 

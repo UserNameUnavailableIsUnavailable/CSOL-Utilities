@@ -9,7 +9,6 @@ Include("Setting.lua")
 Executor_lua = true
 Executor = {}
 
-
 ---注册暂停事件处理函数，处理用户手动接管事件。
 Runtime:register_interrupt_handler(
     function ()

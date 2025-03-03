@@ -102,6 +102,8 @@ then
 
     ---根据 `purchase_sequence` 字段中预设的按键序列购买武器。
     function Weapon:purchase()
+        Runtime:push_interrupt_flag()
+        Runtime:cli() -- 暂时关中断，完成原子操作
         for _, key in ipairs(self.purchase_sequence)
         do
             Keyboard:click(key, Delay.MEDIUM, true)
@@ -113,6 +115,7 @@ then
         -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
         Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
         Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
+        Runtime:pop_interrupt_flag()
     end
 
     ---切换到指定武器。
