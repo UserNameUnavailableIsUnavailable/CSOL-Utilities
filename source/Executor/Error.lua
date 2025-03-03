@@ -8,7 +8,7 @@ then
     Error = {}
 
     Error.error_handlers = {}
-    Error.MAGIC = "EXECUTOR_ERROR_OBJECT"
+    Error.HEADER = "EXECUTOR_ERROR_OBJECT"
     Error.type = "SUCCESS"
     Error.message = ""
     Error.parameters = {}
@@ -37,7 +37,7 @@ then
         self.type = init.type or "UNDEFINED"
         self.message = init.message or "UNDEFINED_ERROR_MESSAGE"
         self.parameters = init.parameters or {}
-        error(string.format("%s: ❌%s❌", self.MAGIC, tostring(self)))
+        error(string.format("%s: ❌%s❌", self.HEADER, tostring(self)))
     end
 
     ---错误处理函数，调用者不应该捕获 catch 抛出的错误。
