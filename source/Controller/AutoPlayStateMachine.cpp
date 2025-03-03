@@ -382,15 +382,15 @@ void Controller::DispatchAutoPlayCommand()
         thread_local ExecutorCommand cmd(3, true);
         if (s_Instance->m_ExtendedAutoPlayMode && current_time - m_CurrentState.GetTimestamp() > 60)
         {
-			cmd.Set(EXECUTOR_COMMAND::CMD_PLAY_GAME_EXTEND, current_time);
+			cmd.Set(EXECUTOR_COMMAND::CMD_EXTENDED_IDLE, current_time);
         }
         else if (current_time - m_CurrentState.GetTimestamp() > 5)
         {
-			cmd.Set(EXECUTOR_COMMAND::CMD_PLAY_GAME_NORMAL, current_time);
+			cmd.Set(EXECUTOR_COMMAND::CMD_DEFAULT_IDLE, current_time);
         }
         else
         {
-            cmd.Set(EXECUTOR_COMMAND::CMD_CHOOSE_CLASS, current_time);
+            cmd.Set(EXECUTOR_COMMAND::CMD_CHOOSE_CHARACTER, current_time);
         }
         remove_game_window_border();
         s_Instance->m_Messenger.Dispatch(cmd);

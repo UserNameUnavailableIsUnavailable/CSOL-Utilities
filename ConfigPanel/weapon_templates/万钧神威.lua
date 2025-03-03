@@ -35,7 +35,7 @@ Weapon:new{
                 Keyboard:click(Weapon.RELOAD_KEY, Delay.SHORT)
                 second_throw = true
             end
-        until (Runtime:get_running_time() - start_time > 7000)
+        until (Runtime:get_running_time() - start_time > 7500)
         Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
     end
 }

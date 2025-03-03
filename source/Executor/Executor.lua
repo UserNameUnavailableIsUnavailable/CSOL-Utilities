@@ -9,15 +9,14 @@ Include("Setting.lua")
 Executor_lua = true
 Executor = {}
 
-Executor.command_in_execution = Command.CMD_NOP
 
 ---注册暂停事件处理函数，处理用户手动接管事件。
 Runtime:register_interrupt_handler(
     function ()
         if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
         then
-            Keyboard:release_all()
-            Mouse:release_all()
+            Keyboard:reset()
+            Mouse:reset()
             -- 注意，如果 pause_flag == true，则 restore_context() 不会再恢复中断现场，这是由于 pause_flag 置位后不会执行任何键鼠操作
             if (not Runtime.manual_flag)
             then
@@ -40,12 +39,8 @@ Executor.last_reset_or_respawn_time = 0
 Runtime:register_interrupt_handler(
     function ()
         -- 当前未在挂机
-        if (Executor.command_in_execution ~= Command.CMD_PLAY_GAME_NORMAL and Executor.command_in_execution ~= Command.CMD_PLAY_GAME_EXTEND)
-        then
-            return
-        end
-        -- 当前正在操作，则等到操作完全结束再重置，防止对操作逻辑造成不必要的干扰
-        if (Player:is_playing())
+        local cmd = Command:claim()
+        if (cmd ~= Command.CMD_DEFAULT_IDLE and cmd ~= Command.CMD_EXTENDED_IDLE)
         then
             return
         end
@@ -71,7 +66,10 @@ function Executor:create_game_room()
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_1_Y, 500)
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_Y, 500)
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_Y, 500)
-    Mouse:click_on_several_times(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y, 20, 100)
+    Mouse:click_on_several_times(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y, 30, 50) -- 先移动到最左侧
+    Mouse:click_on_several_times(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y, Setting.FIELD_LOBBY_CREATR_ROOM_MAP_RIGHT_SCROLL_COUNT, 150
+    ) -- 向右移动指定次数
+    Mouse:roll_wheel(Setting.FIELD_LOBBY_CREATE_ROOM_SCROLL_DOWN_COUNT, 50)
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_Y, 200)
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH_Y, 200)
     Mouse:click_on(Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_DIFFICULTY_1_Y, 500)

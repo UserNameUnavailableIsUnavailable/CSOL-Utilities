@@ -2,7 +2,10 @@ if (not DateTime_lua)
 then
 DateTime_lua = true
 ---@class DateTime
+---@field TIME_ZONE number 时区
 DateTime = {}
+
+DateTime.TIME_ZONE = 8
 
 ---判断 `year` 是否为闰年。
 ---@param year integer 
@@ -16,7 +19,7 @@ function DateTime:is_leap(year)
 	return false
 end
 
----计算给定时间的 UNIX 时间戳。
+---根据给定的日期和时间，计算的 UNIX 时间戳
 ---@param year integer
 ---@param month integer 
 ---@param day integer
@@ -58,8 +61,22 @@ function DateTime:timestamp(year, month, day, hour, minute, second, time_zone)
 	return ret
 end
 
----将本机时间转换为时间戳（UTC+0，需确保时区设置正确）。
----@return integer # 时间戳。
+---设定时区。
+---@param tz number
+function DateTime:set_time_zone(tz)
+	if (not tz)
+	then
+		return
+	end
+	self.TIME_ZONE = tz
+end
+
+function DateTime:get_time_zone()
+	return self.TIME_ZONE
+end
+
+---获取操作系统本地时间，并将其转换为 UNIX 时间戳。
+---@return integer # 时间戳
 function DateTime:get_local_timestamp()
 	local year = tonumber(GetDate("%Y"))
 	local month = tonumber(GetDate("%m"))
@@ -74,8 +91,9 @@ function DateTime:get_local_timestamp()
 		hour--[[@as integer]],
 		minute--[[@as integer]],
 		second--[[@as integer]],
-		Setting.FIELD_TIME_ZONE
+		self.TIME_ZONE
 	)
 end
+
 
 end -- DateTime_lua

@@ -203,7 +203,7 @@ then
 	ExtendedSpecialWeapons = {
 		Weapon:new{
 			name = "圣翼皓印/炽翼魔印",
-			switch_delay = 750,
+			switch_delay = 650,
 			number = Weapon.GRENADE,
 			purchase_sequence = {
 				Keyboard.B,
@@ -213,21 +213,21 @@ then
 			discharging = false,
 			discharge_start_moment = 0,
 			recharge_start_moment = 0,
-			DISCHARGE_TIME = 25,
-			RECHARGE_TIME = 10,
+			DISCHARGE_TIME = 27,
+			RECHARGE_TIME = 13,
 			use = function (self)
 				local current_time = DateTime:get_local_timestamp()
 				if not self.discharging and current_time - self.recharge_start_moment > self.RECHARGE_TIME
 				then
 					self:switch()
-					Mouse:click(Mouse.LEFT, 200)
+					Mouse:click(Mouse.LEFT, Delay.LONG)
 					self.discharging = true
 					self.discharge_start_moment = current_time
 				elseif self.discharging and current_time - self.discharge_start_moment > self.DISCHARGE_TIME
 				then
 					self:switch()
 					Mouse:move_relative(0, 4000, Delay.NORMAL)
-					Keyboard:click(Keyboard.R, 350)
+					Keyboard:click(Keyboard.R, Delay.LONG_LONG)
 					Mouse:move_relative(0, - 4000, Delay.NORMAL)
 					self.discharging = false
 					self.recharge_start_moment = current_time

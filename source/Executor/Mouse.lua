@@ -1,8 +1,10 @@
 if (not Mouse_lua)
 then
-Include("Context.lua")
-Include("Runtime.lua")
-Mouse_lua = true
+    Mouse_lua = true
+    Include("Context.lua")
+    Include("Runtime.lua")
+    Include("Error.lua")
+
 ---@class Mouse
 ---@field LEFT integer 鼠标左键。
 ---@field MIDDLE integer 鼠标中键。
@@ -13,14 +15,45 @@ Mouse_lua = true
 ---@field unreleased table 鼠标按下但未释放的按钮，`true` 表示按下。
 Mouse = {
     LEFT = 1, MIDDLE = 2 ,RIGHT = 3, BACKWARD = 4, FORWARD = 5,
-    DOUBLE_CLICK_INTERVAL = 150,
 }
+
+local valid_mouse_buttons = {}
+for k, v in pairs(Mouse)
+do
+    valid_mouse_buttons[k] = v
+end
+
+--检查按钮名是否有效。
+---@param button_name string
+---@return boolean # 有效返回 `true`，无效返回 `false`。
+function Mouse:valid_button_name(button_name)
+    if (type(button_name) ~= "string")
+    then
+        return false
+    end
+    for _, v in pairs(valid_mouse_buttons)
+    do
+        if (v == button_name)
+        then
+            return true
+        end
+    end
+    return false
+end
+
+--双击延迟
+---@type integer
+Mouse.DOUBLE_CLICK_INTERVAL = 150
 
 ---@type {[integer]: boolean}
 Mouse.unreleased = {}
 
 ---@param button integer
 local function press_button_safe(button)
+    if (not button)
+    then
+        return
+    end
     if (not Runtime:is_paused())
     then
         pcall(PressMouseButton, button)
@@ -29,6 +62,10 @@ end
 
 ---@param button integer
 local function release_button_safe(button)
+    if (not button)
+    then
+        return
+    end
     if (not Runtime:is_paused())
     then
         pcall(ReleaseMouseButton, button)
@@ -37,6 +74,10 @@ end
 
 ---@param button integer
 local function press_and_release_button_safe(button)
+    if (not button)
+    then
+        return
+    end
     if (not Runtime:is_paused())
     then
         pcall(PressAndReleaseMouseButton, button)
@@ -46,6 +87,10 @@ end
 ---@param x integer
 ---@param y integer
 local function move_mouse_to(x, y)
+    if (not x or not y)
+    then
+        return
+    end
     if (not Runtime:is_paused())
     then
         pcall(MoveMouseTo, x, y)
@@ -62,39 +107,40 @@ end
 ---@param x integer 横坐标。
 ---@param y integer 纵坐标。
 ---@param delay integer | nil 移动鼠标光标后的延迟时间，默认为 `Delay.SHORT`。
----@return nil
-function Mouse:place(x, y, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:place(x, y, delay, precise)
     delay = delay or Delay.SHORT
     move_mouse_to(x, y)
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
 ---按下按钮。
 ---@param button integer
 ---@param delay integer | nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
----@return nil
-function Mouse:press(button, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:press(button, delay, precise)
     delay = delay or Delay.SHORT
     if (button)
     then
         press_button_safe(button)
         self.unreleased[button] = true
     end
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
 ---弹起按钮。
 ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
+---@param precise boolean | nil 是否精确定时
 ---@return nil
-function Mouse:release(button, delay)
+function Mouse:release(button, delay, precise)
     delay = delay or Delay.SHORT
     if (button)
     then
         release_button_safe(button)
         self.unreleased[button] = nil
     end
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
 ---判断某个按钮是否按下。
@@ -106,73 +152,72 @@ end
 
 ---弹起所有通过 `Mouse:press` 按下但未通过 `Mouse.release` 回弹的按钮（记录在 `Mouse.unreleased` 中）。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 释放每个按钮后的延迟时间，默认为 `Delay.SHORT`。
----@return nil
-function Mouse:release_all (delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:reset (delay, precise)
     delay = delay or Delay.SHORT
     for button, _ in pairs(self.unreleased)
     do
-        self:release(button, delay)
+        self:release(button, delay, precise)
     end
 end
 
 ---单击一次按钮。
 ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 单击某个按钮后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
----@return nil
-function Mouse:click(button, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:click(button, delay, precise)
     delay = delay or Delay.SHORT
     press_and_release_button_safe(button)
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
 ---双击一次按钮。
 ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param delay integer | nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
----@return nil
-function Mouse:double_click(button, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:double_click(button, delay, precise)
     delay = delay or Delay.SHORT
     press_and_release_button_safe(button)
     Sleep(Mouse.DOUBLE_CLICK_INTERVAL)
     press_and_release_button_safe(button)
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
 ---使用鼠标单击屏幕上某个位置。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param x integer 横坐标。
 ---@param y integer 纵坐标。
 ---@param delay integer | nil 点击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+---@param precise boolean | nil 是否精确定时
 ---@see Mouse.locate_cursor 获取 `(x, y)` 。
----@return nil
-function Mouse:click_on(x, y, delay)
+function Mouse:click_on(x, y, delay, precise)
     delay = delay or Delay.SHORT
     Mouse:place(x, y, Delay.SHORT)
-    Mouse:click(Mouse.LEFT, delay)
+    Mouse:click(Mouse.LEFT, delay, precise)
 end
 
 ---相对移动鼠标光标。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param rightward integer 向右移动的偏移量，负数表示向左。
 ---@param downward integer 向下移动的偏移量，负数表示向上。
 ---@param delay integer | nil 移动光标后的延迟，默认为 `Delay.SHORT`。
----@return nil
----@remark 
-function Mouse:move_relative(rightward, downward, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:move_relative(rightward, downward, delay, precise)
     if (not Runtime:is_paused() and rightward and downward) -- 当下达退出指令时，不进行任何操作
     then
         MoveMouseRelative(math.ceil(rightward), math.ceil(downward))
     end
-    Runtime:sleep(delay or Delay.SHORT)
+    Runtime:sleep(delay or Delay.SHORT, precise)
 end
 
 ---使用鼠标双击屏幕上某个位置。当 `Runtime:is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
 ---@param x integer 横坐标。
 ---@param y integer 纵坐标。
 ---@param delay integer | nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
----@return nil
+---@param precise boolean | nil 是否精确定时
 ---@see Mouse.locate_cursor 获取 `(x, y)` 。
-function Mouse:double_click_on(x, y, delay)
+function Mouse:double_click_on(x, y, delay, precise)
     delay = delay or Delay.SHORT
     Mouse:place(x, y, Delay.SHORT)
-    Mouse:double_click(Mouse.LEFT, delay)
+    Mouse:double_click(Mouse.LEFT, delay, precise)
 end
 
 ---使用鼠标重复点击屏幕上的某个位置若干次。当 `Runtime.is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
@@ -180,17 +225,28 @@ end
 ---@param y integer 纵坐标。
 ---@param n integer 重复次数。
 ---@param delay integer | nil 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-function Mouse:click_on_several_times(x, y, n, delay)
+---@param precise boolean | nil 是否精确定时
+function Mouse:click_on_several_times(x, y, n, delay, precise)
     delay = delay or Delay.SHORT
+    n = n or 0
     n = math.floor(n) or 0
     while (n > 0)
     do
         Mouse:click_on(x, y, Delay.NORMAL)
         n = n - 1
     end
-    Runtime:sleep(delay)
+    Runtime:sleep(delay, precise)
 end
 
+---滚动鼠标滚轮。
+---@param times integer 滚动次数，正数表示向上滚动，负数表示向下滚动。
+---@param delay integer 滚动后的延迟，单位为毫秒。
+---@param precise boolean | nil 是否精确定时
+function Mouse:roll_wheel(times, delay, precise)
+    delay = delay or Delay.SHORT
+    pcall(MoveMouseWheel, times)
+    Runtime:sleep(delay, precise)
+end
 
 Runtime:register_context(
     Context:new(
@@ -211,4 +267,9 @@ Runtime:register_context(
     )
 )
 
+Error:register_fatal_disposal(
+    function ()
+        Mouse:reset(0)
+    end
+)
 end -- if (not Mouse)
