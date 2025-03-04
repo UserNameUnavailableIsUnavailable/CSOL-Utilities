@@ -38,7 +38,6 @@ then
         NUM_ENTER = "numenter",
         PRINTSCREEN = "printscreen", PAUSE = "pause",
         CAPS_LOCK = "capslock", NUM_LOCK = "numlock", SCROLL_LOCK = "scrolllock",
-
     }
 
     for k, v in pairs(valid_keynames)

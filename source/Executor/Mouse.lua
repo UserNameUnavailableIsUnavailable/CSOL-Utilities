@@ -81,7 +81,7 @@ function Mouse:place(x, y, delay, precise)
     delay = delay or Delay.SHORT
     if (not Mouse.frozen)
     then
-        if (self:is_position_valid(x, y))
+        if (not self:is_position_valid(x, y))
         then
             MoveMouseTo(x, y)
         end
