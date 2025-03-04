@@ -130,9 +130,9 @@ then
     ---回合重置或复活。
     function Player:reset_round_or_respawn()
         Runtime:sleep(20, true) -- 等待鼠标光标位置稳定（精确定时，尽可能减少对正常挂机的影响）
-        local x, y = Mouse:locate_cursor() -- 获取光标位置
+        local x, y = Mouse:locate() -- 获取光标位置
         Mouse:move_relative(250, 20, 20, true) -- 小幅度移动光标
-        local _x, _y = Mouse:locate_cursor() -- 稳定后再次获取光标位置
+        local _x, _y = Mouse:locate() -- 稳定后再次获取光标位置
         -- 如果光标位置在中心附近，且变化量比移动幅度小，则说明当前没有其他弹窗的影响，直接按下回合重置/复活按键
         if (math.abs(_x - x) < 200 and math.abs(_y - y) < 200 and math.abs(_x - 32767) < 250 and math.abs(_x - 32767) < 250)
         then
@@ -141,7 +141,7 @@ then
         end
         -- 存在其他弹窗的影响
         Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI) -- 清除弹窗
-        Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, Delay.SHORT) -- 点击弹窗中的 “取消” 按钮
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, Delay.SHORT) -- 点击弹窗中的 “取消” 按钮
         Keyboard:click(self.RESPAWN_KEY, Delay.MINI) -- 回合重置
     end
 

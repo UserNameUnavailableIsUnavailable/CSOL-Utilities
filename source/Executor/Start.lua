@@ -19,13 +19,13 @@ then
             Command:update() -- 更新命令
             Runtime.last_command_update_timepoint = Runtime:get_running_time()
             -- 命令类型发生变化，需要立即停止当前执行
-            if ((Command:get_status() & Command.TYPE_CHANGED) == Command.TYPE_CHANGED)
+            if ((Command:get_status() & Command.NAME_CHANGED) == Command.NAME_CHANGED)
             then
                 Mouse:reset()
                 Keyboard:reset()
                 Player:reset()
                 local e = {
-                    type = "COMMAND_CHANGED",
+                    name = "COMMAND_CHANGED",
                     message = "命令变更",
                     parameters = {}
                 }
@@ -65,9 +65,9 @@ then
         elseif (cmd == Command.CMD_BATCH_PURCHASE_ITEM) -- 购买物品功能
         then
             -- 对于新发出的命令，需要更新鼠标光标位置
-            if ((Command:get_status() & Command.TYPE_CHANGED) ~= Command.UNCHANGED) -- 新旧命令类型不同，即旧命令不是购买物品
+            if ((Command:get_status() & Command.NAME_CHANGED) ~= Command.UNCHANGED) -- 新旧命令类型不同，即旧命令不是购买物品
             then
-                Executor:purchase_item(Mouse:locate_cursor())
+                Executor:purchase_item(Mouse:locate())
             else
                 Executor:purchase_item()
             end

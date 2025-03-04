@@ -63,7 +63,11 @@ then
         -- 参数列表有效性校验
         if (type(weapon.name) ~= "string")
         then
-            self("Invalid paramter `name`.", 2)
+            Error:throw{
+                name = "ILLEGAL_WEAPON_NAME_TYPE",
+                message = ("武器名称必须具有 `string` 类型，但获取到的类型为 `%s`"):format(type(weapon.name)),
+                parameters = {}
+            }
         end
         if (type(weapon.number) ~= "string" or
             not (weapon.number == Weapon.NULL
@@ -73,21 +77,37 @@ then
                 or weapon.number == Weapon.GRENADE)
         )
         then
-            self("Invalid paramter `number`.", 2)
+            Error:throw{
+                name = "ILLEGAL_WEAPON_NUMBER_TYPE",
+                message = ("武器栏位必须为 `Weapon.NULL`、`Weapon.PRIMARY`、`Weapon.SECONDARY`、`Weapon.MELEE`、`Weapon.GRENADE`，但实际获取到的值为 `%s`"):format(weapon.number),
+                parameters = {}
+            }
         end
-        if (Mouse:valid_button_name(weapon.attack_button))
+        if (not Mouse:is_button_name_valid(weapon.attack_button))
         then
-            self("Invalid paramter `attack_button`.", 2)
+            Error:throw{
+                name = "ILLEGAL_WEAPON_ATTACK_BUTTON",
+                message = ("武器攻击按钮必须为合法的鼠标按钮，但实际获取到的值为 `%s`"):format(weapon.attack_button),
+                parameters = {}
+            }
         end
         if (type(weapon.purchase_sequence) ~= "table")
         then
-            self("Invalid paramter `purchase_sequence`.", 2)
+            Error:throw{
+                name = "ILLEGAL_WEAPON_PURCHASE_SEQUENCE_TYPE",
+                message = ("武器购买按键序列必须具有 `table` 类型，但实际获取到的类型为 `%s`"):format(type(weapon.purchase_sequence)),
+                parameters = {}
+            }
         end
         for i = 1, #weapon.purchase_sequence
         do
             if (not Keyboard:is_key_name_valid(weapon.purchase_sequence[i]))
             then
-                self("`purchase_sequence` contains invalid key name.", 2)
+                Error:throw{
+                    name = "ILLEGAL_WEAPON_PURCHASE_SEQUENCE_KEY",
+                    message = ("武器购买按键序列由合法键盘按键构成，但获取到了非法按键 `%s`"):format(type(weapon.purchase_sequence[i])),
+                    parameters = {}
+                }
             end
         end
         if (math.floor(weapon.switch_delay) ~= weapon.switch_delay or weapon.switch_delay < 0)
@@ -114,7 +134,7 @@ then
         end
         -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
         Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
-        Mouse:click_on(Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
         Runtime:pop_interrupt_flag()
     end
 
@@ -139,13 +159,13 @@ then
 
     ---确认武器购买资金不足提示框（预设按钮在 Setting.lua 中）。
     function Weapon:in_case_insufficient_funds()
-        Mouse:click_on(Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_X, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_Y)
+        Mouse:click_on(Mouse.LEFT, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_X, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_Y)
         Keyboard:click(Keyboard.ZERO, Delay.SHORT)
     end
 
     ---关闭死亡状态下的预购买菜单（点击“重复购买”按钮，不点击“取消购买”以避免与大厅界面按钮冲突）。
     function Weapon:close_dead_purchase_menu()
-        Mouse:click_on(Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_X, Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_Y, Delay.NORMAL)
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_X, Setting.POSITION_GAME_PURCHASE_BEFORE_RESPAWN_Y, Delay.NORMAL)
     end
 
     ---使用特殊武器的函数，在创建特殊武器对象时重写此函数。

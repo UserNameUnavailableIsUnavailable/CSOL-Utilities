@@ -19,7 +19,7 @@ void Messenger::DispatchNOP() noexcept
 {
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = 0\n"
-                 << "CmdType = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
+                 << "CmdName = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
                  << "CmdTimepoint = 0\n"
                  << "CmdRepeatable = false\n"
                  << std::endl;
@@ -37,7 +37,7 @@ void Messenger::Dispatch(const ExecutorCommand& ec) noexcept
     m_CommandTimepoint = ec.GetCmdTimepoint();
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = " << ec.GetId() << '\n'
-                 << "CmdType = " << m_CommandString << '\n'
+                 << "CmdName = " << m_CommandString << '\n'
                  << "CmdTimepoint = " << m_CommandTimepoint << '\n'
                  << "CmdRepeatable = " << (ec.IsRepeatable() ? "true" : "false") << std::endl;
     std::filesystem::resize_file(m_CommandFile, m_FileStream.tellp()); /* 设置文件 EOF */

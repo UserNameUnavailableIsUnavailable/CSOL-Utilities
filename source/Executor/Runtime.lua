@@ -1,6 +1,7 @@
 if (not Runtime_lua)
 then
     Include("Context.lua")
+    Include("JSON.lua")
     Runtime_lua = true
     Runtime = {}
     ---手动接管标志。必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。
@@ -205,4 +206,10 @@ then
         return self.manual_flag
     end
 
+    ---向 Windows 调试器汇报 JSON 格式的消息。
+    ---@param message table 消息内容
+    function Runtime:report(message)
+        local json = JSON.encode(message)
+        OutputDebugMessage(json)
+    end
 end -- Runtime_lua
