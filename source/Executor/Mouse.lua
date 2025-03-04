@@ -81,7 +81,7 @@ function Mouse:place(x, y, delay, precise)
     delay = delay or Delay.SHORT
     if (not Mouse.frozen)
     then
-        if (not self:is_position_valid(x, y))
+        if (self:is_position_valid(x, y))
         then
             MoveMouseTo(x, y)
         end
@@ -196,7 +196,7 @@ end
 ---@see Mouse.locate 获取 `(x, y)` 。
 function Mouse:click_on(button, x, y, delay, precise)
     delay = delay or Delay.SHORT
-    if (not Mouse:is_button_name_valid())
+    if (not Mouse:is_position_valid(x, y))
     then
         Runtime:sleep(delay, precise)
         return
