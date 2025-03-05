@@ -64,3 +64,7 @@ B 站 ID：_CoreDump
 - 其他功能（如强制最小化窗口、阻止鼠标指针移出游戏窗口等），详见 <a href="https://gitee.com/silver1867/gaming-tool">GamingTool 使用说明</a>。
 
 > 注意：该工具已经合并到集成工具压缩包中，无需额外下载。
+
+## 开发者文档
+
+有一定编程经验的用户，可阅读 [CSOL 集成工具开发者文档](https://blog.macrohard.fun/CSOL-Utilities/) 了解更多详细信息。在未来即将发布的 v1.5.x 正式版中，将提供开发者文档中介绍的特性，并提供其中介绍的编程接口，敬请期待。
