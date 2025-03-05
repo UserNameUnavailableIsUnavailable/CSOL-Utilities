@@ -75,23 +75,19 @@ then
 
     ---向随机的方向移动
     function Player:start_move()
-        self.run_direction = math.random(3) - 2
-        self.strafe_direction = math.random(3) - 2
-
+        self.run_direction = Utility:random(1, 4)
         if (self.run_direction == 1)
         then
-            Keyboard:press(Keyboard.W, Delay.SHORT)
-        elseif (self.run_direction == -1)
+            Keyboard:press(Keyboard.W, Delay.MINI)
+        elseif (self.run_direction == 2)
         then
-            Keyboard:press(Keyboard.S, Delay.SHORT)
-        end
-
-        if (self.strafe_direction == 1)
+            Keyboard:press(Keyboard.S, Delay.MINI)
+        elseif (self.strafe_direction == 3)
         then
-            Keyboard:press(Keyboard.D, Delay.SHORT)
-        elseif (self.strafe_direction == -1)
+            Keyboard:press(Keyboard.D, Delay.MINI)
+        elseif (self.strafe_direction == 4)
         then
-            Keyboard:press(Keyboard.A, Delay.SHORT)
+            Keyboard:press(Keyboard.A, Delay.MINI)
         end
     end
 
@@ -100,15 +96,13 @@ then
         if (self.run_direction == 1)
         then
             Keyboard:release(Keyboard.W, Delay.SHORT)
-        elseif (self.run_direction == -1)
+        elseif (self.run_direction == 2)
         then
             Keyboard:release(Keyboard.S, Delay.SHORT)
-        end
-
-        if (self.strafe_direction == 1)
+        elseif (self.strafe_direction == 3)
         then
             Keyboard:release(Keyboard.D, Delay.SHORT)
-        elseif (self.strafe_direction == -1)
+        elseif (self.strafe_direction == 4)
         then
             Keyboard:release(Keyboard.A, Delay.SHORT)
         end
