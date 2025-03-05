@@ -2,17 +2,19 @@ if (not Automation_lua)
 then
     Include("Delay.lua")
     Include("Console.lua")
+    Include("JSON.lua")
+    Include("Context.lua")
+    Include("Error.lua")
     Include("Runtime.lua")
     Include("Keyboard.lua")
     Include("Mouse.lua")
-    Include("Setting.lua")
     Include("DateTime.lua")
     Include("Command.lua")
-    Include("Context.lua")
     Include("Utility.lua")
     Include("Weapon.lua")
     Include("Player.lua")
-    Include("Error.lua")
+    Include("Setting.lua")
+    Include("WeaponList.lua")
     Automation_lua = true
     Automation = {}
 
