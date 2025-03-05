@@ -1,12 +1,14 @@
 if (not Player_lua)
 then
     Player_lua = true
+
     Include("Keyboard.lua")
     Include("Weapon.lua")
     Include("Mouse.lua")
     Include("Runtime.lua")
     Include("Utility.lua")
     Include("DateTime.lua")
+
     ---@class Player
     ---@field RESPAWN_KEY string 复活或回合重置按键
     ---@field private run_direction integer 跑动方向（前后），1 表示向前，0 表示静止，-1 表示向后
@@ -23,7 +25,6 @@ then
 
     Player.RESPAWN_KEY = Keyboard.R
     Player.run_direction = 1
-    Player.strafe_direction = 1
     Player.last_activate_special_ability_time = 0
     Player.last_weapon = Weapon
     Player.last_primary_weapon = Weapon
@@ -32,6 +33,10 @@ then
     Player.last_part_weapon_index = 0
     Player.last_buy_special_weapon_time = 0
     Player.last_special_weapon_index = 0
+    Player.armor = nil
+    Player.part_weapons = {}
+    Player.conventional_weapons = {}
+    Player.special_weapons = {}
 
     ---在新一局游戏开始时重置玩家状态。
     function Player:reset()
@@ -67,11 +72,11 @@ then
 
     ---@brief 创建Player实例
     ---@param init table 初始化列表
-    ---@return nil
+    ---@return Player player 玩家对象
     ---@remark 如果选择直接创建Player实例，则默认使用类中预定义好的若干内容
     function Player:new(init)
-        self.__index = self
         local player = init or {}
+        self.__index = self
         setmetatable(player, self)
         return player
     end
@@ -80,19 +85,19 @@ then
     ---向随机的方向移动
     function Player:start_move()
         math.randomseed(Runtime:get_running_time())
-        self.run_direction = math.random(1, 4)
+        self.run_direction = math.random(0, 4)
         if (self.run_direction == 1)
         then
             Keyboard:press(Keyboard.W, Delay.MINI)
         elseif (self.run_direction == 2)
         then
+            Keyboard:press(Keyboard.A, Delay.MINI)
+        elseif (self.run_direction == 3)
+        then
             Keyboard:press(Keyboard.S, Delay.MINI)
-        elseif (self.strafe_direction == 3)
+        elseif (self.run_direction == 4)
         then
             Keyboard:press(Keyboard.D, Delay.MINI)
-        elseif (self.strafe_direction == 4)
-        then
-            Keyboard:press(Keyboard.A, Delay.MINI)
         end
     end
 
@@ -103,19 +108,19 @@ then
             Keyboard:release(Keyboard.W, Delay.SHORT)
         elseif (self.run_direction == 2)
         then
+            Keyboard:release(Keyboard.A, Delay.SHORT)
+        elseif (self.run_direction == 3)
+        then
             Keyboard:release(Keyboard.S, Delay.SHORT)
-        elseif (self.strafe_direction == 3)
+        elseif (self.run_direction == 4)
         then
             Keyboard:release(Keyboard.D, Delay.SHORT)
-        elseif (self.strafe_direction == 4)
-        then
-            Keyboard:release(Keyboard.A, Delay.SHORT)
         end
     end
 
     ---移动视角，并执行回合重置。
     ---@deprecated 此函数功能已经合并到 `Weapon.attack` 函数中
-    function Player:turn()
+    function Player:view()
         local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度 ∈ (0.2, 1]
         local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度 ∈ (0.2, 1]
         local direction = Utility:random_direction() -- 随机向左或右
@@ -139,7 +144,7 @@ then
             return
         end
         -- 存在其他弹窗的影响
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI) -- 清除弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.SHORT) -- 清除弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, Delay.SHORT) -- 点击弹窗中的 “取消” 按钮
         Keyboard:click(self.RESPAWN_KEY, Delay.MINI) -- 回合重置
     end
@@ -159,24 +164,26 @@ then
             return
         end
         -- 按 7 发动角色技能，重复 3 次以保证成功发动
-        Keyboard:click_several_times(Keyboard.SEVEN, 3, 500)
+        Keyboard:click_several_times(Keyboard.SEVEN, 3, 500, Delay.SHORT)
         -- 更新最近一次发动角色技能的时间
         self.last_activate_special_ability_time = DateTime:get_local_timestamp()
     end
 
+    function Player:buy_armor()
+        if (self.armor) then self.armor:purchase() end
+    end
+
     ---随机使用常规武器列表中的武器。
-    ---@param weapon_list Weapon[] 常规武器列表。
-    function Player:play(weapon_list)
-        if (Armor) then Armor:purchase() end
-        if (not weapon_list or 0 == #weapon_list)
+    function Player:attack_with_conventional_weapons()
+        if (not self.conventional_weapons or 0 == #self.conventional_weapons)
         then
             return
         end
-        local count = #weapon_list
+        local count = #self.conventional_weapons
         math.randomseed(Runtime:get_running_time(), DateTime:get_local_timestamp())
         -- 随机选择一件武器
         -- 若上次使用与本次随机到的武器相同，丢弃后重新购买
-        local weapon = weapon_list[math.random(count)]
+        local weapon = self.conventional_weapons[math.random(count)]
         -- 随机到最近一次使用的主武器相同
         if (weapon.name == self.last_primary_weapon.name)
         then
@@ -203,8 +210,7 @@ then
     end
 
     ---按序购买配件武器。
-    ---@param weapons Weapon[] 配件武器列表。
-    function Player:buy_part_weapon(weapons)
+    function Player:buy_part_weapons()
         local current_time = DateTime:get_local_timestamp()
         if (math.abs(current_time - self.last_buy_part_weapon_time) < 20) -- 每隔 20 秒购买一次
         then
@@ -213,26 +219,26 @@ then
             self.last_buy_part_weapon_time = current_time
         end
         -- 非空且至少有一件武器
-        if (not weapons or #weapons == 0)
+        if (not self.part_weapons or #self.part_weapons == 0)
         then
             return
         end
         local index = Player.last_part_weapon_index + 1
-        if (index > #weapons)
+        if (index > #self.part_weapons)
         then
             index = 1
         end
-        local weapon = weapons[index]
+        local weapon = self.part_weapons[index]
         -- 购买配件武器
         weapon:purchase()
         Player.last_part_weapon_index = index
     end
 
-    ---@param special_weapons Weapon[] 特殊武器。
-    function Player:use_special_weapon(special_weapons)
+    ---使用特殊武器。
+    function Player:attack_with_special_weapons()
         Player.playing_flag = true
         -- 非空且至少有一件武器
-        if (not special_weapons or #special_weapons == 0)
+        if (not self.special_weapons or #self.special_weapons == 0)
         then
             return
         end
@@ -241,7 +247,7 @@ then
         -- 下一件武器
         local index = Player.last_special_weapon_index + 1
 
-        if (index > #special_weapons)
+        if (index > #self.special_weapons)
         then
             index = 1
         end
@@ -249,12 +255,12 @@ then
         -- 每隔 20 秒购买一次特殊武器
         if (current_time - self.last_buy_special_weapon_time > 20)
         then
-            special_weapons[index]:purchase()
+            self.special_weapons[index]:purchase()
             self.last_buy_special_weapon_time = current_time
         end
 
         -- 使用武器
-        special_weapons[index]:use()
+        self.special_weapons[index]:use()
         Player.last_part_weapon_index = index
         if (self.last_weapon)
         then
@@ -262,6 +268,14 @@ then
             self.last_weapon:switch()
         end
         Player.playing_flag = false
+    end
+
+    ---使用玩家对象进行游戏。
+    function Player:play()
+        self:buy_armor()
+        self:buy_part_weapons()
+        self:attack_with_conventional_weapons()
+        self:attack_with_special_weapons()
     end
 
 end -- Play_lua

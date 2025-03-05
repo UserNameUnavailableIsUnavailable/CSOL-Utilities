@@ -1,4 +1,4 @@
-if (not Executor_lua)
+if (not Automation_lua)
 then
     Include("Delay.lua")
     Include("Console.lua")
@@ -6,30 +6,37 @@ then
     Include("Keyboard.lua")
     Include("Mouse.lua")
     Include("Setting.lua")
-    Executor_lua = true
-    Executor = {}
+    Include("DateTime.lua")
+    Include("Command.lua")
+    Include("Context.lua")
+    Include("Utility.lua")
+    Include("Weapon.lua")
+    Include("Player.lua")
+    Include("Error.lua")
+    Automation_lua = true
+    Automation = {}
 
     ---手动接管标识。
     Runtime.manual_flag = false
     ---注册暂停事件处理函数，处理用户手动接管事件。
     Runtime:register_interrupt_handler(
         function ()
-            if (Keyboard:is_modifier_pressed(Keyboard.LCTRL) and Keyboard:is_modifier_pressed(Keyboard.RCTRL))
+            if (Keyboard:is_modifier_pressed(Keyboard.LEFT_CTRL) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_CTRL))
             then
                 Keyboard:reset()
                 Mouse:reset()
                 if (not Runtime.manual_flag)
                 then
-                    Console:information("开始手动接管，键鼠操作冻结。")
+                    Console:information("开始手动接管，冻结键鼠操作。")
                     Keyboard:freeze()
                     Mouse:freeze()
                 end
                 Runtime.manual_flag = true
-            elseif (Keyboard:is_modifier_pressed(Keyboard.LALT) and Keyboard:is_modifier_pressed(Keyboard.RALT))
+            elseif (Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT))
             then
                 if (Runtime.manual_flag)
                 then
-                    Console:information("中止手动接管，键鼠操作解冻。")
+                    Console:information("中止手动接管，恢复键鼠操作。")
                     Keyboard:unfreeze()
                     Mouse:unfreeze()
                 end
@@ -38,7 +45,7 @@ then
         end
     )
 
-    Executor.last_reset_or_respawn_time = 0
+    Automation.last_reset_or_respawn_time = 0
     ---注册回合重置检查函数，游戏开始后每隔 8 秒进行回合重置。
     Runtime:register_interrupt_handler(
         function ()
@@ -49,23 +56,77 @@ then
                 return
             end
             local time= Runtime:get_running_time()
-            if (time - Executor.last_reset_or_respawn_time > 8000)
+            if (time - Automation.last_reset_or_respawn_time > 8000)
             then
                 Player:reset_round_or_respawn()
-                Executor.last_reset_or_respawn_time = time
+                Automation.last_reset_or_respawn_time = time
+            end
+        end
+    )
+
+    -- 初始化
+    Error:register_error_handler(
+        "COMMAND_CHANGED",
+        function ()
+        end
+    )
+    DateTime:set_time_zone(Setting.FIELD_TIME_ZONE) -- 时区
+    Weapon:set_reload_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 换弹按键
+    Player:set_respawn_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 复活按键
+
+    -- 为默认挂机模式和扩展挂机模式创建两个玩家对象。
+
+    ---默认模式挂机玩家对象。
+    Automation.default_player = Player:new{
+        armor = Armor,
+        part_weapons = DefaultPartWeapons,
+        conventional_weapons = DefaultConventionalWeapons,
+        special_weapons = DefaultSpecialWeapons
+    }
+
+    ---扩展模式挂机玩家对象。
+    Automation.extended_player = Player:new{
+        armor = Armor,
+        part_weapons = ExtendedPartWeapons,
+        conventional_weapons = ExtendedConventionalWeapons,
+        special_weapons = ExtendedSpecialWeapons
+    }
+
+    Runtime.last_command_update_timepoint = 0
+    Runtime:register_interrupt_handler(
+        function ()
+            if (Runtime:get_running_time() - Runtime.last_command_update_timepoint < 100)
+            then
+                return
+            end
+            Command:update() -- 更新命令
+            Runtime.last_command_update_timepoint = Runtime:get_running_time()
+            -- 命令类型发生变化，需要立即停止当前执行
+            if ((Command:get_status() & Command.NAME_CHANGED) == Command.NAME_CHANGED)
+            then
+                Mouse:reset()
+                Keyboard:reset()
+                Automation.default_player:reset()
+                Automation.extended_player:reset()
+                local e = {
+                    name = "COMMAND_CHANGED",
+                    message = "命令变更",
+                    parameters = {}
+                }
+                Error:throw(e) -- 主动触发运行时错误
             end
         end
     )
 
     ---创建游戏房间。
-    function Executor:create_game_room()
+    function Automation:create_game_room()
         if (not Setting.SWITCH_CREATE_ROOM_ON_EXCEPTION)
         then
             return
         end
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
         Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_BACK_X, Setting.POSITION_LOBBY_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_LIST_ROOMS_X, Setting.POSITION_LOBBY_LIST_ROOMS_Y, 500)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_1_Y, 500)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_Y, 500)
@@ -96,19 +157,19 @@ then
     end
 
     ---点击“开始游戏”按钮，开始游戏。
-    function Executor:start_game_room()
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI) -- 清除所有可能存在的弹窗
+    function Automation:start_game_room()
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_ROOM_START_GAME_X, Setting.POSITION_ROOM_START_GAME_Y, 2000)
     end
 
-    Executor.last_choose_golden_zombie_reward_time = 0
-    function Executor:choose_golden_zombie_reward()
+    Automation.last_choose_golden_zombie_reward_time = 0
+    function Automation:choose_golden_zombie_reward()
         if (not Setting.SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS)
         then
             return
         end
         local t = DateTime:get_local_timestamp()
-        if (Executor.last_choose_golden_zombie_reward_time - t > 45)
+        if (Automation.last_choose_golden_zombie_reward_time - t > 45)
         then
             return
         end
@@ -127,13 +188,13 @@ then
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_Y,
             300
         )
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, 10)
-        Executor.last_choose_golden_zombie_reward_time = t
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, 10, Delay.SHORT)
+        Automation.last_choose_golden_zombie_reward_time = t
     end
 
     ---选定角色，开始新一轮游戏。
     ---@return nil
-    function Executor:choose_character()
+    function Automation:choose_character()
         Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, 2, 200) -- 点击屏幕上某一处，唤醒窗口（此处点击取消按钮处防止冲突）
         if (Setting.SWITCH_GAME_CHOOSE_TERRORISTS)
         then
@@ -150,20 +211,20 @@ then
     end
 
     ---上一次尝试确认结算界面的时间戳。
-    Executor.last_confirm_timestamp = 0
-    function Executor:try_confirm()
+    Automation.last_confirm_timestamp = 0
+    function Automation:try_confirm()
         local current_timestamp = DateTime:get_local_timestamp()
         if (math.abs(current_timestamp - self.last_confirm_timestamp) < 20) -- 未超过 20 秒
         then
             return
         end
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, Delay.MINI) -- 清除所有可能存在的弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 10, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y)
         self.last_confirm_timestamp = current_timestamp
     end
 
     ---合成配件。
-    function Executor:combine_parts()
+    function Automation:combine_parts()
         if (not Setting.SWITCH_CRAFT_PARTS_BATCH_COMBINE)
         then
             return
@@ -187,31 +248,31 @@ then
         Mouse:click_on(Mouse.LEFT, 
             Setting.POSITION_CRAFT_PARTS_CLEAR_X,
             Setting.POSITION_CRAFT_PARTS_CLEAR_Y,
-            20
+            20, true
         )
     end
 
-    Executor.buy_button_x = 0
-    Executor.buy_button_y = 0
+    Automation.buy_button_x = 0
+    Automation.buy_button_y = 0
     ---购买商店物品。
     ---@param buy_button_x integer|nil 横坐标。
     ---@param buy_button_y integer|nil 纵坐标。
-    function Executor:purchase_item(buy_button_x, buy_button_y)
+    function Automation:purchase_item(buy_button_x, buy_button_y)
         if (not Setting.SWITCH_STORE_BATCH_PURCHASE)
         then
             return
         end
         self.buy_button_x = buy_button_x or self.buy_button_x or 0
         self.buy_button_y = buy_button_y or self.buy_button_y or 0
-        Mouse:click_on(Mouse.LEFT, Executor.buy_button_x, Executor.buy_button_y, 50)
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_PURCHASE_OPTION_X, Setting.POSITION_STORE_PURCHASE_OPTION_Y, 50) -- 弹出界面选项
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_PURCHASE_X, Setting.POSITION_STORE_PURCHASE_Y, 50) -- 弹出界面兑换按钮
+        Mouse:click_on(Mouse.LEFT, Automation.buy_button_x, Automation.buy_button_y, 30)
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_PURCHASE_OPTION_X, Setting.POSITION_STORE_PURCHASE_OPTION_Y, 30) -- 弹出界面选项
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_PURCHASE_X, Setting.POSITION_STORE_PURCHASE_Y, 30) -- 弹出界面兑换按钮
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_CONFIRM_PURCHASE_X, Setting.POSITION_STORE_CONFIRM_PURCHASE_Y, 600) -- 兑换后确认
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI)
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI)
     end
 
     ---光标定位。
-    function Executor:locate_cursor()
+    function Automation:locate_cursor()
         if (Keyboard:is_modifier_pressed(Keyboard.CTRL) and Keyboard:is_modifier_pressed(Keyboard.ALT) and not Keyboard:is_modifier_pressed(Keyboard.SHIFT))
         then
             local x, y = Mouse:locate()
@@ -220,7 +281,7 @@ then
         end
     end
 
-    function Executor:clear_popups()
-        Keyboard:click_several_times(Keyboard.ESCAPE, 1, 5000)
+    function Automation:clear_popups()
+        Keyboard:click_several_times(Keyboard.ESCAPE, 1, 5000, Delay.MINI)
     end
-end -- Executor_lua
+end -- Automation_lua

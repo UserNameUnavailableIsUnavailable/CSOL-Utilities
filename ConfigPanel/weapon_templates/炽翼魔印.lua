@@ -1,6 +1,6 @@
 Weapon:new{
     name = "炽翼魔印",
-    switch_delay = 650,
+    switch_delay = 850,
     number = Weapon.GRENADE ,
     purchase_sequence = {},
     template_name = "炽翼魔印",
@@ -19,7 +19,7 @@ Weapon:new{
             self.discharging = true
             self.discharge_start_moment = current_time
             self:switch()
-            Mouse:click(Mouse.LEFT, Delay.LONG)
+            Mouse:click(Mouse.LEFT, Delay.LONG_LONG)
         -- 当前正在释放，且释放时间超过 `DISCHARGE_TIME`。
         elseif (self.discharging and current_time - self.charge_start_moment > self.DISCHARGE_TIME)
         then

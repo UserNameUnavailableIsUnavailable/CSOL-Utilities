@@ -87,7 +87,7 @@ then
                 parameters = {}
             }
         end
-        if (not Mouse:is_button_name_valid(weapon.attack_button))
+        if (not Mouse:is_button_value_valid(weapon.attack_button))
         then
             Error:throw{
                 name = "ILLEGAL_WEAPON_ATTACK_BUTTON",
@@ -134,14 +134,14 @@ then
         Runtime:cli() -- 暂时关中断，完成原子操作
         for _, key in ipairs(self.purchase_sequence)
         do
-            Keyboard:click(key, Delay.MEDIUM, true)
+            Keyboard:click(key, Delay.LONG, true)
         end
         if (self.number == Weapon.GRENADE or self.number == Weapon.NULL)
         then
-            Keyboard:click(Weapon.MELEE, Delay.MEDIUM, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
+            Keyboard:click(Weapon.MELEE, Delay.LONG, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
         end
         -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
-        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI)
+        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.SHORT)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
         Runtime:pop_interrupt_flag()
     end
@@ -149,7 +149,7 @@ then
     ---切换到指定武器。
     ---@return nil
     function Weapon:switch()
-        Keyboard:click(self.number, self.switch_delay)
+        Keyboard:click(self.number, self.switch_delay, true)
     end
 
     ---切换到指定武器，不考虑切枪延迟。

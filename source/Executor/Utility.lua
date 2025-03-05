@@ -1,8 +1,9 @@
 if (not Utility_lua)
 then
+    Utility_lua = true
+
     Include("Runtime.lua")
 
-    Utility_lua = true
     Utility = {}
 
     ---等概率随机正负方向。
@@ -18,15 +19,18 @@ then
     end
     ---返回一个（循环）计数器。如果未提供 `from` 参数，则计数器从 `0` 开始递增计数；
     ---`to`为循环计数器上限，达到上限后计数器回到 `from`，若不提供 `to` 参数则计数上限为 `114514`。
-    ---@param from integer 计数起始
-    ---@param to integer 计数终止
+    ---@param from number 计数起始
+    ---@param to number 计数终止
+    ---@param step number 计数步长
     ---@return function # 计数器对象
-    function Utility:create_counter(from, to)
+    function Utility:create_counter(from, to, step)
+        step = step or 1
+        to = to or 1145141919810
         local counter = from
         return function ()
             local ret = counter
-            counter = counter + 1
-            if (counter > to)
+            counter = counter + step
+            if (counter >= to)
             then
                 counter = from
             end

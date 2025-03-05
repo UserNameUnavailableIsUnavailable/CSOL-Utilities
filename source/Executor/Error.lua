@@ -1,7 +1,9 @@
 if not Error_lua
 then
-    Include("JSON.lua")
     Error_lua = true
+
+    Include("JSON.lua")
+
     ---@class Error
     ---@field name string 错误名称
     ---@field message string 错误消息

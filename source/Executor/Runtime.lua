@@ -1,8 +1,10 @@
 if (not Runtime_lua)
 then
+    Runtime_lua = true
+
     Include("Context.lua")
     Include("JSON.lua")
-    Runtime_lua = true
+
     Runtime = {}
 
     ---中断标志位，用于开/关中断，避免中断嵌套。`true` 允许中断，`false` 不允许中断。
