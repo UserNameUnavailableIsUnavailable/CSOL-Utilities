@@ -1,3 +1,4 @@
+-- This file is modified based on https://github.com/rxi/json.lua
 --
 -- json.lua
 --
@@ -23,10 +24,7 @@
 
 if not JSON_lua
 then
-
-    -- Note: modified based on https://github.com/rxi/json.lua
     JSON_lua = true
-
     JSON = { _version = "0.1.2" }
 
     -------------------------------------------------------------------------------

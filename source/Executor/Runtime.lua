@@ -205,11 +205,4 @@ then
     function Runtime:is_paused()
         return self.manual_flag
     end
-
-    ---向 Windows 调试器汇报 JSON 格式的消息。
-    ---@param message table 消息内容
-    function Runtime:report(message)
-        local json = JSON.encode(message)
-        OutputDebugMessage(json)
-    end
 end -- Runtime_lua

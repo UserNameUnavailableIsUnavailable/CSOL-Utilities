@@ -10,34 +10,40 @@ then
     Keyboard = {}
 
     local valid_keynames = {
+        -- 功能区
+        ESCAPE = "escape",
         F1 = "f1", F2 = "f2", F3 = "f3", F4 = "f4", F5 = "f5", F6 = "f6",
         F7 = "f7", F8 = "f8", F9 = "f9", F10 = "f10", F11 = "f11", F12 = "f12",
         F13 = "f13", F14 = "f14", F15 = "f15", F16 = "f16", F17 = "f17", F18 = "f18",
         F19 = "f19", F20 = "f20", F21 = "f21", F22 = "f22", F23 = "f23", F24 = "f24",
-        BACKQUOTE = "tilde",
-        ESCAPE = "escape",  ONE = "1", TWO = "2", THREE = "3", FOUR = "4", FIVE = "5", SIX = "6", SEVEN = "7",
-        EIGHT = "8", NINE = "9", ZERO = "0", MINUS = "-", EQUAL = "=", BACKSPACE = "backspace", TAB = "tab",
-        Q = "q", W = "w", E = "e", R = "r", T = "t", Y = "y", U = "u", I = "i", O = "o",
-        P = "p", LBRACKET = "lbracket", RBRACKET = "rbracket", FORWARD_SLASH = "backslash",
-        A = "a", S = "s", D = "d", F = "f", G = "g", H = "h", J = "j", K = "k", L = "l", SEMICOLON = "semicolon",
-        QUOTE = "quote", ENTER = "enter", BACK_SLASH = "backslash", NON_US_SLASH = "non_us_slash",
-        Z = "z", X = "x", C = "c", V = "v", B = "b", N = "n", M = "m", COMMA = "comma", PERIOD = "period", SLASH = "slash",
-        LSHIFT = "lshift", RSHIFT = "rshift",
-        LWIN = "lgui", RWIN = "rgui",
-        LALT = "lalt", RALT = "ralt",
-        LCTRL = "lctrl", RCTRL = "rctrl",
-        SPACE = "spacebar",
-        APPS = "appkey",
+        -- 主区
+        BACKQUOTE = "tilde", ONE = "1", TWO = "2", THREE = "3", FOUR = "4", FIVE = "5", SIX = "6", SEVEN = "7",
+        EIGHT = "8", NINE = "9", ZERO = "0", MINUS = "minus", EQUAL = "equal", BACKSPACE = "backspace",
+
+        TAB = "tab", Q = "q", W = "w", E = "e", R = "r", T = "t", Y = "y", U = "u", I = "i", O = "o",
+        P = "p", LBRACKET = "lbracket", RBRACKET = "rbracket", BACKSLASH = "backslash",
+
+        CAPS_LOCK = "capslock", A = "a", S = "s", D = "d", F = "f", G = "g", H = "h", J = "j", K = "k", L = "l",
+        SEMICOLON = "semicolon", QUOTE = "quote", ENTER = "enter",
+
+        LSHIFT = "lshift", NON_US_BACKSLASH = "non_us_slash", Z = "z", X = "x", C = "c", V = "v", B = "b", N = "n", M = "m",
+        COMMA = "comma", PERIOD = "period", SLASH = "slash", RSHIFT = "rshift",
+        
+        LCTRL = "lctrl", LWIN = "lgui", LALT = "lalt", SPACE = "spacebar",
+        RALT = "ralt", RWIN = "rgui", APPS = "appkey", RCTRL = "rctrl",
+        -- 控制区
+        PRINT_SCREEN = "printscreen", SCROLL_LOCK = "scrolllock", PAUSE_BREAK = "pause",
         INSERT = "insert", HOME = "home", PAGE_UP = "pageup",
         DELETE = "delete", END = "end", PAGE_DOWN = "pagedown",
+
         UP = "up", LEFT = "left", DOWN = "down", RIGHT = "right",
-        NUM_DIVIDE = "numslash", NUM_MINUS = "numminus", NUM_MULTIPLY = "numstar",
+
+        -- 数字区
+        NUM_LOCK = "numlock", NUM_DIVIDE = "numslash", NUM_MINUS = "numminus", NUM_MULTIPLY = "numstar",
         NUM_SEVEN = "num7", NUM_EIGHT = "num8", NUM_NINE = "num9", NUM_PLUS = "numplus",
         NUM_FOUR = "num4", NUM_FIVE = "num5", NUM_SIX = "num6",
-        NUM_ONE = "num1", NUM_TWO = "num2", NUM_THREE = "num3", NUM_ZERO = "num0", NUM_PERIOD = "numperiod",
-        NUM_ENTER = "numenter",
-        PRINTSCREEN = "printscreen", PAUSE = "pause",
-        CAPS_LOCK = "capslock", NUM_LOCK = "numlock", SCROLL_LOCK = "scrolllock",
+        NUM_ONE = "num1", NUM_TWO = "num2", NUM_THREE = "num3",
+        NUM_ZERO = "num0", NUM_PERIOD = "numperiod", NUM_ENTER = "numenter",
     }
 
     for k, v in pairs(valid_keynames)
@@ -193,7 +199,7 @@ then
         local shift = false -- shift 是否按下
         for i = 1, #s
         do
-            local c = string.sub(s, i, i)
+            local c = s:sub(i, i)
             if (string.byte("0") <= string.byte(c) and string.byte(c) <= string.byte("9"))
             then
                 Keyboard:click(c, 100)
@@ -223,14 +229,54 @@ then
                     Keyboard:release(Keyboard.LSHIFT)
                     shift = false
                 end
+            elseif (c == '-') then Keyboard:click(Keyboard.MINUS)
+            elseif (c == '=') then Keyboard:click(Keyboard.EQUAL)
+            elseif (c == '[') then Keyboard:click(Keyboard.LBRACKET)
+            elseif (c == ']') then Keyboard:click(Keyboard.RBRACKET)
+            elseif (c == '\\') then Keyboard:click(Keyboard.BACKSLASH)
+            elseif (c == ';') then Keyboard:click(Keyboard.SEMICOLON)
+            elseif (c == '\'') then Keyboard:click(Keyboard.QUOTE)
+            elseif (c == ',') then Keyboard:click(Keyboard.COMMA)
+            elseif (c == '.') then Keyboard:click(Keyboard.PERIOD)
+            elseif (c == '/') then Keyboard:click(Keyboard.SLASH)
+            else
+                Keyboard:press(Keyboard.LSHIFT)
+                if (c == '~') then Keyboard:click(Keyboard.BACKQUOTE)
+                elseif (c == '!') then Keyboard:click(Keyboard.ONE)
+                elseif (c == '@') then Keyboard:click(Keyboard.TWO)
+                elseif (c == '#') then Keyboard:click(Keyboard.THREE)
+                elseif (c == '$') then Keyboard:click(Keyboard.FOUR)
+                elseif (c == '%') then Keyboard:click(Keyboard.FIVE)
+                elseif (c == '^') then Keyboard:click(Keyboard.SIX)
+                elseif (c == '&') then Keyboard:click(Keyboard.SEVEN)
+                elseif (c == '*') then Keyboard:click(Keyboard.EIGHT)
+                elseif (c == '(') then Keyboard:click(Keyboard.NINE)
+                elseif (c == ')') then Keyboard:click(Keyboard.ZERO)
+                elseif (c == '_') then Keyboard:click(Keyboard.MINUS)
+                elseif (c == '+') then Keyboard:click(Keyboard.EQUAL)
+                elseif (c == '{') then Keyboard:click(Keyboard.LBRACKET)
+                elseif (c == '}') then Keyboard:click(Keyboard.RBRACKET)
+                elseif (c == '|') then Keyboard:click(Keyboard.BACKSLASH)
+                elseif (c == ':') then Keyboard:click(Keyboard.SEMICOLON)
+                elseif (c == '"') then Keyboard:click(Keyboard.QUOTE)
+                elseif (c == '<') then Keyboard:click(Keyboard.COMMA)
+                elseif (c == '>') then Keyboard:click(Keyboard.PERIOD)
+                elseif (c == '?') then Keyboard:click(Keyboard.SLASH)
+                end
+                Keyboard:release(Keyboard.LSHIFT)
             end
         end
     end
 
-    ---判断修饰键（如 `CTRL`，`ALT` 等）是否按下。
+    ---判断修饰键（SHIFT、CTRL、ALT）是否按下。
     ---@param key string 按键名称，如 `Keyboard.LALT`。 
     ---@return boolean # 指定修饰键是否按下
     function Keyboard:is_modifier_pressed(key) return IsModifierPressed(key) end
+
+    ---判断锁定键（CAPSLOCK、SCROLLLOCK、NUMLOCK）是否处于开启状态。
+    ---@param key string 按键名称
+    ---@return boolean
+    function Keyboard:is_key_lock_on(key) return IsKeyLockOn(key) end
 
     Error:register_fatal_disposal(
         function ()

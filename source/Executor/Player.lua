@@ -75,7 +75,8 @@ then
 
     ---向随机的方向移动
     function Player:start_move()
-        self.run_direction = Utility:random(1, 4)
+        math.randomseed(Runtime:get_running_time())
+        self.run_direction = math.random(1, 4)
         if (self.run_direction == 1)
         then
             Keyboard:press(Keyboard.W, Delay.MINI)

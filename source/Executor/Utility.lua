@@ -5,14 +5,6 @@ then
     Utility_lua = true
     Utility = {}
 
-    ---封装了math.random函数，每次调用时以运行时间为随机种子产生随机数
-    ---@param ... any 参见 `math.random`
-    ---@see math.random
-    function Utility:random(...)
-        math.randomseed(Runtime:get_running_time())
-        return math.random(...)
-    end
-
     ---等概率随机正负方向。
     ---@return integer `1` 或 `-1`
     function Utility:random_direction()
@@ -30,8 +22,6 @@ then
     ---@param to integer 计数终止
     ---@return function # 计数器对象
     function Utility:create_counter(from, to)
-        from = from or 0
-        to = to or 114514
         local counter = from
         return function ()
             local ret = counter
@@ -42,6 +32,13 @@ then
             end
             return ret
         end
+    end
+
+    ---向 Windows 调试器汇报 JSON 格式的消息。
+    ---@param t table 消息内容
+    function Utility:report(t)
+        local json = JSON.encode(t)
+        OutputDebugMessage(json)
     end
 
 end -- Utility_lua
