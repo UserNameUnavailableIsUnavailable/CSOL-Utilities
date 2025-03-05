@@ -83,12 +83,9 @@ then
     ---@param precise boolean | nil 是否精确定时
     function Mouse:place(x, y, delay, precise)
         delay = delay or Delay.SHORT
-        if (not self:frozen())
+        if (not self:frozen() and self:is_position_valid(x, y))
         then
-            if (self:is_position_valid(x, y))
-            then
-                MoveMouseToVirtual(x, y)
-            end
+            MoveMouseToVirtual(x, y)
         end
         Runtime:sleep(delay, precise)
     end
@@ -111,13 +108,11 @@ then
     ---@param precise boolean | nil 是否精确定时。
     function Mouse:move_relative(rightward, downward, delay, precise)
         rightward, downward = rightward or 0, downward or 0
-        if (not self:frozen()) -- 当下达退出指令时，不进行任何操作
+        if (not self:frozen() and
+            math.type(rightward) == "integer" and
+            math.type(downward) == "integer")
         then
-            if (math.type(rightward) == "integer" and
-                math.type(downward) == "integer")
-            then
-                MoveMouseRelative(rightward, downward)
-            end
+            MoveMouseRelative(rightward, downward)
         end
         Runtime:sleep(delay or Delay.SHORT, precise)
     end
@@ -128,13 +123,10 @@ then
     ---@param precise boolean | nil 是否精确定时
     function Mouse:press(button, delay, precise)
         delay = delay or Delay.SHORT
-        if (not self:frozen())
+        if (not self:frozen() and Mouse:is_button_name_valid(button))
         then
-            if (Mouse:is_button_name_valid(button))
-            then
-                PressMouseButton(button)
-                self.unreleased[button] = true
-            end
+            PressMouseButton(button)
+            self.unreleased[button] = true
         end
         Runtime:sleep(delay, precise)
     end
@@ -146,13 +138,10 @@ then
     ---@return nil
     function Mouse:release(button, delay, precise)
         delay = delay or Delay.SHORT
-        if (not self:frozen())
+        if (not self:frozen() and self:is_button_name_valid(button))
         then
-            if (self:is_button_name_valid(button))
-            then
-                ReleaseMouseButton(button)
-                self.unreleased[button] = nil
-            end
+            ReleaseMouseButton(button)
+            self.unreleased[button] = nil
         end
         Runtime:sleep(delay, precise)
     end

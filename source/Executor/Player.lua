@@ -50,7 +50,11 @@ then
     function Player:set_respawn_key(key)
         if (not Keyboard:is_key_name_valid(key))
         then
-           self("Invalid key name.")
+            Error:throw{
+                name = "INVALID_KEY_NAME",
+                message = "无效的键盘按键",
+                parameters = { key }
+            }
         end
         self.RESPAWN_KEY = key
     end

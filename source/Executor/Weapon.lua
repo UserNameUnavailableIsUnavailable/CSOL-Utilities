@@ -39,7 +39,11 @@ then
     function Weapon:set_reload_key(key)
         if (not Keyboard:is_key_name_valid(key))
         then
-            self("Invalid key name.")
+            Error:throw{
+                name = "INVALID_KEY_NAME",
+                message = "无效的按键名称",
+                parameters = { key }
+            }
         end
         self.RELOAD_KEY = key
     end
@@ -112,7 +116,11 @@ then
         end
         if (math.floor(weapon.switch_delay) ~= weapon.switch_delay or weapon.switch_delay < 0)
         then
-            self("Invalid paramter `switch_delay`.", 2)
+            Error:throw{
+                name = "ILLEGAL_WEAPON_SWITCH_DELAY",
+                message = "无效的武器切换延迟",
+                parameters = { weapon.switch_delay }
+            }
         end
         Console:information(
             "新增武器/装备：" .. weapon.name
