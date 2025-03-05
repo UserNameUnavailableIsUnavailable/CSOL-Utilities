@@ -199,7 +199,10 @@ then
 
     ---通过键盘输入由字母和数字构成的字符串序列
     ---@param s string ASCII 字符
-    function Keyboard:puts(s)
+    ---@param interval integer 输入每个字符间隔时间
+    ---@param delay integer 输入完成后的延迟时间
+    ---@
+    function Keyboard:puts(s, interval, delay, precise)
         if (self:is_frozen())
         then
             return
@@ -210,7 +213,7 @@ then
             local c = s:sub(i, i)
             if (string.byte("0") <= string.byte(c) and string.byte(c) <= string.byte("9"))
             then
-                Keyboard:click(c, 100)
+                Keyboard:click(c, interval, precise)
             elseif (string.byte("A") <= string.byte(c) and string.byte(c) <= string.byte("Z"))
             then
                 if (not IsKeyLockOn(Keyboard.CAPS_LOCK)) -- 非大写锁定状态
@@ -218,7 +221,7 @@ then
                     Keyboard:press(Keyboard.LSHIFT)
                     shift = true
                 end
-                Keyboard:click(c, 100)
+                Keyboard:click(c:lower(), interval, precise)
                 if (shift)
                 then
                     Keyboard:release(Keyboard.LSHIFT)
@@ -231,45 +234,45 @@ then
                     Keyboard:press(Keyboard.LSHIFT)
                     shift = true
                 end
-                Keyboard:click(c, 100)
+                Keyboard:click(c, interval, precise)
                 if (shift)
                 then
                     Keyboard:release(Keyboard.LSHIFT)
                     shift = false
                 end
-            elseif (c == '-') then Keyboard:click(Keyboard.MINUS)
-            elseif (c == '=') then Keyboard:click(Keyboard.EQUAL)
-            elseif (c == '[') then Keyboard:click(Keyboard.LBRACKET)
-            elseif (c == ']') then Keyboard:click(Keyboard.RBRACKET)
-            elseif (c == '\\') then Keyboard:click(Keyboard.BACKSLASH)
-            elseif (c == ';') then Keyboard:click(Keyboard.SEMICOLON)
-            elseif (c == '\'') then Keyboard:click(Keyboard.QUOTE)
-            elseif (c == ',') then Keyboard:click(Keyboard.COMMA)
-            elseif (c == '.') then Keyboard:click(Keyboard.PERIOD)
-            elseif (c == '/') then Keyboard:click(Keyboard.SLASH)
+            elseif (c == '-') then Keyboard:click(Keyboard.MINUS, interval, precise)
+            elseif (c == '=') then Keyboard:click(Keyboard.EQUAL, interval, precise)
+            elseif (c == '[') then Keyboard:click(Keyboard.LBRACKET, interval, precise)
+            elseif (c == ']') then Keyboard:click(Keyboard.RBRACKET, interval, precise)
+            elseif (c == '\\') then Keyboard:click(Keyboard.BACKSLASH, interval, precise)
+            elseif (c == ';') then Keyboard:click(Keyboard.SEMICOLON, interval, precise)
+            elseif (c == '\'') then Keyboard:click(Keyboard.QUOTE, interval, precise)
+            elseif (c == ',') then Keyboard:click(Keyboard.COMMA, interval, precise)
+            elseif (c == '.') then Keyboard:click(Keyboard.PERIOD, interval, precise)
+            elseif (c == '/') then Keyboard:click(Keyboard.SLASH, interval, precise)
             else
                 Keyboard:press(Keyboard.LSHIFT)
-                if (c == '~') then Keyboard:click(Keyboard.BACKQUOTE)
-                elseif (c == '!') then Keyboard:click(Keyboard.ONE)
-                elseif (c == '@') then Keyboard:click(Keyboard.TWO)
-                elseif (c == '#') then Keyboard:click(Keyboard.THREE)
-                elseif (c == '$') then Keyboard:click(Keyboard.FOUR)
-                elseif (c == '%') then Keyboard:click(Keyboard.FIVE)
-                elseif (c == '^') then Keyboard:click(Keyboard.SIX)
-                elseif (c == '&') then Keyboard:click(Keyboard.SEVEN)
-                elseif (c == '*') then Keyboard:click(Keyboard.EIGHT)
-                elseif (c == '(') then Keyboard:click(Keyboard.NINE)
-                elseif (c == ')') then Keyboard:click(Keyboard.ZERO)
-                elseif (c == '_') then Keyboard:click(Keyboard.MINUS)
-                elseif (c == '+') then Keyboard:click(Keyboard.EQUAL)
-                elseif (c == '{') then Keyboard:click(Keyboard.LBRACKET)
-                elseif (c == '}') then Keyboard:click(Keyboard.RBRACKET)
-                elseif (c == '|') then Keyboard:click(Keyboard.BACKSLASH)
-                elseif (c == ':') then Keyboard:click(Keyboard.SEMICOLON)
-                elseif (c == '"') then Keyboard:click(Keyboard.QUOTE)
-                elseif (c == '<') then Keyboard:click(Keyboard.COMMA)
-                elseif (c == '>') then Keyboard:click(Keyboard.PERIOD)
-                elseif (c == '?') then Keyboard:click(Keyboard.SLASH)
+                if (c == '~') then Keyboard:click(Keyboard.BACKQUOTE, interval, precise)
+                elseif (c == '!') then Keyboard:click(Keyboard.ONE, interval, precise)
+                elseif (c == '@') then Keyboard:click(Keyboard.TWO, interval, precise)
+                elseif (c == '#') then Keyboard:click(Keyboard.THREE, interval, precise)
+                elseif (c == '$') then Keyboard:click(Keyboard.FOUR, interval, precise)
+                elseif (c == '%') then Keyboard:click(Keyboard.FIVE, interval, precise)
+                elseif (c == '^') then Keyboard:click(Keyboard.SIX, interval, precise)
+                elseif (c == '&') then Keyboard:click(Keyboard.SEVEN, interval, precise)
+                elseif (c == '*') then Keyboard:click(Keyboard.EIGHT, interval, precise)
+                elseif (c == '(') then Keyboard:click(Keyboard.NINE, interval, precise)
+                elseif (c == ')') then Keyboard:click(Keyboard.ZERO, interval, precise)
+                elseif (c == '_') then Keyboard:click(Keyboard.MINUS, interval, precise)
+                elseif (c == '+') then Keyboard:click(Keyboard.EQUAL, interval, precise)
+                elseif (c == '{') then Keyboard:click(Keyboard.LBRACKET, interval, precise)
+                elseif (c == '}') then Keyboard:click(Keyboard.RBRACKET, interval, precise)
+                elseif (c == '|') then Keyboard:click(Keyboard.BACKSLASH, interval, precise)
+                elseif (c == ':') then Keyboard:click(Keyboard.SEMICOLON, interval, precise)
+                elseif (c == '"') then Keyboard:click(Keyboard.QUOTE, interval, precise)
+                elseif (c == '<') then Keyboard:click(Keyboard.COMMA, interval, precise)
+                elseif (c == '>') then Keyboard:click(Keyboard.PERIOD, interval, precise)
+                elseif (c == '?') then Keyboard:click(Keyboard.SLASH, interval, precise)
                 end
                 Keyboard:release(Keyboard.LSHIFT)
             end
