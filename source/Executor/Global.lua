@@ -19,5 +19,4 @@ DateTime:set_time_zone(Setting.FIELD_TIME_ZONE) -- 时区
 Weapon:set_reload_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 换弹按键
 Player:set_respawn_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 复活按键
 Runtime:sti() -- 开中断
-
 Include("Start.lua")
