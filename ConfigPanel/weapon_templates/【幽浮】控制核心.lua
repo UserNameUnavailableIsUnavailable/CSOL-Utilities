@@ -1,7 +1,7 @@
 Weapon:new{
     name = "【幽浮】控制核心",
     purchase_sequence = {},
-    switch_delay = 500,
+    switch_delay = 750,
     number = Weapon.GRENADE,
     template_name = "【幽浮】控制核心",
     COOL_DOWN_TIME = 60,

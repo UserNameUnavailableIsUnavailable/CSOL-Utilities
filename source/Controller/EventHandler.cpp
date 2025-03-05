@@ -120,13 +120,13 @@ void Controller::HandleHotKeyEvent() noexcept
 				}
 				else if (msg.wParam == '3')
 				{ /* 合成配件 */
-					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_COMBINE_PARTS;
+					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_BATCH_COMBINE_PARTS;
 					s_Instance->m_FixedCommandDispatcherSwitch.Set();
 					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 3 号模式。");
 				}
 				else if (msg.wParam == '4')
 				{ /* 购买物品 */
-					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_PURCHASE_ITEM;
+					s_Instance->m_PeriodicCommand = EXECUTOR_COMMAND::CMD_BATCH_PURCHASE_ITEM;
 					s_Instance->m_FixedCommandDispatcherSwitch.Set();
 					Console::Log(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_MESSAGE, "切换为 4 号模式。");
 				}

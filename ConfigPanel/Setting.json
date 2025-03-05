@@ -2,7 +2,7 @@
     "id": "GeneralSettings",
     "type": "SECTION",
     "title": "通用设定",
-    "annotation": "鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。⏺️ 为录制按键按钮，⏹️ 为结束录制按钮。",
+    "annotation": "鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。⏺️为录制按键按钮，⏹️为结束录制按钮。",
     "components": [
         {
             "id": "SYSTEM_SETTINGS",
@@ -32,7 +32,7 @@
                     "id": "CREATE_ROOM_ON_EXCEPTION",
                     "title": "自动创建房间功能开关",
                     "type": "SWITCH",
-                    "value": true,
+                    "values": ["true", "false"],
                     "depends_on": null,
                     "labels": [
                         "启用",
@@ -137,6 +137,30 @@
                     ],
                     "legacy_name": "MAP_CHOOSE_RIGHT_SCROLL",
                     "image": "assets/lobby_create_room_map_choose_right_scroll.avif"
+                },
+                {
+                    "id": "LOBBY_CREATR_ROOM_MAP_RIGHT_SCROLL_COUNT",
+                    "title": "选择地图时向右翻页次数",
+                    "annotation": "考虑到大灾变季度会不断更新，因此若<b style='color: red;'>需要选择特定靠后季度的地图</b>，需要指定从最左边起（最左侧一栏为第 1 季度）向右翻页的次数。<b style='color: red;'>在选择地图时，将先翻页到最左，然后向右翻页。</b>",
+                    "type": "FIELD",
+                    "value": "0",
+                    "pre_label": "向右翻页",
+                    "post_label": "次",
+                    "depends_on": [
+                        "CREATE_ROOM_ON_EXCEPTION"
+                    ]
+                },
+                {
+                    "id": "LOBBY_CREATE_ROOM_SCROLL_DOWN_COUNT",
+                    "title": "向下翻页次数",
+                    "annotation": "每次翻页滚动一格滚轮（一般就已经足够）。",
+                    "type": "FIELD",
+                    "value": "0",
+                    "pre_label": "向下翻页",
+                    "post_label": "次",
+                    "depends_on": [
+                        "CREATE_ROOM_ON_EXCEPTION"
+                    ]
                 },
                 {
                     "id": "LOBBY_CREATE_ROOM_MAP_OPTION",

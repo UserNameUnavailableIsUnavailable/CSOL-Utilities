@@ -64,10 +64,3 @@ B 站 ID：_CoreDump
 - 其他功能（如强制最小化窗口、阻止鼠标指针移出游戏窗口等），详见 <a href="https://gitee.com/silver1867/gaming-tool">GamingTool 使用说明</a>。
 
 > 注意：该工具已经合并到集成工具压缩包中，无需额外下载。
-
-# 捐赠（自愿）
-
-本项目用爱发电，如您感觉本项目对您有帮助，可以点点 star 支持一下，也欢迎向作者捐赠，让作者更新更有动力 😃😃😃。
-
-<img src="https://macrohard.fun/assets/donate/donate_alipay.jpg" width=300/>
-<img src="https://macrohard.fun/assets/donate/donate_wepay.jpg" width=300/>
