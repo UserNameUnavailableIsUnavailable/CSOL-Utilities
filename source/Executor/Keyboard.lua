@@ -70,12 +70,16 @@ then
         self.frozen = false
     end
 
-    ---@param key string | string[] 按键名称，如 `Keyboard.F1`。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    function Keyboard:is_frozen()
+        return self.frozen
+    end
+
+    ---@param key string | string[] 按键名称，如 `Keyboard.F1`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer | nil 按下按键后的延迟时间。可以直接使用预定义于Delay表中的字段，如 `Delay.NORMAL`。
     ---@param precise boolean | nil 是否精确定时
     ---按下按键。
     function Keyboard:press(key, delay, precise)
-        if (not Keyboard.frozen)
+        if (not self:is_frozen())
         then
             if (type(key) == "string" and self:is_key_name_valid(key))
             then
@@ -100,11 +104,11 @@ then
     end
 
     ---弹起按键。
-    ---@param key string | table 按键名称，如 `Keyboard.ESCAPE`。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---@param key string | table 按键名称，如 `Keyboard.ESCAPE`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer | nil 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
     ---@param precise boolean | nil 是否精确定时
     function Keyboard:release(key, delay, precise)
-        if (not Keyboard.frozen)
+        if (not self:is_frozen())
         then
             if (type(key) == "string" and self:is_key_name_valid(key))
             then
@@ -128,12 +132,12 @@ then
         Runtime:sleep(delay, precise)
     end
 
-    ---按下，而后弹起按键（视为一次点击）。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---按下，而后弹起按键（视为一次点击）。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param key string | table 按键名称，如 `Keyboard.ESCAPE`
     ---@param delay integer | nil 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
     ---@param precise boolean | nil 是否精确定时
     function Keyboard:click(key, delay, precise)
-        if (not Keyboard.frozen)
+        if (not self:is_frozen())
         then
             if (type(key) == "string" and self:is_key_name_valid(key))
             then
@@ -155,7 +159,7 @@ then
         Runtime:sleep(delay, precise)
     end
 
-    ---释放所有按键。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---释放所有按键。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
     ---@param precise boolean | nil 是否精确定时
     function Keyboard:reset(delay, precise)
@@ -165,8 +169,8 @@ then
         end
     end
 
-    ---点击某个按键若干次。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `Keyboard.frozen` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---点击某个按键若干次。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---@param key string 按键名称，如 `Keyboard.ESCAPE`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param times integer | nil 重复次数。
     ---@param delay integer | nil 每释放一个按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
     ---@param precise boolean | nil 是否精确定时
@@ -196,6 +200,10 @@ then
     ---通过键盘输入由字母和数字构成的字符串序列
     ---@param s string ASCII 字符
     function Keyboard:puts(s)
+        if (self:is_frozen())
+        then
+            return
+        end
         local shift = false -- shift 是否按下
         for i = 1, #s
         do

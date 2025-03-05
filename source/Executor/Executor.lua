@@ -1,14 +1,16 @@
 if (not Executor_lua)
 then
-Include("Delay.lua")
-Include("Console.lua")
-Include("Runtime.lua")
-Include("Keyboard.lua")
-Include("Mouse.lua")
-Include("Setting.lua")
-Executor_lua = true
-Executor = {}
+    Include("Delay.lua")
+    Include("Console.lua")
+    Include("Runtime.lua")
+    Include("Keyboard.lua")
+    Include("Mouse.lua")
+    Include("Setting.lua")
+    Executor_lua = true
+    Executor = {}
 
+    ---手动接管标识。
+    Runtime.manual_flag = false
     ---注册暂停事件处理函数，处理用户手动接管事件。
     Runtime:register_interrupt_handler(
         function ()
@@ -18,7 +20,7 @@ Executor = {}
                 Mouse:reset()
                 if (not Runtime.manual_flag)
                 then
-                    Console:information("开始手动接管，禁用键鼠动作。")
+                    Console:information("开始手动接管，键鼠操作冻结。")
                     Keyboard:freeze()
                     Mouse:freeze()
                 end
@@ -27,7 +29,7 @@ Executor = {}
             then
                 if (Runtime.manual_flag)
                 then
-                    Console:information("中止手动接管，允许键鼠动作。")
+                    Console:information("中止手动接管，键鼠操作解冻。")
                     Keyboard:unfreeze()
                     Mouse:unfreeze()
                 end

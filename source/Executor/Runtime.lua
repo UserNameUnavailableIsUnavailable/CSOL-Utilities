@@ -4,10 +4,7 @@ then
     Include("JSON.lua")
     Runtime_lua = true
     Runtime = {}
-    ---手动接管标志。必须通过用户手动恢复。接管期间，所有键鼠操作将被跳过。
-    Runtime.manual_flag = false
-    ---暂停标志。若置为 `true`，则所有键鼠操作都将被跳过。
-    -- Runtime.pause_flag = false
+
     ---中断标志位，用于开/关中断，避免中断嵌套。`true` 允许中断，`false` 不允许中断。
     Runtime.interrupt_flag = false
     ---中断发生时保存的中断现场。
@@ -199,10 +196,5 @@ then
         do
             obj:restore_callback()
         end
-    end
-
-    ---判断是否处于停止状态，停止状态下跳过所有键鼠操作。
-    function Runtime:is_paused()
-        return self.manual_flag
     end
 end -- Runtime_lua
