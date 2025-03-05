@@ -19,7 +19,7 @@ void Messenger::DispatchNOP() noexcept
 {
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = 0\n"
-                 << "CmdType = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
+                 << "CmdName = " << QueryCommandString(EXECUTOR_COMMAND::CMD_NOP) << '\n'
                  << "CmdTimepoint = 0\n"
                  << "CmdRepeatable = false\n"
                  << std::endl;
@@ -37,7 +37,7 @@ void Messenger::Dispatch(const ExecutorCommand& ec) noexcept
     m_CommandTimepoint = ec.GetCmdTimepoint();
     m_FileStream.seekp(0);
     m_FileStream << "CmdId = " << ec.GetId() << '\n'
-                 << "CmdType = " << m_CommandString << '\n'
+                 << "CmdName = " << m_CommandString << '\n'
                  << "CmdTimepoint = " << m_CommandTimepoint << '\n'
                  << "CmdRepeatable = " << (ec.IsRepeatable() ? "true" : "false") << std::endl;
     std::filesystem::resize_file(m_CommandFile, m_FileStream.tellp()); /* 设置文件 EOF */
@@ -51,20 +51,20 @@ constexpr const char* Messenger::QueryCommandString(EXECUTOR_COMMAND cmd) noexce
         return "Command.CMD_NOP";
     case EXECUTOR_COMMAND::CMD_START_GAME_ROOM:
         return "Command.CMD_START_GAME_ROOM";
-    case EXECUTOR_COMMAND::CMD_CHOOSE_CLASS:
-        return "Command.CMD_CHOOSE_CLASS";
-    case EXECUTOR_COMMAND::CMD_PLAY_GAME_NORMAL:
-        return "Command.CMD_PLAY_GAME_NORMAL";
-    case EXECUTOR_COMMAND::CMD_PLAY_GAME_EXTEND:
-        return "Command.CMD_PLAY_GAME_EXTEND";
-    case EXECUTOR_COMMAND::CMD_TRY_CONFIRM_RESULT:
-        return "Command.CMD_TRY_CONFIRM_RESULT";
+    case EXECUTOR_COMMAND::CMD_CHOOSE_CHARACTER:
+        return "Command.CMD_CHOOSE_CHARACTER";
+    case EXECUTOR_COMMAND::CMD_DEFAULT_IDLE:
+        return "Command.CMD_DEFAULT_IDLE";
+    case EXECUTOR_COMMAND::CMD_EXTENDED_IDLE:
+        return "Command.CMD_EXTENDED_IDLE";
+    case EXECUTOR_COMMAND::CMD_CONFIRM_RESULTS:
+        return "Command.CMD_CONFIRM_RESULTS";
     case EXECUTOR_COMMAND::CMD_CREATE_GAME_ROOM:
-        return "Command.CMD_CREATE_ROOM";
-    case EXECUTOR_COMMAND::CMD_COMBINE_PARTS:
-        return "Command.CMD_COMBINE_PARTS";
-    case EXECUTOR_COMMAND::CMD_PURCHASE_ITEM:
-        return "Command.CMD_PURCHASE_ITEM";
+        return "Command.CMD_CREATE_GAME_ROOM";
+    case EXECUTOR_COMMAND::CMD_BATCH_COMBINE_PARTS:
+        return "Command.CMD_BATCH_COMBINE_PARTS";
+    case EXECUTOR_COMMAND::CMD_BATCH_PURCHASE_ITEM:
+        return "Command.CMD_BATCH_PURCHASE_ITEM";
     case EXECUTOR_COMMAND::CMD_LOCATE_CURSOR:
         return "Command.CMD_LOCATE_CURSOR";
     case EXECUTOR_COMMAND::CMD_CLEAR_POPUPS:

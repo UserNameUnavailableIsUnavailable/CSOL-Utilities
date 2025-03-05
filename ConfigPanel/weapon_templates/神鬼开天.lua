@@ -1,6 +1,6 @@
 Weapon:new{
     name = "神鬼开天",
-    switch_delay = Delay.SHORT,
+    switch_delay = Delay.LONG,
     number = Weapon.MELEE,
     purchase_sequence = {},
     template_name = "神鬼开天",

@@ -26,7 +26,7 @@ constexpr const wchar_t* GAME_IMAGE_FILE_NAME_UTF16 = L"$~capture.bmp";
 /* 大厅中可能被检测到的文本 */
 const char* HALL_TEXT[]{ "公告栏", "教程大纲", "通过好友", "返回", "新建房间", "进入房间", "输入房间号", "搜索" };
 /* 等候房间内可能被检测到的文本 */
-const char* ROOM_TEXT[] { "房间信息", "设置视角", "玩家列表", "添加技能插件", "技能插件目录", "邀请", "游戏难度说明", "强制踢出", "屏蔽列表添加", "观战", "等待中", "游戏进行中", "自动添加", "详细设定" };
+const char* ROOM_TEXT[] { "房间信息", "设置视角", "玩家列表", "添加技能插件", "技能插件目录", "邀请", "游戏难度说明", "屏蔽列表添加", "观战", "等待中", "游戏进行中", "自动添加", "详细设定" };
 /* 游戏加载过程中可能被检测到的文本 */
 const char* LOADING_TEXT[]{ "自定义游戏", "与服务器连接中", "认证游戏资源", "预缓存资源", "游戏信息读取", "最佳奖励", "正在下载" };
 /* 游戏进行中可能被检测到的文本 */
@@ -382,15 +382,15 @@ void Controller::DispatchAutoPlayCommand()
         thread_local ExecutorCommand cmd(3, true);
         if (s_Instance->m_ExtendedAutoPlayMode && current_time - m_CurrentState.GetTimestamp() > 60)
         {
-			cmd.Set(EXECUTOR_COMMAND::CMD_PLAY_GAME_EXTEND, current_time);
+			cmd.Set(EXECUTOR_COMMAND::CMD_EXTENDED_IDLE, current_time);
         }
         else if (current_time - m_CurrentState.GetTimestamp() > 5)
         {
-			cmd.Set(EXECUTOR_COMMAND::CMD_PLAY_GAME_NORMAL, current_time);
+			cmd.Set(EXECUTOR_COMMAND::CMD_DEFAULT_IDLE, current_time);
         }
         else
         {
-            cmd.Set(EXECUTOR_COMMAND::CMD_CHOOSE_CLASS, current_time);
+            cmd.Set(EXECUTOR_COMMAND::CMD_CHOOSE_CHARACTER, current_time);
         }
         remove_game_window_border();
         s_Instance->m_Messenger.Dispatch(cmd);
