@@ -7,7 +7,7 @@ export TEST= $(ROOT)/test
 export DOCS = $(ROOT)/documents
 export BUILD = $(ROOT)/build
 
-PROJECT_NAME = CSOL_Utilities
+PROJECT_NAME = CSOL-Utilities
 VERSION = v1.5.1
 
 ARCH = x86_64

@@ -139,21 +139,21 @@
                     "image": "assets/lobby_create_room_map_choose_right_scroll.avif"
                 },
                 {
-                    "id": "LOBBY_CREATR_ROOM_MAP_RIGHT_SCROLL_COUNT",
-                    "title": "选择地图时向右翻页次数",
-                    "annotation": "考虑到大灾变季度会不断更新，因此若<b style='color: red;'>需要选择特定靠后季度的地图</b>，需要指定从最左边起（最左侧一栏为第 1 季度）向右翻页的次数。<b style='color: red;'>在选择地图时，将先翻页到最左，然后向右翻页。</b>",
+                    "id": "LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT",
+                    "title": "选择地图时向左翻页次数",
+                    "annotation": "考虑到大灾变季度会不断更新，因此若<b style='color: red;'>需要选择特定靠后季度的地图</b>，需要指定从最右边起向左翻页的次数。<b style='color: red;'>在选择地图时，将按照指定的翻页次数进行翻页。默认值为 32，即翻页到最左（目前够用，这个游戏以后不知道还会不会有不够用的时候😅）。</b>",
                     "type": "FIELD",
-                    "value": "0",
-                    "pre_label": "向右翻页",
+                    "value": "32",
+                    "pre_label": "向左翻页",
                     "post_label": "次",
                     "depends_on": [
                         "CREATE_ROOM_ON_EXCEPTION"
                     ]
                 },
                 {
-                    "id": "LOBBY_CREATE_ROOM_SCROLL_DOWN_COUNT",
+                    "id": "LOBBY_CREATE_ROOM_MAP_SCROLL_DOWN_COUNT",
                     "title": "向下翻页次数",
-                    "annotation": "每次翻页滚动一格滚轮（一般就已经足够）。",
+                    "annotation": "有的灾变季度有地图较多，选择该季度靠后的地图需要向下翻页，一次翻页滚动一格滚轮。",
                     "type": "FIELD",
                     "value": "0",
                     "pre_label": "向下翻页",
