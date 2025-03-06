@@ -9,6 +9,8 @@ then
 
     ---中断标志位，用于开/关中断，避免中断嵌套。`true` 允许中断，`false` 不允许中断。
     Runtime.interrupt_flag = false
+    ---不可屏蔽中断标志位，若设置为 `true` 则说明当前没有正在处理的不可屏蔽中断，即允许处理不可屏蔽中断；否则，说明当前正在处理其他不可屏蔽中断，此标志禁止任何手动修改。
+    Runtime.nonmaskable_interrupt_flag = false
     ---中断发生时保存的中断现场。
     ---@type Context[]
     Runtime.interrupt_context = {}
@@ -41,12 +43,12 @@ then
     end
 
     ---开中断。
-    function Runtime:sti()
+    function Runtime:set_interrupt_flag()
         Runtime.interrupt_flag = true
     end
 
     ---关中断。
-    function Runtime:cli()
+    function Runtime:clear_interrupt_flag()
         Runtime.interrupt_flag = false
     end
 
@@ -65,6 +67,7 @@ then
             local before_int = Runtime:get_running_time()
             -- 先执行中断处理
             self:interrupt_handler()
+            self:nonmaskable_interrupt_handler()
             -- 中断处理结束后，再校验参数（无论如何都要进行中断处理，即便参数非法）
             if (type(milliseconds) ~= "number" or milliseconds < 0)
             then
@@ -103,17 +106,16 @@ then
 
     ---中断处理函数列表。
     Runtime.interrupt_handlers = {}
-
     ---默认的中断处理函数（不进行任何操作）。只有中断标志位使能时才允许中断。
     function Runtime:interrupt_handler()
+        local int_status, int_result = true, "INTERRUPT_HANDLER_SUCCESS"
         if (not Runtime.interrupt_flag) -- 未关中断才会触发中断
         then
             return
         end
-        local int_status, int_result = true, "INTERRUPT_HANDLER_SUCCESS"
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         self:push_interrupt_flag()
-        self:cli() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+        self:clear_interrupt_flag() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
         for i = 1, #self.interrupt_handlers
         do
             -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
@@ -124,6 +126,31 @@ then
         end
         -- 中断处理完毕
         self:pop_interrupt_flag() -- 开中断
+        if (not int_status) -- 中断处理出现错误
+        then
+            error(int_result) -- 将中断处理过程中引发的错误上抛
+        end
+    end
+
+    function Runtime:nonmaskable_interrupt_handler()
+        local int_status, int_result = true, "NONMASKABLE_INTERRUPT_HANDLER_SUCCESS"
+        if (not Runtime.nonmaskable_interrupt_flag) -- 当前是否可以处理其他不可屏蔽中断
+        then
+            return
+        end
+        self.nonmaskable_interrupt_flag = false -- 禁止处理其他不可屏蔽中断
+        self:push_interrupt_flag() -- 当前可能正在处理其他可屏蔽中断，先保存中断标志位
+        self:clear_interrupt_flag() -- 屏蔽普通中断
+        for i = 1, #self.nonmaskable_interrupt_handlers
+        do
+            if (self.nonmaskable_interrupt_handlers[i])
+            then
+                int_status, int_result = pcall(self.nonmaskable_interrupt_handlers[i])
+            end
+        end
+        -- 中断处理完毕
+        self:pop_interrupt_flag() -- 开中断
+        self.nonmaskable_interrupt_flag = true -- 允许处理其他不可屏蔽中断
         if (not int_status) -- 中断处理出现错误
         then
             error(int_result) -- 将中断处理过程中引发的错误上抛
@@ -150,6 +177,33 @@ then
         if (self.interrupt_handlers[index])
         then
             self.interrupt_handlers[index] = nil
+            return true
+        end
+        return false
+    end
+
+    Runtime.nonmaskable_interrupt_handlers = {}
+
+    ---注册不可屏蔽中断处理函数。
+    ---@param f function 中断处理函数
+    ---@return integer index 若 `f` 合法，返回中断函数在列表中的索引（从 `1` 开始编号）；否则，返回 `0`。
+    function Runtime:register_nonmaskable_interrupt_handler(f)
+        if (type(f) == "function")
+        then
+            local index = #self.nonmaskable_interrupt_handler + 1
+            self.nonmaskable_interrupt_handler[index] = f
+            return index
+        end
+        return 0
+    end
+
+    ---注销不可屏蔽中断处理函数。
+    ---@param index integer 索引号
+    ---@return boolean on 操作是否成功。
+    function Runtime:unregister_nonmaskable_interrupt_handler(index)
+        if (self.nonmaskable_interrupt_handlers[index])
+        then
+            self.nonmaskable_interrupt_handlers[index] = nil
             return true
         end
         return false

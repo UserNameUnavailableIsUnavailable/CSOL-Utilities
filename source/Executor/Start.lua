@@ -3,7 +3,7 @@ then
     Start_lua = true
     Include("Automation.lua")
     ---注册完所有中断处理函数后，开中断。
-    Runtime:sti() -- 开中断
+    Runtime:set_interrupt_flag() -- 开中断
 
     local function interpret()
         local cmd = Command:claim() -- 领取任务
