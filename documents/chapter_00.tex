@@ -86,8 +86,8 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 \subsection{罗技软件导入 Lua \lstinline{Executor}（执行器） 模块}
 
-鼠标右键点击集成工具文件夹中的 \lstinline{install.ps1}，点击在 Powershell 中运行（图 \ref{ch0fig-run-install-script}），这会将执行器模块主程序 \lstinline{Main.lua} 的运行目录修改为您的解压目录。
-\textbf{\color{red} 如果变动了安装路径（如：移动集成工具文件夹位置、将集成工具文件夹重命名），则需要重新运行一次 \lstinline{install.ps1}，并重新在 Logitech G Hub 中执行“保存并运行”操作（详见下文）。}
+鼠标右键点击集成工具文件夹中的 \lstinline{install.ps1}，点击在 Powershell 中运行（图 \ref{ch0fig-run-install-script}），您会看到在目录中生成了一个新文件 \lstinline{Executor.lua}（如果已经存在此文件，则会生成新的文件并覆盖它），如果没有看到，请刷新一下文件管理器页面。
+\textbf{\color{red} 如果变动了安装路径（如：移动集成工具文件夹位置、将集成工具文件夹重命名），则需要重新运行一次 \lstinline{install.ps1}，并重新在 Logitech G Hub 中导入并执行“保存并运行”操作（详见下文）。}
 
 \begin{figure}[H]
     \Centering
@@ -182,7 +182,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
     \label{ch0fig-script}
 \end{figure}
 
-点击“脚本”→“导入”（图 \ref{ch0fig-edit}、\ref{ch0fig-import}）。将 Lua 源文件 \lstinline{Main.lua} 导入软件，点击保存并运行（图 \ref{ch0fig-import-main-lua}、\ref{ch0fig-save-and-run}）。
+点击“脚本”→“导入”（图 \ref{ch0fig-edit}、\ref{ch0fig-import}）。将 Lua 源文件 \lstinline{Executor.lua} 导入软件，点击保存并运行（图 \ref{ch0fig-import-executor-lua}、\ref{ch0fig-save-and-run}）。
 
 \begin{figure}[H]
     \Centering
@@ -200,9 +200,9 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 \begin{figure}[H]
     \Centering
-    \includegraphics[width=\textwidth]{documents/assets/intro/main.png}
-    \caption{选择 \lstinline{Main.lua} 后导入}
-    \label{ch0fig-import-main-lua}
+    \includegraphics[width=\textwidth]{documents/assets/intro/import_executor.png}
+    \caption{选择 \lstinline{Executor.lua} 后导入}
+    \label{ch0fig-import-executor-lua}
 \end{figure}
 
 \begin{figure}[H]
@@ -318,3 +318,7 @@ v1.3.19 之后，控制器运行于挂机模式（1 号模式或 2 号模式）�
 
 \textbf{\color{red}\lstinline{lua} 目录下的 \lstinline{Setting.lua} 及 \lstinline{WeaponList.lua} 是根据用户自身情况自行定义的配置文件。有关配置文件的使用方法参见后续章节。
 按照本文档介绍的方式配置完毕且能够正常使用后，您应当妥善保管。后续版本更新不会对这两个配置文件内容作出较大的变动。当您修改配置文件内容后，必须在罗技软件中重新导入并保存运行。}
+
+\subsection{关于编程接口}
+
+对于具有一定编程经验的用户，阅读完本手册内容后可以访问 \href{https://blog.macrohard.fun/CSOL-Utilities/}{CSOL 集成工具开发者文档} 了解更多定制化使用方法。

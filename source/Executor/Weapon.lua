@@ -130,12 +130,13 @@ then
 
     ---根据 `purchase_sequence` 字段中预设的按键序列购买武器。
     function Weapon:purchase()
-        Runtime:push_interrupt_flag()
-        Runtime:cli() -- 暂时关中断，完成原子操作
+        Runtime:push_interrupt_mask_flag()
+        Runtime:disable_interrupt() -- 暂时关中断，完成原子操作
         for _, key in ipairs(self.purchase_sequence)
         do
             Keyboard:click(key, Delay.LONG, true)
         end
+        Runtime:pop_interrupt_mask_flag()
         if (self.number == Weapon.GRENADE or self.number == Weapon.NULL)
         then
             Keyboard:click(Weapon.MELEE, Delay.LONG, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
@@ -143,7 +144,6 @@ then
         -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
         Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.SHORT)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
-        Runtime:pop_interrupt_flag()
     end
 
     ---切换到指定武器。
