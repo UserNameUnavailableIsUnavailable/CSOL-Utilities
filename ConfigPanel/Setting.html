@@ -22,7 +22,7 @@
 import * as LuaASTUtil from "./scripts/LuaASTUtil.js"
 import * as Widget from "./scripts/Widget.js"
 let response = await fetch("./Setting.json")
-if (response.status !== 200) {
+if (!response.ok) {
     throw Error("Failed to fetch `Setting.json`")
 }
 
