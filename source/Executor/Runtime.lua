@@ -3,53 +3,73 @@ then
     Runtime_lua = true
 
     Include("Context.lua")
+    Include("Interrupt.lua")
     Include("JSON.lua")
 
+    ---@class Runtime 运行时
+    ---@field interrupts Interrupt[] 中断列表。
+    ---@field interrupt_mode integer 中断模式
+    ---@field INTERRUPT_BURST_MODE integer 猝发中断模式。
+    ---@field INTERRUPT_SEQUENCE_MODE integer 顺序中断模式。
+    ---@field INTERRUPT_RANDOM_MODE integer 随机中断模式。
+    ---@field interrupt_mask_flag boolean 中断屏蔽标志位。`true` 屏蔽中断，`false` 允许受理中断。
+    ---@field interrupt_busy_flag boolean 中断忙标志，用于避免中断嵌套。`true` 表示当前正在受理其他中断，`false` 表示空闲。
+    ---@field interrupt_mask_flag_stack boolean[] 存放中断屏蔽标志位的栈。
+    ---@field interrupt_context Context[] 中断发生时保存的中断现场。
+    ---@field expected_sleep_time number 根据最近睡眠情况推测的一轮睡眠时间
+    ---@field actual_sleep_time number 最近一次实际的一轮睡眠时间
+    ---@field last_interrupt_id integer 最近一次处理的中断对应标识符
     Runtime = {}
 
-    ---中断标志位，用于开/关中断，避免中断嵌套。`true` 允许中断，`false` 不允许中断。
-    Runtime.interrupt_flag = false
-    ---不可屏蔽中断标志位，若设置为 `true` 则说明当前没有正在处理的不可屏蔽中断，即允许处理不可屏蔽中断；否则，说明当前正在处理其他不可屏蔽中断，此标志禁止任何手动修改。
-    Runtime.nonmaskable_interrupt_flag = false
-    ---中断发生时保存的中断现场。
-    ---@type Context[]
+    Runtime.interrupt_mode = 0
+    Runtime.INTERRUPT_BURST_MODE = 0
+    Runtime.INTERRUPT_SEQUENCE_MODE = 1
+    Runtime.INTERRUPT_RANDOM_MODE = 2
+
+    Runtime.interrupt_mask_flag = false
+    Runtime.interrupt_busy_flag = false
     Runtime.interrupt_context = {}
+
     ---获取当前程序运行时间，单位为毫秒。
     ---@return integer
     function Runtime:get_running_time()
         return GetRunningTime()
     end
 
-    ---期望的睡眠时间
     Runtime.expected_sleep_time = 10
-    ---实际睡眠时间粒度
     Runtime.actual_sleep_time = 10
 
-    Runtime.interrupt_flag_stack = {}
+    Runtime.interrupt_mask_flag_stack = {}
 
     ---将中断标志位压栈。
-    function Runtime:push_interrupt_flag()
-        self.interrupt_flag_stack[#self.interrupt_flag_stack + 1] = self.interrupt_flag_stack
+    function Runtime:push_interrupt_mask_flag()
+        self.interrupt_mask_flag_stack[#self.interrupt_mask_flag_stack + 1] = self.interrupt_mask_flag
     end
 
     ---从栈中恢复最近一次的中断标志位。
-    function Runtime:pop_interrupt_flag()
-        if (#self.interrupt_flag_stack < 1)
+    function Runtime:pop_interrupt_mask_flag()
+        if (#self.interrupt_mask_flag_stack < 1)
         then
             return
         end
-        self.interrupt_flag = self.interrupt_flag_stack[#self.interrupt_flag_stack]
-        self.interrupt_flag_stack[#self.interrupt_flag_stack] = nil
+        self.interrupt_mask_flag = self.interrupt_mask_flag_stack[#self.interrupt_mask_flag_stack]
+        self.interrupt_mask_flag_stack[#self.interrupt_mask_flag_stack] = nil
     end
 
     ---开中断。
-    function Runtime:set_interrupt_flag()
-        Runtime.interrupt_flag = true
+    function Runtime:enable_interrupt()
+        Runtime.interrupt_mask_flag = false
     end
 
     ---关中断。
-    function Runtime:clear_interrupt_flag()
-        Runtime.interrupt_flag = false
+    function Runtime:disable_interrupt()
+        Runtime.interrupt_mask_flag = true
+    end
+
+    ---判断中断是否处于屏蔽状态。
+    ---@return boolean
+    function Runtime:is_interrupt_masked()
+        return Runtime.interrupt_mask_flag
     end
 
     ---挂起当前执行流，挂起后，可以处理中断事件。除了 `Runtime` 内部方法外，其他地方都应当调用 `Runtime:sleep`，而非直接调用罗技 API 中的 Sleep，这样可以进行中断处理。
@@ -66,8 +86,7 @@ then
             -- 罗技 API 不支持真正的中断，故而当某个过程主动将自己挂起时（即调用Runtime:sleep)视为自发中断，此时可以处理外部事件
             local before_int = Runtime:get_running_time()
             -- 先执行中断处理
-            self:interrupt_handler()
-            self:nonmaskable_interrupt_handler()
+            self:interrupt()
             -- 中断处理结束后，再校验参数（无论如何都要进行中断处理，即便参数非法）
             if (type(milliseconds) ~= "number" or milliseconds < 0)
             then
@@ -104,106 +123,141 @@ then
         end
     end
 
-    ---中断处理函数列表。
-    Runtime.interrupt_handlers = {}
+    Runtime.interrupts = {}
+
     ---默认的中断处理函数（不进行任何操作）。只有中断标志位使能时才允许中断。
-    function Runtime:interrupt_handler()
-        local int_status, int_result = true, "INTERRUPT_HANDLER_SUCCESS"
-        if (not Runtime.interrupt_flag) -- 未关中断才会触发中断
+    function Runtime:interrupt_in_burst()
+        local int_status = true
+        local int_result --[[@as any]]
+        int_result = "INTERRUPT_HANDLER_SUCCESS"
+        if (Runtime.interrupt_busy_flag) -- 当前有正在处理的中断，跳过
         then
             return
         end
         -- 中断开始时，中断标志位使能以屏蔽后续中断
-        self:push_interrupt_flag()
-        self:clear_interrupt_flag() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
-        for i = 1, #self.interrupt_handlers
+        for i, interrupt in ipairs(self.interrupts)
         do
             -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
-            if (self.interrupt_handlers[i])
+            if (interrupt:is_alive() and -- 该中断可用
+                (not interrupt:is_maskable() or not self:is_interrupt_masked())) -- 该中断不可屏蔽，或处于开中断状态
             then
-                int_status, int_result = pcall(self.interrupt_handlers[i])
+                self:push_interrupt_mask_flag()
+                self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                self.interrupt_busy_flag = true
+                int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+                self.interrupt_busy_flag = false
+                self:pop_interrupt_mask_flag() -- 开中断
             end
         end
         -- 中断处理完毕
-        self:pop_interrupt_flag() -- 开中断
         if (not int_status) -- 中断处理出现错误
         then
             error(int_result) -- 将中断处理过程中引发的错误上抛
         end
     end
 
-    function Runtime:nonmaskable_interrupt_handler()
-        local int_status, int_result = true, "NONMASKABLE_INTERRUPT_HANDLER_SUCCESS"
-        if (not Runtime.nonmaskable_interrupt_flag) -- 当前是否可以处理其他不可屏蔽中断
+    Runtime.last_interrupt_id = 0
+    function Runtime:interrupt_in_sequence()
+        local int_status = true
+        local int_result --[[@as any]]
+        int_result = "INTERRUPT_HANDLER_SUCCESS"
+        if (Runtime.interrupt_busy_flag) -- 当前有正在处理的中断，跳过
         then
             return
         end
-        self.nonmaskable_interrupt_flag = false -- 禁止处理其他不可屏蔽中断
-        self:push_interrupt_flag() -- 当前可能正在处理其他可屏蔽中断，先保存中断标志位
-        self:clear_interrupt_flag() -- 屏蔽普通中断
-        for i = 1, #self.nonmaskable_interrupt_handlers
-        do
-            if (self.nonmaskable_interrupt_handlers[i])
-            then
-                int_status, int_result = pcall(self.nonmaskable_interrupt_handlers[i])
-            end
+        local id = self.last_interrupt_id + 1
+        if (id > #self.interrupts)
+        then
+            id = 1
         end
+        local interrupt = self.interrupts[id] or Interrupt -- 如果为空，则用默认的中断模板代替
+        -- 中断开始时，中断标志位使能以屏蔽后续中断
+            -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
+            if (interrupt:is_alive() and -- 该中断可用
+                (not interrupt:is_maskable() or not self:is_interrupt_masked())) -- 该中断不可屏蔽，或处于开中断状态
+            then
+                self:push_interrupt_mask_flag()
+                self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                self.interrupt_busy_flag = true
+                int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+                self.interrupt_busy_flag = false
+                self:pop_interrupt_mask_flag() -- 开中断
+            end
         -- 中断处理完毕
-        self:pop_interrupt_flag() -- 开中断
-        self.nonmaskable_interrupt_flag = true -- 允许处理其他不可屏蔽中断
+        self.last_interrupt_id = id
         if (not int_status) -- 中断处理出现错误
         then
             error(int_result) -- 将中断处理过程中引发的错误上抛
         end
     end
 
-    ---注册中断处理函数。若 `f` 类型非 `function`，则返回值为 0。
-    ---@param f function 中断处理函数。
-    ---@return integer index 中断处理函数索引。
-    function Runtime:register_interrupt_handler(f)
-        if (type(f) ~= "function")
+    function Runtime:interrupt_at_random()
+        local int_status = true
+        local int_result --[[@as any]]
+        int_result = "INTERRUPT_HANDLER_SUCCESS"
+        if (Runtime.interrupt_busy_flag) -- 当前有正在处理的中断，跳过
         then
-            return 0
+            return
         end
-        local index = #self.interrupt_handlers + 1
-        self.interrupt_handlers[index] = f
-        return index
+        local interrupt = Interrupt
+        if (#self.interrupts > 0)
+        then
+            interrupt = self.interrupts[math.random(1, #self.interrupts)]
+        end
+        -- 中断开始时，中断标志位使能以屏蔽后续中断
+            -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
+            if (interrupt:is_alive() and -- 该中断可用
+                (not interrupt:is_maskable() or not self:is_interrupt_masked())) -- 该中断不可屏蔽，或处于开中断状态
+            then
+                self:push_interrupt_mask_flag()
+                self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                self.interrupt_busy_flag = true
+                int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+                self.interrupt_busy_flag = false
+                self:pop_interrupt_mask_flag() -- 开中断
+            end
+        -- 中断处理完毕
+        if (not int_status) -- 中断处理出现错误
+        then
+            error(int_result) -- 将中断处理过程中引发的错误上抛
+        end
+    end
+    
+    function Runtime:interrupt()
+        if (self.interrupt_mode == self.INTERRUPT_BURST_MODE)
+        then
+            self:interrupt_in_burst()
+        elseif (self.interrupt_mode == self.INTERRUPT_SEQUENCE_MODE)
+        then
+            self:interrupt_in_sequence()
+        elseif (self.interrupt_mode == self.INTERRUPT_RANDOM_MODE)
+        then
+            self:interrupt_at_random()
+        end
     end
 
-    ---注销中断处理函数。
-    ---@param index integer
-    ---@return boolean success 操作是否成功
-    function Runtime:unregister_interrput_handler(index)
-        if (self.interrupt_handlers[index])
-        then
-            self.interrupt_handlers[index] = nil
-            return true
-        end
-        return false
+    ---切换采用猝发式中断/顺序式中断。
+    ---@param mode integer
+    function Runtime:set_interrupt_mode(mode)
+        self.interrupt_mode = mode
     end
 
-    Runtime.nonmaskable_interrupt_handlers = {}
-
-    ---注册不可屏蔽中断处理函数。
-    ---@param f function 中断处理函数
-    ---@return integer index 若 `f` 合法，返回中断函数在列表中的索引（从 `1` 开始编号）；否则，返回 `0`。
-    function Runtime:register_nonmaskable_interrupt_handler(f)
-        if (type(f) == "function")
-        then
-            local index = #self.nonmaskable_interrupt_handler + 1
-            self.nonmaskable_interrupt_handler[index] = f
-            return index
-        end
-        return 0
+    ---注册中断。
+    ---@param interrupt Interrupt 中断回调函数或中断处理流程初始化列表
+    ---@return integer id
+    function Runtime:register_interrupt(interrupt)
+        local id = #self.interrupts + 1
+        self.interrupts[id] = interrupt
+        return id
     end
 
-    ---注销不可屏蔽中断处理函数。
-    ---@param index integer 索引号
-    ---@return boolean on 操作是否成功。
-    function Runtime:unregister_nonmaskable_interrupt_handler(index)
-        if (self.nonmaskable_interrupt_handlers[index])
+    ---注销中断。
+    ---@param id integer 中断标识符
+    ---@return boolean
+    function Runtime:unregister_interrput(id)
+        if (self.interrupts[id])
         then
-            self.nonmaskable_interrupt_handlers[index] = nil
+            self.interrupts[id]:kill()
             return true
         end
         return false

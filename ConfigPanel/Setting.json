@@ -299,7 +299,7 @@
                     "title": "自定义房间密码",
                     "type": "FIELD",
                     "pre_label": "密码",
-                    "post_label": "由数字、大小写字母组成，其余字符忽略",
+                    "post_label": "由数字、大小写字母组成",
                     "quoted": true,
                     "depends_on": [
                         "CREATE_ROOM_ON_EXCEPTION",
@@ -430,7 +430,7 @@
                 },
                 {
                     "id": "GAME_RESET_ROUND_KEY",
-                    "title": "换弹按键",
+                    "title": "换弹、复活、回合重置按键",
                     "annotation": "默认为 R。如果修改了换弹按钮，则需要修改此项。回合重置、复活、使用特殊武器（如神鬼开天、圣翼皓印等）的按键均受此影响。",
                     "type": "KEYSTROKES",
                     "values": ["Keyboard.R"],

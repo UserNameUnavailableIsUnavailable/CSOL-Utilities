@@ -1,9 +1,9 @@
-if (not Start_lua)
+if (not Main_lua)
 then
-    Start_lua = true
+    Main_lua = true
     Include("Automation.lua")
     ---注册完所有中断处理函数后，开中断。
-    Runtime:set_interrupt_flag() -- 开中断
+    Runtime:enable_interrupt() -- 开中断
 
     local function interpret()
         local cmd = Command:claim() -- 领取任务
@@ -16,12 +16,10 @@ then
         elseif (cmd == Command.CMD_DEFAULT_IDLE) -- 24H 挂机模式（常规）
         then
             Automation:try_confirm()
-            Automation:choose_golden_zombie_reward()
             Automation.default_player:play()
         elseif (cmd == Command.CMD_EXTENDED_IDLE) -- 24H 挂机模式（扩展）
         then
             Automation:try_confirm()
-            Automation:choose_golden_zombie_reward()
             Automation.extended_player:play()
         elseif (cmd == Command.CMD_CREATE_GAME_ROOM) -- 创建房间功能
         then
@@ -49,7 +47,7 @@ then
         Runtime:sleep(100)
     end
 
-    function Start()
+    function Main()
         while (true)
         do
             local ok, err_msg = pcall(interpret)
@@ -60,4 +58,4 @@ then
         end
     end
 
-end -- Start_lua
+end -- Main_lua

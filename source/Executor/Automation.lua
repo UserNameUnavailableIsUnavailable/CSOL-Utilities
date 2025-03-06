@@ -21,49 +21,56 @@ then
     ---手动接管标识。
     Runtime.manual_flag = false
     ---注册暂停事件处理函数，处理用户手动接管事件。
-    Runtime:register_interrupt_handler(
-        function ()
-            if (Keyboard:is_modifier_pressed(Keyboard.LEFT_CTRL) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_CTRL))
-            then
-                Keyboard:reset()
-                Mouse:reset()
-                if (not Runtime.manual_flag)
+    Runtime:register_interrupt(
+        Interrupt:new{
+            name = "手动接管功能",
+            handler = function ()
+                if (Keyboard:is_modifier_pressed(Keyboard.LEFT_CTRL) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_CTRL))
                 then
-                    Console:information("开始手动接管，冻结键鼠操作。")
-                    Keyboard:freeze()
-                    Mouse:freeze()
-                end
-                Runtime.manual_flag = true
-            elseif (Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT))
-            then
-                if (Runtime.manual_flag)
+                    Keyboard:reset()
+                    Mouse:reset()
+                    if (not Runtime.manual_flag)
+                    then
+                        Console:information("开始手动接管，冻结键鼠操作。")
+                        Keyboard:freeze()
+                        Mouse:freeze()
+                    end
+                    Runtime.manual_flag = true
+                elseif (Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT))
                 then
-                    Console:information("中止手动接管，恢复键鼠操作。")
-                    Keyboard:unfreeze()
-                    Mouse:unfreeze()
+                    if (Runtime.manual_flag)
+                    then
+                        Console:information("中止手动接管，恢复键鼠操作。")
+                        Keyboard:unfreeze()
+                        Mouse:unfreeze()
+                    end
+                    Runtime.manual_flag = false
                 end
-                Runtime.manual_flag = false
-            end
-        end
+            end,
+            maskable = false -- 此中断不可屏蔽
+        }
     )
 
     Automation.last_reset_or_respawn_time = 0
     ---注册回合重置检查函数，游戏开始后每隔 8 秒进行回合重置。
-    Runtime:register_interrupt_handler(
-        function ()
-            -- 当前未在挂机
-            local cmd = Command:claim()
-            if (cmd ~= Command.CMD_DEFAULT_IDLE and cmd ~= Command.CMD_EXTENDED_IDLE)
-            then
-                return
+    Runtime:register_interrupt(
+        Interrupt:new{
+            name = "复活、回合重置功能",
+            handler = function ()
+                -- 当前未在挂机
+                local cmd = Command:claim()
+                if (cmd ~= Command.CMD_DEFAULT_IDLE and cmd ~= Command.CMD_EXTENDED_IDLE)
+                then
+                    return
+                end
+                local time= Runtime:get_running_time()
+                if (time - Automation.last_reset_or_respawn_time > 8000)
+                then
+                    Player:reset_round_or_respawn()
+                    Automation.last_reset_or_respawn_time = time
+                end
             end
-            local time= Runtime:get_running_time()
-            if (time - Automation.last_reset_or_respawn_time > 8000)
-            then
-                Player:reset_round_or_respawn()
-                Automation.last_reset_or_respawn_time = time
-            end
-        end
+        }
     )
 
     -- 初始化
@@ -73,8 +80,8 @@ then
         end
     )
     DateTime:set_time_zone(Setting.FIELD_TIME_ZONE) -- 时区
-    Weapon:set_reload_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 换弹按键
-    Player:set_respawn_key(Setting.KEYSTROKES_GAME_WEAPON_RELOAD_KEY[1]) -- 复活按键
+    Weapon:set_reload_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 换弹按键
+    Player:set_respawn_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 复活按键
 
     -- 为默认挂机模式和扩展挂机模式创建两个玩家对象。
 
@@ -95,29 +102,32 @@ then
     }
 
     Runtime.last_command_update_timepoint = 0
-    Runtime:register_interrupt_handler(
-        function ()
-            if (Runtime:get_running_time() - Runtime.last_command_update_timepoint < 100)
-            then
-                return
+    Runtime:register_interrupt(
+        Interrupt:new{
+            name = "命令即时响应功能",
+            handler = function ()
+                if (Runtime:get_running_time() - Runtime.last_command_update_timepoint < 100)
+                then
+                    return
+                end
+                Command:update() -- 更新命令
+                Runtime.last_command_update_timepoint = Runtime:get_running_time()
+                -- 命令类型发生变化，需要立即停止当前执行
+                if ((Command:get_status() & Command.NAME_CHANGED) == Command.NAME_CHANGED)
+                then
+                    Mouse:reset()
+                    Keyboard:reset()
+                    Automation.default_player:reset()
+                    Automation.extended_player:reset()
+                    local e = {
+                        name = "COMMAND_CHANGED",
+                        message = "命令变更",
+                        parameters = {}
+                    }
+                    Error:throw(e) -- 主动触发运行时错误
+                end
             end
-            Command:update() -- 更新命令
-            Runtime.last_command_update_timepoint = Runtime:get_running_time()
-            -- 命令类型发生变化，需要立即停止当前执行
-            if ((Command:get_status() & Command.NAME_CHANGED) == Command.NAME_CHANGED)
-            then
-                Mouse:reset()
-                Keyboard:reset()
-                Automation.default_player:reset()
-                Automation.extended_player:reset()
-                local e = {
-                    name = "COMMAND_CHANGED",
-                    message = "命令变更",
-                    parameters = {}
-                }
-                Error:throw(e) -- 主动触发运行时错误
-            end
-        end
+        }
     )
 
     ---创建游戏房间。
@@ -164,34 +174,34 @@ then
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_ROOM_START_GAME_X, Setting.POSITION_ROOM_START_GAME_Y, 2000)
     end
 
-    Automation.last_choose_golden_zombie_reward_time = 0
+    -- Automation.last_choose_golden_zombie_reward_time = 0
     function Automation:choose_golden_zombie_reward()
-        if (not Setting.SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS)
+        if (not Setting.SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS) -- 防卡黄金僵尸功能开关
         then
             return
         end
-        local t = DateTime:get_local_timestamp()
-        if (Automation.last_choose_golden_zombie_reward_time - t > 45)
-        then
-            return
-        end
-        Mouse:click_on(Mouse.LEFT, 
+        -- local t = DateTime:get_local_timestamp()
+        -- if (Automation.last_choose_golden_zombie_reward_time - t > 45)
+        -- then
+        --     return
+        -- end
+        Mouse:click_on(Mouse.LEFT,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_X,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_Y,
             300
         )
-        Mouse:click_on(Mouse.LEFT, 
+        Mouse:click_on(Mouse.LEFT,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_SELECT_X,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_SELECT_Y,
             300
         )
-        Mouse:click_on(Mouse.LEFT, 
+        Mouse:click_on(Mouse.LEFT,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_X,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_Y,
             300
         )
         Keyboard:click_several_times(Keyboard.ESCAPE, 4, 10, Delay.SHORT)
-        Automation.last_choose_golden_zombie_reward_time = t
+        -- Automation.last_choose_golden_zombie_reward_time = t
     end
 
     ---选定角色，开始新一轮游戏。
@@ -213,16 +223,28 @@ then
     end
 
     ---上一次尝试确认结算界面的时间戳。
-    Automation.last_confirm_timestamp = 0
+    -- Automation.last_confirm_timestamp = 0
     function Automation:try_confirm()
-        local current_timestamp = DateTime:get_local_timestamp()
-        if (math.abs(current_timestamp - self.last_confirm_timestamp) < 20) -- 未超过 20 秒
+        -- local current_timestamp = DateTime:get_local_timestamp()
+        -- if (math.abs(current_timestamp - self.last_confirm_timestamp) < 20) -- 未超过 20 秒
+        -- then
+        --     return
+        -- end
+        Runtime:sleep(50)
+        local x, y = Mouse:locate()
+        Mouse:move_relative(400, 400, 50, true)
+        local _x, _y = Mouse:locate()
+        if (
+            math.abs(x - _x) < 300 and math.abs(y - _y) < 300 and
+            math.abs(_x - 32767) < 300 and math.abs(_y - 32767) < 300
+        )
         then
-            return
+            Keyboard:click_several_times(Keyboard.ESCAPE, 5, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
+            Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
+            Keyboard:click_several_times(Keyboard.ESCAPE, 5, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
+            Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
+            -- self.last_confirm_timestamp = current_timestamp
         end
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y)
-        self.last_confirm_timestamp = current_timestamp
     end
 
     ---合成配件。
