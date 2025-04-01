@@ -20,7 +20,7 @@ Weapon:new{
                 self:switch_without_delay()
                 last_switch_time = current_time
             end
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+            Mouse:move_relative(math.ceil(direction * 100 * sensitivity_x / Setting.FIELD_IN_GAME_SENSITIVITY), math.ceil(math.sin(current_time / 1000) * 100 * sensitivity_y / Setting.FIELD_IN_GAME_SENSITIVITY), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
         until (Runtime:get_running_time() - start_time > 6000)
         Mouse:release(Mouse.RIGHT, 200)
         Mouse:press(Mouse.LEFT, 1000)

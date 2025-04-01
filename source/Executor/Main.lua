@@ -2,9 +2,11 @@ if (not Main_lua)
 then
     Main_lua = true
     Include("Automation.lua")
+    Include("Version.lua")
+    Version:set("Main", { 1, 5, 1 })
+    Version:assert()
     ---注册完所有中断处理函数后，开中断。
     Runtime:enable_interrupt() -- 开中断
-
     local function interpret()
         local cmd = Command:claim() -- 领取任务
         if (cmd == Command.CMD_START_GAME_ROOM) -- 开始游戏

@@ -5,6 +5,8 @@ then
     Include("Context.lua")
     Include("Interrupt.lua")
     Include("JSON.lua")
+    Include("Version.lua")
+    Version:set("Runtime", { 1, 5, 1 })
 
     ---@class Runtime 运行时
     ---@field interrupts Interrupt[] 中断列表。

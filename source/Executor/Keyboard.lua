@@ -6,6 +6,8 @@ then
     Include("Runtime.lua")
     Include("Error.lua")
     Include("Delay.lua")
+    Include("Version.lua")
+    Version:set("Keyboard", { 1, 5, 1 })
     ---@class Keyboard
     ---@enum
     local valid_keynames = {

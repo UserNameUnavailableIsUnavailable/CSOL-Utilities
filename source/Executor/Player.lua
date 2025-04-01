@@ -8,6 +8,8 @@ then
     Include("Runtime.lua")
     Include("Utility.lua")
     Include("DateTime.lua")
+    Include("Version.lua")
+    Version:set("Player", { 1, 5, 2 })
 
     ---@class Player
     ---@field RESPAWN_KEY string 复活或回合重置按键
@@ -127,31 +129,26 @@ then
         local start_time = DateTime:get_local_timestamp() -- 本次转圈开始时间
         repeat
             local t = Runtime:get_running_time() / 1000
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速，竖直方向简谐
+            Mouse:move_relative(math.ceil(direction * 100 * sensitivity_x), math.ceil(math.sin(t) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速，竖直方向简谐
         until (DateTime:get_local_timestamp() - start_time > 6)
     end
 
     ---回合重置或复活。
     function Player:reset_round_or_respawn()
-        Runtime:sleep(20, true) -- 等待鼠标光标位置稳定（精确定时，尽可能减少对正常挂机的影响）
-        local x, y = Mouse:locate() -- 获取光标位置
-        Mouse:move_relative(250, 20, 20, true) -- 小幅度移动光标
-        local _x, _y = Mouse:locate() -- 稳定后再次获取光标位置
-        -- 如果光标位置在中心附近，且变化量比移动幅度小，则说明当前没有其他弹窗的影响，直接按下回合重置/复活按键
-        if (math.abs(_x - x) < 200 and math.abs(_y - y) < 200 and math.abs(_x - 32767) < 250 and math.abs(_x - 32767) < 250)
+        if (Mouse:is_cursor_position_locked())
         then
-            Keyboard:click(Keyboard.R, 10, true)
+            Keyboard:click(self.RESPAWN_KEY, 20)
             return
         end
         -- 存在其他弹窗的影响
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.SHORT) -- 清除弹窗
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, Delay.SHORT) -- 点击弹窗中的 “取消” 按钮
-        Keyboard:click(self.RESPAWN_KEY, Delay.MINI) -- 回合重置
+        Keyboard:click_several_times(Keyboard.ESCAPE, 2, 10, 25, true) -- 清除弹窗
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 30, true)
+        Keyboard:click(self.RESPAWN_KEY, 20, true) -- 回合重置
     end
 
     ---发动角色技能。
     function Player:activate_special_ability()
-        -- 无发动角色技能的记录（一局游戏刚开始） 
+        -- 无发动角色技能的记录（一局游戏刚开始）
         if (self.last_activate_special_ability_time == 0)
         then
             self.last_activate_special_ability_time = DateTime:get_local_timestamp()
@@ -204,7 +201,10 @@ then
         self:start_move()
         weapon:attack()
         self:stop_move()
-        self:activate_special_ability()
+        if (Setting.SWITCH_GAME_CHARACTER_USE_SPECIAL_SKILLS)
+        then
+            self:activate_special_ability()
+        end
         -- 更新最近一次使用的武器
         self.last_weapon = weapon
     end

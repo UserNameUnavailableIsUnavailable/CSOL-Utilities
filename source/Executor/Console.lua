@@ -1,6 +1,8 @@
 if (not Console_lua)
 then
     Console_lua = true
+    Include("Version.lua")
+    Version:set("Console", { 1, 5, 1 })
     Console = {}
     ---在控制台上打印字符串，不换行
     ---@param fmt string

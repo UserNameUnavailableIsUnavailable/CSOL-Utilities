@@ -6,6 +6,8 @@ then
     Include("Runtime.lua")
     Include("Error.lua")
     Include("Delay.lua")
+    Include("Version.lua")
+    Version:set("Mouse", { 1, 5, 1 })
 
     ---@class Mouse
     ---@field LEFT integer 鼠标左键。
@@ -117,7 +119,7 @@ then
         end
         Runtime:sleep(delay or Delay.SHORT, precise)
     end
-
+   
     ---按下按钮。
     ---@param button integer
     ---@param delay integer | nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
@@ -297,6 +299,20 @@ then
             MoveMouseWheel(times)
         end
         Runtime:sleep(delay, precise)
+    end
+
+    ---检测鼠标光标是否被锁定在某个位置。
+    ---@return boolean
+    function Mouse:is_cursor_position_locked()
+        self:place(32767, 32767, 25, true)
+        local x, y = self:locate()
+        self:move_relative(400, 400, 25, true)
+        local new_x, new_y = self:locate()
+        if (math.abs(new_x - x) <= 300 and math.abs(new_y - y) <= 300)
+        then
+            return true
+        end
+        return false
     end
 
     Error:register_fatal_disposal(

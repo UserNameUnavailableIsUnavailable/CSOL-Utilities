@@ -1,6 +1,8 @@
 if (not Delay_lua)
 then
     Delay_lua = true
+    Include("Version.lua")
+    Version:set("Delay", { 1, 5, 1 })
     Delay = {
         MINI_MINI = 5,
         MINI = 10,

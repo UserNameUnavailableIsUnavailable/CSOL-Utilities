@@ -1,6 +1,8 @@
 if (not Context_lua)
 then
     Context_lua = true
+    Include("Version.lua")
+    Version:set("Context", { 1, 5, 1 })
     ---@class Context
     Context = {}
 

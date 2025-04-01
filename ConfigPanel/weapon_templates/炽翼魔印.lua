@@ -19,16 +19,15 @@ Weapon:new{
             self.discharging = true
             self.discharge_start_moment = current_time
             self:switch()
-            Mouse:click(Mouse.LEFT, Delay.LONG_LONG)
         -- 当前正在释放，且释放时间超过 `DISCHARGE_TIME`。
         elseif (self.discharging and current_time - self.charge_start_moment > self.DISCHARGE_TIME)
         then
             self.discharging = false
             self.charge_start_moment = current_time
             self:switch()
-            Mouse:move_relative(0, 4000, Delay.NORMAL)
+            Mouse:move_relative(0, 4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
             Keyboard:click(Weapon.RELOAD_KEY, Delay.LONG_LONG)
-            Mouse:move_relative(0, -4000, Delay.NORMAL)
+            Mouse:move_relative(0, -4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
         end
     end
 }

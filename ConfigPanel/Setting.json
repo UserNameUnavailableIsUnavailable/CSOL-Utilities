@@ -1,8 +1,8 @@
 {
     "id": "GeneralSettings",
     "type": "SECTION",
-    "title": "通用设定",
-    "annotation": "鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。⏺️为录制按键按钮，⏹️为结束录制按钮。",
+    "title": "通用",
+    "annotation": "<ul><li>本配置面板对应于集成工具版本 v1.5.2，支持导入 v1.4.x 及更早版本的配置文件，并将其导出为 v1.5.x 版本工具使用的配置文件；</li><li>鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片（⏺️为录制按键按钮，⏹️为结束录制按钮）；</li><li>配置坐标时，应使用 GamingTool 去除游戏窗口边框并将窗口居中（Ctrl Alt B），以获取准确的坐标，挂机时不强制要求开启 GamingTool（控制器会自动处理）；</li><li><b>2025/3/19 游戏窗口分辨率更新后，产生了新的 bug，导致使用 GamingTool 去除游戏窗口边框后，点击窗口外任意区域时在游戏窗口周围会出现黑边，并伴随游戏窗口内按钮显示位置与实际位置不匹配的现象，获取坐标时需要以实际坐标位置为准（此问题系游戏本身问题，开启一局游戏并退出后，该问题消失）；</b></li><li>问题反馈渠道：admin@macrohard.fun（回复较及时）、ttyuig@126.com。</li></ul>",
     "components": [
         {
             "id": "SYSTEM_SETTINGS",
@@ -12,7 +12,7 @@
                 {
                     "id": "TIME_ZONE",
                     "title": "时区",
-                    "annotation": "操作系统时区，单位为小时。例如，对于 UTC-07:30，此处应填写 -7.5。此设定必须保证正确，否则会因时间不匹配导致控制器和执行器无法正确交互。",
+                    "annotation": "操作系统时区，单位为小时。例如，对于 UTC-07:30，此处应填写 -7.5。此设定<b style='color: red'>必须</b>保证正确，否则会因时间不匹配导致控制器和执行器无法正确交互。",
                     "pre_label": "UTC + ",
                     "post_label": "<a href='ms-settings:dateandtime'>点此查看操作系统时区</a>",
                     "type": "FIELD",
@@ -25,12 +25,13 @@
         {
             "id": "CREATE_ROOM_ON_EXCEPTION",
             "title": "异常情况自动创建房间",
-            "annotation": "挂机出现异常情况后，重新创建房间挂机。所谓异常情况是指：游戏掉线（控制器将会尝试重启游戏）后成功重启、游戏进行过程中因被强制踢出、游戏进行过程中因网络波动多次回退到房间等候室等其他导致挂机无法正常进行的情况。",
+            "annotation": "挂机出现异常情况后，重新创建房间挂机。所谓异常情况是指：游戏掉线（控制器将会尝试重启游戏）后成功重启、游戏进行过程中被强制踢出、游戏进行过程中因网络波动多次回退到房间等候室等其他导致挂机无法正常进行的情况。",
             "type": "SECTION",
             "components": [
                 {
                     "id": "CREATE_ROOM_ON_EXCEPTION",
                     "title": "自动创建房间功能开关",
+                    "annotation": "自动创建房间功能，可最大限度保证挂机正常进行，建议启用。",
                     "type": "SWITCH",
                     "values": ["true", "false"],
                     "depends_on": null,
@@ -141,7 +142,7 @@
                 {
                     "id": "LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT",
                     "title": "选择地图时向左翻页次数",
-                    "annotation": "考虑到大灾变季度会不断更新，因此若<b style='color: red;'>需要选择特定靠后季度的地图</b>，需要指定从最右边起向左翻页的次数。<b style='color: red;'>在选择地图时，将按照指定的翻页次数进行翻页。默认值为 32，即翻页到最左（目前够用，这个游戏以后不知道还会不会有不够用的时候😅）。</b>",
+                    "annotation": "考虑到大灾变季度会不断更新，因此<b style='color: red;'>若需要选择特定靠后季度的地图</b>，需要指定从<b style='color: red;'>最右边起向左翻页</b>的次数。<b style='color: red;'>在选择地图时，将按照指定的翻页次数进行翻页。默认值为 32，即翻页到最左（目前够用，这个游戏以后不知道还会不会有不够用的时候😅）。</b>",
                     "type": "FIELD",
                     "value": "32",
                     "pre_label": "向左翻页",
@@ -153,7 +154,7 @@
                 {
                     "id": "LOBBY_CREATE_ROOM_MAP_SCROLL_DOWN_COUNT",
                     "title": "向下翻页次数",
-                    "annotation": "有的灾变季度有地图较多，选择该季度靠后的地图需要向下翻页，一次翻页滚动一格滚轮。",
+                    "annotation": "有的灾变季度有地图较多，选择该季度靠后的地图需要向下翻页，一次翻页对应向下滚动一格滚轮。",
                     "type": "FIELD",
                     "value": "0",
                     "pre_label": "向下翻页",
@@ -221,6 +222,7 @@
                 {
                     "id": "LOBBY_CREATE_ROOM_LOCK",
                     "title": "房间密码",
+                    "annotation": "自动创建房间时，为房间添加密码，实现担任锁房挂机，亦可防止恶意举报。",
                     "type": "SWITCH",
                     "labels": [
                         "是",
@@ -331,6 +333,14 @@
             "type": "SECTION",
             "components": [
                 {
+                    "id": "IN_GAME_SENSITIVITY",
+                    "title": "游戏内灵敏度",
+                    "annotation": "此选项用于确保游戏内转圈幅度平稳性，注意在控制台中通过 <code>sensitivity</code> 可以查看灵敏度精确数值（或在“选项-鼠标”中查看粗略数值）。另外，<b style='color: red'>强烈建议</b>在控制台中通过 <code>m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。",
+                    "type": "FIELD",
+                    "pre_label": "灵敏度",
+                    "image": "assets/in_game_sensitivity.avif"
+                },
+                {
                     "id": "ROOM_START_GAME",
                     "title": "开始游戏按钮",
                     "type": "POSITION",
@@ -385,11 +395,13 @@
                 {
                     "id": "GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN",
                     "title": "角色技能冷却时间",
+                    "annotation": "角色技能冷却时间，单位为秒，默认为 <code>math.huge</code>，代表 +∞（即处于不启用状态），请按需修改。",
                     "type": "FIELD",
                     "legacy_name": "CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME",
                     "depends_on": [
                         "GAME_CHARACTER_USE_SPECIAL_SKILLS"
-                    ]
+                    ],
+                    "value": "math.huge"
                 },
                 {
                     "id": "GAME_ESC_MENU_CANCEL",
@@ -438,7 +450,8 @@
                 },
                 {
                     "id": "GAME_RESET_ROUND_ON_FAILURE",
-                    "title": "在通关失败时重置当前回合。",
+                    "title": "在通关失败时重置当前回合",
+                    "annotation": "定期（时间间隔 8 秒左右）执行一次回合重置，防止通关失败。",
                     "type": "SWITCH",
                     "labels": ["是", "否"],
                     "true_option": 0,

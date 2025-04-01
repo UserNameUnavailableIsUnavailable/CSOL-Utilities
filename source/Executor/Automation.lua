@@ -1,5 +1,6 @@
 if (not Automation_lua)
 then
+    Automation_lua = true
     Include("Delay.lua")
     Include("Console.lua")
     Include("JSON.lua")
@@ -15,7 +16,8 @@ then
     Include("Player.lua")
     Include("Setting.lua")
     Include("WeaponList.lua")
-    Automation_lua = true
+    Include("Version.lua")
+    Version:set("Automation", { 1, 5, 2 })
     Automation = {}
 
     ---手动接管标识。
@@ -64,7 +66,7 @@ then
                     return
                 end
                 local time= Runtime:get_running_time()
-                if (time - Automation.last_reset_or_respawn_time > 8000)
+                if (Setting.SWITCH_GAME_RESET_ROUND_ON_FAILURE and time - Automation.last_reset_or_respawn_time > 8000)
                 then
                     Player:reset_round_or_respawn()
                     Automation.last_reset_or_respawn_time = time
@@ -143,7 +145,7 @@ then
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_1_Y, 500)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_1_Y, 500)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_X, Setting.POSITION_LOBBY_CREATE_ROOM_GAME_MODE_2_Y, 500)
-        Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y, Setting.FIELD_LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32, 100) -- 向左翻页指定次数
+        Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y, Setting.FIELD_LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32, 200) -- 向左翻页指定次数
         -- Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y, Setting.FIELD_LOBBY_CREATR_ROOM_MAP_RIGHT_SCROLL_COUNT, 150
         -- ) -- 向右移动指定次数
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_Y, 750) -- 点击一下，激活子窗口
@@ -201,7 +203,6 @@ then
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_Y,
             300
         )
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, 10, Delay.SHORT)
         -- Automation.last_choose_golden_zombie_reward_time = t
     end
 
@@ -231,21 +232,21 @@ then
         -- then
         --     return
         -- end
-        Runtime:sleep(50)
-        local x, y = Mouse:locate()
-        Mouse:move_relative(400, 400, 50, true)
-        local _x, _y = Mouse:locate()
-        if (
-            math.abs(x - _x) < 300 and math.abs(y - _y) < 300 and
-            math.abs(_x - 32767) < 300 and math.abs(_y - 32767) < 300
-        )
+        local cursor_locked = true
+        if (not Mouse:is_cursor_position_locked())
         then
-            Keyboard:click_several_times(Keyboard.ESCAPE, 5, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
-            Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
-            Keyboard:click_several_times(Keyboard.ESCAPE, 5, Delay.MINI, Delay.SHORT) -- 清除所有可能存在的弹窗
-            Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
-            -- self.last_confirm_timestamp = current_timestamp
+            Keyboard:click_several_times(Keyboard.ESCAPE, 3, Delay.MINI, Delay.MINI, true)
+            cursor_locked = Mouse:is_cursor_position_locked()
         end
+        if (cursor_locked)
+        then
+            return
+        end
+        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+        Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
+        -- self.last_confirm_timestamp = current_timestamp
     end
 
     ---合成配件。
@@ -255,26 +256,34 @@ then
             return
         end
         local counter = 20
+        while (
+            Keyboard:is_modifier_pressed(Keyboard.ALT) or
+            Keyboard:is_modifier_pressed(Keyboard.SHIFT) or
+            Keyboard:is_modifier_pressed(Keyboard.CTRL)
+        )
+        do
+            Runtime:sleep(10)
+        end
         Keyboard:press(Keyboard.ENTER, 10)
         repeat
-            Mouse:click_on(Mouse.LEFT, 
+            Mouse:click_on(Mouse.LEFT,
                 Setting.POSITION_CRAFT_PARTS_FILL_X,
                 Setting.POSITION_CRAFT_PARTS_FILL_Y,
                 10
             )
-            Mouse:click_on(Mouse.LEFT, 
+            Mouse:click_on(Mouse.LEFT,
                 Setting.POSITION_CRAFT_PARTS_COMBINE_X,
                 Setting.POSITION_CRAFT_PARTS_COMBINE_Y,
                 10
             )
             counter = counter - 1
         until (counter == 0)
-        Keyboard:release(Keyboard.ENTER, 10)
-        Mouse:click_on(Mouse.LEFT, 
+        Mouse:click_on(Mouse.LEFT,
             Setting.POSITION_CRAFT_PARTS_CLEAR_X,
             Setting.POSITION_CRAFT_PARTS_CLEAR_Y,
             20, true
         )
+        Keyboard:release(Keyboard.ENTER, 10)
     end
 
     Automation.buy_button_x = 0
@@ -307,6 +316,7 @@ then
     end
 
     function Automation:clear_popups()
-        Keyboard:click_several_times(Keyboard.ESCAPE, 1, 5000, Delay.MINI)
+        Keyboard:click(Keyboard.ESCAPE, 5000)
     end
+
 end -- Automation_lua

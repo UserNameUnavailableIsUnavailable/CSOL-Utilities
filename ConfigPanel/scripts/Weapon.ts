@@ -1,5 +1,5 @@
-declare var luaparse
-declare var g_WeaponTemplateList
+declare var luaparse /* luaparse 在 html 中引入 */
+declare var g_WeaponTemplateList /* 在 html 的 js 块中定义 */
 
 import * as LuaASTUtil from "./LuaASTUtil.js"
 
@@ -161,11 +161,11 @@ export class Weapon {
      */
     generate(indent: string, indent_level: number = 0, first_line_indent: boolean = true): string {
         this.gather()
-        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new{\n` +
+        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new({\n` +
         `${indent.repeat(indent_level + 1)}name = "${this.m_Name}",\n` +
         `${indent.repeat(indent_level + 1)}number = ${this.m_Number},\n` +
         `${indent.repeat(indent_level + 1)}purchase_sequence = { ${this.m_PurchaseSequence.join(", ")} }\n` +
-        `${indent.repeat(indent_level)}}`
+        `${indent.repeat(indent_level)}})`
     }
     /**
      * 修改某些字段后，更新 HTML 元素。注意，m_Element 必须已经加入 DOM，否则不会执行任何操作。
@@ -176,7 +176,7 @@ export class Weapon {
         name.value = this.m_Name
         // purchase_sequence
         let purchase_sequence = document.getElementById(`Weapon_${this.m_Id}_purchase_sequence_display`) as HTMLInputElement
-        purchase_sequence.value = this.m_PurchaseSequence.map(e => { return Weapon.s_REVERSE_KEYMAP.get(e) }).join(' ')
+        purchase_sequence.value = this.m_PurchaseSequence?.map(e => { return Weapon.s_REVERSE_KEYMAP.get(e) }).join(' ')
     }
 }
 
@@ -190,10 +190,10 @@ export class Armor extends Weapon {
     }
     override generate(indent: string, indent_level: number = 0, first_line_indent: boolean = true): string {
         this.gather()
-        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new{\n` +
+        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new({\n` +
         `${indent.repeat(indent_level + 1)}name = "${this.m_Name}",\n` +
         `${indent.repeat(indent_level + 1)}purchase_sequence = { ${this.m_PurchaseSequence.join(", ")} }\n` +
-        `${indent.repeat(indent_level)}}`
+        `${indent.repeat(indent_level)}})`
     }
 }
 
@@ -289,13 +289,13 @@ export class ConventionalWeapon extends Weapon {
     }
     override generate(indent: string, indent_level: number = 0, first_line_indent: boolean = true): string {
         this.gather()
-        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new{\n` +
+        return `${first_line_indent ? indent.repeat(indent_level) : ""}Weapon:new({\n` +
         `${indent.repeat(indent_level + 1)}name = "${this.m_Name}",\n` +
         `${indent.repeat(indent_level + 1)}number = ${this.m_Number},\n` +
         `${indent.repeat(indent_level + 1)}purchase_sequence = { ${this.m_PurchaseSequence.join(", ")} },\n` +
         `${indent.repeat(indent_level + 1)}switch_delay = ${this.m_SwitchDelay},\n` +
         `${indent.repeat(indent_level + 1)}attack_button = ${this.m_AttackButton},\n` +
-        `${indent.repeat(indent_level)}}`
+        `${indent.repeat(indent_level)}})`
     }
     override async update(): Promise<void> {
         let base_update = Object.getPrototypeOf(ConventionalWeapon.prototype).update
@@ -320,7 +320,7 @@ export class CustomizedWeapon extends Weapon {
         super()
         this.m_TemplateClass = template_class
         this.m_TemplateName = "无"
-        this.m_TemplateCode = ""
+        this.m_TemplateCode = "Weapon:new({})"
         let p = document.createElement('p')
         let label = document.createElement("label")
         label.innerHTML = "武器模板"
@@ -380,26 +380,35 @@ export class CustomizedWeapon extends Weapon {
         this.gather()
         let template_ast = luaparse.parse(this.m_TemplateCode)
         let args = new Map<string, any>()
-        for (const field of template_ast.body[0].expression.arguments.fields) {
+        
+        let weapon_fields
+        let weapon_def = ConvertTableCallExpressionToCallExpression(template_ast.body[0].expression)
+
+        if (weapon_def) {
+            weapon_fields = weapon_def.arguments[0].fields // 提取出武器各个属性字段
+        }
+
+        for (const field of weapon_fields) {
             args.set(LuaASTUtil.GenerateLuaCodeFromAST(field.key), field)
         }
         let ast = luaparse.parse(
-            `Weapon:new{\n` +
+            `Weapon:new({\n` +
             `    name = "${this.m_Name}",\n` +
             `    purchase_sequence = { ${this.m_PurchaseSequence.join(", ")} }\n` +
-            `}`
+            `})`
         )
-        for (let i = 0; i < ast.body[0].expression.arguments.fields.length; i++) {
-            const key = LuaASTUtil.GenerateLuaCodeFromAST(ast.body[0].expression.argument.fields[i].key)
-            if (args.has(key)) {
-                args.set(key, ast.body[0].expression.arguments.fields[i])
-            }
+        let user_defined_fields = ast.body[0].expression.arguments[0].fields
+        for (let i = 0; i < user_defined_fields.length; i++) {
+            // user_defined_fields[i]: TableKeyString
+            // key, value
+            const key = LuaASTUtil.GenerateLuaCodeFromAST(user_defined_fields[i].key)
+            args.set(key, user_defined_fields[i])
         }
         let fields = new Array()
-        args.forEach((v) => {
-            fields.push(v)
+        args.forEach(e => {
+            fields.push(e)
         })
-        ast.body[0].expression.arguments.fields = fields
+        ast.body[0].expression.arguments[0].fields = fields
         return LuaASTUtil.GenerateLuaCodeFromAST(ast, indent_level, first_line_indent).replace(/\s+$/, "")
     }
     override async update(): Promise<void> {
@@ -432,6 +441,21 @@ export class CustomizedWeapon extends Weapon {
     }
 }
 
+function ConvertTableCallExpressionToCallExpression(node) {
+    if (node.type === LuaASTUtil.AST_NODE_CALL_EXPRESSION) {
+        return node
+    }
+    if (node.type === LuaASTUtil.AST_NODE_TABLE_CALL_EXPRESSION) {
+        return {
+            type: LuaASTUtil.AST_NODE_CALL_EXPRESSION,
+            base: node.base,
+            arguments: [node.argument]
+        }
+    } else {
+        throw Error(`Failed to convert node to AST_NODE_CALL_EXPRESSION: illegal node type.\nNode:${node}`)
+    }
+
+}
 
 function ConvertCallExpressionToTableCallExpression(node) {
     if (node.type === LuaASTUtil.AST_NODE_TABLE_CALL_EXPRESSION) {
@@ -454,15 +478,18 @@ function ConvertCallExpressionToTableCallExpression(node) {
 }
 
 
-function __resolve_weapon(ast) {
+function __impl_resolve_weapon(ast) {
     let fields = new Map()
-    if (ast.type !== LuaASTUtil.AST_NODE_TABLE_CALL_EXPRESSION) {
+    if (ast.type !== LuaASTUtil.AST_NODE_CALL_EXPRESSION) {
+        return undefined
+    }
+    if (ast.arguments.length > 1) {
         return undefined
     }
     if (LuaASTUtil.GenerateLuaCodeFromAST(ast.base) !== "Weapon:new") {
         return undefined
     }
-    let args = ast.arguments
+    let args = ast.arguments[0]
     let string_pattern = /^(['"])(.*?)\1$/
     for (const field of args.fields) {
         if (LuaASTUtil.GenerateLuaCodeFromAST(field.key) === "name") {
@@ -492,12 +519,12 @@ function __resolve_weapon(ast) {
 
 export function ResolveWeaponList(ast) {
     let armor: Armor
-    var default_part_weapons = new Array<PartWeapon>()
-    var extended_part_weapons = new Array<PartWeapon>()
-    var default_conventional_weapons = new Array<ConventionalWeapon | CustomizedWeapon>()
-    var extended_conventional_weapons = new Array<ConventionalWeapon | CustomizedWeapon>()
-    var default_special_weapons = new Array<CustomizedWeapon>()
-    var extended_special_weapons = new Array<CustomizedWeapon>()
+    let default_part_weapons = new Array<PartWeapon>()
+    let extended_part_weapons = new Array<PartWeapon>()
+    let default_conventional_weapons = new Array<ConventionalWeapon | CustomizedWeapon>()
+    let extended_conventional_weapons = new Array<ConventionalWeapon | CustomizedWeapon>()
+    let default_special_weapons = new Array<CustomizedWeapon>()
+    let extended_special_weapons = new Array<CustomizedWeapon>()
 
     let queue = new Array()
     ast.body.forEach(e => {
@@ -507,10 +534,11 @@ export function ResolveWeaponList(ast) {
         let node = queue.shift()
         if (node.type === LuaASTUtil.AST_NODE_ASSIGNMENT_STATEMENT) {
             let index = 0
+            /* 遍历节点，将 Table Call Expression 转换为 Call Expression */
             while (index < node.variables.length) {
                 let variable = LuaASTUtil.GenerateLuaCodeFromAST(node.variables[index], 0)
                 if (variable === "Armor" || variable === "AC") {
-                    let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(node.init[index]))
+                    let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(node.init[index]))
                     if (!dict) continue
                     armor = new Armor()
                     armor.m_Name = dict.get("name")
@@ -518,7 +546,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "DefaultPartWeapons" || variable === "PartWeaponList") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         if (!dict) continue
                         let weapon = new PartWeapon()
                         weapon.m_Name = dict.get("name")
@@ -528,7 +556,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "DefaultConventionalWeapons" || variable === "DefaultWeaponList") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         if (!dict) continue
                         if (dict.has("template_name") || dict.has("template_code")) {
                             let weapon = new CustomizedWeapon("常规")
@@ -550,7 +578,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "DefaultSpecialWeapons") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         let weapon = new CustomizedWeapon("特殊")
                         weapon.m_Name = dict.get("name")
                         weapon.m_PurchaseSequence = dict.get("purchase_sequence")
@@ -561,7 +589,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "ExtendedPartWeapons") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         if (!dict) continue
                         let weapon = new PartWeapon()
                         weapon.m_Name = dict.get("name")
@@ -571,7 +599,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "ExtendedConventionalWeapons" || variable === "ExtendedWeaponList") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         if (!dict) continue
                         if (dict.has("template_name") || dict.has("template_code")) {
                             let weapon = new CustomizedWeapon("常规")
@@ -593,7 +621,7 @@ export function ResolveWeaponList(ast) {
                 } else if (variable === "ExtendedSpecialWeapons") {
                     let weapons = node.init[index].fields
                     for (let i = 0; i < weapons.length; i++) {
-                        let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(weapons[i].value))
+                        let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(weapons[i].value))
                         let weapon = new CustomizedWeapon("特殊")
                         weapon.m_Name = dict.get("name")
                         weapon.m_PurchaseSequence = dict.get("purchase_sequence")
@@ -602,7 +630,7 @@ export function ResolveWeaponList(ast) {
                         extended_special_weapons.push(weapon)
                     }
                 } else if (variable === "SpecialWeapon") {
-                    let dict = __resolve_weapon(ConvertCallExpressionToTableCallExpression(node.init[index]))
+                    let dict = __impl_resolve_weapon(ConvertTableCallExpressionToCallExpression(node.init[index]))
                     let weapon = new CustomizedWeapon("特殊")
                     weapon.m_Name = dict.get("name")
                     weapon.m_PurchaseSequence = dict.get("purchase_sequence")

@@ -1,6 +1,8 @@
 if (not Command_lua)
 then
     Command_lua = true
+    Include("Version.lua")
+    Version:set("Command", { 1, 5, 1 })
     Command = {
         CMD_NOP = 0,
         CMD_START_GAME_ROOM = 1,
@@ -12,7 +14,8 @@ then
         CMD_BATCH_COMBINE_PARTS = 7,
         CMD_BATCH_PURCHASE_ITEM = 8,
         CMD_LOCATE_CURSOR = 9,
-        CMD_CLEAR_POPUPS = 10
+        CMD_CLEAR_POPUPS = 10,
+        CMD_DETECT_IN_GAME = 11,
     }
 
     Command.status = 0

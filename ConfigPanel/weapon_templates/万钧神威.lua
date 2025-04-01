@@ -16,7 +16,10 @@ Weapon:new{
         local last_throw_time = Runtime:get_running_time()
         repeat
             local current_time = Runtime:get_running_time()
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), Delay.MINI) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+            Mouse:move_relative( -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+                math.ceil(direction * 100 * sensitivity_x / Setting.FIELD_IN_GAME_SENSITIVITY),
+                math.ceil(math.sin(current_time / 1000) * 100 * sensitivity_y / Setting.FIELD_IN_GAME_SENSITIVITY),
+                Delay.MINI)
             if (Runtime:get_running_time() - last_throw_time > 4000)
             then
                 Keyboard:click(Weapon.RELOAD_KEY, Delay.MINI)

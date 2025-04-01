@@ -1,3 +1,4 @@
+declare var g_Version: string
 import * as LuaASTUtil from "./LuaASTUtil.js"
 /**
  * 开关事件发布者
@@ -616,7 +617,10 @@ function ExportSetting(root: Widget): string {
         let snippet = "if not Setting_lua\n" +
             "then\n" +
             "\tSetting_lua = true\n" +
+            `\tInclude("Version.lua")\n` +
+            `\tVersion:set("Setting", ${g_Version})\n` +
             "\tSetting = {\n"
+
         setting.forEach((v, k) => {
             snippet += `\t\t${k} = ${v},\n`
         })
