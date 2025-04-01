@@ -6,6 +6,9 @@ then
     Include("Console.lua")
     Include("Mouse.lua")
     Include("Keyboard.lua")
+    Include("Version.lua")
+    Version:set("Weapon", { 1, 5, 2 })
+    Version:require("Weapon", "Setting", { 1, 5, 2 }, nil)
 
     ---@class Weapon 武器类
     ---@field NULL string 配件武器
@@ -141,9 +144,12 @@ then
         then
             Keyboard:click(Weapon.MELEE, Delay.LONG, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
         end
-        -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
-        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.SHORT)
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
+        if (not Mouse:is_cursor_position_locked())
+        then
+            -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
+            Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.SHORT)
+            Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_ESC_MENU_CANCEL_X, Setting.POSITION_GAME_ESC_MENU_CANCEL_Y, 20) -- 点击ESC菜单的取消按钮。
+        end
     end
 
     ---切换到指定武器。
@@ -207,7 +213,7 @@ then
                 self:switch_without_delay()
                 last_switch_time = current_time
             end
-            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
+            Mouse:move_relative(math.floor(direction * 100 * sensitivity_x / Setting.FIELD_IN_GAME_SENSITIVITY), math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y / Setting.FIELD_IN_GAME_SENSITIVITY), 10) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
         until (Runtime:get_running_time() - start_time > 7000)
         Mouse:release(self.attack_button)
     end

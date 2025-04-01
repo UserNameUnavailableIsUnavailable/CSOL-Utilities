@@ -25,6 +25,8 @@
 if not JSON_lua
 then
     JSON_lua = true
+    Include("Version.lua")
+    Version:set("JSON", { 1, 5, 1 })
     JSON = { _version = "0.1.2" }
 
     -------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 if (not DateTime_lua)
 then
 	DateTime_lua = true
+    Include("Version.lua")
+    Version:set("DateTime", { 1, 5, 1 })
 	---@class DateTime
 	---@field TIME_ZONE number 时区
 	DateTime = {}

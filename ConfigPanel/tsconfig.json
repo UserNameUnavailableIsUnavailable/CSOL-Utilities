@@ -2,10 +2,16 @@
   "compilerOptions": {
     "target": "es6",
     "allowJs": true,
-    "outDir": "scripts/"
+    "outDir": "../build/ConfigPanel/scripts/"
   },
   "files": [
+    "scripts/DisplayTab.js",
+    "scripts/PopUpImage.js",
+    "scripts/Version.js",
+    "scripts/Export.js",
+
     "scripts/Widget.ts",
+    "scripts/luaparse.js",
     "scripts/Weapon.ts",
     "scripts/LuaASTUtil.ts"
   ]

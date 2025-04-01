@@ -17,7 +17,12 @@
     <input id="__impl_ImportSetting" type="file" style="display: none;" />
     <button id="ExportSetting" class="export">导出</button>
 </body>
-<script src="./scripts/luaparse.js"></script>
+
+<!-- 依赖 -->
+<script src="scripts/luaparse.js"></script>
+<script src="scripts/Version.js"></script>
+<script src="scripts/Export.js"></script>
+
 <script type="module">
 import * as LuaASTUtil from "./scripts/LuaASTUtil.js"
 import * as Widget from "./scripts/Widget.js"
@@ -52,22 +57,7 @@ document.getElementById("ExportSetting").onclick = async () => {
     if (!setting) {
         return
     }
-    try {
-        const hFile = await window.showSaveFilePicker({
-            suggestedName: "Setting",
-            types: [{
-                description: "Lua source file",
-                accept: {
-                    'text/plain': ['.lua']
-                }
-            }]
-        });
-        const ofstream = await hFile.createWritable();
-        await ofstream.write(setting);
-        await ofstream.close();
-    } catch (e) {
-        console.log(e);
-    }
+    Export("Setting.lua", setting)
 }
 </script>
 </html>
