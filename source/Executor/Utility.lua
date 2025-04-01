@@ -1,9 +1,9 @@
 if (not Utility_lua)
 then
     Utility_lua = true
-
     Include("Runtime.lua")
-
+    Include("Version.lua")
+    Version:set("Utility", { 1, 5, 1 })
     Utility = {}
 
     ---等概率随机正负方向。

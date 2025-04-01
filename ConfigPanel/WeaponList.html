@@ -10,13 +10,21 @@
 </head>
 <body>
 
-<h1>挂机武器配置面板</h1>
+<h1>武器</h1>
 
 <div>
+    <ul>
+        <li>集成工具支持两种挂机模式：默认模式和扩展模式。在本配置面板中，可以同时针对这两种挂机模式进行配置，最后以 Lua 源码形式导出一份武器列表配置文件，其中包含对默认模式和扩展模式的配置；</li>
+        <li>此配置界面对应于集成工具版本 v1.5.2，支持导入 v1.4.x 及先前版本武器列表文件，并导出为 v1.5.x 版本工具使用的武器列表文件；</li>
+        <li>定制武器的模板会时常更新。</li>
+    </ul>
+</div>
+
 <h2>挂机模式</h2>
-<p>说明：集成工具支持两种挂机模式：默认模式和扩展模式。在本配置面板中，可以同时针对这两种挂机模式进行配置，最后以 Lua 源码形式导出一份武器列表配置文件，其中包含对默认模式和扩展模式的配置。</p>
-<input type="radio" name="idle_mode" value="default" onclick="SelectMode('default')" checked /><label>默认模式</label>
-<input type="radio" name="idle_mode" value="extended" onclick="SelectMode('extended')" /><label>扩展模式</label>
+<div>
+    <p>选择需要配置的挂机模式，两种模式共享护甲配置，其余武器装备的配置完全独立。</p>
+    <input type="radio" name="idle_mode" value="default" onclick="SelectMode('default')" checked /><label>默认模式</label>
+    <input type="radio" name="idle_mode" value="extended" onclick="SelectMode('extended')" /><label>扩展模式</label>
 </div>
 
 <div id="armor">
@@ -70,7 +78,12 @@
 <button id="export" class="export">导出</button>
 
 </body>
+
+<!-- 依赖 -->
 <script src="scripts/luaparse.js"></script>
+<script src="scripts/Export.js"></script>
+<script src="scripts/Version.js"></script>
+    
 <script>
     function SelectMode(mode) {
         switch (mode) {
@@ -250,18 +263,21 @@ function __impl_import(content) {
 }
 
 document.getElementById("export").onclick = async () => {
-    let lua_snippet = "if not WeaponList_lua\n" +
+    let weapon_list = "if not WeaponList_lua\n" +
         "then\n" +
-        "\tWeaponList_lua = true\n"
+        "\tWeaponList_lua = true\n" +
+        `\tInclude("Version.lua")\n` +
+        `\tVersion:set("WeaponList", ${g_Version})\n` +
+        `\tVersion:require("WeaponList", "Setting", { 1, 5, 2 })\n`
     if (g_Armor) {
-        lua_snippet += `\tArmor = ${g_Armor.generate('\t', 1, false)}\n`
+        weapon_list += `\tArmor = ${g_Armor.generate('\t', 1, false)}\n`
     }
 
     let DefaultPartWeapons = []
     g_DefaultPartWeapons.forEach((v) => {
         DefaultPartWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tDefaultPartWeapons = {\n` +
+    weapon_list += `\tDefaultPartWeapons = {\n` +
         `${DefaultPartWeapons.join(",\n")}\n` +
         `\t}\n`
 
@@ -269,7 +285,7 @@ document.getElementById("export").onclick = async () => {
     g_DefaultConventionalWeapons.forEach((v) => {
         DefaultConventionalWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tDefaultConventionalWeapons = {\n` +
+    weapon_list += `\tDefaultConventionalWeapons = {\n` +
         `${DefaultConventionalWeapons.join(",\n")}\n` +
         `\t}\n`
     
@@ -277,7 +293,7 @@ document.getElementById("export").onclick = async () => {
     g_DefaultSpecialWeapons.forEach((v) => {
         DefaultSpecialWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tDefaultSpecialWeapons = {\n` +
+    weapon_list += `\tDefaultSpecialWeapons = {\n` +
         `${DefaultSpecialWeapons.join(",\n")}\n` +
         `\t}\n`
 
@@ -286,7 +302,7 @@ document.getElementById("export").onclick = async () => {
     g_ExtendedPartWeapons.forEach((v) => {
         ExtendedPartWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tExtendedPartWeapons = {\n` +
+    weapon_list += `\tExtendedPartWeapons = {\n` +
         `${ExtendedPartWeapons.join(",\n")}\n` +
         `\t}\n`
 
@@ -294,7 +310,7 @@ document.getElementById("export").onclick = async () => {
     g_ExtendedConventionalWeapons.forEach((v) => {
         ExtendedConventionalWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tExtendedConventionalWeapons = {\n` +
+    weapon_list += `\tExtendedConventionalWeapons = {\n` +
         `${ExtendedConventionalWeapons.join(",\n")}\n` +
         `\t}\n`
 
@@ -302,28 +318,12 @@ document.getElementById("export").onclick = async () => {
     g_ExtendedSpecialWeapons.forEach((v) => {
         ExtendedSpecialWeapons.push(v.generate('\t', 2, true))
     })
-    lua_snippet += `\tExtendedSpecialWeapons = {\n` +
+    weapon_list += `\tExtendedSpecialWeapons = {\n` +
         `${ExtendedSpecialWeapons.join(",\n")}\n` +
         `\t}\n`
 
-    lua_snippet += "end"
-    try {
-        const hFile = await window.showSaveFilePicker({
-            suggestedName: "WeaponList",
-            types: [{
-                description: "Lua source file",
-                accept: {
-                    'text/plain': ['.lua']
-                }
-            }]
-        });
-        const ofstream = await hFile.createWritable();
-        await ofstream.write(lua_snippet);
-        await ofstream.close();
-    } catch (e) {
-        console.log(e);
-    }
-
+    weapon_list += "end"
+    Export("WeaponList.lua", weapon_list)
 }
 </script>
 </html>

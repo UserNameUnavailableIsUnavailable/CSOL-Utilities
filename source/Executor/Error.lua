@@ -1,8 +1,9 @@
 if not Error_lua
 then
     Error_lua = true
-
     Include("JSON.lua")
+    Include("Version.lua")
+    Version:set("Error", { 1, 5, 1 })
 
     ---@class Error
     ---@field name string 错误名称

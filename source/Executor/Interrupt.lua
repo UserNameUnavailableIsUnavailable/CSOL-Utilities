@@ -3,6 +3,8 @@ then
     Interrupt_lua = true
 
     Include("Error.lua")
+    Include("Version.lua")
+    Version:set("Interrupt", { 1, 5, 1 })
 
     ---@class Interrupt
     Interrupt = {}

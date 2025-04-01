@@ -22,8 +22,10 @@ export const AST_NODE_BINARY_EXPRESSION = "BinaryExpression"
 export const AST_NODE_STRING_LITERAL = "StringLiteral"
 export const AST_NODE_NUMERIC_LITERAL = "NumericLiteral"
 export const AST_NODE_BOOLEAN_LITERAL = "BooleanLiteral"
+export const AST_NODE_VARARG_LITERAL = "VarargLiteral"
 export const AST_NODE_NIL_LITERAL = "NilLiteral"
 export const AST_NODE_TABLE_CALL_EXPRESSION = "TableCallExpression"
+export const AST_NODE_STRING_CALL_EXPRESSION = "StringCallExpression"
 export const AST_NODE_MEMBER_EXPRESSION = "MemberExpression"
 export const AST_NODE_INDEX_EXPRESSION = "IndexExpression"
 export const AST_NODE_FUNCTION_DECLARATION = "FunctionDeclaration"
@@ -117,11 +119,17 @@ export function GenerateLuaCodeFromAST(ast, indent_level: number = 0, first_line
         case AST_NODE_BOOLEAN_LITERAL:
             ret = generate_boolean_literal(ast, indent_level)
             break
+        case AST_NODE_VARARG_LITERAL:
+            ret = generate_vararg_literal(ast, indent_level)
+            break
         case AST_NODE_NIL_LITERAL:
             ret = generate_nil_literal(ast, indent_level)
             break
         case AST_NODE_TABLE_CALL_EXPRESSION:
             ret = generate_table_call_expression(ast, indent_level)
+            break
+        case AST_NODE_STRING_CALL_EXPRESSION:
+            ret = generate_string_call_expression(ast, indent_level)
             break
         case AST_NODE_MEMBER_EXPRESSION:
             ret = generate_member_expression(ast, indent_level)
@@ -344,6 +352,12 @@ function generate_boolean_literal(ast, indent_level): string {
     return ast.raw
 }
 
+function generate_vararg_literal(ast, indent_level): string {
+    if (ast.type != AST_NODE_VARARG_LITERAL) {
+        throw new ASTTypeError(AST_NODE_VARARG_LITERAL, ast)
+    }
+    return ast.raw
+}
 function generate_nil_literal(ast, indent_level): string {
     if (ast.type != AST_NODE_NIL_LITERAL) {
         throw new ASTTypeError(AST_NODE_NIL_LITERAL, ast)
@@ -356,6 +370,13 @@ function generate_table_call_expression(ast, indent_level): string {
         throw new ASTTypeError(AST_NODE_TABLE_CALL_EXPRESSION, ast)
     }
     return `${GenerateLuaCodeFromAST(ast.base, indent_level)}${GenerateLuaCodeFromAST(ast.arguments, indent_level)}`
+}
+
+function generate_string_call_expression(ast, indent_level): string {
+    if (ast.type != AST_NODE_STRING_CALL_EXPRESSION) {
+        throw new ASTTypeError(AST_NODE_TABLE_CALL_EXPRESSION, ast)
+    }
+    return `${GenerateLuaCodeFromAST(ast.base, indent_level)}${GenerateLuaCodeFromAST(ast.argument, indent_level)}`
 }
 
 function generate_member_expression(ast, indent_level): string {
