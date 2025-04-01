@@ -7,7 +7,7 @@ if (-not $PROJECT_PATH.EndsWith("/"))
 }
 $code = @"
 PATH = "{0}"
----加载 LUA 源文件。
+---引入模块。
 ---@param file_name string 文件名（相对路径）。
 function Include(file_name)
     if (type(file_name) == "string")
@@ -15,7 +15,7 @@ function Include(file_name)
         dofile(PATH .. file_name)
     end
 end
-Include("Main.lua")
+Include("Main.lua") -- 加载入口函数
 Main()
 "@
 $file = New-Item -Type File -Path "$PSScriptRoot\Executor.lua" -Force # 创建 Executor.lua

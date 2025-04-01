@@ -1,2 +1,3 @@
 CompileFlags:
-    Add: [--include-directory=C:/Users/Silve/Develop/CSOL-Utilities/source/include]
+    Add: [-std=c++20, --include-directory=C:/Users/Silver/Develop/CSOL-Utilities/source/Controller/include, -IC:/toolchain/MSYS2/ucrt64/include/opencv4]
+    Compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/clang++.exe

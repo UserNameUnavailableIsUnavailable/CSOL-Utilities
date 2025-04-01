@@ -1,37 +1,33 @@
 ﻿#pragma once
 
-#include <cstdio>
-#include <exception>
 #include <sal.h>
-#include <string>
-#include <CSOL_Utilities.hpp>
+#include <exception>
+#include <cstdio>
 
 namespace CSOL_Utilities
 {
-class Exception : public std::exception
-{
-public:
-    Exception(const char *detail) : m_Level(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR)
+    class Exception : public std::exception
     {
-        strcpy_s(m_Detail, detail);
-    }
-    template <typename... VARARG> Exception(_Printf_format_string_ const char* fmt, VARARG... args) :
-        m_Level(CSOL_UTILITIES_MESSAGE_LEVEL::CUML_ERROR)
-    {
-        std::snprintf(m_Detail, sizeof(m_Detail), fmt, args...);
-    }
-    template <typename... VARARG> Exception(CSOL_UTILITIES_MESSAGE_LEVEL level, _Printf_format_string_ const char *fmt, VARARG... args) :
-        m_Level(level)
-    {
-        std::snprintf(m_Detail, sizeof(m_Detail), fmt, args...);
-    }
-	  CSOL_UTILITIES_MESSAGE_LEVEL GetLevel() const { return m_Level; }
-    const char *what() const noexcept override
-    {
-        return m_Detail;
+    public:
+        // 构造异常对象
+        explicit Exception(const char *detail)
+        {
+            strcpy_s(m_detail, detail);
+        }
+
+        // 用格式化字符串的方式构造异常对象
+        template <typename... VARARG>
+        explicit Exception(_Printf_format_string_ const char* fmt, VARARG... args)
+        {
+            std::snprintf(m_detail, sizeof(m_detail), fmt, args...);
+        }
+
+
+        const char *what() const noexcept override
+        {
+            return m_detail;
+        };
+        private:
+        char m_detail[512];
     };
-    private:
-      CSOL_UTILITIES_MESSAGE_LEVEL m_Level;
-	char m_Detail[512];
-};
 }; // namespace CSOL_Utilities

@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <mutex>
+#include "Command.hpp"
 #include "ExecutorCommand.hpp"
 
 namespace CSOL_Utilities
@@ -20,7 +21,7 @@ class Messenger
     void Dispatch(const ExecutorCommand& ec) noexcept;
     void DispatchNOP() noexcept;
   private:
-    static constexpr const char *QueryCommandString(EXECUTOR_COMMAND cmd) noexcept;
+    static constexpr const char *QueryCommandString(COMMAND cmd) noexcept;
     std::filesystem::path m_CommandFile;
     std::ofstream m_FileStream;
     const char *m_CommandString;

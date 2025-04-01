@@ -96,6 +96,18 @@
     <ClCompile Include="source\Controller\WindowCapture.cpp">
       <Filter>Controller</Filter>
     </ClCompile>
+    <ClCompile Include="LGHUB_Agent_Debugger.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="InGameStateRecognizer.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="Commander.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="GameProcessDetector.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\include\CLI11.hpp">
@@ -138,6 +150,15 @@
       <Filter>Controller\include</Filter>
     </ClInclude>
     <ClInclude Include="source\include\WindowCapture.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="InGameStateRecognizer.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Commander.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="GameProcessDetector.hpp">
       <Filter>Controller\include</Filter>
     </ClInclude>
   </ItemGroup>

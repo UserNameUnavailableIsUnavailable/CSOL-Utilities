@@ -7,5 +7,5 @@ function Include(file_name)
         dofile(PATH .. file_name)
     end
 end
-Include("Main.lua")
+Include("Main.lua") -- 加载入口函数
 Main()

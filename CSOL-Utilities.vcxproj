@@ -185,6 +185,10 @@
     <None Include="source\Weapon.html" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Commander.cpp" />
+    <ClCompile Include="GameProcessDetector.cpp" />
+    <ClCompile Include="LGHUB_Agent_Debugger.cpp" />
+    <ClCompile Include="InGameStateRecognizer.cpp" />
     <ClCompile Include="source\Controller\AutoPlayStateMachine.cpp" />
     <ClCompile Include="source\Controller\Console.cpp" />
     <ClCompile Include="source\Controller\Controller.cpp" />
@@ -199,6 +203,9 @@
     <ClCompile Include="source\Controller\WindowCapture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Commander.hpp" />
+    <ClInclude Include="GameProcessDetector.hpp" />
+    <ClInclude Include="InGameStateRecognizer.hpp" />
     <ClInclude Include="source\include\aho_corasick\aho_corasick.hpp" />
     <ClInclude Include="source\include\Console.hpp" />
     <ClInclude Include="source\include\Controller.hpp" />

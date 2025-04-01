@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Event.hpp"
 #include "InGameState.hpp"
+#include "Command.hpp"
 #include "Messenger.hpp"
 #include "CSOL_Utilities.hpp"
 #include "OCR/OcrLiteCApi.h"
@@ -79,8 +80,8 @@ class Controller
     Event m_FixedCommandDispatcherSwitch{};
     std::thread m_FixedCommandDispatcher{};
     Event m_FixedCommandDispatcherFinished{};
-    EXECUTOR_COMMAND m_PeriodicCommand;
-    static void DispatchFixedCommand(EXECUTOR_COMMAND& command) noexcept;
+    COMMAND m_PeriodicCommand;
+    static void DispatchFixedCommand(COMMAND& command) noexcept;
     OCR_HANDLE m_hOcr = nullptr;
 };
 }; // namespace CSOL_Utilities

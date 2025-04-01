@@ -8,18 +8,28 @@ export DOCS = $(ROOT)/documents
 export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL-Utilities
-VERSION = v1.5.1
+MAIN_VERSION = 1
+SUB_VERSION = 5
+REVISION_VERSION = 2
+VERSION = v$(MAIN_VERSION).$(SUB_VERSION).$(REVISION_VERSION)
 
 ARCH = x86_64
 
-MODULES = Controller Documents Executor Ps1 Web
+MODULES = Controller Documents Executor Ps1 Web ConfigPanel
 VPATH = source
-TEST_UNIT := check_file
+TEST_UNIT := module
 
 .PHONY: $(MODULES) all
 
 # link everything
 all: MODULES
+
+ConfigPanel:
+	tsc -p "$(ROOT)/ConfigPanel"
+	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/assets"
+	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/styles","$(ROOT)/ConfigPanel/weapon_templates"
+	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
+	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
 Ps1:
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Install.ps1 -Force
 	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
@@ -40,8 +50,6 @@ Documents:
 	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
-Panel:
-	Copy-Item -Destination $(BUILD) -Path ConfigPanel -Recurse -Force
 Pack:
 	Out-File -FilePath $(BUILD)/VERSION.txt -InputObject "$(VERSION)"
 	Copy-Item -Force -Destination $(BUILD)/pack -Path $(BUILD)/VERSION.txt

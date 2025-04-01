@@ -34,6 +34,7 @@
         "EnablePrimaryMouseButtonEvents",
         "SetSteeringWheelProperty"
     ],
-    "clangd.path": "C:\\toolchain\\MSYS2\\clang64\\bin\\clangd.exe",
-    "vscode-neovim.neovimExecutablePaths.win32": "C:\\toolchain\\MSYS2\\clang64\\bin\\nvim.exe"
+    "clangd.path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64\\bin\\clangd.exe",
+    "vscode-neovim.neovimExecutablePaths.win32": "nvim",
+    "editor.fontFamily": "\"Cascadia Mono NF\", \"Cascadia Next SC\""
 }

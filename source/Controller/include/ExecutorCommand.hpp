@@ -12,7 +12,7 @@ private:
     static std::mutex s_Mutex;
     static std::uint64_t s_Counter;
     std::uint64_t m_Id = 0;
-    EXECUTOR_COMMAND m_Cmd = EXECUTOR_COMMAND::CMD_NOP;
+    COMMAND m_Cmd = COMMAND::CMD_NOP;
     std::time_t m_CmdTimepoint = 0;
     std::time_t m_LastAllocationTimepoint = 0;
     bool m_bRepeatable = false; /* 是否为可重复类型 */
@@ -41,6 +41,6 @@ public:
     {
         m_bRepeatable = repeatable;
     }
-    bool Set(EXECUTOR_COMMAND cmd, std::time_t cmd_timepoint);
+    bool Set(COMMAND cmd, std::time_t cmd_timepoint);
 };
 }
