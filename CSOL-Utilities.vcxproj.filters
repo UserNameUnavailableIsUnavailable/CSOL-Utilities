@@ -17,20 +17,6 @@
     <Filter Include="Web Pages\Resources\Assets">
       <UniqueIdentifier>{492b6772-48e5-41d5-bda2-d28ed4952c61}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Executor">
-      <UniqueIdentifier>{0a05edc7-d851-468e-8858-e386c59d6903}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Executor\Modules">
-      <UniqueIdentifier>{eb8e9572-77f8-4e68-879f-50e1823557f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Controller">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Controller\include">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Docs">
       <UniqueIdentifier>{808aaf2c-bd47-4fc6-8136-8f6656d728c7}</UniqueIdentifier>
     </Filter>
@@ -49,118 +35,30 @@
     <Filter Include="Docs\Assets\Update">
       <UniqueIdentifier>{69256ed6-2298-4be4-aa94-11a6014b849f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Lib">
-      <UniqueIdentifier>{d94e42a2-6af7-46a1-94a7-42344385e748}</UniqueIdentifier>
+    <Filter Include="Controller">
+      <UniqueIdentifier>{e8876dc1-781c-46ef-a6db-490aedb95390}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies">
-      <UniqueIdentifier>{60ea6ea4-65db-4a61-b274-720c9f6af603}</UniqueIdentifier>
+    <Filter Include="dependencies">
+      <UniqueIdentifier>{50cf7e84-5e7a-452f-8654-320d83e56b21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies\Models">
-      <UniqueIdentifier>{ed6ac99a-0ad8-4101-ad95-4ad48830e0cf}</UniqueIdentifier>
+    <Filter Include="Controller\include">
+      <UniqueIdentifier>{f40d7221-7925-41cd-a863-21605c7fa553}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="source\controller\AutoPlayStateMachine.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\controller\DispatchFixedCommand.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\controller\ExecutorCommand.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\controller\Main.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\controller\WatchGameProcess.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\BasicUtilities.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\Console.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\Controller.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\DateTime.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\Messenger.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\EventHandler.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Controller\WindowCapture.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="LGHUB_Agent_Debugger.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="InGameStateRecognizer.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="Commander.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="GameProcessDetector.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="source\include\CLI11.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\CSOL_Utilities.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\ExecutorCommand.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\aho_corasick\aho_corasick.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\ocr\OcrLiteCApi.h">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\Console.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\Controller.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\DateTime.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\Event.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\EventList.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\Exception.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\InGameState.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\Messenger.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\include\WindowCapture.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="InGameStateRecognizer.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="Commander.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
-    <ClInclude Include="GameProcessDetector.hpp">
-      <Filter>Controller\include</Filter>
-    </ClInclude>
+    <Filter Include="Controller\implementation">
+      <UniqueIdentifier>{c7183b53-c3fc-4567-a15f-0602dd1298cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\include">
+      <UniqueIdentifier>{26d41b0e-c3c3-49cc-8456-b97285015fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\include\aho_corasick">
+      <UniqueIdentifier>{801753df-f26d-4c27-8de5-cdffcb82fe94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\include\onxxruntime">
+      <UniqueIdentifier>{f1a108a3-ca99-480b-bd24-f770b7cbb645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\implmentation">
+      <UniqueIdentifier>{f526137e-6c9a-4563-aac1-dbb9ec6de7bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".EditorConfig">
@@ -196,60 +94,6 @@
     <None Include="source\Setting.html">
       <Filter>Web Pages</Filter>
     </None>
-    <None Include="source\Executor\WeaponList.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Weapon.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Utility.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Start.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Setting.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Runtime.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Player.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Mouse.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Keyboard.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Global.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Executor.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Delay.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\DateTime.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Context.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Console.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\Command.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Executor\$~cmd.lua">
-      <Filter>Executor\Modules</Filter>
-    </None>
-    <None Include="source\Main.lua">
-      <Filter>Executor</Filter>
-    </None>
     <None Include="docs\chapter_00.tex">
       <Filter>Docs</Filter>
     </None>
@@ -277,30 +121,12 @@
     <None Include="docs\main.tex">
       <Filter>Docs</Filter>
     </None>
-    <None Include="dependencies\msvcp140.dll">
-      <Filter>Dependencies</Filter>
-    </None>
-    <None Include="dependencies\RapidOcrOnnx.dll">
-      <Filter>Dependencies</Filter>
-    </None>
-    <None Include="dependencies\vcruntime140.dll">
-      <Filter>Dependencies</Filter>
-    </None>
-    <None Include="dependencies\vcruntime140_1.dll">
-      <Filter>Dependencies</Filter>
-    </None>
-    <None Include="dependencies\models\ch_ppocr_mobile_v2.0_cls_infer_model.onnx">
-      <Filter>Dependencies\Models</Filter>
-    </None>
-    <None Include="dependencies\models\ch_PP-OCRv4_det_infer.onnx">
-      <Filter>Dependencies\Models</Filter>
-    </None>
-    <None Include="dependencies\models\ch_PP-OCRv4_rec_infer.onnx">
-      <Filter>Dependencies\Models</Filter>
-    </None>
     <None Include=".clang-format">
       <Filter>Config</Filter>
     </None>
+    <None Include="vcpkg.json" />
+    <None Include="vcpkg-configuration.json" />
+    <None Include="Controller.cmake" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="source\ConfigWebPages\assets\auto_fill.png">
@@ -722,13 +548,145 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\RapidOcrOnnx.lib">
-      <Filter>Lib</Filter>
-    </Library>
+    <ClCompile Include="Controller\implementation\Command.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\CommandDispatcher.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Console.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\CRNN.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\DBNet.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Driver.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Global.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\HotKey.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\IdleEngine.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Main.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\OCR.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\OCRIdleEngine.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Utilities.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\OCRUtilities.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\Test.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependencies\implementation\clipper.cpp">
+      <Filter>dependencies\implmentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\implementation\LowLevelKeyboardHook.cpp">
+      <Filter>Controller\implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dependencies\models\ppocr_keys_v1.txt">
-      <Filter>Dependencies\Models</Filter>
-    </Text>
+    <ClInclude Include="Controller\include\Command.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\CommandDispatcher.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Console.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Driver.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Event.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Exception.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Global.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\HotKey.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\IdleEngine.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Module.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\OCR.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\OCRIdleEngine.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Utilities.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\aho_corasick\aho_corasick.hpp">
+      <Filter>dependencies\include\aho_corasick</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\cpu_provider_factory.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_c_api.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_api.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_inline.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_float16.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_lite_custom_op.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_run_options_config_keys.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_session_options_config_keys.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_c_api.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_api.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_inline.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\onnxruntime\provider_options.h">
+      <Filter>dependencies\include\onxxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\include\clipper\clipper.hpp">
+      <Filter>dependencies\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\LowLevelKeyboardHook.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
 </Project>

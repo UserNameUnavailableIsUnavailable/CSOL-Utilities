@@ -102,7 +102,7 @@ if not Automation_lua then
             Command:update() -- 更新命令
             Runtime.last_command_update_timepoint = Runtime:get_running_time()
             -- 命令类型发生变化，需要立即停止当前执行
-            if (Command:get_status() & Command.NAME_CHANGED) == Command.NAME_CHANGED then
+            if (Command:get_status() & Command.TYPE_CHANGED) == Command.TYPE_CHANGED then
                 Mouse:reset()
                 Keyboard:reset()
                 Automation.default_player:reset()

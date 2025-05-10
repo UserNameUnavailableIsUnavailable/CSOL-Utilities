@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
+    <ProjectConfiguration Include="Controller|x64">
+      <Configuration>Controller</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -15,6 +11,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test|x64">
+      <Configuration>Test</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -25,16 +25,6 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -45,16 +35,18 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Controller|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -62,91 +54,149 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Controller|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)build\</OutDir>
-    <IntDir>$(SolutionDir)build\Controller\</IntDir>
+    <IncludePath>dependencies\include;Controller\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)build\Controller</OutDir>
+    <IntDir>$(SolutionDir)build\Controller\Debug</IntDir>
     <TargetName>Controller</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <ExternalIncludePath>
+    </ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)build\Controller\Release</IntDir>
+    <OutDir>$(SolutionDir)build\Controller</OutDir>
+    <TargetName>Controller</TargetName>
+    <IncludePath>dependencies\include;Controller\include;$(IncludePath)</IncludePath>
+    <ExternalIncludePath />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Controller|x64'">
+    <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)build\Controller\</IntDir>
     <OutDir>$(SolutionDir)build\</OutDir>
     <TargetName>Controller</TargetName>
+    <IncludePath>dependencies\include;Controller\include;$(IncludePath)</IncludePath>
+    <ExternalIncludePath />
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <OutDir>$(SolutionDir)build\Test\</OutDir>
+    <IntDir>$(SolutionDir)build\Test\</IntDir>
+    <TargetName>Test</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgInstalledDir>$(ProjectDir)vcpkg_installed</VcpkgInstalledDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
+    <VcpkgInstalledDir>$(ProjectDir)vcpkg_installed</VcpkgInstalledDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgInstalledDir>$(ProjectDir)vcpkg_installed</VcpkgInstalledDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Controller|x64'" Label="Vcpkg">
+    <VcpkgInstalledDir>$(ProjectDir)vcpkg_installed</VcpkgInstalledDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)\$(VcpkgTriplet)\include;$(VcpkgInstalledDir)\$(VcpkgTriplet)\include\opencv4;$(ProjectDir)dependencies\include;$(ProjectDir)Controller\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8</AdditionalOptions>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(SolutionDir)lib\RapidOcrOnnx.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\lib\onnxruntime.lib;%(AdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>Level3</WarningLevel>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Controller\locales" "$(OutDir)locales" /s /e /i /y
+xcopy "$(SolutionDir)Dependencies\lib\*.dll" "$(OutDir)" /y
+xcopy "$(SolutionDir)Models" "$(OutDir)Models" /s /e /i /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Test__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)\$(VcpkgTriplet)\include;$(VcpkgInstalledDir)\$(VcpkgTriplet)\include\opencv4;$(ProjectDir)dependencies\include;$(ProjectDir)Controller\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8</AdditionalOptions>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)lib\RapidOcrOnnx.lib;kernel32.lib;user32.lib;shell32.lib;gdi32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dependencies\Ort\lib\onnxruntime.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Controller|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)\$(VcpkgTriplet)\include;$(VcpkgInstalledDir)\$(VcpkgTriplet)\include\opencv4;$(ProjectDir)dependencies\include;$(ProjectDir)Controller\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8</AdditionalOptions>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>dependencies\Ort\lib\onnxruntime.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>Test__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)\$(VcpkgTriplet)\include;$(VcpkgInstalledDir)\$(VcpkgTriplet)\include\opencv4;$(ProjectDir)dependencies\include;$(ProjectDir)Controller\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8</AdditionalOptions>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dependencies\Ort\lib\onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
     <None Include=".clangd" />
     <None Include=".EditorConfig" />
-    <None Include="dependencies\models\ch_PP-OCRv4_det_infer.onnx" />
-    <None Include="dependencies\models\ch_PP-OCRv4_rec_infer.onnx" />
-    <None Include="dependencies\models\ch_ppocr_mobile_v2.0_cls_infer_model.onnx" />
-    <None Include="dependencies\msvcp140.dll" />
-    <None Include="dependencies\RapidOcrOnnx.dll" />
-    <None Include="dependencies\vcruntime140.dll" />
-    <None Include="dependencies\vcruntime140_1.dll" />
+    <None Include="Controller.cmake" />
     <None Include="docs\chapter_00.tex" />
     <None Include="docs\chapter_01.tex" />
     <None Include="docs\chapter_02.tex" />
@@ -163,63 +213,10 @@
     <None Include="source\ConfigWebPages\PopUpImage.js" />
     <None Include="source\ConfigWebPages\ToggleElement.js" />
     <None Include="source\ConfigWebPages\WeaponCodeGeneration.js" />
-    <None Include="source\Executor\$~cmd.lua" />
-    <None Include="source\Executor\Command.lua" />
-    <None Include="source\Executor\Console.lua" />
-    <None Include="source\Executor\Context.lua" />
-    <None Include="source\Executor\DateTime.lua" />
-    <None Include="source\Executor\Delay.lua" />
-    <None Include="source\Executor\Executor.lua" />
-    <None Include="source\Executor\Global.lua" />
-    <None Include="source\Executor\Keyboard.lua" />
-    <None Include="source\Executor\Mouse.lua" />
-    <None Include="source\Executor\Player.lua" />
-    <None Include="source\Executor\Runtime.lua" />
-    <None Include="source\Executor\Setting.lua" />
-    <None Include="source\Executor\Start.lua" />
-    <None Include="source\Executor\Utility.lua" />
-    <None Include="source\Executor\Weapon.lua" />
-    <None Include="source\Executor\WeaponList.lua" />
-    <None Include="source\Main.lua" />
     <None Include="source\Setting.html" />
     <None Include="source\Weapon.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Commander.cpp" />
-    <ClCompile Include="GameProcessDetector.cpp" />
-    <ClCompile Include="LGHUB_Agent_Debugger.cpp" />
-    <ClCompile Include="InGameStateRecognizer.cpp" />
-    <ClCompile Include="source\Controller\AutoPlayStateMachine.cpp" />
-    <ClCompile Include="source\Controller\Console.cpp" />
-    <ClCompile Include="source\Controller\Controller.cpp" />
-    <ClCompile Include="source\Controller\DateTime.cpp" />
-    <ClCompile Include="source\Controller\Messenger.cpp" />
-    <ClCompile Include="source\Controller\DispatchFixedCommand.cpp" />
-    <ClCompile Include="source\Controller\ExecutorCommand.cpp" />
-    <ClCompile Include="source\Controller\EventHandler.cpp" />
-    <ClCompile Include="source\Controller\Main.cpp" />
-    <ClCompile Include="source\Controller\WatchGameProcess.cpp" />
-    <ClCompile Include="source\Controller\BasicUtilities.cpp" />
-    <ClCompile Include="source\Controller\WindowCapture.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Commander.hpp" />
-    <ClInclude Include="GameProcessDetector.hpp" />
-    <ClInclude Include="InGameStateRecognizer.hpp" />
-    <ClInclude Include="source\include\aho_corasick\aho_corasick.hpp" />
-    <ClInclude Include="source\include\Console.hpp" />
-    <ClInclude Include="source\include\Controller.hpp" />
-    <ClInclude Include="source\include\DateTime.hpp" />
-    <ClInclude Include="source\include\Event.hpp" />
-    <ClInclude Include="source\include\EventList.hpp" />
-    <ClInclude Include="source\include\Exception.hpp" />
-    <ClInclude Include="source\include\InGameState.hpp" />
-    <ClInclude Include="source\include\CLI11.hpp" />
-    <ClInclude Include="source\include\Messenger.hpp" />
-    <ClInclude Include="source\include\CSOL_Utilities.hpp" />
-    <ClInclude Include="source\include\ExecutorCommand.hpp" />
-    <ClInclude Include="source\include\OCR\OcrLiteCApi.h" />
-    <ClInclude Include="source\include\WindowCapture.hpp" />
+    <None Include="vcpkg-configuration.json" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="docs\assets\advanced\change_max_wait_time_in_room_0.png" />
@@ -363,10 +360,56 @@
     <Image Include="source\ConfigWebPages\assets\zs_esc_cancel.png" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\RapidOcrOnnx.lib" />
+    <ClCompile Include="Controller\implementation\Command.cpp" />
+    <ClCompile Include="Controller\implementation\CommandDispatcher.cpp" />
+    <ClCompile Include="Controller\implementation\Console.cpp" />
+    <ClCompile Include="Controller\implementation\CRNN.cpp" />
+    <ClCompile Include="Controller\implementation\DBNet.cpp" />
+    <ClCompile Include="Controller\implementation\Driver.cpp" />
+    <ClCompile Include="Controller\implementation\Global.cpp" />
+    <ClCompile Include="Controller\implementation\HotKey.cpp" />
+    <ClCompile Include="Controller\implementation\IdleEngine.cpp" />
+    <ClCompile Include="Controller\implementation\LowLevelKeyboardHook.cpp" />
+    <ClCompile Include="Controller\implementation\Main.cpp" />
+    <ClCompile Include="Controller\implementation\OCR.cpp" />
+    <ClCompile Include="Controller\implementation\OCRIdleEngine.cpp" />
+    <ClCompile Include="Controller\implementation\OCRUtilities.cpp" />
+    <ClCompile Include="Controller\implementation\Test.cpp" />
+    <ClCompile Include="Controller\implementation\Utilities.cpp" />
+    <ClCompile Include="Dependencies\implementation\clipper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dependencies\models\ppocr_keys_v1.txt" />
+    <ClInclude Include="Controller\include\Command.hpp" />
+    <ClInclude Include="Controller\include\CommandDispatcher.hpp" />
+    <ClInclude Include="Controller\include\Console.hpp" />
+    <ClInclude Include="Controller\include\Driver.hpp" />
+    <ClInclude Include="Controller\include\Event.hpp" />
+    <ClInclude Include="Controller\include\Exception.hpp" />
+    <ClInclude Include="Controller\include\Global.hpp" />
+    <ClInclude Include="Controller\include\HotKey.hpp" />
+    <ClInclude Include="Controller\include\IdleEngine.hpp" />
+    <ClInclude Include="Controller\include\LowLevelKeyboardHook.hpp" />
+    <ClInclude Include="Controller\include\Module.hpp" />
+    <ClInclude Include="Controller\include\OCR.hpp" />
+    <ClInclude Include="Controller\include\OCRIdleEngine.hpp" />
+    <ClInclude Include="Controller\include\Utilities.hpp" />
+    <ClInclude Include="Dependencies\include\aho_corasick\aho_corasick.hpp" />
+    <ClInclude Include="Dependencies\include\clipper\clipper.hpp" />
+    <ClInclude Include="Dependencies\include\onnxruntime\cpu_provider_factory.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_api.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_inline.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_c_api.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_float16.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_lite_custom_op.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_run_options_config_keys.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_session_options_config_keys.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_api.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_inline.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_c_api.h" />
+    <ClInclude Include="Dependencies\include\onnxruntime\provider_options.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,12 +20,12 @@ if not Command_lua then
     Command.status = 0
     Command.UNCHANGED = 0 -- 与上次相比，命令未发生更新
     Command.IDENTIFIER_CHANGED = 0x1 -- 与上次相比，命令标识符发生变化
-    Command.NAME_CHANGED = 0x2 -- 与上次相比，命令的类型发生变化
+    Command.TYPE_CHANGED = 0x2 -- 与上次相比，命令的类型发生变化
     Command.TIMEPOINT_CHANGED = 0x4 -- 与上次相比，命令的时间戳发生变化
     Command.REPEATABILITY_CHANGED = 0x8 -- 与上次相比，命令可重复性发生变化
 
     Command.id = 0
-    Command.name = Command.CMD_NOP
+    Command.type = Command.CMD_NOP
     Command.timepoint = 0
     Command.repeatable = true
     Command.finished = false -- 命令是否执行结束，注意对于可重复执行的命令，此字段一直保持为 `false`
@@ -39,16 +39,16 @@ if not Command_lua then
         local status = 0
         pcall(Include, "$~cmd.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
         CmdId = CmdId or 0
-        CmdName = CmdName or Command.CMD_NOP
+        CmdType = CmdType or Command.CMD_NOP
         CmdTimepoint = CmdTimepoint or 0
         if CmdId ~= self.id then
             self.id = CmdId
             self.finished = false -- 新的命令
             status = status | Command.IDENTIFIER_CHANGED
         end
-        if CmdName ~= self.name then
-            self.name = CmdName
-            status = status | Command.NAME_CHANGED
+        if CmdName ~= self.type then
+            self.type = CmdName
+            status = status | Command.TYPE_CHANGED
         end
         if CmdTimepoint ~= self.timepoint then
             self.timepoint = CmdTimepoint
@@ -87,7 +87,7 @@ if not Command_lua then
     ---领取待执行命令。
     function Command:claim()
         if self:is_valid() then
-            return self.name
+            return self.type
         end
         return Command.NOP
     end

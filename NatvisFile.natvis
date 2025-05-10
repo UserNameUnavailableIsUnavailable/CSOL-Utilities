@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="std::basic_string&lt;char, *&gt;" Priority="High">
+        <DisplayString Condition="_Mypair._Myval2._Myres &lt; _Mypair._Myval2._BUF_SIZE">{_Mypair._Myval2._Bx._Buf,s8}</DisplayString>
+        <DisplayString Condition="_Mypair._Myval2._Myres >= _Mypair._Myval2._BUF_SIZE">{_Mypair._Myval2._Bx._Ptr,s8}</DisplayString>
+        <StringView Condition="_Mypair._Myval2._Myres &gt; _Mypair._Myval2._BUF_SIZE">_Mypair._Myval2._Bx._Buf,s8</StringView>
+        <StringView Condition="_Mypair._Myval2._Myres >= _Mypair._Myval2._BUF_SIZE">_Mypair._Myval2._Bx._Ptr,s8</StringView>
+    </Type>
+</AutoVisualizer>

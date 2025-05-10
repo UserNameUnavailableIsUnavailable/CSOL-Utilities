@@ -1,5 +1,7 @@
-.vs/
-.VSCodeCounter/
-build/
-test/
-.venv/
+/.vs/
+/.venv/
+/.VSCodeCounter/
+/vcpkg_installed/
+/build/
+/test/
+/Models/

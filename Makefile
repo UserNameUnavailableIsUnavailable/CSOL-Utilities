@@ -1,7 +1,6 @@
 SHELL = pwsh.exe
 export .SHELLFLAGS = -NoProfile -Command
 export ROOT := $(shell (Get-Location).ToString() -replace("\\", "/"))
-export SOURCE = $(ROOT)/source
 export DEPENDENCIES := $(ROOT)/dependencies
 export TEST= $(ROOT)/test
 export DOCS = $(ROOT)/documents
@@ -16,7 +15,6 @@ VERSION = v$(MAIN_VERSION).$(SUB_VERSION).$(REVISION_VERSION)
 ARCH = x86_64
 
 MODULES = Controller Documents Executor Ps1 Web ConfigPanel
-VPATH = source
 TEST_UNIT := module
 
 .PHONY: $(MODULES) all
@@ -31,19 +29,19 @@ ConfigPanel:
 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
 Ps1:
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Install.ps1 -Force
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Controller.ps1 -Force
+	Copy-Item -Destination $(BUILD) -Path $(ROOT)/Install.ps1 -Force
+	Copy-Item -Destination $(BUILD) -Path $(ROOT)/Controller.ps1 -Force
 Executor:
-	if (Test-Path $(BUILD)/Executor) { Remove-Item $(BUILD)/Executor -Recurse }
-	Copy-Item -Destination $(BUILD) -Path $(SOURCE)/Executor -Recurse -Force
+	if (Test-Path $(BUILD)/$@) { Remove-Item $(BUILD)/$@ -Recurse }
+	Copy-Item -Destination $(BUILD) -Path $@ -Recurse -Force
 # compile and link test
 Test:
-	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(SOURCE)/include
+	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(ROOT)/include
 # compile Controller
 Controller:
 	(New-Item -Type Directory -Path $(BUILD)/$@ -Force).Attributes += "Hidden"
 	Write-Host $(MAKE)
-	$(MAKE) --directory=$(SOURCE)/$@ SHELL="$(SHELL)" MOD=$@
+	$(MAKE) --directory=$@ SHELL="$(SHELL)" MOD=$@
 	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
 Documents:
 	New-Item -Type Directory -Path $(BUILD)/Documents -Force

@@ -45,7 +45,7 @@ if not Main_lua then
         then
             -- 对于新发出的命令，需要更新鼠标光标位置
             if
-                (Command:get_status() & Command.NAME_CHANGED)
+                (Command:get_status() & Command.TYPE_CHANGED)
                 ~= Command.UNCHANGED -- 新旧命令类型不同，即旧命令不是购买物品
             then
                 Automation:purchase_item(Mouse:locate())
