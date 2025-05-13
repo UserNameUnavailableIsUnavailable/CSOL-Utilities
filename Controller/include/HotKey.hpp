@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include <atomic>
-#include <string>
-#include <Windows.h>
+#include "pch.hpp"
 
 namespace CSOL_Utilities
 {

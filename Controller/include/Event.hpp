@@ -1,10 +1,7 @@
 ﻿#pragma once
 
-#include <chrono>
-#include <cstddef>
-#include <memory>
-#include <Windows.h>
-#include <winerror.h>
+#include "pch.hpp"
+
 #include "Utilities.hpp"
 #include "Exception.hpp"
 

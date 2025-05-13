@@ -1,5 +1,5 @@
-﻿#include <numeric>
-#include <opencv2/imgproc.hpp>
+﻿#include "pch.hpp"
+
 #include "OCR.hpp"
 
 namespace CSOL_Utilities

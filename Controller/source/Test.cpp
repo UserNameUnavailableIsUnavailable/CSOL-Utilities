@@ -1,16 +1,11 @@
-﻿#include <filesystem>
-#include <fstream>
-#include <iostream>
+﻿#include "pch.hpp"
 
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
 #include "OCR.hpp"
 #include "Utilities.hpp"
 
-constexpr const char* DETECTION_MODEL_FILE = "models/paddle_ocr_detection_v4_distilled.onnx";
+constexpr const char* DETECTION_MODEL_FILE = "models/ch_PP-OCRv4_det_infer.onnx";
 // constexpr const char* CLS_MODEL_FILE = "models/ch_ppocr_mobile_v2.0_cls_infer_model.onnx";
-constexpr const char* RECOGNITION_MODEL_FILE = "models/paddle_ocr_recognition_v4_distilled.onnx";
+constexpr const char* RECOGNITION_MODEL_FILE = "models/ch_PP-OCRv4_rec_infer.onnx";
 constexpr const char* DICTIONARY_FILE = "models/dictionary.txt";
 
 #ifdef Test__

@@ -1,15 +1,5 @@
-﻿#include <Windows.h>
-#include <atomic>
-#include <chrono>
-#include <cstdint>
-#include <exception>
-#include <fstream>
-#include <minwindef.h>
-#include <string>
-#include <thread>
-#include <utility>
-#include <vector>
-#include <opencv2/imgcodecs.hpp>
+﻿#include "pch.hpp"
+
 #include "OCRIdleEngine.hpp"
 #include "Command.hpp"
 #include "IdleEngine.hpp"
@@ -23,9 +13,28 @@
 namespace CSOL_Utilities
 {
     OCRIdleEngine::OCRIdleEngine(GameProcessInformation game_process_information, OCRBackboneInformation ocr_backbone_information) :
-        IdleEngine(std::move(game_process_information)),
-        m_OCR(ocr_backbone_information.DBNetPath, ocr_backbone_information.CRNNPath, ocr_backbone_information.DictPath, 0)
+        IdleEngine(std::move(game_process_information))
     {
+		auto dbnet_setting = std::make_unique<DBNet_Setting>();
+		dbnet_setting->m_ModelPath = ocr_backbone_information.DBNetPath;
+		dbnet_setting->m_BinarizationProbabilityThreshold = 0.8f;
+		dbnet_setting->m_DilationOffsetRatio = 1.6f;
+
+		auto crnn_setting = std::make_unique<CRNN_Setting>();
+		crnn_setting->m_ModelPath = ocr_backbone_information.CRNNPath;
+		crnn_setting->m_DictionaryPath = ocr_backbone_information.DictPath;
+
+		auto ocr_setting = std::make_unique<OCR_Setting>();
+		ocr_setting->m_Padding = 16;
+		ocr_setting->m_MaxSideLength = 1920;
+		ocr_setting->m_DetectionConfidenceThreshold = 0.8f;
+
+		m_OCR = std::make_unique<OCR>(
+			std::move(ocr_setting),
+			std::move(dbnet_setting),
+			std::move(crnn_setting)
+		);
+
         std::ifstream ifs(ocr_backbone_information.KeywordsPath, std::ios::ate | std::ios::binary);
         if (!ifs.is_open())
         {
@@ -44,17 +53,17 @@ namespace CSOL_Utilities
         json_string.resize(size);
         ifs.seekg(0);
         ifs.read(json_string.data(), size);
-		m_Keywords = nlohmann::json::parse(json_string);
+		auto keywords_json = nlohmann::json::parse(json_string);
 		/* 导入关键词 */
-        for (auto i : { "LOBBY", "ROOM", "LOADING", "IN_GAME" })
+        for (auto i : { "LOBBY", "ROOM", "LOADING", "GAMING" })
         {
-            for (auto j : m_Keywords[i])
+            for (auto j : keywords_json[i])
             {
                 if (j.type() != nlohmann::json::value_t::string)
                 {
                     throw Exception(Translate("IdleEngine::OCR::ERROR_InvalidKeywordType"));
                 }
-                trie.insert(j.get<std::string>());
+				m_Keywords[i].emplace_back(j.get<std::string>());
             }
         }
     }
@@ -81,104 +90,110 @@ namespace CSOL_Utilities
 				m_bRecognizerFinished = true;
 			}
 			m_RecognizerFinished.notify_one();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+			SleepEx(5000, true);
         }
     }
 
     void OCRIdleEngine::Analyze()
     {
-		std::chrono::system_clock::time_point tp; /* 记录状态识别开始时间 */
-		auto ocr_result = Recognize();
-		if (ocr_result.empty()) // 未检测到任何结果
+		auto recognize_start = std::chrono::system_clock::now();
+		thread_local std::vector<std::string> results; /* 复用容器，节省空间 */
+		Recognize(results);
+		std::chrono::system_clock::time_point recognize_end = std::chrono::system_clock::now();
+		#ifdef _DEBUG
+		Console::Debug(std::format("本次识别耗时 {} 毫秒。", std::chrono::duration_cast<std::chrono::milliseconds>(recognize_end - recognize_start).count()));
+		#endif
+		if (results.empty()) /* 未识别到任何文本，剔除 */
 		{
-			update_state(IN_GAME_STATE::IGS_UNKNOWN, std::chrono::system_clock::now());
+			return;
 		}
 		thread_local auto igs = IN_GAME_STATE::IGS_UNKNOWN;
-		auto parse_result = trie.parse_text(ocr_result);
-		if (parse_result.empty())
+		std::array<int, 4> scenarios{ 0, 0, 0, 0 };
+		constexpr auto lobby = 0;
+		constexpr auto room = 1;
+		constexpr auto loading = 2;
+		constexpr auto gaming = 3;
+		for (const auto& s : results)
+		{
+			for (std::string_view keyword : m_Keywords["LOBBY"])
+			{
+				if (s.find(keyword) != std::string::npos)
+				{
+					scenarios[lobby]++;
+				}
+			}
+			for (std::string_view keyword : m_Keywords["ROOM"])
+			{
+				if (s.find(keyword) != std::string::npos)
+				{
+					scenarios[room]++;
+				}
+			}
+			for (std::string_view keyword : m_Keywords["LOADING"])
+			{
+				if (s.find(keyword) != std::string::npos)
+				{
+					scenarios[loading]++;
+				}
+			}
+			for (std::string_view keyword : m_Keywords["GAMING"])
+			{
+				if (s.find(keyword) != std::string::npos)
+				{
+					scenarios[gaming]++;
+				}
+			}
+		}
+		auto greatest = std::max_element(scenarios.begin(), scenarios.end());
+		if (*greatest < 1)
 		{
 			igs = IN_GAME_STATE::IGS_UNKNOWN;
 		}
-		else /* 根据出现频次确定当前状态 */
+		else
 		{
-			struct InGameStatistics
+			switch (greatest - scenarios.begin())
 			{
-				int occurrences = 0;
-				IN_GAME_STATE state = IN_GAME_STATE::IGS_UNKNOWN;
-				InGameStatistics& operator++() noexcept
-				{
-					++occurrences;
-					return *this;
-				}
-				InGameStatistics operator++(int) noexcept
-				{
-					auto tmp = *this;
-					operator++();
-					return tmp;
-				}
-			};
-			InGameStatistics hall{0, IN_GAME_STATE::IGS_LOBBY};
-			InGameStatistics room{0, IN_GAME_STATE::IGS_ROOM};
-			InGameStatistics loading{0, IN_GAME_STATE::IGS_LOADING};
-			InGameStatistics map{0, IN_GAME_STATE::IGS_GAMING};
-			for (auto i = parse_result.begin(); i != parse_result.end(); i++)
+			case lobby: igs = IN_GAME_STATE::IGS_LOBBY; break;
+			case room: igs = IN_GAME_STATE::IGS_ROOM; break;
+			case loading: igs = IN_GAME_STATE::IGS_LOADING; break;
+			case gaming: igs = IN_GAME_STATE::IGS_GAMING; break;
+			}
+			if (*greatest == scenarios[gaming])
 			{
-				if (i->get_index() < m_Keywords[KEYWORD_CATEGORY_LOBBY].size())
-				{
-					++hall;
-				}
-				else if (i->get_index() <
-						 m_Keywords[KEYWORD_CATEGORY_LOBBY].size() + m_Keywords[KEYWORD_CATEGORY_ROOM].size())
-				{
-					++room;
-				}
-				else if (i->get_index() < m_Keywords[KEYWORD_CATEGORY_LOBBY].size() +
-							 m_Keywords[KEYWORD_CATEGORY_ROOM].size() + m_Keywords[KEYWORD_CATEGORY_LOADING].size())
-				{
-					++loading;
-				}
-				else
-				{
-					++map;
-				}
-				std::array<InGameStatistics*, 4> list{&hall, &room, &loading, &map};
-				auto result =
-					std::max_element(list.begin(), list.end(), [](const InGameStatistics* a, const InGameStatistics* b)
-									 { return a->occurrences < b->occurrences; });
-				igs = (*result)->occurrences > 0 ? (*result)->state : IN_GAME_STATE::IGS_UNKNOWN; /* 出现次数要大于 0，否则仍然设定为未知状态 */
+				igs = IN_GAME_STATE::IGS_GAMING;
 			}
 		}
 		thread_local int abnormal_back_to_room = 0;
 		/* 合法状态迁移 */
 		/* 手写状态机，考虑到后续维护难度，故引入了更多的代码冗余降低理解难度 */
-		/* 5 种自迁移 */
 		if (m_igs == igs)
 		{
+			/* 自上一次起状态未发生变化 */
 		}
 		/* 5 种顺序迁移 */
 		else if (m_igs == IN_GAME_STATE::IGS_LOGIN && igs == IN_GAME_STATE::IGS_LOBBY) /* 登陆成功，进入大厅 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_LoginSuccess"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_LOBBY && igs == IN_GAME_STATE::IGS_ROOM) /* 创建房间 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_EnterGameRoom"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_ROOM && igs == IN_GAME_STATE::IGS_LOADING) /* 开始游戏 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_StartGameRoom"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_LOADING && igs == IN_GAME_STATE::IGS_GAMING) /* 场景加载完成 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_GameMapLoaded"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_GAMING && igs == IN_GAME_STATE::IGS_ROOM) /* 结算确认 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_ResultsConfirmed"));
 		}
 		/* 消除未知状态迁移，不计入迁移种类 */
@@ -186,16 +201,17 @@ namespace CSOL_Utilities
 		{
 			if (m_igs != IN_GAME_STATE::IGS_GAMING && m_igs != IN_GAME_STATE::IGS_LOADING)
 			{
-				update_state(IN_GAME_STATE::IGS_UNKNOWN, tp);
+				update_state(IN_GAME_STATE::IGS_UNKNOWN);
 			}
 			else
 			{
-				/* 正在游戏 */
+				// m_igs 不变
+				/* 正在游戏或正在加载，保持原有状态不变 */
 			}
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_UNKNOWN && igs != IN_GAME_STATE::IGS_UNKNOWN)
+		else if (igs != IN_GAME_STATE::IGS_UNKNOWN && m_igs != IN_GAME_STATE::IGS_UNKNOWN)
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			switch (igs)
 			{
 			case IN_GAME_STATE::IGS_LOBBY:
@@ -218,7 +234,7 @@ namespace CSOL_Utilities
 		else if (m_igs == IN_GAME_STATE::IGS_LOADING &&
 				 igs == IN_GAME_STATE::IGS_ROOM) /* 加载失败，现象一般为重连 1 2 3，可能是网络问题 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY, tp); /* 直接离开房间回到大厅 */
+			update_state(IN_GAME_STATE::IGS_LOBBY); /* 直接离开房间回到大厅 */
 			Console::Warn(Translate("IdleEngine::OCR::WARN_LoadGameMap"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_GAMING && igs == IN_GAME_STATE::IGS_ROOM)
@@ -226,7 +242,7 @@ namespace CSOL_Utilities
 			abnormal_back_to_room++;
 			if (abnormal_back_to_room == 3)
 			{
-				update_state(IN_GAME_STATE::IGS_LOBBY, tp); /* 直接离开房间回到大厅 */
+				update_state(IN_GAME_STATE::IGS_LOBBY); /* 直接离开房间回到大厅 */
 				Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoom"));
 				abnormal_back_to_room = 0;
 			}
@@ -235,18 +251,18 @@ namespace CSOL_Utilities
 		else if (m_igs == IN_GAME_STATE::IGS_GAMING &&
 				 igs == IN_GAME_STATE::IGS_LOBBY) /* 从游戏场景返回到大厅，原因一般为：强制踢出、长时间没有有效操作 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY, tp);
+			update_state(IN_GAME_STATE::IGS_LOBBY);
 			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToLobby"));
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_ROOM &&
 				 igs == IN_GAME_STATE::IGS_LOBBY) /* 从游戏房间返回到大厅，原因可能是：强制踢出、房间等待时间过长 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY, tp);
+			update_state(IN_GAME_STATE::IGS_LOBBY);
 			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromRoomToLobby"));
 		}
 		else /* 其他情形，除非手动操作，否则应该不会出现 */
 		{
-			update_state(igs, tp);
+			update_state(igs);
 			switch (igs)
 			{
 			case IN_GAME_STATE::IGS_LOBBY:
@@ -267,29 +283,29 @@ namespace CSOL_Utilities
 		}
 
 		/* 超时检查 */
-		if (m_igs == IN_GAME_STATE::IGS_ROOM && tp - m_tp > std::chrono::seconds(Global::g_StartGameRoomTimeout))
+		if (m_igs == IN_GAME_STATE::IGS_ROOM && recognize_start - m_tp > std::chrono::seconds(Global::StartGameRoomTimeout))
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY, tp);
-			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitStartGameRoomTimeout@1", Global::g_StartGameRoomTimeout));
+			update_state(IN_GAME_STATE::IGS_LOBBY);
+			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitStartGameRoomTimeout@1", Global::StartGameRoomTimeout));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOGIN && tp - m_tp > std::chrono::seconds(60)) /* 登录时间超过 60 秒 */
+		else if (m_igs == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(60)) /* 登录时间超过 60 秒 */
 		{
-			update_state(IN_GAME_STATE::IGS_UNKNOWN, tp);
+			update_state(IN_GAME_STATE::IGS_UNKNOWN);
 			Console::Warn(Translate("IdleEngine::OCR::WaitLoginTimeout@1",
-						 Global::g_LoginTimeout));
+						 Global::LoginTimeout));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOADING && tp - m_tp > std::chrono::seconds(150)) /* 游戏加载超时 */
+		else if (m_igs == IN_GAME_STATE::IGS_LOADING && recognize_start - m_tp > std::chrono::seconds(150)) /* 游戏加载超时 */
 		{
 			Console::Warn(Translate("OCRIdleEngine::WaitLoadGameMapTimeout@1",
-						 Global::g_LoadMapTimeout));
+						 Global::LoadMapTimeout));
 			DWORD dwPId = 0;
 			GetWindowThreadProcessId(m_GameProcessInfo.hGameWindow.load(std::memory_order_acquire), &dwPId);
 			if (dwPId)
 			{
-				HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, NULL, dwPId);
+				HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, NULL, dwPId);
 				if (hProcess)
 				{
-					TerminateProcess(hProcess, -1);
+					SafeTerminateProcess(hProcess, 0);
 					CloseHandle(hProcess);
 				}
 			}
@@ -323,17 +339,26 @@ namespace CSOL_Utilities
 		}
 		else if (m_igs == IN_GAME_STATE::IGS_GAMING) /* 游戏中 */
 		{
-			if (m_extended.load(std::memory_order_acquire) && tp - m_tp > std::chrono::milliseconds(60))
+			if (tp - m_tp > std::chrono::seconds(60) && GetIdleMode() == IDLE_MODE::IM_EXTENDED) /* 扩展模式启用，且进入游戏达到 60 秒 */
 			{
 				command = Command::TYPE::CMD_EXTENDED_IDLE;
+			#ifdef _DEBUG
+				Console::Debug("扩展挂机模式。");
+			#endif
 			}
-			else if (tp - m_tp > std::chrono::seconds(5))
+			else if (tp - m_tp > std::chrono::seconds(7)) /* 角色选择完成，进入挂机模式 */
 			{
 				command = Command::TYPE::CMD_DEFAULT_IDLE;
+			#ifdef _DEBUG
+				Console::Debug("默认挂机模式。");
+			#endif
 			}
 			else
 			{
 				command = Command::TYPE::CMD_CHOOSE_CHARACTER;
+			#ifdef _DEBUG
+				Console::Info("选择游戏角色。");
+			#endif
 			}
 		}
 		switch (command)
@@ -352,10 +377,11 @@ namespace CSOL_Utilities
 		}
     }
 
-	std::string OCRIdleEngine::Recognize()
+	void OCRIdleEngine::Recognize(std::vector<std::string>& results)
 	{
 		thread_local std::vector<uint8_t> buffer;
 		thread_local auto capture_error_count{ 0 };
+		results.clear(); /* 清空结果 */
 		auto hGameWindow = m_GameProcessInfo.hGameWindow.load(std::memory_order_acquire);
 		if (!IsWindow(hGameWindow))
 		{
@@ -388,8 +414,8 @@ namespace CSOL_Utilities
 						return true; /* 继续枚举下一个窗口 */
 					}
 					window_title.resize(length + 1); /* length 不包含 '\0' */
-					GetWindowTextW(hWnd, window_title.data(), static_cast<int>(window_title.size()));
-					window_title.resize(length); /* 忽略末尾多余的 '\0' */
+					auto iSize = GetWindowTextW(hWnd, window_title.data(), static_cast<int>(window_title.size()));
+					window_title.resize(iSize); /* iSize 为不含末尾空字符的实际长度 */
 					#ifdef _DEBUG
 					Console::Debug(std::format("窗口句柄：0x{:X}，窗口标题：{}", reinterpret_cast<std::uintptr_t>(hWnd), ConvertUtf16ToUtf8(window_title)));
 					#endif
@@ -407,25 +433,32 @@ namespace CSOL_Utilities
 				{
 					hGameWindow = params.hWnd;
 					m_GameProcessInfo.hGameWindow.store(params.hWnd);
+					if (IsIconic(hGameWindow))
+					{
+						ShowWindow(hGameWindow, SW_NORMAL);
+					}
+					SetWindowPos(hGameWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+					RemoveWindowBorder(hGameWindow);
+					CenterWindow(hGameWindow);
 					Console::Info(Translate("IdleEngine::OCR::INFO_GameWindowUpdated"));
 				}
 				else
 				{
-					return "";
+					return;
 				}
 			}
 			else
 			{
-				return "";
+				return;
 			}
 		}
 		try
 		{
 			CaptureWindowAsBmp(hGameWindow, buffer);
-#ifdef _DEBUG
+		#ifdef _DEBUG
 			std::ofstream bmp_file("capture.bmp", std::ios::binary | std::ios::out | std::ios::trunc);
 			bmp_file.write(reinterpret_cast<char*>(buffer.data()), buffer.size());
-#endif
+		#endif
 		}
 		catch (std::exception& e)
 		{
@@ -435,7 +468,7 @@ namespace CSOL_Utilities
 			{
 				throw Exception(Translate("IdleEngine::OCR::ERROR_CaptureWindowAsBmpFailedTooManyTimes"));
 			}
-			return "";
+			return;
 		}
 		capture_error_count = 0;
 		auto mat = cv::imdecode(buffer, cv::IMREAD_COLOR);
@@ -449,12 +482,13 @@ namespace CSOL_Utilities
 				throw Exception("IdleEngine::OCR::ERROR_imdecodeFailedTooManyTimes");
 			}
 			Console::Warn(Translate("IdleEngine::OCR::WARN_imdecode"));
-			return "";
+			return;
 		}
-		OCRParam param{
-			.nPadding = 50, .nMaxSideLength = 1024, .fBoxScoreThreshold = 0.6f, .fBoxThreshold = 0.3f, .fUnclipRatio = 2.0f,
-		};
-		auto result = m_OCR.Detect(mat, param);
-		return result.content;
+		auto ocr_results = m_OCR->Detect(mat);
+		results.clear();
+		for (auto& r : ocr_results)
+		{
+			results.emplace_back(std::move(r.m_ReognitionResult.m_Text));
+		}
 	}
 }

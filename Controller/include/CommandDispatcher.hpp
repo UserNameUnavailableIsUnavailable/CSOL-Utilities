@@ -1,16 +1,8 @@
 ﻿#pragma once
 
+#include "pch.hpp"
+
 #include "Module.hpp"
-#include <Windows.h>
-#include <condition_variable>
-#include <filesystem>
-#include <handleapi.h>
-#include <memory>
-#include <stop_token>
-#include <string>
-#include <mutex>
-#include <thread>
-#include <type_traits>
 
 namespace CSOL_Utilities
 {

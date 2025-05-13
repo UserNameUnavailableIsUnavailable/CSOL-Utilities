@@ -1,21 +1,34 @@
-
-$Config = @{
-#	自行指定游戏根目录和游戏启动命令示例：
-#	GameRootDirectory = "C:\Users\Silver\Games\Tiancity\csol\";
-#	LaunchGameCmd = '"C:\Program Files (x86)\TCGame\tcgame.exe" cso';
-	MaxWaitTimeInRoom = 600;
+$Options = @{
+	"--locale-resources-directory" = "$PSScriptRoot\Controller\Locales"
+	"--language" = "zh-CN"
+	"--executor-command-file-path" = "$PSScriptRoot\Executor\Temporary.lua"
+	"--detect-mode" = "OCR"
+	"--OCR-detection-model-path" = "$PSScriptRoot\Controller\Models\OCR\ch_PP-OCRv4_det_infer.onnx"
+	"--OCR-recognition-model-path" = "$PSScriptRoot\Controller\Models\OCR\ch_PP-OCRv4_rec_infer.onnx"
+	"--OCR-dictionary-path" = "$PSScriptRoot\Controller\Models\OCR\dictionary.txt"
+	"--OCR-keywords-path" = "$PSScriptRoot\Controller\Models\OCR\keywords.json"
 }
+
+$Flags = @(
+	"--suppress-CSOBanner",
+	"--default-idle-after-reconnection"
+)
 
 $Parameters = @()
 
-foreach ($key in $Config.Keys)
+foreach ($key in $Options.Keys)
 {
-	$val = $Config[$key]
+	$val = $Options[$key]
 	if ($val -ne $Null -and $val.Length -gt 0)
 	{
-		$Parameters += "--$key"
+		$Parameters += "$key"
 		$Parameters += "$val"
 	}
+}
+
+foreach ($flag in $Flags)
+{
+	$Parameters += $flag
 }
 
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -25,5 +38,5 @@ if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Adm
 }
 else
 {
-    .\Controller.exe $Parameters
+    & "$PSScriptRoot\Controller\Controller.exe" $Parameters
 }

@@ -1,16 +1,14 @@
 ﻿#pragma once
 
-#include <Windows.h>
-#include <string>
-#include <filesystem>
-#include <vector>
-#include <unordered_map>
-#include <format>
-#include <tlhelp32.h>
-#include <functional>
+#include "pch.hpp"
 
 namespace CSOL_Utilities
 {
+	namespace Global
+	{
+		extern std::unordered_map<std::string, std::string> g_LanguagePackage; /* 语言包 */
+	}
+
 	std::wstring ConvertUtf8ToUtf16(const std::string& u8);
 	std::string ConvertUtf16ToUtf8(const std::wstring& u16);
 	BOOL IsRunningAsAdmin() noexcept;
@@ -19,10 +17,8 @@ namespace CSOL_Utilities
 	void EnumProcesses(std::function<bool (const PROCESSENTRY32W& process_entry)> callback);
 	void CaptureWindowAsBmp(HWND hWnd, std::vector<uint8_t>& buffer);
     void LoadLanguagePackage(std::unordered_map<std::string, std::string>& lang_pack); /* 根据 locale 加载语言包 */
-	namespace Global
-	{
-		extern std::unordered_map<std::string, std::string> g_LanguagePackage; /* 语言包 */
-	}
+	void RemoveWindowBorder(HWND hWnd) noexcept;
+	void CenterWindow(HWND hWnd) noexcept;
     template <typename... VA>
     std::string Translate(const std::string& key, VA&&... va)
     {
@@ -33,4 +29,5 @@ namespace CSOL_Utilities
         }
         return key;
     }
+	bool SafeTerminateProcess(HANDLE hProcess, DWORD dwMilliseconds) noexcept;
 }

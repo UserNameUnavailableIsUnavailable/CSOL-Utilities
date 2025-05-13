@@ -38,26 +38,29 @@
     <Filter Include="Controller">
       <UniqueIdentifier>{e8876dc1-781c-46ef-a6db-490aedb95390}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies">
-      <UniqueIdentifier>{50cf7e84-5e7a-452f-8654-320d83e56b21}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Controller\include">
       <UniqueIdentifier>{f40d7221-7925-41cd-a863-21605c7fa553}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Controller\implementation">
-      <UniqueIdentifier>{c7183b53-c3fc-4567-a15f-0602dd1298cc}</UniqueIdentifier>
+    <Filter Include="Controller\dependencies">
+      <UniqueIdentifier>{87f89f9f-153e-4ba8-92e1-27ed2bcf05c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies\include">
-      <UniqueIdentifier>{26d41b0e-c3c3-49cc-8456-b97285015fbc}</UniqueIdentifier>
+    <Filter Include="Controller\dependencies\include">
+      <UniqueIdentifier>{697ef04c-ae62-4661-824c-aaadfe6243bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies\include\aho_corasick">
-      <UniqueIdentifier>{801753df-f26d-4c27-8de5-cdffcb82fe94}</UniqueIdentifier>
+    <Filter Include="Controller\dependencies\include\aho_corasick">
+      <UniqueIdentifier>{c40d2e50-f359-431c-acb6-fe5adfcef0f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies\include\onxxruntime">
-      <UniqueIdentifier>{f1a108a3-ca99-480b-bd24-f770b7cbb645}</UniqueIdentifier>
+    <Filter Include="Controller\dependencies\include\onnxruntime">
+      <UniqueIdentifier>{47ddb138-126f-42dd-81ea-940918cf0e55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies\implmentation">
-      <UniqueIdentifier>{f526137e-6c9a-4563-aac1-dbb9ec6de7bb}</UniqueIdentifier>
+    <Filter Include="Controller\source">
+      <UniqueIdentifier>{054c3933-1581-4e56-90d9-5fc744caaa8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\source">
+      <UniqueIdentifier>{338c0a1e-96fb-4922-bdbb-fea024c9de3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\libraries">
+      <UniqueIdentifier>{31e80884-3452-40ce-9879-6a987bc1fc36}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +130,18 @@
     <None Include="vcpkg.json" />
     <None Include="vcpkg-configuration.json" />
     <None Include="Controller.cmake" />
+    <None Include="Controller\dependencies\libraries\onnxruntime.dll">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime.pdb">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.dll">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.pdb">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="source\ConfigWebPages\assets\auto_fill.png">
@@ -548,56 +563,62 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Controller\implementation\Command.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Command.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\CommandDispatcher.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\CommandDispatcher.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Console.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Console.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\CRNN.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\CRNN.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\DBNet.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\CSOBannerSuppressor.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Driver.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\DBNet.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Global.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Driver.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\HotKey.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Global.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\IdleEngine.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\HotKey.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Main.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\IdleEngine.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\OCR.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\LowLevelKeyboardHook.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\OCRIdleEngine.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Main.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Utilities.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\OCR.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\OCRUtilities.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\OCRIdleEngine.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\Test.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\OCRUtilities.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Dependencies\implementation\clipper.cpp">
-      <Filter>dependencies\implmentation</Filter>
+    <ClCompile Include="Controller\source\Test.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
-    <ClCompile Include="Controller\implementation\LowLevelKeyboardHook.cpp">
-      <Filter>Controller\implementation</Filter>
+    <ClCompile Include="Controller\source\Utilities.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\dependencies\source\clipper.cpp">
+      <Filter>Controller\dependencies\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\pch.cpp">
+      <Filter>Controller\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -640,53 +661,67 @@
     <ClInclude Include="Controller\include\Utilities.hpp">
       <Filter>Controller\include</Filter>
     </ClInclude>
-    <ClInclude Include="Dependencies\include\aho_corasick\aho_corasick.hpp">
-      <Filter>dependencies\include\aho_corasick</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\cpu_provider_factory.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_c_api.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_api.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_cxx_inline.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_float16.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_lite_custom_op.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_run_options_config_keys.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_session_options_config_keys.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_c_api.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_api.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\onnxruntime_training_cxx_inline.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\onnxruntime\provider_options.h">
-      <Filter>dependencies\include\onxxruntime</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencies\include\clipper\clipper.hpp">
-      <Filter>dependencies\include</Filter>
-    </ClInclude>
     <ClInclude Include="Controller\include\LowLevelKeyboardHook.hpp">
       <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\CSOBannerSuppressor.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\pch.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\clipper.hpp">
+      <Filter>Controller\dependencies\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\aho_corasick\aho_corasick.hpp">
+      <Filter>Controller\dependencies\include\aho_corasick</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\cpu_provider_factory.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_c_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_cxx_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_cxx_inline.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_float16.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_lite_custom_op.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_run_options_config_keys.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_session_options_config_keys.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_c_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_cxx_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_cxx_inline.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\provider_options.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="NatvisFile.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Controller\dependencies\libraries\onnxruntime.lib">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </Library>
+    <Library Include="Controller\dependencies\libraries\onnxruntime_providers_shared.lib">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </Library>
   </ItemGroup>
 </Project>

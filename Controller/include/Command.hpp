@@ -1,10 +1,6 @@
 ﻿#pragma once
 
-#include <chrono>
-#include <cstdint>
-#include <cstdlib>
-#include <atomic>
-#include <string_view>
+#include "pch.hpp"
 
 namespace CSOL_Utilities
 {

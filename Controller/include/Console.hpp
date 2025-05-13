@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include <Windows.h>
-#include <string>
-#include <mutex>
-#include <iostream>
-#include <utility>
-#include <format>
-#include <boost/static_string.hpp>
+#include "pch.hpp"
+
 #include "Utilities.hpp"
 
 namespace CSOL_Utilities
@@ -22,6 +17,12 @@ namespace CSOL_Utilities
 		static constexpr const boost::static_string FOREGROUND_COLOR_RED = "\x1b[31m";
 		static constexpr const boost::static_string FOREGROUND_COLOR_DEFAULT = "\x1b[39m";
 		static constexpr const boost::static_string FOREGROUND_COLOR_WHITE = "\x1b[37m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_GREEN = "\x1b[92m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_YELLOW = "\x1b[93m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_BLUE = "\x1b[94m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_RED = "\x1b[101m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_DEFAULT = "\x1b[39m";
+		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_WHITE = "\x1b[37m";
 		static constexpr const boost::static_string COLOR_DEFAULT = "\x1b[0m";
 		static void Print(std::string_view s);
 		static void Println(std::string_view s);
@@ -61,25 +62,25 @@ namespace CSOL_Utilities
 		}
 		static void Info(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_GREEN + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
+			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_GREEN + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
 			auto str = std::format(fmt, Translate("Console::INFO_HEADER"), s);
 			Console::Println(str);
 		}
 		static void Warn(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_YELLOW + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
+			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_YELLOW + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
 			auto str = std::format(fmt, Translate("Console::WARN_HEADER"), s);
 			Console::Println(str);
 		}
 		static void Error(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_RED + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
+			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_RED + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
 			auto str = std::format(fmt, Translate("Console::ERROR_HEADER"), s);
 			Console::Println(str);
 		}
 		static void Debug(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BLUE + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
+			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_BLUE + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
 			auto str = std::format(fmt, Translate("Console::DEBUG_HEADER"), s);
 			Console::Println(str);
 		}

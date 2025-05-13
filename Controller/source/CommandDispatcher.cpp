@@ -1,13 +1,6 @@
-﻿#include "CommandDispatcher.hpp"
-#include <Windows.h>
-#include <chrono>
-#include <exception>
-#include <handleapi.h>
-#include <memory>
-#include <mutex>
-#include <stop_token>
-#include <thread>
-#include <csignal>
+﻿#include "pch.hpp"
+
+#include "CommandDispatcher.hpp"
 #include "Command.hpp"
 #include "Console.hpp"
 #include "Utilities.hpp"
@@ -33,6 +26,9 @@ namespace CSOL_Utilities
 			DWORD dwBytesWritten;
 			thread_local std::string last_cmd;
 			Command::Get(m_content);
+			#ifdef _DEBUG
+			Console::Debug(std::format("命令：{}。", m_content));
+			#endif
 			if (m_content != last_cmd) /* 命令内容发生变更才写入 */
 			{
 				SetFilePointer(m_hFile.get(), 0, NULL, FILE_BEGIN); // 移动到文件开始处
@@ -54,7 +50,7 @@ namespace CSOL_Utilities
 				m_bFinished = true;
 			}
 			m_Finished.notify_one();
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			SleepEx(4000, true);
 		}
 	}
 
@@ -66,16 +62,17 @@ namespace CSOL_Utilities
 							  FILE_ATTRIBUTE_HIDDEN, NULL));
 		if (m_hFile.get() == INVALID_HANDLE_VALUE)
 		{
-			throw Exception(Translate("CommandDispatcher::ERROR_CreateFileW@1", GetLastError()));
+			throw Exception(Translate("CommandDispatcher::ERROR_CreateFileW@2", ConvertUtf16ToUtf8(m_file_path.wstring()), GetLastError()));
 		}
 		m_Worker = std::thread(
 			[this] (std::stop_token st) {
+				std::string module_name = "CommandDispatcher";
 				try {
 					Work(st);
 				} catch (std::exception& e) {
-					Console::Error(e.what());
+					Console::Error(Translate("Module::ERROR_ModulePanic@2", module_name, e.what()));
 				}
-				Console::Info(Translate("Module::INFO_ModuleExited@1", Translate("CommandDispatcher::NAME")));
+				Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
 			},
 			m_StopSource.get_token()
 		);
@@ -105,6 +102,7 @@ namespace CSOL_Utilities
 	{
 		m_StopSource.request_stop();
 		m_Runnable.notify_one();
+        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_Worker.native_handle()), 0);
 		m_Worker.join();
 	}
 } // namespace CSOL_Utilities

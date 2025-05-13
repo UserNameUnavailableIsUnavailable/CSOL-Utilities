@@ -5,6 +5,7 @@ export DEPENDENCIES := $(ROOT)/dependencies
 export TEST= $(ROOT)/test
 export DOCS = $(ROOT)/documents
 export BUILD = $(ROOT)/build
+export Configuration = Release
 
 PROJECT_NAME = CSOL-Utilities
 MAIN_VERSION = 1
@@ -29,11 +30,11 @@ ConfigPanel:
 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
 Ps1:
-	Copy-Item -Destination $(BUILD) -Path $(ROOT)/Install.ps1 -Force
-	Copy-Item -Destination $(BUILD) -Path $(ROOT)/Controller.ps1 -Force
+	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Install.ps1 -Force
+	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Controller.ps1 -Force
 Executor:
-	if (Test-Path $(BUILD)/$@) { Remove-Item $(BUILD)/$@ -Recurse }
-	Copy-Item -Destination $(BUILD) -Path $@ -Recurse -Force
+	if (Test-Path $(BUILD)/$(Configuration)/$@) { Remove-Item $(BUILD)/$(Configuration)/$@ -Force -Recurse }
+	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $@ -Recurse -Force
 # compile and link test
 Test:
 	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(ROOT)/include

@@ -3,7 +3,7 @@ CompileFlags:
         - -std=c++20
         - -Ivcpkg_installed/x64-windows/include
         - -Ivcpkg_installed/x64-windows/include/opencv4
-        - -Idependencies/include
+        - -IController/dependencies/include
         - -IController/include
         - -include sal.h
         - -D_DEBUG

@@ -1,6 +1,5 @@
-﻿#include <Windows.h>
-#include <atomic>
-#include <minwindef.h>
+﻿#include "pch.hpp"
+
 #include "Driver.hpp"
 #include "Command.hpp"
 #include "Console.hpp"
@@ -23,11 +22,12 @@ namespace CSOL_Utilities
 
     void Driver::RegisterLowLevelKeyboardHook(LowLevelKeyboardHook llhk)
     {
-        static std::atomic_bool locked{ false };
-        bool expected = false;
-        while (!locked.compare_exchange_strong(expected, true, std::memory_order_seq_cst));
+        std::lock_guard lk(m_FrozenLock);
+        if (m_Frozen)
+        {
+            throw Exception("Driver::ERROR_DriverIsFrozen");
+        }
         m_LowLevelKeyboardHooks.emplace_back(std::move(llhk));
-        locked.store(false, std::memory_order_release);
     }
 
     void Driver::HandleHotKey(WPARAM wParam, LPARAM lParam)
@@ -48,7 +48,7 @@ namespace CSOL_Utilities
         }
         else if (uId == m_DriverHotKeyBindings->hkNormalIdle.Id())
         {
-            m_IdleEngine->ToggleExtendedMode(false);
+            m_IdleEngine->SetIdleMode(IDLE_MODE::IM_DEFAULT);
             m_IdleEngine->Resume();
             disable_current_mode = [this] {
                 m_IdleEngine->Suspend();
@@ -58,7 +58,7 @@ namespace CSOL_Utilities
         }
         else if (uId == m_DriverHotKeyBindings->hkExtendedIdle.Id())
         {
-            m_IdleEngine->ToggleExtendedMode(true);
+            m_IdleEngine->SetIdleMode(IDLE_MODE::IM_EXTENDED);
             m_IdleEngine->Resume();
             disable_current_mode = [this] {
                 m_IdleEngine->Suspend();
@@ -87,11 +87,27 @@ namespace CSOL_Utilities
         m_CurrentModeId = uId;
     }
 
+    void Driver::RegisterOptionalModule(std::unique_ptr<Module> module)
+    {
+        std::lock_guard lk(m_FrozenLock);
+        if (m_Frozen)
+        {
+            throw Exception("Driver::ERROR_DriverIsFrozen");
+        }
+        m_OptionalModules.emplace_back(std::move(module));
+    }
+
     void Driver::Launch()
     {
-        MSG msg;
-        BOOL bRet;
+        {
+            std::lock_guard lk(m_FrozenLock);
+            m_Frozen = true; /* 锁定驱动器，不允许再添加新模块 */
+        }
 
+        /* 与调用线程绑定 */
+        m_dwThreadId.store(GetCurrentThreadId(), std::memory_order_release);
+
+        /* 注册热键 */
         m_DriverHotKeyBindings->hkNULL.Register();
 		m_DriverHotKeyBindings->hkNormalIdle.Register();
 		m_DriverHotKeyBindings->hkExtendedIdle.Register();
@@ -99,15 +115,23 @@ namespace CSOL_Utilities
 		m_DriverHotKeyBindings->hkBatchPurchaseItem.Register();
 		m_DriverHotKeyBindings->hkLocateCursor.Register();
 
+        /* 应用注册的键盘钩子 */
         for (auto& llhk : m_LowLevelKeyboardHooks)
         {
             llhk.Install();
         }
 
-        m_dwThreadId.store(GetCurrentThreadId(), std::memory_order_release);
-
+        /* 启动命令指派器 */
         m_CommandDispatcher->Resume();
 
+        /* 启动可选模块 */
+        for (auto& i : m_OptionalModules)
+        {
+            i->Resume();
+        }
+
+        MSG msg;
+        BOOL bRet;
         while ((bRet = GetMessageW(&msg, nullptr, 0, 0)) != 0)
         {
             if (bRet == -1)

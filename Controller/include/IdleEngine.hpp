@@ -1,11 +1,7 @@
 ﻿#pragma once
 
-#include <atomic>
-#include <condition_variable>
-#include <stop_token>
-#include <string>
-#include <thread>
-#include <Windows.h>
+#include "pch.hpp"
+
 #include "Module.hpp"
 
 namespace CSOL_Utilities
@@ -23,7 +19,7 @@ namespace CSOL_Utilities
 		{
 		}
 		GameProcessInformation(const GameProcessInformation& game_process_information) = delete;
-        GameProcessInformation(GameProcessInformation&& game_process_information)
+        GameProcessInformation(GameProcessInformation&& game_process_information) noexcept
         {
             std::swap(GameProcessName, game_process_information.GameProcessName);
             std::swap(GameWindowTitle, game_process_information.GameWindowTitle);
@@ -54,6 +50,12 @@ namespace CSOL_Utilities
 		GPS_UNKNOWN, /* 尚未确认游戏进程状态 */
 	};
 
+    enum class IDLE_MODE
+    {
+	    IM_DEFAULT,
+        IM_EXTENDED
+    };
+
     class IdleEngine : public Module
     {
     public:
@@ -61,9 +63,14 @@ namespace CSOL_Utilities
         ~IdleEngine() noexcept;
         virtual void Resume();
         virtual void Suspend();
-        void ToggleExtendedMode(bool flag) noexcept
+		
+        void SetIdleMode(IDLE_MODE idle_mode) noexcept
         {
-            m_ExtendedMode.store(flag, std::memory_order_release);
+            m_IdleMode.store(idle_mode, std::memory_order_release);
+        }
+		IDLE_MODE GetIdleMode() const noexcept
+        {
+			return m_IdleMode.load(std::memory_order_acquire);
         }
     protected:
         std::mutex m_StateLock;
@@ -84,6 +91,6 @@ namespace CSOL_Utilities
         std::thread m_GameStateRecognizer;
         std::thread m_GameProcessDetector;
 		HMODULE m_hGamingTool = nullptr; /* 游戏工具 */
-        std::atomic_bool m_ExtendedMode;
+        std::atomic<IDLE_MODE> m_IdleMode;
     };
 }

@@ -1,8 +1,6 @@
+#include "pch.hpp"
+
 #include "LowLevelKeyboardHook.hpp"
-#include <Windows.h>
-#include <atomic>
-#include <errhandlingapi.h>
-#include <utility>
 #include "Exception.hpp"
 #include "Utilities.hpp"
 

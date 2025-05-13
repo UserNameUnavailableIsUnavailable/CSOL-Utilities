@@ -1,16 +1,6 @@
-﻿#include "IdleEngine.hpp"
-#include <Windows.h>
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <exception>
-#include <filesystem>
-#include <handleapi.h>
-#include <string>
-#include <tlhelp32.h>
-#include <type_traits>
-#include <winnt.h>
+﻿#include "pch.hpp"
+
+#include "IdleEngine.hpp"
 #include "Global.hpp"
 #include "Utilities.hpp"
 #include "Console.hpp"
@@ -19,34 +9,36 @@
 namespace CSOL_Utilities
 {
     IdleEngine::IdleEngine(GameProcessInformation game_process_info) :
-        m_GameProcessInfo(std::move(game_process_info)),
-        m_GameProcessDetector([this] (std::stop_token st) { 
+        m_GameProcessInfo(std::move(game_process_info))
+    {
+        m_GameProcessDetector = std::thread([this] (std::stop_token st) { 
+            std::string module_name = "GameProcessDetector";
             try {
                 DetectGameProcess(st);
             } catch (std::exception& e) {
-                Console::Error(e.what());
+                Console::Error(Translate("Module::ERROR_ModulePanic@2", module_name, e.what()));
             }
-            Console::Info(Translate("Module::INFO_ModuleExited@1", Translate("IdleEngine::ProcessDetector::NAME")));
+            Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
             },
-            m_StopSource.get_token()),
-    
-        m_GameStateRecognizer([this] (std::stop_token st) {
+            m_StopSource.get_token());
+        m_GameStateRecognizer = std::thread([this] (std::stop_token st) {
+			std::string module_name = "GameStateRecognizer";
             try {
                 RecognizeGameState(st);
             } catch (std::exception& e) {
-                Console::Error(e.what());
+                Console::Error(Translate("Module::INFO_ModulePanic@2", module_name, e.what()));
             }
-            Console::Info(Translate("Module::INFO_ModuleExited@1", Translate("IdleEngine::OCR::NAME")));
-        }, m_StopSource.get_token())
-    {
+            Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
+        }, m_StopSource.get_token());
     }
 
     IdleEngine::~IdleEngine() noexcept
     {
         m_StopSource.request_stop();
-        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_GameProcessDetector.native_handle()), 0); /* 检测器可能正在等待进程，需要使用 APC 将其唤醒 */
         m_DetectorRunnable.notify_one();
         m_RecognizerRunnable.notify_one();
+        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_GameProcessDetector.native_handle()), 0);
+        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_GameProcessDetector.native_handle()), 0);
         m_GameProcessDetector.join();
         m_GameStateRecognizer.join();
     }
@@ -82,7 +74,6 @@ namespace CSOL_Utilities
     void IdleEngine::DetectGameProcess(std::stop_token st)
     {
 		thread_local GAME_PROCESS_STATE state = GAME_PROCESS_STATE::GPS_UNKNOWN; // 初始状态未知
-		// thread_local DWORD m_dwGameProcessId = 0; // 游戏进程标识符
 
         auto handle_destructor = [] (HANDLE h) {
             if (h == NULL || h == INVALID_HANDLE_VALUE) {
@@ -93,7 +84,7 @@ namespace CSOL_Utilities
 
         std::unique_ptr<std::remove_pointer_t<HANDLE>, void (*)(HANDLE)> hGameProcess(nullptr, handle_destructor);
 
-        std::function<bool (const PROCESSENTRY32W&)> check_process = [this] (const PROCESSENTRY32W& process_entry) {
+        std::function<bool (const PROCESSENTRY32W&)> find_game_process = [this] (const PROCESSENTRY32W& process_entry) {
             thread_local std::wstring executable_path;
 			if (!m_GameProcessInfo.GameProcessName.starts_with(process_entry.szExeFile))
 			{
@@ -160,37 +151,38 @@ namespace CSOL_Utilities
                     m_RecognizerFinished.wait(lk, [this] { return m_bRecognizerFinished; }); /* 等待识别器当前轮次执行完毕 */
                     m_GameProcessInfo.dwGameProcessId.store(0, std::memory_order_release); /* 进程号清零 */
                     state = GAME_PROCESS_STATE::GPS_EXITED;
+                    Console::Warn(Translate("IdleEngine::GameProcessDetector::WARN_GameProcessExited"));
                 }
             }
             else if (state == GAME_PROCESS_STATE::GPS_BEING_CREATED) // 游戏进程正在创建
             {
                 auto id = m_GameProcessInfo.dwGameProcessId.load(std::memory_order_acquire);
                 assert(id == 0);
-                EnumProcesses(check_process);
+                EnumProcesses(find_game_process);
                 id = m_GameProcessInfo.dwGameProcessId.load(std::memory_order_acquire);
-                if (id) // 查找到有效的 Id
+                if (id != 0) /* 查找到有效 id */
                 {
                     hGameProcess.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE | SYNCHRONIZE, FALSE, id)); // 通过 Id 打开进程
                     if (hGameProcess)
                     {
-                        // todo: message
                         {
                             std::lock_guard lk(m_StateLock);
                             m_bRecognizerRunnable = true; /* 允许识别器运行 */
                         }
                         m_RecognizerRunnable.notify_one(); /* 唤醒识别器线程 */
                         state = GAME_PROCESS_STATE::GPS_RUNNING;
+                        Console::Info(Translate("IdleEngine::GameProcessDetector::INFO_ProcessDetected@1", id));
                     }
                     else
                     {
-                        throw Exception(Translate("IdleEngine::ProcessDetector::ERROR_OpenProcess@1", GetLastError()));
+                        throw Exception(Translate("IdleEngine::GameProcessDetector::ERROR_OpenProcess@1", GetLastError()));
                     }
                 }
                 m_GameProcessInfo.dwGameProcessId.store(id);
-                if (m_ExtendedMode.load(std::memory_order_acquire) && Global::g_DefaultIdleAfterReconnection)
+                if (GetIdleMode() == IDLE_MODE::IM_EXTENDED && Global::DefaultIdleAfterReconnection)
                 {
-                    m_ExtendedMode.store(false, std::memory_order_release);
-                    Console::Info("IdleEngine::ProcessDetector::INFO_SwitchToDefaultIdleMode");
+                    m_IdleMode.store(IDLE_MODE::IM_DEFAULT, std::memory_order_release);
+                    Console::Info("IdleEngine::GameProcessDetector::INFO_SwitchToDefaultIdleMode");
                 }
             }
             else if (state == GAME_PROCESS_STATE::GPS_EXITED) // 游戏进程退出，需要重启
@@ -210,7 +202,7 @@ namespace CSOL_Utilities
                     &si,
                     &pi
                 );
-                // pi.hProcess, pi.hThread 是游戏启动器进程的句柄，故直接关闭
+                /* pi.hProcess, pi.hThread 是游戏启动器进程的句柄，故直接关闭 */
                 if (bRet)
                 {
                     CloseHandle(pi.hProcess);
@@ -218,27 +210,27 @@ namespace CSOL_Utilities
                 }
                 else
                 {
-                    Console::Warn(Translate("IdleEngine::ProcessDetector::WARN_CreateProcessW@1", GetLastError()));
+                    Console::Warn(Translate("IdleEngine::GameProcessDetector::WARN_CreateProcessW@1", GetLastError()));
                 }
-                state = GAME_PROCESS_STATE::GPS_BEING_CREATED; // 游戏进程正在创建
+                state = GAME_PROCESS_STATE::GPS_BEING_CREATED; /* 游戏进程正在创建 */
+                Console::Info(Translate("IdleEngine::GameProcessDetector::INFO_WaitGameProcessLaunch"));
             }
             else if (state == GAME_PROCESS_STATE::GPS_UNKNOWN)
             {
                 auto id = m_GameProcessInfo.dwGameProcessId.load(std::memory_order_acquire);
                 assert(id == 0);
-                EnumProcesses(check_process);
+                EnumProcesses(find_game_process);
                 id = m_GameProcessInfo.dwGameProcessId.load(std::memory_order_acquire);
-                if (id)
+                if (id != 0)
                 {
-                    Console::Info(Translate("IdleEngine::ProcessDetector::INFO_ProcessDetected@1", id));
-                    hGameProcess.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE | SYNCHRONIZE,
-                                                    FALSE, id)); // 通过 Id 打开进程
+                    Console::Info(Translate("IdleEngine::GameProcessDetector::INFO_ProcessDetected@1", id));
+                    hGameProcess.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE | SYNCHRONIZE, FALSE, id));
                     if (!hGameProcess)
                     {
-                        throw Exception(Translate("IdleEngine::ProcessDetector::ERROR_OpenProcess@1", GetLastError()));
+                        throw Exception(Translate("IdleEngine::GameProcessDetector::ERROR_OpenProcess@1", GetLastError()));
                     }
                     m_GameProcessInfo.dwGameProcessId.store(id);
-                    state = GAME_PROCESS_STATE::GPS_RUNNING; // 状态修改为正在运行
+                    state = GAME_PROCESS_STATE::GPS_RUNNING;
                     {
                         std::lock_guard lk(m_StateLock);
                         m_bRecognizerRunnable = true;
@@ -247,7 +239,8 @@ namespace CSOL_Utilities
                 }
                 else
                 {
-                    state = GAME_PROCESS_STATE::GPS_EXITED; // 游戏进程处于退出状态
+                    state = GAME_PROCESS_STATE::GPS_EXITED; /* 游戏进程未运行 */
+                    Console::Info(Translate("IdleEngine::GameProcessDetector::INFO_GameProcessNotRunning"));
                 }
             }
             {
@@ -255,7 +248,7 @@ namespace CSOL_Utilities
                 m_bDetectorFinished = true;
             }
             m_DetectorFinished.notify_one();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            SleepEx(1000, true);
         }
     }
 }

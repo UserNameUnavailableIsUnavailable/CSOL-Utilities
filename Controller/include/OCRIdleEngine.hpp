@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include <filesystem>
 #include "IdleEngine.hpp"
 #include "OCR.hpp"
-#include "opencv2/core/mat.hpp"
-#include <aho_corasick/aho_corasick.hpp>
-#include <nlohmann/json.hpp>
-#include <stop_token>
 
 namespace CSOL_Utilities
 {
@@ -27,23 +22,23 @@ namespace CSOL_Utilities
 		static constexpr std::string_view KEYWORD_CATEGORY_ROOM = "ROOM";
 		static constexpr std::string_view KEYWORD_CATEGORY_LOADING = "LOADING";
 		static constexpr std::string_view KEYWORD_CATEGORY_IN_GAME = "IN_GAME";
-		nlohmann::json m_Keywords; /* 关键词 */
-		std::atomic_bool m_extended = false; /* 扩展模式是否启用 */
+		std::unordered_map<std::string, std::vector<std::string>> m_Keywords; /* 关键词 */
 		IN_GAME_STATE m_igs; /* 游戏内状态 */
 		std::chrono::system_clock::time_point m_tp; /* 状态解析时刻 */
-        OCR m_OCR;
+        std::unique_ptr<OCR> m_OCR;
         cv::Mat m_Image;
         std::vector<uint8_t> m_ImageBuffer;
         aho_corasick::trie trie;
 		std::function<void (HWND)> m_RemoveWindowBorder;
     private:
         virtual void RecognizeGameState(std::stop_token st) override;
-		void update_state(IN_GAME_STATE state, std::chrono::system_clock::time_point tp) noexcept
+		void update_state(IN_GAME_STATE state) noexcept
 		{
+            if (m_igs == state) return; /* 前后两个状态相同，不发生更新，这样保持此状态开始时刻不变 */
 			m_igs = state;
-			m_tp = tp;
+			m_tp = std::chrono::system_clock::now();
 		}
-		std::string Recognize();
+		void Recognize(std::vector<std::string>&);
 		void Dispatch();
 		void Analyze();
     };

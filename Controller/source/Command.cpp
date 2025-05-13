@@ -1,10 +1,6 @@
-﻿#include "Command.hpp"
-#include <atomic>
-#include <chrono>
-#include <cstdint>
-#include <cstdlib>
-#include <format>
-#include <unordered_map>
+﻿#include "pch.hpp"
+
+#include "Command.hpp"
 
 namespace CSOL_Utilities
 {

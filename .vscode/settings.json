@@ -38,7 +38,7 @@
     "vscode-neovim.neovimExecutablePaths.win32": "nvim",
     "editor.fontFamily": "\"Cascadia Mono NF\", \"Cascadia Next SC\"",
     "clangd.arguments": [
-        "--header-insertion=iwyu"
+        "--header-insertion=never"
     ],
     "editor.fontSize": 16
 }

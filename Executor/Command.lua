@@ -37,17 +37,17 @@ if not Command_lua then
     ---读取命令文件。
     function Command:update()
         local status = 0
-        pcall(Include, "$~cmd.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
+        pcall(Include, "Temporary.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
         CmdId = CmdId or 0
         CmdType = CmdType or Command.CMD_NOP
         CmdTimepoint = CmdTimepoint or 0
         if CmdId ~= self.id then
             self.id = CmdId
-            self.finished = false -- 新的命令
+            self.finished = false -- 新的命令，将完成状态设置为 false
             status = status | Command.IDENTIFIER_CHANGED
         end
-        if CmdName ~= self.type then
-            self.type = CmdName
+        if CmdType ~= self.type then
+            self.type = CmdType
             status = status | Command.TYPE_CHANGED
         end
         if CmdTimepoint ~= self.timepoint then

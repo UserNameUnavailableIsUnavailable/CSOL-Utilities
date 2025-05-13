@@ -1,13 +1,6 @@
-﻿#include "Utilities.hpp"
-#include <Windows.h>
-#include <cstdint>
-#include <fstream>
-#include <nlohmann/json.hpp>
-#include <string>
-#include <atomic>
-#include <mutex>
-#include <tlhelp32.h>
-#include <unordered_map>
+﻿#include "pch.hpp"
+
+#include "Utilities.hpp"
 #include "Exception.hpp"
 #include "Global.hpp"
 
@@ -36,7 +29,7 @@ namespace CSOL_Utilities
 				else if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
 				{
 					/* If the function succeeds, the return value is the length of the string that is copied to the buffer, in characters, not including the terminating null character. */
-					path.resize(length); /* 设置字符串长度 */
+					path.resize(length); /* 设置字符串长度，length 是不包含末尾空字符的字符串实际长度 */
 					break;
 				}
 				else /* length != 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER */
@@ -201,7 +194,8 @@ namespace CSOL_Utilities
 		auto cchRequiredBufferSizeInChars = MultiByteToWideChar(CP_UTF8, 0, u8.c_str(), -1, nullptr, 0);
 		std::wstring u16(cchRequiredBufferSizeInChars, L'0');
         u16.resize(cchRequiredBufferSizeInChars);
-		MultiByteToWideChar(CP_UTF8, 0, u8.c_str(), -1, u16.data(), cchRequiredBufferSizeInChars);
+		auto cchWritten = MultiByteToWideChar(CP_UTF8, 0, u8.c_str(), -1, u16.data(), cchRequiredBufferSizeInChars);
+		u16.resize(cchWritten - 1); /* cchWritten 是写入缓冲区的字符数，包含空字符 */
 		return u16;
 	}
 
@@ -210,8 +204,45 @@ namespace CSOL_Utilities
 		auto cchRequiredBufferSizeInChars = WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, nullptr, 0, nullptr, nullptr);
 		std::string u8;
 		u8.resize(cchRequiredBufferSizeInChars);
-		WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, u8.data(), cchRequiredBufferSizeInChars, nullptr, nullptr);
+		auto cchWritten = WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, u8.data(), cchRequiredBufferSizeInChars, nullptr, nullptr);
+		u8.resize(cchWritten - 1); /* cchWritten 是写入缓冲区的字符数，包含空字符 */
 		return u8;
+	}
+
+	void RemoveWindowBorder(HWND hWnd) noexcept
+	{
+		WINDOWINFO windowInfo;
+		if (IsWindow(hWnd))
+		{
+			GetWindowInfo(hWnd, &windowInfo);
+			DWORD dwStyle = windowInfo.dwStyle & ~WS_CAPTION;
+			ShowWindow(hWnd, SW_SHOW);
+			SetWindowLongPtrW(hWnd, GWL_STYLE, dwStyle);
+			UpdateWindow(hWnd);
+		}
+	}
+
+	void CenterWindow(HWND hWnd) noexcept
+	{
+		WINDOWINFO windowInfo;
+		RECT rcScreen = {
+			.left = 0,
+			.top = 0
+		};
+		if (IsWindow(hWnd))
+		{
+			GetWindowInfo(hWnd, &windowInfo);
+			RECT& rcClient = windowInfo.rcClient;
+			rcScreen.right = GetSystemMetrics(SM_CXSCREEN);
+			rcScreen.bottom = GetSystemMetrics(SM_CYSCREEN);
+			LONG lDeltaX = (rcScreen.right - (rcClient.left + rcClient.right)) / 2;
+			LONG lDeltaY = (rcScreen.bottom - (rcClient.top + rcClient.bottom)) / 2;
+			rcClient.left += lDeltaX;
+			rcClient.right += lDeltaX;
+			rcClient.top += lDeltaY;
+			rcClient.bottom += lDeltaY;
+			MoveWindow(hWnd	, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
+		}
 	}
 
 	BOOL IsRunningAsAdmin() noexcept
@@ -280,16 +311,12 @@ namespace CSOL_Utilities
 	{
 		auto locale = std::locale();
 		auto locale_name = locale.name(); // e.g., zh-CN.UTF-8 (Windows)
-	#ifdef WIN32
-		std::replace(locale_name.begin(), locale_name.end(), '-', '_');
-		auto encoding_dot = locale_name.find('.');
-		if (encoding_dot != std::string::npos)
+		auto encoding_dot_index = locale_name.find('.');
+		if (encoding_dot_index != std::string::npos)
 		{
-			locale_name.erase(encoding_dot);
+			locale_name.erase(encoding_dot_index);
 		}
-	#endif
-		// locale_name = zh_CN
-		std::filesystem::path package_path = std::filesystem::path(Global::g_LocaleResourcesDirectory) /
+		std::filesystem::path package_path = std::filesystem::path(Global::LocaleResourcesDirectory) /
 			(locale_name + ".json");
 		if (package_path.is_relative())
 		{
@@ -304,7 +331,7 @@ namespace CSOL_Utilities
 		ifs.seekg(0, std::ios::beg);
 		assert(size != -1);
 		std::string json_string;
-		json_string.resize(size + 4);
+		json_string.resize(size); /* json 文件大小为 size 字节 */
 		ifs.read(json_string.data(), size);
 		nlohmann::json json_obj = nlohmann::json::parse(json_string);
 
@@ -331,6 +358,65 @@ namespace CSOL_Utilities
 		};
 
 		resolve(json_obj, "");
+	}
+
+	/// 安全地结束某个进程。
+	/// @param hProcess 进程句柄。
+	/// @param dwMilliseconds 等待进程结束的时延。
+	/// @return 进程是否在指定时间内结束。
+	/// @note `hProcess` 应具有 `SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION` 权限，否则函数将返回 `false`。若 `dwMilliseconds` 为 `0`，则不会检查进程是否结束并直接返回 `false`。
+	bool SafeTerminateProcess(HANDLE hProcess, DWORD dwMilliseconds) noexcept
+	{
+		DWORD dwProcessId = GetProcessId(hProcess);
+
+		if (dwProcessId == 0)
+		{
+			return false;
+		}
+
+		EnumWindows(/* 优先检索是否存在窗口，如果存在窗口则尝试通过向窗口发送 WM_CLOSE 结束进程 */
+					[](HWND hWnd, LPARAM lParam) -> BOOL
+					{
+						DWORD dwOwnerProcessId;
+						GetWindowThreadProcessId(hWnd, &dwOwnerProcessId);
+						if (dwOwnerProcessId == static_cast<DWORD>(lParam))
+						{
+							PostMessageW(hWnd, WM_CLOSE, 0, 0);
+						}
+						return true;
+					},
+					static_cast<LPARAM>(dwProcessId));
+
+		if (dwMilliseconds != 0 && WAIT_OBJECT_0 == WaitForSingleObject(hProcess, dwMilliseconds))
+		{
+			return true;
+		}
+
+		/* 尝试通过向各个线程发送 WM_QUIT 消息结束进程 */
+		HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+		if (!hThreadSnap)
+			return false;
+		THREADENTRY32 te32{.dwSize = sizeof(THREADENTRY32)};
+		if (Thread32First(hThreadSnap, &te32))
+		{
+			do
+			{
+				if (te32.th32OwnerProcessID == dwProcessId)
+				{
+					DWORD dwThreadId = te32.th32ThreadID;
+					PostThreadMessageW(dwThreadId, WM_QUIT, 0, 0); /* 向各个线程发送 WM_QUIT 消息 */
+				}
+			}
+			while (Thread32Next(hThreadSnap, &te32));
+		}
+		CloseHandle(hThreadSnap);
+
+		if (dwMilliseconds != 0 && WAIT_OBJECT_0 == WaitForSingleObject(hProcess, dwMilliseconds))
+		{
+			return true;
+		}
+
+		return false;
 	}
 } // namespace CSOL_Utilities
 

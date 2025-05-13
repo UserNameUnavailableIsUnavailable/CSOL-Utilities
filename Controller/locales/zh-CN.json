@@ -1,33 +1,21 @@
 {
     "Main":
     {
-        "NAME": "CSOL 集成工具",
-        "Version": "1.5.2",
+        "INFO_Meta": "CSOL 集成工具控制器 v1.5.2",
         "WARN_NotRunningAsAdmin": "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。",
         "INFO_AutoDetectGameRootDir": "未指定游戏程序根目录，尝试自动检测（仅适用于国服）。",
         "INFO_AutoDetectLaunchGameCmd": "未指定游戏启动命令，尝试自动检测（仅适用于国服）。",
         "ERROR_RegGetValueW@1": "RegGetValueW 失败，错误代码：{}",
         "INFO_GameRootDir@1": "游戏根目录：{}。",
         "INFO_LaunchGameCmd@1": "游戏启动命令：{}。",
-
-        "HELP_GameRootDirectory": "游戏根目录，即 cstrike-online.exe 所在的目录，例如：C:\\Program Files\\TCGAME\\TCGAMEApps\\csol。缺省此参数将自动检测。",
-        "HELP_LaunchGameCommand": "启动游戏的命令，此参数将作为 lpCommandLine 传递给CreateProcessW。需注意可执行程序需要用引号包含，与命令行参数分隔开，例如 \"C:\\TCGAME\\tcgame.exe\" cso。缺省此参数将自动检测。",
-        "HELP_StartGameRoomTimeout": "在游戏房间中等待的最长时间（单位为秒），若等待房主开始游戏超时，则自动离开当前房间并创建新房间挂机。缺省值为 900。",
-        "HELP_LoginTimeout": "登录超时时间。",
-        "HELP_LoadMapTimeout": "加载地图超时时间",
-        "HELP_LGHUBAgentName": "LGHUB Agent 进程名称，默认为 lghub_agent.exe。",
-        "HELP_IdleEngineBackbone": "挂机引擎使用的骨干网络，目前仅支持 OCR。",
-        "HELP_OCRDetectionModelPath": "使用 OCR 作为骨干网络时，OCR 目标检测模型所在路径。",
-        "HELP_OCRRecognitionModelPath": "使用 OCR 作为骨干网络时，OCR 文本识别模型所在路径。",
-        "HELP_OCRDictionaryPath": "使用 OCR 作为骨干网络时，OCR 字典文件所在路径。",
-        "HELP_OCRKeywordsPath": "使用 OCR 作为骨干网络时，关键词文件所在路径。",
-        "HELP_NormalIdleModeAfterReconnection": "掉线重连后切换为普通挂机模式。",
-        "HELP_RestartGameOnLoadingTimeout": "若游戏加载地图超时（表现为卡死在加载界面），则重启游戏进程。",
-        "ABOUT": "本工具由 _CoreDump 开发，如遇问题请通过邮件联系：admin@macrohard.fun 或 ttyuig@126.com，有开发经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
-        "NOTE": "本工具项目开源，请注意甄别。",
-        "GITEE_URL": "Gitee 项目地址：https://gitee.com/silver1867/csol-24-h。",
-        "GITHUB_URL": "GitHub 项目地址：https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities。",
-        "HOW_TO_EXIT": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
+        "INFO_DisableQuickFullscreen": "屏蔽了游戏窗口全屏热键 {{ Alt Enter }}。",
+        "INFO_SuppressCSOBanner": "自动检测并关闭 CSO Banner 功能启用",
+        "INFO_About": "本工具由 _CoreDump 开发，如遇问题请通过邮件联系：admin@macrohard.fun 或 ttyuig@126.com，有开发经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
+        "INFO_Note": "本工具项目开源，请注意甄别。",
+        "INFO_Gitee_URL": "Gitee 项目地址：https://gitee.com/silver1867/csol-24-h。",
+        "INFO_GitHub_URL": "GitHub 项目地址：https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities。",
+        "INFO_HowToExit": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
+        "INFO_SafelyExited": "程序安全地退出。",
         "ERROR_Panic": "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。"
     },
     "Exception":
@@ -36,9 +24,8 @@
     },
     "CommandDispatcher":
     {
-        "NAME": "命令指派器",
         "ERROR_GET_CURRENT_PROCESS_MODULE_FILE_PATH@1": "无法获取当前进程模块文件路径，错误代码：{}。",
-        "ERROR_CreateFileW@1": "CreateFileW 失败，无法打开命令文件，错误代码：{}。",
+        "ERROR_CreateFileW@2": "CreateFileW 失败，无法打开命令文件 {0}，错误代码：{1}。",
         "ERROR_WriteFile@1": "WriteFile 失败，错误代码：{}。"
     },
     "Console":
@@ -53,18 +40,18 @@
     },
     "IdleEngine":
     {
-        "NAME": "挂机引擎",
-        "ProcessDetector":
+        "GameProcessDetector":
         {
-            "NAME": "游戏进程检测器",
+            "INFO_GameProcessNotRunning": "游戏进程未运行，尝试启动游戏。",
             "INFO_ProcessDetected@1": "检测到游戏进程，标识符：{}。",
-            "WARN_CreateProcessW@1": "尝试启动游戏进程失败，错误代码：{}。此问题一般是由于未以管理员权限启动控制器。",
+            "WARN_CreateProcessW@1": "尝试启动游戏进程失败，错误代码：{}，请手动启动游戏。此问题一般是由于未以管理员权限启动控制器。",
             "ERROR_OpenProcess@1": "OpenProcess 失败，错误代码：{}。",
-            "INFO_SwitchToDefaultIdleMode": "发生掉线，新建房间后将使用默认挂机模式。"
+            "INFO_SwitchToDefaultIdleMode": "发生掉线，新建房间后将使用默认挂机模式。",
+            "WARN_GameProcessExited": "游戏进程退出，尝试重启游戏。",
+            "INFO_WaitGameProcessLaunch": "等待游戏进程启动。"
         },
         "OCR":
         {
-            "NAME": "OCR 挂机引擎",
             "INFO_GameWindowUpdated": "成功更新游戏窗口句柄。",
             "ERROR_EnumWindows@1": "EnumWindows 失败，错误代码：{}。",
             "ERROR_InvalidKeywordType": "加载关键词时遇到非法类型的字段。",
@@ -94,6 +81,10 @@
             "WARN_WaitLoadGameMapTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应，结束游戏进程并重新启动。"
         }
     },
+    "CSOBannerSuppressor":
+    {
+        "INFO_CSOBannerSuppressed": "检测到 CSOBanner 正在运行，尝试终止 CSOBanner。"
+    },
     "CRNN":
     {
         "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。"
@@ -119,12 +110,12 @@
     },
     "Module":
     {
-        "ERROR_ModulePanic@1": "模块 {} 遇到严重错误。",
-        "INFO_ModuleExited@1": "模块 {} 退出。"
+        "ERROR_ModulePanic@2": "模块 {{ {0} }} 运行时遇到严重错误：{1}",
+        "INFO_ModuleExited@1": "模块 {{ {} }} 退出。"
     },
     "Event":
     {
-        "ERROR_CreateEvent@1": "CreateEventW 失败，错误代码：{}"
+        "ERROR_CreateEvent@1": "CreateEventW 失败，错误代码：{}。"
     },
     "HotKey":
     {
@@ -138,10 +129,11 @@
     "Driver":
     {
         "INFO_SwitchToNullMode": "切换为空模式。",
-        "INFO_SwitchToDefaultIdleMode": "切换为普通挂机模式。",
+        "INFO_SwitchToDefaultIdleMode": "切换为默认挂机模式。",
         "INFO_SwitchToExtendedIdleMode": "切换为扩展挂机模式。",
         "INFO_SwitchToBatchCombinePartsMode": "切换为批量合成配件模式。",
         "INFO_SwitchToBatchPurchaseItemMode": "切换为批量购买物品模式。",
-        "INFO_SwitchToLocateCursorMode": "切换为光标定位模式。"
+        "INFO_SwitchToLocateCursorMode": "切换为光标定位模式。",
+        "ERROR_DriverIsFrozen": "驱动器已经冻结，不允许修改。"
     }
 }

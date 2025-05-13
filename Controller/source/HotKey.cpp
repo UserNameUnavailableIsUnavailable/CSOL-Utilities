@@ -1,11 +1,6 @@
-﻿#include "HotKey.hpp"
-#include <Windows.h>
-#include <errhandlingapi.h>
-#include <imm.h>
-#include <ios>
-#include <sstream>
-#include <windef.h>
+﻿#include "pch.hpp"
 
+#include "HotKey.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"
 #include "Utilities.hpp"
