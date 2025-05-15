@@ -1,6 +1,12 @@
 /.vs/
-/.venv/
 /.VSCodeCounter/
-/vcpkg_installed/
 /build/
 /test/
+/.venv/
+/.vscode/
+/vcpkg_installed/
+Makefile
+CSOL-Utilities.sln
+CSOL-Utilities.vcxproj
+CSOL-Utilities.vcxproj.user
+CSOL-Utilities.vcxproj.filters
