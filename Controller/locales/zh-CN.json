@@ -1,0 +1,141 @@
+{
+    "Main":
+    {
+        "INFO_Version@1": "CSOL 集成工具控制器（版本：{}），请留意控制器与执行器版本是否匹配。",
+        "WARN_NotRunningAsAdmin": "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。",
+        "INFO_AutoDetectGameRootDir": "未指定游戏程序根目录，尝试自动检测（仅适用于国服）。",
+        "INFO_AutoDetectLaunchGameCmd": "未指定游戏启动命令，尝试自动检测（仅适用于国服）。",
+        "ERROR_RegGetValueW@1": "RegGetValueW 失败，错误代码：{}",
+        "INFO_GameRootDir@1": "游戏根目录：{}。",
+        "INFO_LaunchGameCmd@1": "游戏启动命令：{}。",
+        "INFO_DisableQuickFullscreen": "屏蔽了游戏窗口全屏热键 {{ Alt Enter }}。",
+        "INFO_SuppressCSOBanner": "自动检测并关闭 CSO Banner 功能启用",
+        "INFO_Author": "本工具由 _CoreDump 开发。",
+        "INFO_Feedback": "如遇问题请通过邮箱 admin@macrohard.fun 或 ttyuig@126.com 联系作者，有编程经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
+        "WARN_Note": "本工具项目开源，请注意甄别，切勿上当受骗。",
+        "INFO_Gitee_URL": "Gitee 项目地址：https://gitee.com/silver1867/csol-24-h。",
+        "INFO_GitHub_URL": "GitHub 项目地址：https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities。",
+        "INFO_HowToExit": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
+        "INFO_SafelyExited": "程序安全地退出。",
+        "ERROR_Panic": "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。"
+    },
+    "Exception":
+    {
+        "DETAILED_QUICK_THROW_TEMPLATE@4": "{0}。异常触发位置：源文件 {1} 第 {2} 行，在函数 {3} 中。"
+    },
+    "CommandDispatcher":
+    {
+        "ERROR_GET_CURRENT_PROCESS_MODULE_FILE_PATH@1": "无法获取当前进程模块文件路径，错误代码：{}。",
+        "ERROR_CreateFileW@2": "CreateFileW 失败，无法打开命令文件 {0}，错误代码：{1}。",
+        "ERROR_WriteFile@1": "WriteFile 失败，错误代码：{}。"
+    },
+    "Console":
+    {
+        "INFO_HEADER": "【信息】",
+        "WARN_HEADER": "【警告】",
+        "ERROR_HEADER": "【错误】",
+        "DEBUG_HEADER": "【调试】",
+        "ERROR_SetConsoleCtrlHandler@1": "SetConsoleCtrlHandler 失败，错误代码：{}。",
+        "ERROR_GetConsoleMode@1": "GetConsoleMode 失败，错误代码：{}。",
+        "ERROR_SetConsoleMode@1": "SetConsoleMode 失败，错误代码：{}。"
+    },
+    "IdleEngine":
+    {
+        "GameProcessDetector":
+        {
+            "INFO_GameProcessNotRunning": "游戏进程未运行，尝试启动游戏。",
+            "INFO_ProcessDetected@1": "检测到游戏进程，标识符：{}。",
+            "WARN_CreateProcessW@1": "尝试启动游戏进程失败，错误代码：{}，请手动启动游戏。此问题一般是由于未以管理员权限启动控制器。",
+            "ERROR_OpenProcess@1": "OpenProcess 失败，错误代码：{}。",
+            "INFO_SwitchToDefaultIdleMode": "发生掉线，新建房间后将使用默认挂机模式。",
+            "WARN_GameProcessExited": "游戏进程退出，尝试重启游戏。",
+            "INFO_WaitGameProcessLaunch": "等待游戏进程启动。"
+        },
+        "OCR":
+        {
+            "INFO_GameWindowUpdated": "成功更新游戏窗口句柄。",
+            "ERROR_EnumWindows@1": "EnumWindows 失败，错误代码：{}。",
+            "ERROR_InvalidKeywordType": "加载关键词时遇到非法类型的字段。",
+            "ERROR_OpenKeywordsFile@1": "无法打开关键词文件，错误原因：{}。",
+            "FAIL_BIT": "文件不存在或没有访问权限",
+            "BAD_BIT": "严重错误（如 I/O 故障）",
+            "UNKNOWN": "未知",
+            "ERROR_CaptureWindowAsBmpFailedTooManyTime@1": "尝试截取游戏窗口失败次数过多。",
+            "WARN_imdecode": "图片解码失败。",
+            "ERROR_imdecodeFailedTooManyTimes": "尝试解码图像错误次数过多。",
+            "INFO_LoginSuccess": "成功登录游戏，进入游戏大厅。",
+            "INFO_EnterGameRoom": "进入游戏房间。",
+            "INFO_StartGameRoom": "开始游戏，加载游戏场景。",
+            "INFO_GameMapLoaded": "游戏地图加载完成。",
+            "INFO_ResultsConfirmed": "结算界面确认。",
+            "INFO_Lobby": "当前状态：游戏大厅。",
+            "INFO_Gaming": "当前状态：游戏中。",
+            "INFO_Loading": "当前状态：加载游戏地图。",
+            "INFO_Room": "当前状态：游戏房间。",
+            "WARN_ReturnFromGamingToRoom": "从游戏中返回到游戏房间。",
+            "WARN_ReturnFromGamingToRoomTooManyTimes": "从游戏中返回到游戏房间次数过多，离开当前房间重新创建。",
+            "WARN_LoadGameMap": "游戏场景加载失败（可能为网络问题，一般表现为重连 1 2 3），离开当前房间重新创建。",
+            "WARN_ReturnFromGamingToLobby": "从游戏中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+            "WARN_ReturnFromRoomToLobby": "从房间中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+            "WARN_WaitStartGameRoomTimeout@1": "等待开始游戏超过预设时间 {} 秒，回到大厅重新创建房间。",
+            "WARN_WaitLoginTimeout@1": "等待游戏登录超过预设时间 {} 秒。",
+            "WARN_WaitLoadGameMapTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应。",
+            "INFO_TryKillGameProcess": "尝试结束游戏进程。"
+        }
+    },
+    "CSOBannerSuppressor":
+    {
+        "INFO_CSOBannerSuppressed": "检测到 CSOBanner 正在运行，尝试终止 CSOBanner。"
+    },
+    "CRNN":
+    {
+        "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。"
+    },
+    "DBNet":
+    {
+        "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。"
+    },
+    "Utilities":
+    {
+        "CaptureWindowAsBmp":
+        {
+            "ERROR_GetModuleFileNameW": "GetModuleFileNameW 失败，错误代码：{}。",
+            "ERROR_InValidWindow": "窗口句柄无效。",
+            "ERROR_GetDC@1": "GetDC 失败，错误代码：{}。",
+            "ERROR_CreateCompatibleDC@1": "CreateCompatibleDC 失败，错误代码：{}。",
+            "ERROR_WindowIsMinimized": "无法截取处于最小化状态的窗口。",
+            "ERROR_GetClientRect@1": "GetClientRect 失败，错误代码：{}。",
+            "ERROR_StretchBlt@1": "StretchBlt 失败，错误代码：{}。",
+            "ERROR_BltBlt@1": "BitBlt 失败，错误代码：{}。",
+            "ERROR_GetDIBits@1": "GetDIBits 失败，错误代码：{}。"
+        }
+    },
+    "Module":
+    {
+        "ERROR_ModulePanic@2": "模块 {{ {0} }} 运行时遇到严重错误：{1}",
+        "INFO_ModuleExited@1": "模块 {{ {} }} 退出。"
+    },
+    "Event":
+    {
+        "ERROR_CreateEvent@1": "CreateEventW 失败，错误代码：{}。"
+    },
+    "HotKey":
+    {
+        "ERROR_RegisterHotKey@2": "注册热键 {{ {0} }} 失败，错误代码：{1}。",
+        "INFO_RegisterHotKey@1": "成功注册热键：{{ {} }}。"
+    },
+    "LowLevelKeyboardHook":
+    {
+        "ERROR_SetWindowsHookExW@1": "SetWindowsHookExW 失败，错误代码：{}。"
+    },
+    "Driver":
+    {
+        "INFO_SwitchToNullMode": "切换为空模式。",
+        "INFO_SwitchToDefaultIdleMode": "切换为默认挂机模式。",
+        "INFO_SwitchToExtendedIdleMode": "切换为扩展挂机模式。",
+        "INFO_SwitchToBatchCombinePartsMode": "切换为批量合成配件模式。",
+        "INFO_SwitchToBatchPurchaseItemMode": "切换为批量购买物品模式。",
+        "INFO_SwitchToLocateCursorMode": "切换为光标定位模式。",
+        "ERROR_DriverIsFrozen": "驱动器已经冻结，不允许修改。"
+    }
+}

@@ -1,0 +1,727 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{904e949c-669f-41f9-957c-41d501fd517c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Web Pages">
+      <UniqueIdentifier>{b319654c-780d-48bd-b145-17140ba6874b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Web Pages\Resources">
+      <UniqueIdentifier>{9c50bc0e-896e-4a21-9b7b-7246c57bd9da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Web Pages\Resources\Assets">
+      <UniqueIdentifier>{492b6772-48e5-41d5-bda2-d28ed4952c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{808aaf2c-bd47-4fc6-8136-8f6656d728c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\Assets">
+      <UniqueIdentifier>{0fc9d86f-d0bb-4f8d-bd12-77c9ecf60ade}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\Assets\Intro">
+      <UniqueIdentifier>{32b6fc44-2cef-41e7-af8b-3867def19401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\Assets\Skills">
+      <UniqueIdentifier>{5edf51e5-0c04-4ad3-bf85-321b38c7d6ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\Assets\Advanced">
+      <UniqueIdentifier>{5e781e4d-6617-4e0c-905c-677724a890d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\Assets\Update">
+      <UniqueIdentifier>{69256ed6-2298-4be4-aa94-11a6014b849f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller">
+      <UniqueIdentifier>{e8876dc1-781c-46ef-a6db-490aedb95390}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\include">
+      <UniqueIdentifier>{f40d7221-7925-41cd-a863-21605c7fa553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies">
+      <UniqueIdentifier>{87f89f9f-153e-4ba8-92e1-27ed2bcf05c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\include">
+      <UniqueIdentifier>{697ef04c-ae62-4661-824c-aaadfe6243bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\include\aho_corasick">
+      <UniqueIdentifier>{c40d2e50-f359-431c-acb6-fe5adfcef0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\include\onnxruntime">
+      <UniqueIdentifier>{47ddb138-126f-42dd-81ea-940918cf0e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\source">
+      <UniqueIdentifier>{054c3933-1581-4e56-90d9-5fc744caaa8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\source">
+      <UniqueIdentifier>{338c0a1e-96fb-4922-bdbb-fea024c9de3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controller\dependencies\libraries">
+      <UniqueIdentifier>{31e80884-3452-40ce-9879-6a987bc1fc36}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".EditorConfig">
+      <Filter>Config</Filter>
+    </None>
+    <None Include=".clangd">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\Copy.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\Export.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\Import.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\PopUpImage.css">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\PopUpImage.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\ToggleElement.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\ConfigWebPages\WeaponCodeGeneration.js">
+      <Filter>Web Pages\Resources</Filter>
+    </None>
+    <None Include="source\Weapon.html">
+      <Filter>Web Pages</Filter>
+    </None>
+    <None Include="source\Setting.html">
+      <Filter>Web Pages</Filter>
+    </None>
+    <None Include="docs\chapter_00.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_01.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_02.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_03.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_04.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_05.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_06.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\chapter_07.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="docs\main.tex">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include=".clang-format">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="vcpkg.json" />
+    <None Include="vcpkg-configuration.json" />
+    <None Include="Controller.cmake" />
+    <None Include="Controller\dependencies\libraries\onnxruntime.dll">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime.pdb">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.dll">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.pdb">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="source\ConfigWebPages\assets\auto_fill.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\choose_difficulty.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\choose_T_class.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\clear.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\combine.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\confirm_password.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\confirm_round.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\create_room_0.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\create_room_1.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\dead_purchase_rebuy.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\difficulty_option.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\finish_choose.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\game_insuff_funds_confirm.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\game_mode.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\hall_back.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\left_scroll.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\map_trap.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\password_box.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\right_scroll.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\room_list.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\start_game.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\store_buy_confirm.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\store_buy_option.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\store_purchase.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\timezone.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\use_password.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\zombie_scenario.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="source\ConfigWebPages\assets\zs_esc_cancel.png">
+      <Filter>Web Pages\Resources\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\after-make-borderless.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\auto_fill.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\before-make-borderless.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\brionac.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\buy_ac.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\choose_difficulty.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\choose_T_class.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\clear.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\combine.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\confirm_password.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\confirm_round.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\create_room_0.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\create_room_1.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\dead_purchase_rebuy.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\delete_AC.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\delete_SpecialWeapon.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\difficulty_option.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\export_setting.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\finish_choose.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\game_insuff_funds_confirm.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\game_mode.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\generate_brionac_code.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\generate_part_weapon_code.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\hall_back.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\left_scroll.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\map_trap.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\password_box.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\position.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\right_scroll.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\room_list.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\start_game.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\store_buy_confirm.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\store_buy_option.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\store_purchase.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\timezone.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\use_password.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\zombie_scenario.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\zs_esc_cancel.png">
+      <Filter>Docs\Assets</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\confirm_execution_policy_00.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\confirm_execution_policy_01.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\controller.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\disable_login_start.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\download-lghub.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\edit.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\exit_controller.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\exit_gamingtool.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\import.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\install.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\interrupt.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\lghub.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\lghub_advanced.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\lghub_menu.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\lghub_property.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\lghub_setting.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\main.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\manage_configs.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\run_controller.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\run_lghub.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\run_pwsh_as_admin.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\save_and_run.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\script.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\search_lghub_process.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\success.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\terminate_lghub_00.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\terminate_lghub_01.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\unlock_00.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\unlock_01.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\win11_23h2_00.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\intro\win11_23h2_01.png">
+      <Filter>Docs\Assets\Intro</Filter>
+    </Image>
+    <Image Include="docs\assets\advanced\change_max_wait_time_in_room_0.png">
+      <Filter>Docs\Assets\Advanced</Filter>
+    </Image>
+    <Image Include="docs\assets\advanced\change_max_wait_time_in_room_1.png">
+      <Filter>Docs\Assets\Advanced</Filter>
+    </Image>
+    <Image Include="docs\assets\update\close_controller.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\close_gamingtool.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\config_new_positions_00.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\config_new_positions_01.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\config_new_positions_02.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\export_error.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\extract_new_version.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\import_main_00.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\import_main_01.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\import_setting.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\override_setting.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\replace_00.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\replace_01.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\replace_02.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\replace_03.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\run_install.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\run_new_controller.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\run_new_gamingtool.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\save_and_run_00.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\save_and_run_01.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\section_number_in_conf.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\unlock_00.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\update\unlock_01.png">
+      <Filter>Docs\Assets\Update</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_00.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_01.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_02.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_03.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_04.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_05.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_06.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_07.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_08.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_09.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_10.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\create_basic_task_11.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\lghub_property.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\new_folder.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\run_task.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\specify_name.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+    <Image Include="docs\assets\skills\task_scheduler.png">
+      <Filter>Docs\Assets\Skills</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Controller\source\Command.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\CommandDispatcher.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Console.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\CRNN.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\CSOBannerSuppressor.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\DBNet.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Driver.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Global.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\HotKey.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\IdleEngine.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\LowLevelKeyboardHook.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Main.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\OCR.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\OCRIdleEngine.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\OCRUtilities.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Test.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\Utilities.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\dependencies\source\clipper.cpp">
+      <Filter>Controller\dependencies\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller\source\pch.cpp">
+      <Filter>Controller\source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Controller\include\Command.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\CommandDispatcher.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Console.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Driver.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Event.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Exception.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Global.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\HotKey.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\IdleEngine.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Module.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\OCR.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\OCRIdleEngine.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\Utilities.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\LowLevelKeyboardHook.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\CSOBannerSuppressor.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\include\pch.hpp">
+      <Filter>Controller\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\clipper.hpp">
+      <Filter>Controller\dependencies\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\aho_corasick\aho_corasick.hpp">
+      <Filter>Controller\dependencies\include\aho_corasick</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\cpu_provider_factory.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_c_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_cxx_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_cxx_inline.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_float16.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_lite_custom_op.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_run_options_config_keys.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_session_options_config_keys.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_c_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_cxx_api.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\onnxruntime_training_cxx_inline.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller\dependencies\include\onnxruntime\provider_options.h">
+      <Filter>Controller\dependencies\include\onnxruntime</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="NatvisFile.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Controller\dependencies\libraries\onnxruntime.lib">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </Library>
+    <Library Include="Controller\dependencies\libraries\onnxruntime_providers_shared.lib">
+      <Filter>Controller\dependencies\libraries</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

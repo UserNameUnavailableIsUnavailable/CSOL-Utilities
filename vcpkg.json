@@ -1,0 +1,16 @@
+{
+  "dependencies": [
+    "cli11",
+    "lua",
+    "nlohmann-json",
+    {
+      "name": "opencv",
+      "features": [
+        "default-features",
+        "thread"
+      ]
+    },
+    "pkgconf",
+    "boost-static-string"
+  ]
+}

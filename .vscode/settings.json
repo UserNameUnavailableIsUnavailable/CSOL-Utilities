@@ -1,0 +1,44 @@
+{
+    "Lua.diagnostics.globals":
+    [
+        "OnEvent",
+        "GetMKeyState",
+        "SetMKeyState",
+        "Sleep",
+        "OutputLogMessage",
+        "GetRunningTime",
+        "GetDate",
+        "ClearLog",
+        "PressKey",
+        "ReleaseKey",
+        "PressAndReleaseKey",
+        "IsModifierPressed",
+        "PressMouseButton",
+        "ReleaseMouseButton",
+        "PressAndReleaseMouseButton",
+        "IsMouseButtonPressed",
+        "MoveMouseTo",
+        "MoveMouseWheel",
+        "MoveMouseRelative",
+        "MoveMouseToVirtual",
+        "GetMousePosition",
+        "OutputLCDMessage",
+        "ClearLCD",
+        "PlayMacro",
+        "AbortMacro",
+        "IsKeyLockOn",
+        "SetBacklightColor",
+        "OutputDebugMessage",
+        "SetMouseDPITable",
+        "SetMouseDPITableIndex",
+        "EnablePrimaryMouseButtonEvents",
+        "SetSteeringWheelProperty"
+    ],
+    "clangd.path": "C:\\toolchain\\MSYS2\\ucrt64\\bin\\clangd.exe",
+    "vscode-neovim.neovimExecutablePaths.win32": "nvim",
+    "editor.fontFamily": "\"Cascadia Mono NF\", \"Cascadia Next SC\"",
+    "clangd.arguments": [
+        "--header-insertion=never"
+    ],
+    "editor.fontSize": 16
+}

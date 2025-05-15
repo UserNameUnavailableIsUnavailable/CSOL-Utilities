@@ -1,1 +1,1 @@
-var g_Version = "{ 1, 5, 2 }"
+var g_Version = "\"1.5.2\""
