@@ -102,7 +102,7 @@
       <Command>xcopy "$(SolutionDir)Controller\locales" "$(TargetDir)locales" /s /e /i /y
 xcopy "$(SolutionDir)Controller\models" "$(TargetDir)models" /s /e /i /y
 xcopy "$(SolutionDir)Controller.ps1" "$(TargetDir).." /y
-xcopy "$(SolutionDir)Executor" "$(TargetDir)..\Executor" /s /e /i /y
+xcopy "$(SolutionDir)Executor" "$(TargetDir)..\Executor" /s /e /i /y /h /r
 xcopy "$(SolutionDir)Controller\dependencies\libraries\onnxruntime.dll" "$(TargetDir)" /y
 </Command>
     </PostBuildEvent>

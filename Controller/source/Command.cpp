@@ -1,6 +1,8 @@
 ﻿#include "pch.hpp"
 
 #include "Command.hpp"
+#include "Utilities.hpp"
+#include "Exception.hpp"
 
 namespace CSOL_Utilities
 {
@@ -9,7 +11,7 @@ namespace CSOL_Utilities
 		auto& self = GetInstance();
 		auto expected = false;
 
-		while (!self.m_Lock.compare_exchange_strong(expected, true, std::memory_order_seq_cst)) {}
+		while (!self.m_SpinLock.compare_exchange_strong(expected, true, std::memory_order_seq_cst)) {}
 
 		if (self.m_AutoRenew) // 自动续期
 		{
@@ -25,7 +27,7 @@ namespace CSOL_Utilities
 		s.resize(new_size);
 		std::format_to(s.data(), COMMAND_FORMAT, self.m_Id, QueryCommandString(self.m_CmdType),
 					   static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.m_Timepoint)), self.m_Repeatable);
-		self.m_Lock.store(true, std::memory_order_release);
+		self.m_SpinLock.store(true, std::memory_order_release);
 	}
 
 	std::string Command::Get()
@@ -40,7 +42,7 @@ namespace CSOL_Utilities
 		auto& self = GetInstance();
 		auto expected = false;
 
-		while (!self.m_Lock.compare_exchange_strong(expected, true, std::memory_order_seq_cst)) {} // 自旋锁
+		while (!self.m_SpinLock.compare_exchange_strong(expected, true, std::memory_order_seq_cst)) {} // 自旋锁
 
 		auto now = std::chrono::system_clock::now();
 
@@ -56,7 +58,7 @@ namespace CSOL_Utilities
 		self.m_Repeatable = static_cast<bool>(mode & CMD_REPEATABLE);
 		self.m_AutoRenew = static_cast<bool>(mode & CMD_AUTO_REFRESH);
 		
-		self.m_Lock.store(false, std::memory_order_release); // 解锁
+		self.m_SpinLock.store(false, std::memory_order_release); // 解锁
 	}
 
 	Command& Command::GetInstance()

@@ -185,7 +185,7 @@ namespace CSOL_Utilities
 					   buffer.data() + bmp_body_offset, reinterpret_cast<BITMAPINFO*>(&BitmapInfoHeader),
 					   DIB_RGB_COLORS))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_GetDIBits", GetLastError()));
+			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_GetDIBits@1", GetLastError()));
 		}
 	}
 
@@ -285,7 +285,7 @@ namespace CSOL_Utilities
 		return dwPId;
 	}
 
-	void EnumProcesses(std::function<bool (const PROCESSENTRY32W& process_entry)> callback)
+	void EnumerateProcesses(std::function<bool (const PROCESSENTRY32W& process_entry)> callback)
 	{
 		DWORD dwPId = 0;
 		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);

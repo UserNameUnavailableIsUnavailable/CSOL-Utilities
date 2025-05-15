@@ -23,7 +23,7 @@ namespace CSOL_Utilities
 		static constexpr std::string_view KEYWORD_CATEGORY_LOADING = "LOADING";
 		static constexpr std::string_view KEYWORD_CATEGORY_IN_GAME = "IN_GAME";
 		std::unordered_map<std::string, std::vector<std::string>> m_Keywords; /* 关键词 */
-		IN_GAME_STATE m_igs; /* 游戏内状态 */
+		std::atomic<IN_GAME_STATE> m_InGameState; /* 游戏内状态 */
 		std::chrono::system_clock::time_point m_tp; /* 状态解析时刻 */
         std::unique_ptr<OCR> m_OCR;
         cv::Mat m_Image;
@@ -31,13 +31,18 @@ namespace CSOL_Utilities
         aho_corasick::trie trie;
 		std::function<void (HWND)> m_RemoveWindowBorder;
     private:
+        virtual void Reset() noexcept override { m_InGameState = IN_GAME_STATE::IGS_UNKNOWN; }
         virtual void RecognizeGameState(std::stop_token st) override;
-		void update_state(IN_GAME_STATE state) noexcept
+		void SetInGameState(IN_GAME_STATE state) noexcept
 		{
-            if (m_igs == state) return; /* 前后两个状态相同，不发生更新，这样保持此状态开始时刻不变 */
-			m_igs = state;
+            if (m_InGameState.load(std::memory_order_acquire) == state) return; /* 前后两个状态相同，不发生更新，这样保持此状态开始时刻不变 */
+			m_InGameState.store(state, std::memory_order_release);
 			m_tp = std::chrono::system_clock::now();
 		}
+        IN_GAME_STATE GetInGameState() noexcept
+        {
+            return m_InGameState.load(std::memory_order_release);
+        }
 		void Recognize(std::vector<std::string>&);
 		void Dispatch();
 		void Analyze();

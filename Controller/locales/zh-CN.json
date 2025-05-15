@@ -1,7 +1,7 @@
 {
     "Main":
     {
-        "INFO_Meta": "CSOL 集成工具控制器 v1.5.2",
+        "INFO_Version@1": "CSOL 集成工具控制器（版本：{}），请留意控制器与执行器版本是否匹配。",
         "WARN_NotRunningAsAdmin": "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。",
         "INFO_AutoDetectGameRootDir": "未指定游戏程序根目录，尝试自动检测（仅适用于国服）。",
         "INFO_AutoDetectLaunchGameCmd": "未指定游戏启动命令，尝试自动检测（仅适用于国服）。",
@@ -10,8 +10,9 @@
         "INFO_LaunchGameCmd@1": "游戏启动命令：{}。",
         "INFO_DisableQuickFullscreen": "屏蔽了游戏窗口全屏热键 {{ Alt Enter }}。",
         "INFO_SuppressCSOBanner": "自动检测并关闭 CSO Banner 功能启用",
-        "INFO_About": "本工具由 _CoreDump 开发，如遇问题请通过邮件联系：admin@macrohard.fun 或 ttyuig@126.com，有开发经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
-        "INFO_Note": "本工具项目开源，请注意甄别。",
+        "INFO_Author": "本工具由 _CoreDump 开发。",
+        "INFO_Feedback": "如遇问题请通过邮箱 admin@macrohard.fun 或 ttyuig@126.com 联系作者，有编程经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
+        "WARN_Note": "本工具项目开源，请注意甄别，切勿上当受骗。",
         "INFO_Gitee_URL": "Gitee 项目地址：https://gitee.com/silver1867/csol-24-h。",
         "INFO_GitHub_URL": "GitHub 项目地址：https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities。",
         "INFO_HowToExit": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
@@ -78,7 +79,8 @@
             "WARN_ReturnFromRoomToLobby": "从房间中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
             "WARN_WaitStartGameRoomTimeout@1": "等待开始游戏超过预设时间 {} 秒，回到大厅重新创建房间。",
             "WARN_WaitLoginTimeout@1": "等待游戏登录超过预设时间 {} 秒。",
-            "WARN_WaitLoadGameMapTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应，结束游戏进程并重新启动。"
+            "WARN_WaitLoadGameMapTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应。",
+            "INFO_TryKillGameProcess": "尝试结束游戏进程。"
         }
     },
     "CSOBannerSuppressor":

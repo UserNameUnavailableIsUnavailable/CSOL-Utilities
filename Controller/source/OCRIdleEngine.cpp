@@ -107,7 +107,7 @@ namespace CSOL_Utilities
 		{
 			return;
 		}
-		thread_local auto igs = IN_GAME_STATE::IGS_UNKNOWN;
+		thread_local auto analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
 		std::array<int, 4> scenarios{ 0, 0, 0, 0 };
 		constexpr auto lobby = 0;
 		constexpr auto room = 1;
@@ -147,72 +147,66 @@ namespace CSOL_Utilities
 		auto greatest = std::max_element(scenarios.begin(), scenarios.end());
 		if (*greatest < 1)
 		{
-			igs = IN_GAME_STATE::IGS_UNKNOWN;
+			analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
 		}
 		else
 		{
 			switch (greatest - scenarios.begin())
 			{
-			case lobby: igs = IN_GAME_STATE::IGS_LOBBY; break;
-			case room: igs = IN_GAME_STATE::IGS_ROOM; break;
-			case loading: igs = IN_GAME_STATE::IGS_LOADING; break;
-			case gaming: igs = IN_GAME_STATE::IGS_GAMING; break;
+			case lobby: analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; break;
+			case room: analyzed_in_game_state = IN_GAME_STATE::IGS_ROOM; break;
+			case loading: analyzed_in_game_state = IN_GAME_STATE::IGS_LOADING; break;
+			case gaming: analyzed_in_game_state = IN_GAME_STATE::IGS_GAMING; break;
 			}
 			if (*greatest == scenarios[gaming])
 			{
-				igs = IN_GAME_STATE::IGS_GAMING;
+				analyzed_in_game_state = IN_GAME_STATE::IGS_GAMING;
 			}
 		}
 		thread_local int abnormal_back_to_room = 0;
 		/* 合法状态迁移 */
 		/* 手写状态机，考虑到后续维护难度，故引入了更多的代码冗余降低理解难度 */
-		if (m_igs == igs)
+		if (m_InGameState == analyzed_in_game_state)
 		{
 			/* 自上一次起状态未发生变化 */
 		}
 		/* 5 种顺序迁移 */
-		else if (m_igs == IN_GAME_STATE::IGS_LOGIN && igs == IN_GAME_STATE::IGS_LOBBY) /* 登陆成功，进入大厅 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN && analyzed_in_game_state == IN_GAME_STATE::IGS_LOBBY) /* 登陆成功，进入大厅 */
 		{
-			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_LoginSuccess"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOBBY && igs == IN_GAME_STATE::IGS_ROOM) /* 创建房间 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOBBY && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM) /* 创建房间 */
 		{
-			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_EnterGameRoom"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_ROOM && igs == IN_GAME_STATE::IGS_LOADING) /* 开始游戏 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_ROOM && analyzed_in_game_state == IN_GAME_STATE::IGS_LOADING) /* 开始游戏 */
 		{
-			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_StartGameRoom"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOADING && igs == IN_GAME_STATE::IGS_GAMING) /* 场景加载完成 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING && analyzed_in_game_state == IN_GAME_STATE::IGS_GAMING) /* 场景加载完成 */
 		{
-			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_GameMapLoaded"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_GAMING && igs == IN_GAME_STATE::IGS_ROOM) /* 结算确认 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM) /* 结算确认 */
 		{
-			update_state(igs);
 			Console::Info(Translate("IdleEngine::OCR::INFO_ResultsConfirmed"));
 		}
 		/* 消除未知状态迁移，不计入迁移种类 */
-		else if (igs == IN_GAME_STATE::IGS_UNKNOWN)
+		else if (analyzed_in_game_state == IN_GAME_STATE::IGS_UNKNOWN)
 		{
-			if (m_igs != IN_GAME_STATE::IGS_GAMING && m_igs != IN_GAME_STATE::IGS_LOADING)
+			if (m_InGameState == IN_GAME_STATE::IGS_GAMING || m_InGameState == IN_GAME_STATE::IGS_LOADING)
 			{
-				update_state(IN_GAME_STATE::IGS_UNKNOWN);
+				/* 正在游戏或正在加载，保持原有状态不变 */
+				analyzed_in_game_state = GetInGameState();
 			}
 			else
 			{
-				// m_igs 不变
-				/* 正在游戏或正在加载，保持原有状态不变 */
+				analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
 			}
 		}
-		else if (igs != IN_GAME_STATE::IGS_UNKNOWN && m_igs != IN_GAME_STATE::IGS_UNKNOWN)
+		else if (analyzed_in_game_state != IN_GAME_STATE::IGS_UNKNOWN && m_InGameState != IN_GAME_STATE::IGS_UNKNOWN)
 		{
-			update_state(igs);
-			switch (igs)
+			switch (analyzed_in_game_state)
 			{
 			case IN_GAME_STATE::IGS_LOBBY:
 				Console::Info(Translate("IdleEngine::OCR::INFO_Lobby"));
@@ -231,39 +225,38 @@ namespace CSOL_Utilities
 			}
 		}
 		/* 非法状态迁移，4 种 */
-		else if (m_igs == IN_GAME_STATE::IGS_LOADING &&
-				 igs == IN_GAME_STATE::IGS_ROOM) /* 加载失败，现象一般为重连 1 2 3，可能是网络问题 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM)
+		/* 加载失败，现象一般为重连 1 2 3，可能是网络问题 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY); /* 直接离开房间回到大厅 */
+			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; /* 直接离开房间回到大厅 */
 			Console::Warn(Translate("IdleEngine::OCR::WARN_LoadGameMap"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_GAMING && igs == IN_GAME_STATE::IGS_ROOM)
+		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM)
 		{
 			abnormal_back_to_room++;
 			if (abnormal_back_to_room == 3)
 			{
-				update_state(IN_GAME_STATE::IGS_LOBBY); /* 直接离开房间回到大厅 */
+				analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; /* 直接离开房间回到大厅 */
 				Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoom"));
 				abnormal_back_to_room = 0;
 			}
 			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoomTooManyTimes"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_GAMING &&
-				 igs == IN_GAME_STATE::IGS_LOBBY) /* 从游戏场景返回到大厅，原因一般为：强制踢出、长时间没有有效操作 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_LOBBY)
+		/* 从游戏场景返回到大厅，原因一般为：强制踢出、长时间没有有效操作 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY);
+			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY;
 			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToLobby"));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_ROOM &&
-				 igs == IN_GAME_STATE::IGS_LOBBY) /* 从游戏房间返回到大厅，原因可能是：强制踢出、房间等待时间过长 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_ROOM && analyzed_in_game_state == IN_GAME_STATE::IGS_LOBBY)
+		/* 从游戏房间返回到大厅，原因可能是：强制踢出、房间等待时间过长 */
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY);
+			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY;
 			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromRoomToLobby"));
 		}
-		else /* 其他情形，除非手动操作，否则应该不会出现 */
+		else /* 其他情形，除非手动操作，否则不会出现 */
 		{
-			update_state(igs);
-			switch (igs)
+			switch (analyzed_in_game_state)
 			{
 			case IN_GAME_STATE::IGS_LOBBY:
 				Console::Info(Translate("IdleEngine::OCR::INFO_Lobby"));
@@ -283,33 +276,48 @@ namespace CSOL_Utilities
 		}
 
 		/* 超时检查 */
-		if (m_igs == IN_GAME_STATE::IGS_ROOM && recognize_start - m_tp > std::chrono::seconds(Global::StartGameRoomTimeout))
+		if (m_InGameState == IN_GAME_STATE::IGS_ROOM && recognize_start - m_tp > std::chrono::seconds(Global::StartGameRoomTimeout))
 		{
-			update_state(IN_GAME_STATE::IGS_LOBBY);
+			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY;
 			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitStartGameRoomTimeout@1", Global::StartGameRoomTimeout));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(60)) /* 登录时间超过 60 秒 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(60))
+		/* 登录时间超过 60 秒 */
 		{
-			update_state(IN_GAME_STATE::IGS_UNKNOWN);
+			analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
 			Console::Warn(Translate("IdleEngine::OCR::WaitLoginTimeout@1",
 						 Global::LoginTimeout));
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOADING && recognize_start - m_tp > std::chrono::seconds(150)) /* 游戏加载超时 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING && recognize_start - m_tp > std::chrono::seconds(150))
+		/* 游戏加载超时 */
 		{
-			Console::Warn(Translate("OCRIdleEngine::WaitLoadGameMapTimeout@1",
-						 Global::LoadMapTimeout));
+			Console::Warn(Translate("IdleEngine::OCR::WaitLoadGameMapTimeout@1", Global::LoadMapTimeout));
 			DWORD dwPId = 0;
-			GetWindowThreadProcessId(m_GameProcessInfo.hGameWindow.load(std::memory_order_acquire), &dwPId);
-			if (dwPId)
+			if (Global::RestartGameOnLoadingTimeout)
 			{
-				HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, NULL, dwPId);
-				if (hProcess)
+				GetWindowThreadProcessId(m_GameProcessInfo.hGameWindow.load(std::memory_order_acquire), &dwPId);
+				if (dwPId)
 				{
-					SafeTerminateProcess(hProcess, 0);
-					CloseHandle(hProcess);
+					Console::Warn(Translate("IdleEngine::OCR::INFO_TryKillGameProcess"));
+					HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, NULL, dwPId);
+					if (hProcess)
+					{
+						if (!SafeTerminateProcess(hProcess, 3000))
+						{
+							TerminateProcess(hProcess, -1);
+						}
+						CloseHandle(hProcess);
+					}
 				}
+				analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
+			}
+			else
+			{
+				analyzed_in_game_state = IN_GAME_STATE::IGS_GAMING;
 			}
 		}
+		/* 更新状态 */
+		SetInGameState(analyzed_in_game_state);
     }
 
     void OCRIdleEngine::Dispatch()
@@ -317,27 +325,27 @@ namespace CSOL_Utilities
 		Command::TYPE command;
 
 		std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-		if (m_igs == IN_GAME_STATE::IGS_UNKNOWN)
+		if (m_InGameState == IN_GAME_STATE::IGS_UNKNOWN)
 		{
 			command = Command::TYPE::CMD_CLEAR_POPUPS;
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOGIN) /* 正在登陆 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN) /* 正在登陆 */
 		{
 			command = Command::TYPE::CMD_NOP;
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOBBY) /* 大厅内 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOBBY) /* 大厅内 */
 		{
 			command = Command::TYPE::CMD_CREATE_GAME_ROOM;
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_ROOM) /* 房间内（正常） */
+		else if (m_InGameState == IN_GAME_STATE::IGS_ROOM) /* 房间内（正常） */
 		{
 			command = Command::TYPE::CMD_START_GAME_ROOM;
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_LOADING) /* 加载 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING) /* 加载 */
 		{
 			command = Command::TYPE::CMD_NOP;
 		}
-		else if (m_igs == IN_GAME_STATE::IGS_GAMING) /* 游戏中 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING) /* 游戏中 */
 		{
 			if (tp - m_tp > std::chrono::seconds(60) && GetIdleMode() == IDLE_MODE::IM_EXTENDED) /* 扩展模式启用，且进入游戏达到 60 秒 */
 			{

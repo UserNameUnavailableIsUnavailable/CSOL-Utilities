@@ -23,40 +23,23 @@ namespace CSOL_Utilities
 				}
 				m_bFinished = false;
 			}
-			DWORD dwBytesWritten;
 			thread_local std::string last_cmd;
-			Command::Get(m_content);
-			#ifdef _DEBUG
-			Console::Debug(std::format("命令：{}。", m_content));
-			#endif
-			if (m_content != last_cmd) /* 命令内容发生变更才写入 */
-			{
-				SetFilePointer(m_hFile.get(), 0, NULL, FILE_BEGIN); // 移动到文件开始处
-				auto write_ok = WriteFile(m_hFile.get(), m_content.c_str(), m_content.length() * sizeof(char), &dwBytesWritten, NULL);
-				if (write_ok)
-				{
-					// 这里不使用 filesystem 的 resize_file，在已经有 Win32 句柄的情况下直接设置 EOF，提高效率
-					SetFilePointer(m_hFile.get(), dwBytesWritten, NULL, FILE_BEGIN);
-					SetEndOfFile(m_hFile.get()); // 写入 EOF
-				}
-				else
-				{
-					Console::Warn(Translate("CommandDispatcher::ERROR_WriteFile@1", GetLastError()));
-				}
-				swap(last_cmd, m_content); /* 交换当前命令内容及上一次命令，避免重复创建新的字符串对象，提高效率 */
-			}
+			thread_local std::string this_cmd;
+			Command::Get(this_cmd);
+			WriteCommandFile(this_cmd);
+			swap(last_cmd, this_cmd); /* 交换当前命令内容及上一次命令，避免重复创建新的字符串对象，提高效率 */
 			{
 				std::lock_guard lk(m_StateLock);
 				m_bFinished = true;
 			}
 			m_Finished.notify_one();
-			SleepEx(4000, true);
+			SleepEx(1000, true); /* 每隔 1 秒运行一次，但不一定会触发文件写入 */
 		}
 	}
 
 	CommandDispatcher::CommandDispatcher(std::filesystem::path command_file_path) :
 		m_file_path(command_file_path),
-		m_hFile(nullptr, [] (HANDLE h) { if (h && h != INVALID_HANDLE_VALUE) { CloseHandle(h); } })
+		m_hFile(INVALID_HANDLE_VALUE, [] (HANDLE h) { if (h && h != INVALID_HANDLE_VALUE) { CloseHandle(h); } })
 	{
 		m_hFile.reset(CreateFileW(m_file_path.wstring().c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS,
 							  FILE_ATTRIBUTE_HIDDEN, NULL));
@@ -98,11 +81,27 @@ namespace CSOL_Utilities
 		m_Runnable.notify_one();
 	}
 
+	void CommandDispatcher::WriteCommandFile(std::string_view command_string)
+	{
+		DWORD dwBytesWritten = 0;
+		auto write_ok = WriteFile(m_hFile.get(), command_string.data(), command_string.length() * sizeof(char), &dwBytesWritten, NULL);
+		if (write_ok)
+		{
+			SetFilePointer(m_hFile.get(), dwBytesWritten, NULL, FILE_BEGIN);
+			SetEndOfFile(m_hFile.get());
+		}
+		else
+		{
+			Console::Warn(Translate("CommandDispatcher::ERROR_WriteFile@1", GetLastError()));
+		}
+	}
+
 	CommandDispatcher::~CommandDispatcher() noexcept
 	{
 		m_StopSource.request_stop();
 		m_Runnable.notify_one();
         QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_Worker.native_handle()), 0);
 		m_Worker.join();
+		WriteCommandFile(Command::NOP()); /* 确保最后写入 NOP */
 	}
 } // namespace CSOL_Utilities

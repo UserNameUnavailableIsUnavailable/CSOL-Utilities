@@ -16,4 +16,4 @@ namespace CSOL_Utilities
 }
 
 #define DetailedQuickThrow(string) \
-	throw CSOL_Utilities::Exception(CSOL_Utilities::Translate("Exception::DETAILED_QUICK_THROW_TEMPLATE", __FILE__, __LINE__, __func__, string))
+	throw CSOL_Utilities::Exception(CSOL_Utilities::Translate("Exception::DETAILED_QUICK_THROW_TEMPLATE@4", __FILE__, __LINE__, __func__, string))

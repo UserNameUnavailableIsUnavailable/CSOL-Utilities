@@ -31,6 +31,7 @@ namespace CSOL_Utilities
 		static void Set(Command::TYPE cmd_type, Command::MODE mode = Command::CMD_DEFAULT);
 		static std::string Get();
 		static void Get(std::string& s);
+		static constexpr const char* NOP() { return "CommandType = Command.CMD_NOP\r\n"; }
 		static constexpr std::string_view QueryCommandString(Command::TYPE cmd_type) noexcept
 		{
 			switch (cmd_type)
@@ -79,15 +80,17 @@ namespace CSOL_Utilities
 	private:
 		static Command& GetInstance();
         Command() = default;
+		~Command() noexcept = default;
 		Command(Command&) = delete;
 		Command(Command&&) = delete;
 
-		std::atomic_bool m_Lock;
-		TYPE m_CmdType;
-		uint64_t m_Id;
-		bool m_Repeatable; /* 是否可重复 */
-		bool m_AutoRenew; /* 自动刷新 */
-		std::chrono::time_point<std::chrono::system_clock> m_Timepoint;
+		std::atomic_bool m_SpinLock;
+		
+		TYPE m_CmdType = TYPE::CMD_NOP;
+		uint64_t m_Id = 0;
+		bool m_Repeatable = false; /* 是否可重复 */
+		bool m_AutoRenew = false; /* 自动刷新 */
+		std::chrono::time_point<std::chrono::system_clock> m_Timepoint = std::chrono::system_clock::time_point(); /* 命令下达时刻 */
 		static constexpr std::string_view COMMAND_FORMAT = "CmdId = {}\r\n"
 															 "CmdType = {}\r\n"
 															 "CmdTimepoint = {}\r\n"

@@ -42,7 +42,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 		auto _ = std::getchar();
 		dwErrorCode = GetLastError();
 	}
-	g_Driver.reset(); /* 在结束进程前（调用 ExitProcess）析构 Driver */
+	g_Driver.reset(); /* 析构 Driver，结束所有线程 */
 	Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
 	Console::Info(Translate("Main::INFO_SafelyExited"));
 	return dwErrorCode;
@@ -77,18 +77,13 @@ void Boot()
 	std::locale locale(ConvertUtf16ToUtf8(Global::LocaleName));
 	std::locale::global(locale);
 	LoadLanguagePackage(Global::g_LanguagePackage);
-	Console::Info(Translate("Main::INFO_Meta"));
-	Console::Info(Translate("Main::INFO_About"));
-	Console::Info(Translate("Main::INFO_Note"));
+	Console::Info(Translate("Main::INFO_Version@1", "1.5.2"));
+	Console::Warn(Translate("Main::WARN_Note"));
+	Console::Info(Translate("Main::INFO_Author"));
+	Console::Info(Translate("Main::INFO_Feedback"));
 	Console::Info(Translate("Main::INFO_Gitee_URL"));
 	Console::Info(Translate("Main::INFO_GitHub_URL"));
 	Console::Info(Translate("Main::INFO_HowToExit"));
-#ifdef _DEBUG
-	//for (auto& [k, v] : Global::g_LanguagePackage)
-	//{
-	//	Console::Debug(std::format("{} = {}", k, v));
-	//}
-#endif
 	if (!IsRunningAsAdmin())
 	{
 		Console::Warn(Translate("Main::WARN_NotRunningAsAdmin"));
@@ -206,7 +201,6 @@ void Boot()
 		g_Driver->RegisterLowLevelKeyboardHook(std::move(disable_alt_enter));
 		Console::Info(Translate("Main::INFO_DisableQuickFullscreen"));
 	}
-
 	if (Global::SuppressCSOBanner)
 	{
 		auto cso_banner_path = std::filesystem::path(Global::GameRootDirectory) / L"Bin" / L"CSOBanner.exe";

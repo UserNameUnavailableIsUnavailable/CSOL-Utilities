@@ -106,7 +106,7 @@ namespace CSOL_Utilities
             }
             {
                 std::lock_guard lk(m_StateLock);
-                EnumProcesses(find_cso_banner_process);
+                EnumerateProcesses(find_cso_banner_process);
                 m_bFinished = true;
             }
             m_FinishedCondition.notify_one();
