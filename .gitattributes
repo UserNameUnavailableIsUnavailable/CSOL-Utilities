@@ -1,0 +1,15 @@
+*.o binary
+*.obj binary
+*.a binary
+*.lib binary
+*.so binary
+*.dll binary
+*.pdb binary
+*.bin binary
+*.exe binary
+*.jpg binary
+*.png binary
+*.avif binary
+*.gif binary
+*.webp binary
+*.onnx binary
