@@ -131,6 +131,7 @@ xcopy "$(SolutionDir)Controller\dependencies\libraries\onnxruntime.dll" "$(Targe
       <Command>xcopy "$(SolutionDir)Controller\locales" "$(TargetDir)locales" /s /e /i /y
 xcopy "$(SolutionDir)Controller\models" "$(TargetDir)models" /s /e /i /y
 xcopy "$(SolutionDir)Controller.ps1" "$(TargetDir).." /y
+xcopy "$(solutionDir)Install.ps1" "$(TargetDir).." /y
 xcopy "$(SolutionDir)Executor" "$(TargetDir)..\Executor" /s /e /i /y
 xcopy "C:\Windows\System32\msvcp140.dll" "$(TargetDir)" /y
 xcopy "C:\Windows\System32\msvcp140_1.dll" "$(TargetDir)" /y
@@ -180,9 +181,7 @@ xcopy "$(SolutionDir)Controller\dependencies\libraries\onnxruntime.dll" "$(Targe
     <None Include=".EditorConfig" />
     <None Include="Controller.cmake" />
     <None Include="Controller\dependencies\libraries\onnxruntime.dll" />
-    <None Include="Controller\dependencies\libraries\onnxruntime.pdb" />
     <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.dll" />
-    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.pdb" />
     <None Include="docs\chapter_00.tex" />
     <None Include="docs\chapter_01.tex" />
     <None Include="docs\chapter_02.tex" />

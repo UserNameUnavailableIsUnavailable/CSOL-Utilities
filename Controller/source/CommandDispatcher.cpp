@@ -81,10 +81,11 @@ namespace CSOL_Utilities
 		m_Runnable.notify_one();
 	}
 
-	void CommandDispatcher::WriteCommandFile(std::string_view command_string)
+	void CommandDispatcher::WriteCommandFile(const std::string& command_string)
 	{
 		DWORD dwBytesWritten = 0;
-		auto write_ok = WriteFile(m_hFile.get(), command_string.data(), command_string.length() * sizeof(char), &dwBytesWritten, NULL);
+		SetFilePointer(m_hFile.get(), 0, NULL, FILE_BEGIN);
+		auto write_ok = WriteFile(m_hFile.get(), command_string.c_str(), command_string.length() * sizeof(char), &dwBytesWritten, NULL);
 		if (write_ok)
 		{
 			SetFilePointer(m_hFile.get(), dwBytesWritten, NULL, FILE_BEGIN);

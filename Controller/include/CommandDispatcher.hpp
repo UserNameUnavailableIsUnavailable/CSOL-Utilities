@@ -15,7 +15,7 @@ namespace CSOL_Utilities
 		virtual void Suspend() override;
 
 	private:
-		void WriteCommandFile(std::string_view command_string);
+		void WriteCommandFile(const std::string& command_string);
 		void Work(std::stop_token st);
 		std::stop_source m_StopSource;
         /* 考虑到 dangling resources 问题，这里使用 thread 而非 jthread */

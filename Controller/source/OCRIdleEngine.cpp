@@ -281,14 +281,14 @@ namespace CSOL_Utilities
 			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY;
 			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitStartGameRoomTimeout@1", Global::StartGameRoomTimeout));
 		}
-		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(60))
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(Global::LoginTimeout))
 		/* 登录时间超过 60 秒 */
 		{
 			analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
-			Console::Warn(Translate("IdleEngine::OCR::WaitLoginTimeout@1",
+			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitLoginTimeout@1",
 						 Global::LoginTimeout));
 		}
-		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING && recognize_start - m_tp > std::chrono::seconds(150))
+		else if (m_InGameState == IN_GAME_STATE::IGS_LOADING && recognize_start - m_tp > std::chrono::seconds(Global::LoadMapTimeout))
 		/* 游戏加载超时 */
 		{
 			Console::Warn(Translate("IdleEngine::OCR::WaitLoadGameMapTimeout@1", Global::LoadMapTimeout));

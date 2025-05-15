@@ -1,19 +1,22 @@
-SHELL = pwsh.exe
+﻿SHELL = pwsh.exe
 export .SHELLFLAGS = -NoProfile -Command
+
 export ROOT := $(shell (Get-Location).ToString() -replace("\\", "/"))
+
 export DEPENDENCIES := $(ROOT)/dependencies
-export TEST= $(ROOT)/test
+export TEST = $(ROOT)/test
 export DOCS = $(ROOT)/documents
-export BUILD = $(ROOT)/build
 export Configuration = Release
+export BUILD = $(ROOT)/build
 
 PROJECT_NAME = CSOL-Utilities
 MAIN_VERSION = 1
 SUB_VERSION = 5
 REVISION_VERSION = 2
 VERSION = v$(MAIN_VERSION).$(SUB_VERSION).$(REVISION_VERSION)
+PLATFORM = Win64
+DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
 
-ARCH = x86_64
 
 MODULES = Controller Documents Executor Ps1 Web ConfigPanel
 TEST_UNIT := module
@@ -50,15 +53,16 @@ Documents:
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
 Pack:
-	Out-File -FilePath $(BUILD)/VERSION.txt -InputObject "$(VERSION)"
-	Copy-Item -Force -Destination $(BUILD)/pack -Path $(BUILD)/VERSION.txt
-	if (Test-Path $(BUILD)/pack) { Remove-Item -Force -Recurse $(BUILD)/pack }
-	New-Item -Type Directory -Path $(BUILD)/pack -Force
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Install.ps1"
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Controller.exe","$(BUILD)/Controller.ps1"
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/Executor" -Recurse
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(BUILD)/GamingTool.dll","$(BUILD)/GamingTool.exe"
-	Copy-Item -Force -Destination $(BUILD)/pack -Path "$(DEPENDENCIES)/*" -Recurse
-	Compress-Archive -DestinationPath $(BUILD)/$(PROJECT_NAME)-$(VERSION)-$(ARCH).zip -Path $(BUILD)/pack/* -Force
+	if (Test-Path "$(BUILD)/$(DISTRO)") { Remove-Item -Force -Recurse "$(BUILD)/$(DISTRO)" }
+	New-Item -Type Directory -Path "$(BUILD)/$(DISTRO)" -Force
+	Out-File -FilePath "$(BUILD)/$(DISTRO)/VERSION.txt" -InputObject "$(VERSION)"
+	Copy-Item -Force -Destination "$(BUILD)/$(DISTRO)" -Path "$(BUILD)/$(Configuration)/Install.ps1"
+	Copy-Item -Force -Destination "$(BUILD)/$(DISTRO)" -Path "$(BUILD)/$(Configuration)/Controller.ps1"
+	New-Item -Type Directory -Path "$(BUILD)/$(DISTRO)/Controller" -Force
+	foreach ($$item in (Get-ChildItem -Path "$(BUILD)/$(Configuration)/Controller" -Exclude "*.pdb")) <#\
+	#> { Copy-Item -Force -Destination "$(BUILD)/$(DISTRO)/Controller" -Path $$item.FullName -Recurse }
+	Copy-Item -Force -Destination $(BUILD)/$(DISTRO) -Path "$(BUILD)/$(Configuration)/Executor" -Recurse
+	Copy-Item -Force -Destination $(BUILD)/$(DISTRO) -Path "$(BUILD)/GamingTool/*"
+	Compress-Archive -DestinationPath $(BUILD)/$(DISTRO).zip -Path $(BUILD)/$(DISTRO)/* -Force
 Clean:
 	Remove-Item -Force -Recurse -Path $(BUILD)

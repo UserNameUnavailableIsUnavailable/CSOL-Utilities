@@ -133,13 +133,7 @@
     <None Include="Controller\dependencies\libraries\onnxruntime.dll">
       <Filter>Controller\dependencies\libraries</Filter>
     </None>
-    <None Include="Controller\dependencies\libraries\onnxruntime.pdb">
-      <Filter>Controller\dependencies\libraries</Filter>
-    </None>
     <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.dll">
-      <Filter>Controller\dependencies\libraries</Filter>
-    </None>
-    <None Include="Controller\dependencies\libraries\onnxruntime_providers_shared.pdb">
       <Filter>Controller\dependencies\libraries</Filter>
     </None>
   </ItemGroup>
