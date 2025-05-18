@@ -72,6 +72,8 @@ namespace CSOL_Utilities
         {
 			return m_IdleMode.load(std::memory_order_acquire);
         }
+        virtual void ResetStateAfterSwitchMode() = 0; /* 切换状态后重置状态机 */
+        virtual void ResetStateAfterReconection() = 0; /* 完成掉线重连后重置状态机 */
     protected:
         std::mutex m_StateLock;
         std::condition_variable m_DetectorRunnable;
@@ -86,7 +88,6 @@ namespace CSOL_Utilities
         bool m_bRecognizerFinished = true;
         virtual void DetectGameProcess(std::stop_token st);
         virtual void RecognizeGameState(std::stop_token st) = 0;
-        virtual void Reset() = 0; /* 掉线重连后重置状态机 */
         GameProcessInformation m_GameProcessInfo;
         /* 考虑到 dangling resources 问题，这里使用 thread 而非 jthread */
         std::thread m_GameStateRecognizer;

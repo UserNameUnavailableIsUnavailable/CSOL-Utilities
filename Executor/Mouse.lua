@@ -290,4 +290,4 @@ if not Mouse_lua then
     Error:register_fatal_disposal(function()
         Mouse:reset()
     end)
-end -- if (not Mouse)
+end -- Mouse_lua

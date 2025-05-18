@@ -1,4 +1,4 @@
-Weapon:new{
+Weapon:new({
     name = "【幽浮】控制核心",
     purchase_sequence = {},
     switch_delay = 750,
@@ -17,4 +17,4 @@ Weapon:new{
             Mouse:click(Mouse.LEFT, 500)
         end
     end
-}
+})

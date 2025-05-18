@@ -21,6 +21,7 @@ namespace CSOL_Utilities
 				self.m_Timepoint = tp;
 			}
 		}
+
 		auto new_size =
 			std::formatted_size(COMMAND_FORMAT, self.m_Id, QueryCommandString(self.m_CmdType),
 								static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.m_Timepoint)), self.m_Repeatable);
@@ -57,13 +58,12 @@ namespace CSOL_Utilities
 		self.m_Timepoint = static_cast<bool>(mode & CMD_ZERO_TIMESTAMP) ? std::chrono::time_point<std::chrono::system_clock>() : std::chrono::system_clock::now() ;
 		self.m_Repeatable = static_cast<bool>(mode & CMD_REPEATABLE);
 		self.m_AutoRenew = static_cast<bool>(mode & CMD_AUTO_REFRESH);
-		
 		self.m_SpinLock.store(false, std::memory_order_release); // 解锁
 	}
 
 	Command& Command::GetInstance()
 	{
-		static Command executor_command; // Meyer's singleton implementation
+		static Command executor_command;
 		return executor_command;
 	}
 } // namespace CSOL_Utilities

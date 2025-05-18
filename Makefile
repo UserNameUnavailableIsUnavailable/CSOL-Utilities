@@ -52,7 +52,7 @@ Documents:
 	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
 	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
-Pack:
+Distro:
 	if (Test-Path "$(BUILD)/$(DISTRO)") { Remove-Item -Force -Recurse "$(BUILD)/$(DISTRO)" }
 	New-Item -Type Directory -Path "$(BUILD)/$(DISTRO)" -Force
 	Out-File -FilePath "$(BUILD)/$(DISTRO)/VERSION.txt" -InputObject "$(VERSION)"

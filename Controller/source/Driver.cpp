@@ -53,6 +53,7 @@ namespace CSOL_Utilities
             disable_current_mode = [this] {
                 m_IdleEngine->Suspend();
                 Command::Set(Command::TYPE::CMD_NOP, Command::CMD_ZERO_TIMESTAMP);
+                m_IdleEngine->ResetStateAfterSwitchMode();
             };
             Console::Info(Translate("Driver::INFO_SwitchToDefaultIdleMode"));
         }
@@ -63,6 +64,7 @@ namespace CSOL_Utilities
             disable_current_mode = [this] {
                 m_IdleEngine->Suspend();
                 Command::Set(Command::TYPE::CMD_NOP, Command::CMD_ZERO_TIMESTAMP);
+                m_IdleEngine->ResetStateAfterSwitchMode();
             };
             Console::Info(Translate("Driver::INFO_SwitchToExtendedIdleMode"));
         }
