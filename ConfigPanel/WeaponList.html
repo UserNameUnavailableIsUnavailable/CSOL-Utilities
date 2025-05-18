@@ -268,7 +268,7 @@ document.getElementById("export").onclick = async () => {
         "\tWeaponList_lua = true\n" +
         `\tInclude("Version.lua")\n` +
         `\tVersion:set("WeaponList", ${g_Version})\n` +
-        `\tVersion:require("WeaponList", "Setting", { 1, 5, 2 })\n`
+        `\tVersion:require("WeaponList", "Setting", ${g_Version})\n`
     if (g_Armor) {
         weapon_list += `\tArmor = ${g_Armor.generate('\t', 1, false)}\n`
     }

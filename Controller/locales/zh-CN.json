@@ -67,7 +67,7 @@
             "INFO_EnterGameRoom": "进入游戏房间。",
             "INFO_StartGameRoom": "开始游戏，加载游戏场景。",
             "INFO_GameMapLoaded": "游戏地图加载完成。",
-            "INFO_ResultsConfirmed": "结算界面确认。",
+            "INFO_RoundCompleted": "一局游戏完成。",
             "INFO_Lobby": "当前状态：游戏大厅。",
             "INFO_Gaming": "当前状态：游戏中。",
             "INFO_Loading": "当前状态：加载游戏地图。",

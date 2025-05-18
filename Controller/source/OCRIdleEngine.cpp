@@ -163,7 +163,7 @@ namespace CSOL_Utilities
 				analyzed_in_game_state = IN_GAME_STATE::IGS_GAMING;
 			}
 		}
-		thread_local int abnormal_back_to_room = 0;
+		// thread_local int abnormal_back_to_room = 0;
 		/* 合法状态迁移 */
 		/* 手写状态机，考虑到后续维护难度，故引入了更多的代码冗余降低理解难度 */
 		if (m_InGameState == analyzed_in_game_state)
@@ -187,9 +187,9 @@ namespace CSOL_Utilities
 		{
 			Console::Info(Translate("IdleEngine::OCR::INFO_GameMapLoaded"));
 		}
-		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM) /* 结算确认 */
+		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM) /* 一局游戏完成 */
 		{
-			Console::Info(Translate("IdleEngine::OCR::INFO_ResultsConfirmed"));
+			Console::Info(Translate("IdleEngine::OCR::INFO_RoundCompleted"));
 		}
 		/* 消除未知状态迁移，不计入迁移种类 */
 		else if (analyzed_in_game_state == IN_GAME_STATE::IGS_UNKNOWN)
@@ -231,17 +231,17 @@ namespace CSOL_Utilities
 			analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; /* 直接离开房间回到大厅 */
 			Console::Warn(Translate("IdleEngine::OCR::WARN_LoadGameMap"));
 		}
-		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM)
-		{
-			abnormal_back_to_room++;
-			if (abnormal_back_to_room == 3)
-			{
-				analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; /* 直接离开房间回到大厅 */
-				Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoom"));
-				abnormal_back_to_room = 0;
-			}
-			Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoomTooManyTimes"));
-		}
+		// else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_ROOM)
+		// {
+		// 	abnormal_back_to_room++;
+		// 	if (abnormal_back_to_room == 3)
+		// 	{
+		// 		analyzed_in_game_state = IN_GAME_STATE::IGS_LOBBY; /* 直接离开房间回到大厅 */
+		// 		Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoom"));
+		// 		abnormal_back_to_room = 0;
+		// 	}
+		// 	Console::Warn(Translate("IdleEngine::OCR::WARN_ReturnFromGamingToRoomTooManyTimes"));
+		// }
 		else if (m_InGameState == IN_GAME_STATE::IGS_GAMING && analyzed_in_game_state == IN_GAME_STATE::IGS_LOBBY)
 		/* 从游戏场景返回到大厅，原因一般为：强制踢出、长时间没有有效操作 */
 		{
@@ -282,9 +282,9 @@ namespace CSOL_Utilities
 			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitStartGameRoomTimeout@1", Global::StartGameRoomTimeout));
 		}
 		else if (m_InGameState == IN_GAME_STATE::IGS_LOGIN && recognize_start - m_tp > std::chrono::seconds(Global::LoginTimeout))
-		/* 登录时间超过 60 秒 */
+		/* 登录超时 */
 		{
-			analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN;
+			analyzed_in_game_state = IN_GAME_STATE::IGS_UNKNOWN; /* 置为未知状态 */
 			Console::Warn(Translate("IdleEngine::OCR::WARN_WaitLoginTimeout@1",
 						 Global::LoginTimeout));
 		}
@@ -381,7 +381,7 @@ namespace CSOL_Utilities
 			Command::Set(command, Command::CMD_DEFAULT);
 			break;
 		default:
-			Command::Set(command, Command::CMD_REPEATABLE | Command::CMD_AUTO_REFRESH);
+			Command::Set(command, Command::CMD_REPEATABLE);
 		}
     }
 

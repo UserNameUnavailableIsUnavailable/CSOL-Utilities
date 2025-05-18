@@ -272,4 +272,4 @@ if not Player_lua then
         self:attack_with_conventional_weapons()
         self:attack_with_special_weapons()
     end
-end -- Play_lua
+end -- Player_lua

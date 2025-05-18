@@ -1,4 +1,4 @@
-Weapon:new{
+Weapon:new({
     name = "万钧神威",
     switch_delay = Delay.LONG,
     number = Weapon.MELEE,
@@ -28,4 +28,4 @@ Weapon:new{
         until (Runtime:get_running_time() - start_time > 9000)
         Mouse:release(Mouse.RIGHT) -- 松开鼠标右键释放旋风
     end
-}
+})

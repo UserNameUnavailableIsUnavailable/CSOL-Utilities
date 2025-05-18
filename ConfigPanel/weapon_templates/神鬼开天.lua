@@ -1,4 +1,4 @@
-Weapon:new{
+Weapon:new({
     name = "神鬼开天",
     switch_delay = Delay.LONG,
     number = Weapon.MELEE,
@@ -28,4 +28,4 @@ Weapon:new{
         Keyboard:release(Weapon.RELOAD_KEY)
         Mouse:release(Mouse.LEFT)
     end
-}
+})

@@ -150,7 +150,6 @@ namespace CSOL_Utilities
                     m_bRecognizerRunnable = false; /* 停止识别器运行 */
                     m_RecognizerFinished.wait(lk, [this] { return m_bRecognizerFinished; }); /* 等待识别器当前轮次执行完毕 */
                     m_GameProcessInfo.dwGameProcessId.store(0, std::memory_order_release); /* 进程号清零 */
-                    Reset(); /* 重置状态机 */
                     state = GAME_PROCESS_STATE::GPS_EXITED;
                     Console::Warn(Translate("IdleEngine::GameProcessDetector::WARN_GameProcessExited"));
                 }
@@ -163,6 +162,7 @@ namespace CSOL_Utilities
                 id = m_GameProcessInfo.dwGameProcessId.load(std::memory_order_acquire);
                 if (id != 0) /* 查找到有效 id */
                 {
+                    ResetStateAfterReconection(); /* 游戏启动，进入登陆状态，重置状态机 */
                     hGameProcess.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE | SYNCHRONIZE, FALSE, id)); // 通过 Id 打开进程
                     if (hGameProcess)
                     {

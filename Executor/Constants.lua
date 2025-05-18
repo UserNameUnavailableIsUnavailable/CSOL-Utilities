@@ -245,11 +245,11 @@ if not Constants_lua then
             NUM_ENTER = "numenter",
         },
         mouse_buttons = {
-            LEFT = 1,
-            RIGHT = 2,
-            MIDDLE = 3,
-            BACK = 4,
-            FORWARD = 5,
+            LEFT = 1, -- 左键
+            MIDDLE = 2, -- 中键
+            RIGHT = 3, -- 右键
+            BACK = 4, -- 后退（X1）
+            FORWARD = 5, -- 前进（X2）
         },
     }
 end

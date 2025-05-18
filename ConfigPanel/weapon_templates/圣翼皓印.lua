@@ -1,4 +1,4 @@
-Weapon:new{
+Weapon:new({
     name = "圣翼皓印",
     switch_delay = 850,
     number = Weapon.GRENADE ,
@@ -31,4 +31,4 @@ Weapon:new{
             Mouse:move_relative(0, -4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
         end
     end
-}
+})

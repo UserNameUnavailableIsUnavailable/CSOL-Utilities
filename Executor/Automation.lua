@@ -17,6 +17,12 @@ if not Automation_lua then
     Include("WeaponList.lua")
     Include("Version.lua")
     Version:set("Automation", "1.5.2")
+    
+    ---自动化执行。
+    ---@class Automation
+    ---@field default_player Player
+    ---@field extended_player Player
+    ---@field last_reset_or_respawn_time integer
     Automation = {}
 
     ---手动接管标识。
@@ -105,8 +111,11 @@ if not Automation_lua then
             if (Command:get_status() & Command.TYPE_CHANGED) == Command.TYPE_CHANGED then
                 Mouse:reset()
                 Keyboard:reset()
+
+                -- 重置玩家对象成员变量
                 Automation.default_player:reset()
                 Automation.extended_player:reset()
+
                 local e = {
                     name = "COMMAND_CHANGED",
                     message = "命令变更",
@@ -143,12 +152,9 @@ if not Automation_lua then
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]]
-                or 32,
-            200
+            Setting.FIELD_LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32,
+            300 -- 点击一次间隔 300 毫秒
         ) -- 向左翻页指定次数
-        -- Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X, Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y, Setting.FIELD_LOBBY_CREATR_ROOM_MAP_RIGHT_SCROLL_COUNT, 150
-        -- ) -- 向右移动指定次数
         Mouse:click_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X,
@@ -218,18 +224,12 @@ if not Automation_lua then
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_ROOM_START_GAME_X, Setting.POSITION_ROOM_START_GAME_Y, 2000)
     end
 
-    -- Automation.last_choose_golden_zombie_reward_time = 0
     function Automation:choose_golden_zombie_reward()
         if
             not Setting.SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS -- 防卡黄金僵尸功能开关
         then
             return
         end
-        -- local t = DateTime:get_local_timestamp()
-        -- if (Automation.last_choose_golden_zombie_reward_time - t > 45)
-        -- then
-        --     return
-        -- end
         Mouse:click_on(
             Mouse.LEFT,
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_X,
@@ -248,7 +248,6 @@ if not Automation_lua then
             Setting.POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM_Y,
             300
         )
-        -- Automation.last_choose_golden_zombie_reward_time = t
     end
 
     ---选定角色，开始新一轮游戏。
@@ -285,13 +284,7 @@ if not Automation_lua then
     end
 
     ---上一次尝试确认结算界面的时间戳。
-    -- Automation.last_confirm_timestamp = 0
     function Automation:try_confirm()
-        -- local current_timestamp = DateTime:get_local_timestamp()
-        -- if (math.abs(current_timestamp - self.last_confirm_timestamp) < 20) -- 未超过 20 秒
-        -- then
-        --     return
-        -- end
         local cursor_locked = true
         if not Mouse:is_cursor_position_locked() then
             Keyboard:click_several_times(Keyboard.ESCAPE, 3, Delay.MINI, Delay.MINI, true)
@@ -304,7 +297,6 @@ if not Automation_lua then
         Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
         Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
-        -- self.last_confirm_timestamp = current_timestamp
     end
 
     ---合成配件。
@@ -379,4 +371,33 @@ if not Automation_lua then
     function Automation:clear_popups()
         Keyboard:click(Keyboard.ESCAPE, 5000)
     end
+
+    ---任务列表。
+    Automation.Task = {
+        [Command.CMD_START_GAME_ROOM] = Automation.start_game_room,
+        [Command.CMD_CHOOSE_CHARACTER] = Automation.choose_character,
+        [Command.CMD_DEFAULT_IDLE] = function ()
+            Automation:try_confirm()
+            Automation.default_player:play()
+        end,
+        [Command.CMD_EXTENDED_IDLE] = function ()
+            Automation:try_confirm()
+            Automation.extended_player:play()
+        end,
+        [Command.CMD_CREATE_GAME_ROOM] = Automation.create_game_room,
+        [Command.CMD_BATCH_COMBINE_PARTS] = Automation.combine_parts,
+        [Command.CMD_BATCH_PURCHASE_ITEM] = function ()
+            -- 对于新发出的命令，需要更新鼠标光标位置
+            if
+                (Command:get_status() & Command.TYPE_CHANGED)
+                ~= Command.UNCHANGED -- 新旧命令类型不同，即旧命令不是购买物品
+            then
+                Automation:purchase_item(Mouse:locate())
+            else
+                Automation:purchase_item()
+            end
+        end,
+        [Command.CMD_LOCATE_CURSOR] = Automation.locate_cursor,
+        [Command.CMD_CLEAR_POPUPS] = Automation.clear_popups,
+    }
 end -- Automation_lua
