@@ -73,7 +73,7 @@ if not Automation_lua then
             end
         end,
     }))
-
+    
     -- 初始化
     Error:register_error_handler("COMMAND_CHANGED", function() end)
     DateTime:set_time_zone(Setting.FIELD_TIME_ZONE) -- 时区

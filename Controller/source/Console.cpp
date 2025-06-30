@@ -76,13 +76,3 @@ namespace CSOL_Utilities
 		std::cout << ctrl_sequence << s << std::endl;
 	}
 } // namespace CSOL_Utilities
-
-#if defined(Test__) && defined(ConsoleTest)
-int main()
-{
-     std::locale locale("zh-CN.UTF-8");
-     std::locale::global(locale);
-     CSOL_Utilities::LoadLanguagePackage(CSOL_Utilities::Global::g_LanguagePackage);
-     CSOL_Utilities::Console::Error(CSOL_Utilities::Translate("Exception::DETAILED_QUICK_THROW_TEMPLATE@4", "测试", "Foo.cpp", "114514", "Bar"));
-}
-#endif

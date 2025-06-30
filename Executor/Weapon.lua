@@ -21,6 +21,7 @@ if not Weapon_lua then
     ---@field attack_button integer 攻击按钮
     ---@field switch_delay integer 切换延迟
     ---@field purchase_sequence table 购买按键序列
+    ---@field reloading_free boolean 是否无需换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
     ---@field RELOAD_KEY string 重新装填按键
     Weapon = {}
 
@@ -35,6 +36,7 @@ if not Weapon_lua then
     Weapon.attack_button = Mouse.LEFT
     Weapon.switch_delay = 150
     Weapon.purchase_sequence = {}
+    Weapon.reloading_free = false
     Weapon.RELOAD_KEY = Keyboard.R
 
     ---设置换弹按键。
@@ -173,7 +175,7 @@ if not Weapon_lua then
     ---@return nil
     function Weapon:abandon()
         self:switch() -- 切换到指定武器。
-        Keyboard:click(Keyboard.G, Delay.NORMAL)
+        Keyboard:click(Keyboard.G, Delay.LONG)
     end
 
     ---确认武器购买资金不足提示框（预设按钮在 Setting.lua 中）。
@@ -193,6 +195,7 @@ if not Weapon_lua then
     end
 
     ---使用特殊武器的函数，在创建特殊武器对象时重写此函数。
+    ---@deprecated 从 v1.5.3 起，此函数被 `attack` 代替
     function Weapon:use() end
 
     ---开始使用该武器攻击。
