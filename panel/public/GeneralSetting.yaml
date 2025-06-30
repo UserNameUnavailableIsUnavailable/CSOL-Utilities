@@ -312,9 +312,9 @@ children:
           - id: IN_GAME_SENSITIVITY
             title: 游戏内灵敏度
             annotation: >-
-                此选项用于确保游戏内转圈幅度平稳性，注意在控制台中通过 <code>sensitivity</code>
+                此选项用于确保游戏内转圈幅度平稳性，注意在控制台中通过 <code class="language-plain">sensitivity</code>
                 可以查看灵敏度精确数值（或在“选项-鼠标”中查看粗略数值）。另外，<b style='color: red'>强烈建议</b>在控制台中通过
-                <code>m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
+                <code class="language-plain">m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
             type: FIELD
             pre_label: 灵敏度
             image: assets/in_game_sensitivity.avif
@@ -366,7 +366,7 @@ children:
             value: "true"
           - id: GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN
             title: 角色技能冷却时间
-            annotation: 角色技能冷却时间，单位为秒，默认为 <code>math.huge</code>，代表 +∞（即处于不启用状态），请按需修改。
+            annotation: 角色技能冷却时间，单位为秒，默认为 <code class="language-plain">math.huge</code>，代表 ∞（即处于不启用状态），请按需修改。
             type: FIELD
             legacy_name: CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME
             depends_on:

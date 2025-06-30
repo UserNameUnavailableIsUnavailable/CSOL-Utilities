@@ -45,7 +45,7 @@
             <button class="widget-button" @click="remove_weapon(id, default_conventional_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_conventional_weapon(false, default_conventional_weapons)">添加（生成普通代码）</button>
-        <button class="widget-button" @click="add_conventional_weapon(true, default_conventional_weapons)">新增（生成定制代码）</button>
+        <button class="widget-button" @click="add_conventional_weapon(true, default_conventional_weapons)">添加（生成定制代码）</button>
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in default_special_weapons" :key="id">
@@ -70,7 +70,7 @@
             <button class="widget-button" @click="remove_weapon(id, extended_conventional_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_conventional_weapon(false, extended_conventional_weapons)">添加（生成普通代码）</button>
-        <button class="widget-button" @click="add_conventional_weapon(true, extended_conventional_weapons)">新增（生成定制代码）</button>
+        <button class="widget-button" @click="add_conventional_weapon(true, extended_conventional_weapons)">添加（生成定制代码）</button>
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_special_weapons" :key="id">

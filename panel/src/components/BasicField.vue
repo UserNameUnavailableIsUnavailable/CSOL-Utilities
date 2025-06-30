@@ -16,12 +16,12 @@ const emit = defineEmits<{
 // 字段是否合法
 const legal = ref(true);
 
-// 读写用户原始输入值
+// 读写用户原始输入值（去掉引号）
 const raw_value = computed({
     get() {
         let ret = props.value;
         if (!ret) { // 处理空值
-            return props.quoted ? `""` : "";
+            return "";
         }
         if (props.check && !props.check(ret)) {
             legal.value = false; // 设置为非法
