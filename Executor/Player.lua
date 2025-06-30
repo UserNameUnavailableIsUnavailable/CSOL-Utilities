@@ -14,7 +14,7 @@ if not Player_lua then
     ---@field RESPAWN_KEY string 复活或回合重置按键
     ---@field private run_direction integer 跑动方向（前后），1 表示向前，0 表示静止，-1 表示向后
     ---@field private strafe_direction integer 扫射方向（左右），1 表示向右，0 表示静止，-1 表示向左
-    ---@field private last_activate_special_ability_time integer 最近一次发动角色技能的时间
+    ---@field private last_activate_special_skill_time integer 最近一次发动角色技能的时间
     ---@field private last_weapon Weapon 最近一次使用武器
     ---@field private last_primary_weapon Weapon 最近一次使用的主武器
     ---@field private last_secondary_weapon Weapon 最近一次使用的副武器
@@ -26,7 +26,7 @@ if not Player_lua then
 
     Player.RESPAWN_KEY = Keyboard.R
     Player.run_direction = 1
-    Player.last_activate_special_ability_time = 0
+    Player.last_activate_special_skill_time = 0
     Player.last_weapon = Weapon
     Player.last_primary_weapon = Weapon
     Player.last_secondary_weapon = Weapon
@@ -41,7 +41,7 @@ if not Player_lua then
 
     ---在新一局游戏开始时重置玩家状态。
     function Player:reset()
-        self.last_activate_special_ability_time = 0
+        self.last_activate_special_skill_time = 0
         self.last_weapon = Weapon
         self.last_primary_weapon = Weapon
         self.last_secondary_weapon = Weapon
@@ -145,24 +145,24 @@ if not Player_lua then
     end
 
     ---发动角色技能。
-    function Player:activate_special_ability()
+    function Player:activate_special_skill()
         -- 无发动角色技能的记录（一局游戏刚开始）
-        if self.last_activate_special_ability_time == 0 then
-            self.last_activate_special_ability_time = DateTime:get_local_timestamp()
+        if self.last_activate_special_skill_time == 0 then
+            self.last_activate_special_skill_time = DateTime:get_local_timestamp()
             return
         end
         local current_time = DateTime:get_local_timestamp()
         -- 技能尚未冷却
         if
-            current_time - self.last_activate_special_ability_time
+            current_time - self.last_activate_special_skill_time
             < Setting.FIELD_GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN
         then
             return
         end
         -- 按 7 发动角色技能，重复 3 次以保证成功发动
-        Keyboard:click_several_times(Keyboard.SEVEN, 3, 500, Delay.SHORT)
+        Keyboard:click_several_times(Keyboard.SEVEN, 3, 150, Delay.SHORT)
         -- 更新最近一次发动角色技能的时间
-        self.last_activate_special_ability_time = DateTime:get_local_timestamp()
+        self.last_activate_special_skill_time = DateTime:get_local_timestamp()
     end
 
     function Player:buy_armor()
@@ -179,17 +179,26 @@ if not Player_lua then
         local count = #self.conventional_weapons
         math.randomseed(Runtime:get_running_time(), DateTime:get_local_timestamp())
         -- 随机选择一件武器
-        -- 若上次使用与本次随机到的武器相同，丢弃后重新购买
         local weapon = self.conventional_weapons[math.random(count)]
-        -- 随机到最近一次使用的主武器相同
-        if weapon.name == self.last_primary_weapon.name then
+        if
+            -- 随机到最近一次使用的主武器，且该主武器需要重新装填，则先将其丢弃
+            weapon.number == Weapon.PRIMARY and
+            weapon.name == self.last_primary_weapon.name and
+            not weapon.reloading_free
+        then
             self.last_primary_weapon:switch()
             self.last_primary_weapon:abandon()
-        -- 随机到最近一次使用的副武器
-        elseif weapon.name == self.last_secondary_weapon.name then
+        elseif
+            -- 随机到最近一次使用的副武器，且该副武器需要重新装填，则先将其丢弃
+            weapon.number == Weapon.SECONDARY and
+            weapon.name == self.last_secondary_weapon.name and
+            not weapon.reloading_free
+        then
             self.last_secondary_weapon:switch()
             self.last_secondary_weapon:abandon()
         end
+        weapon:purchase() -- 购买武器
+        weapon:switch() -- 切换到购买的武器
         -- 更新最近一次使用的主武器
         if weapon.number == Weapon.PRIMARY then
             self.last_primary_weapon = weapon
@@ -197,13 +206,11 @@ if not Player_lua then
         elseif weapon.number == Weapon.SECONDARY then
             self.last_secondary_weapon = weapon
         end
-        weapon:purchase()
-        weapon:switch()
-        self:start_move()
-        weapon:attack()
-        self:stop_move()
+        self:start_move() -- 开始移动
+        weapon:attack() -- 使用武器攻击
+        self:stop_move() -- 结束移动
         if Setting.SWITCH_GAME_CHARACTER_USE_SPECIAL_SKILLS then
-            self:activate_special_ability()
+            self:activate_special_skill() -- 激活角色特殊技能
         end
         -- 更新最近一次使用的武器
         self.last_weapon = weapon
@@ -256,7 +263,7 @@ if not Player_lua then
         end
 
         -- 使用武器
-        self.special_weapons[index]:use()
+        self.special_weapons[index]:attack()
         Player.last_part_weapon_index = index
         if self.last_weapon then
             -- 使用后切换回原来的武器

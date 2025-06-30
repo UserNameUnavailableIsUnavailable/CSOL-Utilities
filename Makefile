@@ -26,12 +26,12 @@ TEST_UNIT := module
 # link everything
 all: MODULES
 
-ConfigPanel:
-	tsc -p "$(ROOT)/ConfigPanel"
-	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/assets"
-	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/styles","$(ROOT)/ConfigPanel/weapon_templates"
-	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
-	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
+# ConfigPanel:
+# 	tsc -p "$(ROOT)/ConfigPanel"
+# 	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/assets"
+# 	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/styles","$(ROOT)/ConfigPanel/weapon_templates"
+# 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
+# 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
 Ps1:
 	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Install.ps1 -Force
 	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Controller.ps1 -Force
