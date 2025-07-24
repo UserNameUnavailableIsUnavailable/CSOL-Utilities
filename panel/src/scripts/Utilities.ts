@@ -9,7 +9,7 @@ export async function SaveAs(file_name: string, content: string) {
         a.click();
         URL.revokeObjectURL(url);
     };
-    // 新版 Edge 和 Firefox 解决方案
+    // 新版 Edge 和 Chrome 解决方案
     const __impl_modern_save_as = async (file_name: string, content: string) => {
         // @ts-ignore
         const file_picker = await window.showSaveFilePicker({
@@ -23,11 +23,16 @@ export async function SaveAs(file_name: string, content: string) {
         await stream.write(content);
         await stream.close();
     };
-    // @ts-ignore
-    if (window.showSaveFilePicker) {
-        __impl_modern_save_as(file_name, content);
-    } else {
-        __impl_legacy_save_as(file_name, content);
+    try {
+        // @ts-ignore
+        if (window.showSaveFilePicker) {
+            __impl_modern_save_as(file_name, content);
+        } else {
+            alert("The showSaveFilePicker() method is not supported in your browser, falling back to legacy download method. We recommend using Edge or Chrome for a better experience.");
+            __impl_legacy_save_as(file_name, content);
+        }
+    } catch (e) {
+        console.error("Error saving file:", e);
     }
 }
 

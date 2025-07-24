@@ -1,5 +1,7 @@
 ﻿#include "pch.hpp"
-
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include "CSOBannerSuppressor.hpp"
 #include "CommandDispatcher.hpp"
 #include "Driver.hpp"
@@ -45,6 +47,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	g_Driver.reset(); /* 析构 Driver，结束所有线程 */
 	Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
 	Console::Info(Translate("Main::INFO_SafelyExited"));
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
 	return dwErrorCode;
 }
 #endif

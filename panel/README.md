@@ -1,5 +1,6 @@
-# Vue 3 + TypeScript + Vite
+# CSOL 集成工具配置面板
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+面板共分为两部分：
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+- 针对 Setting.lua 的通用配置面板
+- 针对 WeaponList.lua 的武器列表配置面板
