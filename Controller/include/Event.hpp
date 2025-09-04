@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 #include "Utilities.hpp"
 #include "Exception.hpp"
 

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 #include "CSOBannerSuppressor.hpp"
 #include "CommandDispatcher.hpp"
 #include "HotKey.hpp"

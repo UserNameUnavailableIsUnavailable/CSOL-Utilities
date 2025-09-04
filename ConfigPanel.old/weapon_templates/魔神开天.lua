@@ -24,8 +24,8 @@ Weapon:new({
         until (Runtime:get_running_time() - start_time > 6000)
         Mouse:release(Mouse.RIGHT, 200)
         Mouse:press(Mouse.LEFT, 1000)
-        Keyboard:press(Weapon.RELOAD_KEY, 200)
-        Keyboard:release(Weapon.RELOAD_KEY)
+        Keyboard:press(Weapon.reload_key, 200)
+        Keyboard:release(Weapon.reload_key)
         Mouse:release(Mouse.LEFT)
     end
 })

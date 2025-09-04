@@ -27,7 +27,7 @@ Weapon:new({
             self.charge_start_moment = current_time
             self:switch()
             Mouse:move_relative(0, 4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
-            Keyboard:click(Weapon.RELOAD_KEY, Delay.LONG_LONG)
+            Keyboard:click(Weapon.reload_key, Delay.LONG_LONG)
             Mouse:move_relative(0, -4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
         end
     end

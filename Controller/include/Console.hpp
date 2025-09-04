@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 #include "Utilities.hpp"
 
 namespace CSOL_Utilities
@@ -10,20 +8,20 @@ namespace CSOL_Utilities
 	class Console
 	{
 	public:
-		static constexpr const boost::static_string COLOR_FORMAT = "\x1b[{}m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_GREEN = "\x1b[32m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_YELLOW = "\x1b[33m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BLUE = "\x1b[34m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_RED = "\x1b[31m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_DEFAULT = "\x1b[39m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_WHITE = "\x1b[37m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_GREEN = "\x1b[92m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_YELLOW = "\x1b[93m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_BLUE = "\x1b[94m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_RED = "\x1b[101m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_DEFAULT = "\x1b[39m";
-		static constexpr const boost::static_string FOREGROUND_COLOR_BRIGHT_WHITE = "\x1b[37m";
-		static constexpr const boost::static_string COLOR_DEFAULT = "\x1b[0m";
+		static constexpr const char* COLOR_FORMAT = "\x1b[{}m";
+		static constexpr const char* FOREGROUND_COLOR_GREEN = "\x1b[32m";
+		static constexpr const char* FOREGROUND_COLOR_YELLOW = "\x1b[33m";
+		static constexpr const char* FOREGROUND_COLOR_BLUE = "\x1b[34m";
+		static constexpr const char* FOREGROUND_COLOR_RED = "\x1b[31m";
+		static constexpr const char* FOREGROUND_COLOR_DEFAULT = "\x1b[39m";
+		static constexpr const char* FOREGROUND_COLOR_WHITE = "\x1b[37m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_GREEN = "\x1b[92m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_YELLOW = "\x1b[93m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_BLUE = "\x1b[94m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_RED = "\x1b[101m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_DEFAULT = "\x1b[39m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_WHITE = "\x1b[37m";
+		static constexpr const char* COLOR_DEFAULT = "\x1b[0m";
 		static void Print(std::string_view s);
 		static void Println(std::string_view s);
 		static void Print(std::string_view ctrl_sequence, std::string_view s);
@@ -62,27 +60,23 @@ namespace CSOL_Utilities
 		}
 		static void Info(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_GREEN + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
-			auto str = std::format(fmt, Translate("Console::INFO_HEADER"), s);
-			Console::Println(str);
+			auto str = std::format("{}{}", Translate("Console::INFO_HEADER"), s);
+			Console::Println(FOREGROUND_COLOR_GREEN + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Warn(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_YELLOW + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
-			auto str = std::format(fmt, Translate("Console::WARN_HEADER"), s);
-			Console::Println(str);
+			auto str = std::format("{}{}", Translate("Console::WARN_HEADER"), s);
+			Console::Println(FOREGROUND_COLOR_BRIGHT_YELLOW + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Error(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_RED + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
-			auto str = std::format(fmt, Translate("Console::ERROR_HEADER"), s);
-			Console::Println(str);
+			auto str = std::format("{}{}", Translate("Console::ERROR_HEADER"), s);
+			Console::Println(FOREGROUND_COLOR_BRIGHT_RED + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Debug(std::string_view s)
 		{
-			static constexpr boost::static_string fmt = FOREGROUND_COLOR_BRIGHT_BLUE + "{0}{1}" + FOREGROUND_COLOR_DEFAULT;
-			auto str = std::format(fmt, Translate("Console::DEBUG_HEADER"), s);
-			Console::Println(str);
+			auto str = std::format("{}{}", Translate("Console::DEBUG_HEADER"), s);
+			Console::Println(FOREGROUND_COLOR_BLUE + str + FOREGROUND_COLOR_DEFAULT);
 		}
 	private:
 		Console();

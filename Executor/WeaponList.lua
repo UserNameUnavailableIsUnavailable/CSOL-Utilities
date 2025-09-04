@@ -70,8 +70,8 @@ if not WeaponList_lua then
                 until Runtime:get_running_time() - start_time > 6000
                 Mouse:release(Mouse.RIGHT, 200)
                 Mouse:press(Mouse.LEFT, 1000)
-                Keyboard:press(Weapon.RELOAD_KEY, 200)
-                Keyboard:release(Weapon.RELOAD_KEY)
+                Keyboard:press(Weapon.reload_key, 200)
+                Keyboard:release(Weapon.reload_key)
                 Mouse:release(Mouse.LEFT)
             end,
         }),
@@ -102,7 +102,7 @@ if not WeaponList_lua then
                         Delay.MINI
                     )
                     if Runtime:get_running_time() - last_throw_time > 4000 then
-                        Keyboard:click(Weapon.RELOAD_KEY, Delay.MINI)
+                        Keyboard:click(Weapon.reload_key, Delay.MINI)
                         last_throw_time = Runtime:get_running_time()
                     end
                 until Runtime:get_running_time() - start_time > 9000
@@ -222,7 +222,7 @@ if not WeaponList_lua then
                     self.charge_start_moment = current_time
                     self:switch()
                     Mouse:move_relative(0, 4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
-                    Keyboard:click(Weapon.RELOAD_KEY, Delay.LONG_LONG)
+                    Keyboard:click(Weapon.reload_key, Delay.LONG_LONG)
                     Mouse:move_relative(0, -4000 / Setting.FIELD_IN_GAME_SENSITIVITY, Delay.NORMAL)
                 end
             end,

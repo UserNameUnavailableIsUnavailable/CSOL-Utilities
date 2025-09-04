@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "IdleEngine.hpp"
+﻿#include "IdleEngine.hpp"
 #include "Global.hpp"
 #include "Utilities.hpp"
 #include "Console.hpp"

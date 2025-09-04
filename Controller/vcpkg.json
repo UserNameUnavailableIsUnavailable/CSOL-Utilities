@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "cli11",
+    "nlohmann-json",
+    {
+      "name": "opencv",
+      "features": [
+        "default-features",
+        "thread"
+      ]
+    },
+    "clipper2"
+  ]
+}

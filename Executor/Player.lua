@@ -171,6 +171,17 @@ if not Player_lua then
         end
     end
 
+    ---重新购买需要换弹的武器。
+    ---@param weapon Weapon
+    local function repurchase_reloading_required_weapon(weapon)
+        if weapon.reloading_required then
+            weapon:switch() -- 切换到该武器
+            weapon:abandon() -- 丢弃
+        end
+        weapon:purchase() -- 重新购买
+        weapon:switch() -- 切换到购买的武器
+    end
+
     ---随机使用常规武器列表中的武器。
     function Player:attack_with_conventional_weapons()
         if not self.conventional_weapons or 0 == #self.conventional_weapons then
@@ -181,24 +192,16 @@ if not Player_lua then
         -- 随机选择一件武器
         local weapon = self.conventional_weapons[math.random(count)]
         if
-            -- 随机到最近一次使用的主武器，且该主武器需要重新装填，则先将其丢弃
-            weapon.number == Weapon.PRIMARY and
-            weapon.name == self.last_primary_weapon.name and
-            not weapon.reloading_free
+            -- 随机到最近一次使用的主武器
+            weapon.number == Weapon.PRIMARY and weapon.name == self.last_primary_weapon.name or
+             -- 随机到最近一次使用的副武器
+            weapon.number == Weapon.SECONDARY and weapon.name == self.last_secondary_weapon.name
         then
-            self.last_primary_weapon:switch()
-            self.last_primary_weapon:abandon()
-        elseif
-            -- 随机到最近一次使用的副武器，且该副武器需要重新装填，则先将其丢弃
-            weapon.number == Weapon.SECONDARY and
-            weapon.name == self.last_secondary_weapon.name and
-            not weapon.reloading_free
-        then
-            self.last_secondary_weapon:switch()
-            self.last_secondary_weapon:abandon()
+            repurchase_reloading_required_weapon(weapon)
+        else -- 其余武器正常购买
+            weapon:purchase() -- 购买武器
+            weapon:switch() -- 切换到购买的武器
         end
-        weapon:purchase() -- 购买武器
-        weapon:switch() -- 切换到购买的武器
         -- 更新最近一次使用的主武器
         if weapon.number == Weapon.PRIMARY then
             self.last_primary_weapon = weapon

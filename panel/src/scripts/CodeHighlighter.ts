@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const cdn_root = "https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.27.0/"
+const cdn_root = "https://cdn.bootcdn.net/ajax/libs/prism/1.30.0/"
 
 const default_plugins = new Map<number, Plugin>([
   [

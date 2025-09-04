@@ -18,7 +18,7 @@ PLATFORM = Win64
 DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
 
 
-MODULES = Controller Documents Executor Ps1 Web ConfigPanel
+MODULES = Controller Manual Executor Ps1 Web ConfigPanel
 TEST_UNIT := module
 
 .PHONY: $(MODULES) all
@@ -26,12 +26,6 @@ TEST_UNIT := module
 # link everything
 all: MODULES
 
-# ConfigPanel:
-# 	tsc -p "$(ROOT)/ConfigPanel"
-# 	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/assets"
-# 	Copy-Item -Recurse -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/styles","$(ROOT)/ConfigPanel/weapon_templates"
-# 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/index.html","$(ROOT)/ConfigPanel/WeaponList.html","$(ROOT)/ConfigPanel/Setting.html"
-# 	Copy-Item -Force -Destination $(BUILD)/ConfigPanel -Path "$(ROOT)/ConfigPanel/Setting.json","$(ROOT)/ConfigPanel/WeaponTemplateList.json"
 Ps1:
 	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Install.ps1 -Force
 	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $(ROOT)/Controller.ps1 -Force
@@ -39,19 +33,8 @@ Executor:
 	if (Test-Path $(BUILD)/$(Configuration)/$@) { Remove-Item $(BUILD)/$(Configuration)/$@ -Force -Recurse }
 	Copy-Item -Destination $(BUILD)/$(Configuration) -Path $@ -Recurse -Force
 # compile and link test
-Test:
-	clang++ -g -o $(BUILD)/$(TEST_UNIT).exe $(TEST)/$(TEST_UNIT).cpp $(BUILD)/Controller.obj -lkernel32 -luser32 -lAdvapi32 --include-directory=$(ROOT)/include
-# compile Controller
-Controller:
-	(New-Item -Type Directory -Path $(BUILD)/$@ -Force).Attributes += "Hidden"
-	Write-Host $(MAKE)
-	$(MAKE) --directory=$@ SHELL="$(SHELL)" MOD=$@
-	Move-Item -Force -Destination $(BUILD) -Path $(BUILD)/$@/$@.exe
-Documents:
-	New-Item -Type Directory -Path $(BUILD)/Documents -Force
-	(New-Item -Type Directory -Force -Path $(BUILD)/$@).Attributes += "Hidden"
-	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
-	xelatex --shell-escape -8bit --output-dir=$(BUILD)/Documents $(DOCS)/main.tex
+Manual:
+	$(MAKE) --directory=Manual SHELL="$(SHELL)"
 Distro:
 	if (Test-Path "$(BUILD)/$(DISTRO)") { Remove-Item -Force -Recurse "$(BUILD)/$(DISTRO)" }
 	New-Item -Type Directory -Path "$(BUILD)/$(DISTRO)" -Force

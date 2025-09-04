@@ -22,7 +22,7 @@ Weapon:new({
                 Delay.MINI)
             if (Runtime:get_running_time() - last_throw_time > 4000)
             then
-                Keyboard:click(Weapon.RELOAD_KEY, Delay.MINI)
+                Keyboard:click(Weapon.reload_key, Delay.MINI)
                 last_throw_time = Runtime:get_running_time()
             end
         until (Runtime:get_running_time() - start_time > 9000)

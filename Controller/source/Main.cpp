@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "CSOBannerSuppressor.hpp"
+﻿#include "CSOBannerSuppressor.hpp"
 #include "CommandDispatcher.hpp"
 #include "Driver.hpp"
 #include "Exception.hpp"

@@ -1,5 +1,3 @@
-#include "pch.hpp"
-
 #include "LowLevelKeyboardHook.hpp"
 #include "Exception.hpp"
 #include "Utilities.hpp"

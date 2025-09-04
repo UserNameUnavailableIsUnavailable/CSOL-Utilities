@@ -1,4 +1,4 @@
-if not Weapon_lua then
+﻿if not Weapon_lua then
     Weapon_lua = true
 
     Include("Runtime.lua")
@@ -21,8 +21,13 @@ if not Weapon_lua then
     ---@field attack_button integer 攻击按钮
     ---@field switch_delay integer 切换延迟
     ---@field purchase_sequence table 购买按键序列
-    ---@field reloading_free boolean 是否无需换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
-    ---@field RELOAD_KEY string 重新装填按键
+    ---@field reloading_required boolean 是否需要换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
+    ---@field reload_key string 重新装填按键
+    ---@field attack_duration integer 攻击持续时间，默认为 1000 毫秒
+    ---@field horizontal_strafe_mode string|nil 武器水平扫射模式，`"none"` 为无扫射，`"left"` 为固定向左，`"right"` 为固定向右，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（左右交替扫射）。该字段缺省值为 `"random"`。
+    ---@field vertical_strafe_mode string|nil 武器垂直扫射模式，`"none"` 为无扫射，`"up"` 为固定向上，`"down"` 为固定向下，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（上下交替扫射）。该字段缺省值为 `"oscillating"`。
+    ---@field horizontal_strafe_direction integer 水平扫射方向，`1` 为右，`0` 为静止，`-1` 为左。
+    ---@field vertical_strafe_direction integer 垂直扫射方向，`1` 为上，`0` 为静止，`-1` 为下。
     Weapon = {}
 
     Weapon.NULL = Keyboard.ZERO
@@ -30,14 +35,18 @@ if not Weapon_lua then
     Weapon.SECONDARY = Keyboard.TWO
     Weapon.MELEE = Keyboard.THREE
     Weapon.GRENADE = Keyboard.FOUR
-
     Weapon.name = "未知"
     Weapon.number = Weapon.NULL
     Weapon.attack_button = Mouse.LEFT
     Weapon.switch_delay = 150
     Weapon.purchase_sequence = {}
-    Weapon.reloading_free = false
-    Weapon.RELOAD_KEY = Keyboard.R
+    Weapon.reloading_required = true
+    Weapon.reload_key = Keyboard.R
+    Weapon.attack_duration = 10 * 1000
+    Weapon.horizontal_strafe_direction = 0
+    Weapon.vertical_strafe_direction = 0
+    Weapon.horizontal_strafe_mode = "random"
+    Weapon.vertical_strafe_mode = "oscillating"
 
     ---设置换弹按键。
     ---@param key string
@@ -49,13 +58,13 @@ if not Weapon_lua then
                 parameters = { key },
             })
         end
-        self.RELOAD_KEY = key
+        self.reload_key = key
     end
 
     ---获取换弹按键。
     ---@return string RELOAD_KEY 换弹按键
     function Weapon:get_reload_key()
-        return self.RELOAD_KEY
+        return self.reload_key
     end
 
     ---创建一个武器对象。
@@ -160,7 +169,6 @@ if not Weapon_lua then
     end
 
     ---切换到指定武器。
-    ---@return nil
     function Weapon:switch()
         Keyboard:click(self.number, self.switch_delay, true)
     end
@@ -199,37 +207,89 @@ if not Weapon_lua then
     function Weapon:use() end
 
     ---开始使用该武器攻击。
-    ---@deprecated `此函数功能已经整合到 Weapon.attack` 中
+    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中
     function Weapon:start_attack()
         Mouse:press(self.attack_button)
     end
 
     ---停止使用该武器攻击。
-    ---@deprecated `此函数功能已经整合到 Weapon.attack` 中
+    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中
     function Weapon:stop_attack()
         Mouse:release(self.attack_button)
     end
 
+    ---使用武器时进行扫射。
+    function Weapon:strafe()
+        local dx = self.horizontal_strafe_direction
+        local dy = self.vertical_strafe_direction
+        if self.horizontal_strafe_mode == "oscillating" then
+            dx = math.sin(Runtime:get_running_time() / 1000)
+        end
+        if self.vertical_strafe_mode == "oscillating" then
+            dy = math.sin(Runtime:get_running_time() / 1000)
+        end
+        dx = dx * 50 * Setting.FIELD_IN_GAME_SENSITIVITY
+        dy = dy * 50 * Setting.FIELD_IN_GAME_SENSITIVITY
+        dx = math.floor(dx)
+        dy = math.floor(dy)
+        Mouse:move_relative(dx, dy, 10)
+    end
+
+    ---攻击迭代。
+    ---@param round integer 攻击轮次。`round == 0` 时，攻击开始；`round > 0` 时，攻击可以进行（可通过返回 `nil` 提前结束）；`round < 0` 时，攻击需要提前结束（必须正确处理此情形）。
+    ---@param begin_timepoint integer 攻击开始的时刻
+    ---@return function|nil # 下一轮需要进行的攻击操作，返回 `nil` 表示结束当前武器的攻击。
+    function Weapon:next_attack_action(round, begin_timepoint)
+        if round == 0 then
+            -- 初始化扫射方向
+            if self.horizontal_strafe_mode == "none" then
+                self.horizontal_strafe_direction = 0
+            elseif self.horizontal_strafe_mode == "left" then
+                self.horizontal_strafe_direction = -1
+            elseif self.horizontal_strafe_mode == "right" then
+                self.horizontal_strafe_direction = 1
+            elseif self.horizontal_strafe_mode == "random" then
+                self.horizontal_strafe_direction = Utility:random_direction()
+            end
+            if self.vertical_strafe_mode == "none" then
+                self.vertical_strafe_direction = 0
+            elseif self.vertical_strafe_mode == "up" then
+                self.vertical_strafe_direction = -1
+            elseif self.vertical_strafe_mode == "down" then
+                self.vertical_strafe_direction = 1
+            elseif self.vertical_strafe_mode == "random" then
+                self.vertical_strafe_direction = Utility:random_direction()
+            end
+            return function()
+                Mouse:press(self.attack_button) -- 按下攻击按钮，开始攻击
+            end
+        end
+        if round < 0 then
+            return function()
+                Mouse:release(self.attack_button) -- 释放攻击按钮，结束攻击
+            end
+        end
+        if round > 0 then
+            return function()
+               self:strafe() -- 扫射
+            end
+        end
+    end
+
     ---使用武器进行攻击攻击。
     function Weapon:attack()
-        Mouse:press(self.attack_button)
-        local sensitivity_x = 1 - 0.8 * math.random() -- 水平灵敏度∈(0.2, 1]
-        local sensitivity_y = 1 - 0.8 * math.random() -- 竖直灵敏度∈(0.2, 1]
-        local direction = Utility:random_direction() -- 随机向左或右
-        local start_time = Runtime:get_running_time() -- 本次转圈开始时间
-        local last_switch_time = Runtime:get_running_time()
+        local timepoint = Runtime:get_running_time()
+        local round = 0
         repeat
-            local current_time = Runtime:get_running_time()
-            if current_time - last_switch_time > math.random(1000, 2000) then
-                self:switch_without_delay()
-                last_switch_time = current_time
+            local act = self:next_attack_action(round, timepoint)
+            round = round + 1
+            if act then
+                act()
+            else
+                break
             end
-            Mouse:move_relative(
-                math.floor(direction * 100 * sensitivity_x / Setting.FIELD_IN_GAME_SENSITIVITY),
-                math.floor(math.sin(current_time / 1000) * 100 * sensitivity_y / Setting.FIELD_IN_GAME_SENSITIVITY),
-                10
-            ) -- 视角运动：水平方向匀速运动，竖直方向简谐运动
-        until Runtime:get_running_time() - start_time > 7000
-        Mouse:release(self.attack_button)
+        until Runtime:get_running_time() - timepoint > self.attack_duration
+        local disposal = self:next_attack_action(-1, timepoint) -- 强制结束攻击
+        if disposal then disposal() end
     end
 end -- Weapon_lua

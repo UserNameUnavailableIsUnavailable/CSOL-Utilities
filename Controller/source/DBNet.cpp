@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "Exception.hpp"
+﻿#include "Exception.hpp"
 #include "OCR.hpp"
 #include "Utilities.hpp"
 

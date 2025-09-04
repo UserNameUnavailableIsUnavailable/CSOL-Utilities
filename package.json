@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@braid/vue-formulate": "^2.5.3",
-    "@formkit/vue": "^1.6.9",
-    "@primevue/forms": "^4.3.5",
-    "lua-fmt": "^2.6.0",
-    "lua-format": "^1.5.2"
-  }
-}
