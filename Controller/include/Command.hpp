@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 namespace CSOL_Utilities
 {
 	class Command

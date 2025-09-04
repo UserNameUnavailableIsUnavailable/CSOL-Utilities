@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "OCRIdleEngine.hpp"
+﻿#include "OCRIdleEngine.hpp"
 #include "Command.hpp"
 #include "IdleEngine.hpp"
 #include "Console.hpp"

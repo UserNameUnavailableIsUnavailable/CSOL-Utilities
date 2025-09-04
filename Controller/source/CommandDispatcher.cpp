@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "CommandDispatcher.hpp"
+﻿#include "CommandDispatcher.hpp"
 #include "Command.hpp"
 #include "Console.hpp"
 #include "Utilities.hpp"

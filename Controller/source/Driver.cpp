@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "Driver.hpp"
+﻿#include "Driver.hpp"
 #include "Command.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"

@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#include <string>
-#include <cstdint>
-
 namespace CSOL_Utilities
 {
     namespace Global

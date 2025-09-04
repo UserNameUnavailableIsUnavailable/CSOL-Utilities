@@ -20,7 +20,7 @@
     <h2>赞助（自愿）</h2>
     可通过如下方式赞助本项目：
     <div>
-        <img src="https://macrohard.fun/assets/donate/wepay.avif" width="256px" />
-        <img src="https://macrohard.fun/assets/donate/alipay.avif" width="256px" />
+        <img src="/donate/wepay.avif" width="256px" />
+        <img src="/donate/alipay.avif" width="256px" />
     </div>
 </template>

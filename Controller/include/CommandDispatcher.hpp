@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 #include "Module.hpp"
 
 namespace CSOL_Utilities

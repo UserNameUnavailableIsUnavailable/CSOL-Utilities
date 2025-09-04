@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.hpp"
-
 namespace CSOL_Utilities
 {
 	struct OCR_PreprocessInformation
@@ -229,44 +227,52 @@ namespace CSOL_Utilities
 		return m_Setting->m_DilationOffsetRatio * area / perimeter;
 	}
 
-	/// 获取能够容纳指定多边形的最小矩形。
+
+	/// 获取能够容纳指定多边形的最小矩形（使用 Clipper2）
 	/// @param polygon 多边形（元素为点的可迭代容器）
 	template <typename Iterable>
 	requires IsValidPointType<typename std::iterator_traits<typename Iterable::const_iterator>::value_type>
 	cv::RotatedRect ComputePolygonBoundingBox(const Iterable& polygon, double delta)
 	{
-		ClipperLib::ClipperOffset clipper_offset;
-		ClipperLib::Path p;
+		using namespace Clipper2Lib;
 
-		for (auto pt : polygon)
+		PathD path;
+
+		for (const auto& pt : polygon)
 		{
-			p << ClipperLib::IntPoint(static_cast<int>(pt.x), static_cast<int>(pt.y));
+			path.emplace_back(pt.x, pt.y);
 		}
 
-		clipper_offset.AddPath(p, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+		// Convert PathD to Path64
+		Path64 path64;
+		for (const auto& pt : path)
+		{
+			path64.emplace_back(static_cast<int64_t>(std::round(pt.x)), static_cast<int64_t>(std::round(pt.y)));
+		}
 
-		ClipperLib::Paths solution;
-		clipper_offset.Execute(solution, delta);
+		ClipperOffset clipper_offset;
+		clipper_offset.AddPath(path64, JoinType::Round, EndType::Polygon);
+
+		Paths64 solution;
+		clipper_offset.Execute(static_cast<int64_t>(std::round(delta)), solution);
 
 		std::vector<cv::Point2f> points;
-
-		for (size_t j = 0; j < solution.size(); j++)
+		for (const auto& sol_path : solution)
 		{
-			for (size_t i = 0; i < solution[solution.size() - 1].size(); i++)
+			for (const auto& pt : sol_path)
 			{
-				points.emplace_back(solution[j][i].X, solution[j][i].Y);
+				points.emplace_back(static_cast<float>(pt.x), static_cast<float>(pt.y));
 			}
 		}
-		cv::RotatedRect res;
+
 		if (points.empty())
 		{
-			res = cv::RotatedRect(cv::Point2f(0, 0), cv::Size2f(1, 1), 0);
+			return cv::RotatedRect(cv::Point2f(0, 0), cv::Size2f(1, 1), 0);
 		}
 		else
 		{
-			res = cv::minAreaRect(points);
+			return cv::minAreaRect(points);
 		}
-		return res;
 	}
 
 	/// 计算 RoI 包含的像素点的均值。

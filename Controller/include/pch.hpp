@@ -1,7 +1,12 @@
 ﻿#pragma once
 
+// pre-compile header
+// This file is included beforehand in other source files (see CMakeLists.txt), so you needn't include this file explicitly.
+
 #include <Windows.h>
 #include <tlhelp32.h>
+#undef min
+#undef max
 
 #include <format>
 #include <iostream>
@@ -27,7 +32,6 @@
 #include <string_view>
 #include <type_traits>
 
-
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/mat.hpp>
@@ -35,7 +39,7 @@
 #include <onnxruntime/onnxruntime_cxx_api.h>
 #include <onnxruntime/onnxruntime_session_options_config_keys.h>
 #include <onnxruntime/onnxruntime_run_options_config_keys.h>
-#include <aho_corasick/aho_corasick.hpp>
-#include <clipper.hpp>
-#include <boost/static_string.hpp>
+#include <clipper2/clipper.core.h>
+#include <clipper2/clipper.offset.h>
 #include <nlohmann/json.hpp>
+#include <aho_corasick/aho_corasick.hpp>

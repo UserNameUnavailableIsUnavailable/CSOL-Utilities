@@ -1,6 +1,4 @@
-﻿#include "pch.hpp"
-
-#include "OCR.hpp"
+﻿#include "OCR.hpp"
 #include "Console.hpp"
 
 namespace CSOL_Utilities
