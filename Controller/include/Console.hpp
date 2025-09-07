@@ -18,7 +18,7 @@ namespace CSOL_Utilities
 		static constexpr const char* FOREGROUND_COLOR_BRIGHT_GREEN = "\x1b[92m";
 		static constexpr const char* FOREGROUND_COLOR_BRIGHT_YELLOW = "\x1b[93m";
 		static constexpr const char* FOREGROUND_COLOR_BRIGHT_BLUE = "\x1b[94m";
-		static constexpr const char* FOREGROUND_COLOR_BRIGHT_RED = "\x1b[101m";
+		static constexpr const char* FOREGROUND_COLOR_BRIGHT_RED = "\x1b[91m";
 		static constexpr const char* FOREGROUND_COLOR_BRIGHT_DEFAULT = "\x1b[39m";
 		static constexpr const char* FOREGROUND_COLOR_BRIGHT_WHITE = "\x1b[37m";
 		static constexpr const char* COLOR_DEFAULT = "\x1b[0m";

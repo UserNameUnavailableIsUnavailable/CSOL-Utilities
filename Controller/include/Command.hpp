@@ -18,6 +18,9 @@ namespace CSOL_Utilities
 			CMD_BATCH_PURCHASE_ITEM,
 			CMD_LOCATE_CURSOR,
 			CMD_CLEAR_POPUPS,
+			CMD_DETECT_IN_GAME,
+			CMD_DEFAULT_IDLE_2,
+			CMD_EXTENDED_IDLE_2,
 		};
 
 		using MODE = unsigned int;
@@ -56,6 +59,12 @@ namespace CSOL_Utilities
 				return "Command.CMD_LOCATE_CURSOR";
 			case Command::TYPE::CMD_CLEAR_POPUPS:
 				return "Command.CMD_CLEAR_POPUPS";
+			case Command::TYPE::CMD_DETECT_IN_GAME:
+				return "Command.CMD_DETECT_IN_GAME";
+			case Command::TYPE::CMD_DEFAULT_IDLE_2:
+				return "Command.CMD_DEFAULT_IDLE_2";
+			case Command::TYPE::CMD_EXTENDED_IDLE_2:
+				return "Command.CMD_EXTENDED_IDLE_2";
 			default:
 				return "Command.NOP";
 			}

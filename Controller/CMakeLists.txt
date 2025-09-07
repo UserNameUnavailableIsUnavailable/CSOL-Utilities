@@ -38,18 +38,21 @@ add_executable(
     source/Command.cpp
     source/CommandDispatcher.cpp
     source/Console.cpp
-    source/CRNN.cpp
     source/CSOBannerSuppressor.cpp
     source/Global.cpp
     source/Hotkey.cpp
     source/LowLevelKeyboardHook.cpp
     source/IdleEngine.cpp
+    source/ModelUtilities.cpp
     source/OCR.cpp
-    source/DBNet.cpp
+    source/OCR_Detector.cpp
+    source/OCR_Recognizer.cpp
     source/OCRIdleEngine.cpp
     source/OCRUtilities.cpp
     source/pch.cpp
     source/Utilities.cpp
+    source/Classifier.cpp
+    source/ClassifierIdleEngine.cpp
 )
 
 target_link_libraries(Controller
@@ -81,16 +84,10 @@ if (dependencies)
     add_custom_command(TARGET Controller POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${dependencies}
-            $<TARGET_FILE_DIR:Controller>
+            "${CMAKE_BINARY_DIR}/$<CONFIG>"
     )
 endif()
 
 add_custom_command(TARGET Controller POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/locales
-        $<TARGET_FILE_DIR:Controller>/locales
-)
-
-add_custom_command(TARGET Controller POST_BUILD
-    COMMAND pwsh -NoLogo -NoProfile -File "${CMAKE_SOURCE_DIR}/InstallModels.ps1" -Target "$<CONFIG>"
+    COMMAND pwsh -NoLogo -NoProfile -File "\"${CMAKE_SOURCE_DIR}/PostBuild.ps1\"" -BuildType "$<CONFIG>" -ModelsPath "\"${MODELS_PATH}\"" -LocalesPath "\"${CMAKE_SOURCE_DIR}/Locales\""
 )

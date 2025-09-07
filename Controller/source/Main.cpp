@@ -1,4 +1,4 @@
-﻿#include "CSOBannerSuppressor.hpp"
+#include "CSOBannerSuppressor.hpp"
 #include "CommandDispatcher.hpp"
 #include "Driver.hpp"
 #include "Exception.hpp"
@@ -9,16 +9,15 @@
 #include "IdleEngine.hpp"
 #include "LowLevelKeyboardHook.hpp"
 #include "OCRIdleEngine.hpp"
+#include "ClassifierIdleEngine.hpp"
 #include "Utilities.hpp"
 
 using namespace CSOL_Utilities;
 
-std::unique_ptr<Driver> g_Driver;
-
+std::function<void()> g_ctrl_c_callback;
 void InitializeCommandLineArgs(CLI::App& app, int argc, wchar_t* argv[]);
-void Boot();
+void Boot(std::unique_ptr<Driver>& driver);
 
-#ifndef Test__
 /* 使用 wmain 作为入口，确保命令行参数以 UTF-16 传入 */
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
@@ -30,8 +29,13 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	DWORD dwErrorCode = ERROR_SUCCESS;
 	try
 	{
-		Boot();
-		g_Driver->Launch();
+		std::unique_ptr<Driver> driver;
+		Boot(driver);
+		assert(driver); // Boot 运行且没有抛出异常则 driver 一定被初始化
+		g_ctrl_c_callback = [&driver]() {
+			driver->Terminate(); // 按下 Ctrl+C 时终止 Driver
+		};
+		driver->Boot();
 	}
 	catch (std::exception& e)
 	{
@@ -40,12 +44,11 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 		auto _ = std::getchar();
 		dwErrorCode = GetLastError();
 	}
-	g_Driver.reset(); /* 析构 Driver，结束所有线程 */
+	// driver.reset(); /* 析构 Driver，结束所有线程 */
 	Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
 	Console::Info(Translate("Main::INFO_SafelyExited"));
 	return dwErrorCode;
 }
-#endif
 
 void InitializeCommandLineArgs(CLI::App& app, int argc, wchar_t* argv[])
 {
@@ -57,19 +60,19 @@ void InitializeCommandLineArgs(CLI::App& app, int argc, wchar_t* argv[])
 	app.add_option("--start-game-room-timeout", Global::StartGameRoomTimeout);
 	app.add_option("--login-timeout", Global::LoginTimeout);
 	app.add_option("--load-map-timeout", Global::LoadMapTimeout);
-	app.add_option("--LGHUB-Agent-name", Global::LGHUB_Agent_Name);
-	app.add_option("--detect-mode", Global::DetectMode);
-	app.add_option("--OCR-detection-model-path", Global::OCRDetectionModelPath);
-	app.add_option("--OCR-recognition-model-path", Global::OCRRecognitionModelPath);
-	app.add_option("--OCR-dictionary-path", Global::OCRDictionaryPath);
-	app.add_option("--OCR-keywords-path", Global::OCRKeywordsPath);
+	app.add_option("--lghub-agent-name", Global::LGHUBAgentName);
+	app.add_option("--idle-engine-type", Global::IdleEngineType);
+	app.add_option("--ocr-detector-json-path", Global::OCRDetectorJSONPath);
+	app.add_option("--ocr-recognizer-json-path", Global::OCRRecognizerJSONPath);
+	app.add_option("--ocr-keywords-path", Global::OCRKeywordsJSONPath);
+	app.add_option("--classifier-model-json-path", Global::ClassifierModelJSONPath);
 	app.add_flag("--default-idle-after-reconnection", Global::DefaultIdleAfterReconnection);
 	app.add_flag("--restart-game-on-loading-timeout", Global::RestartGameOnLoadingTimeout);
 	app.add_flag("--allow-quick-fullscreen", Global::AllowQuickFullScreen);
 	app.add_flag("--suppress-CSOBanner", Global::SuppressCSOBanner);
 }
 
-void Boot()
+void Boot(std::unique_ptr<Driver>& driver)
 {
 	Global::LocaleName += L".UTF-8";
 	std::locale locale(ConvertUtf16ToUtf8(Global::LocaleName));
@@ -89,9 +92,9 @@ void Boot()
 	auto convert_to_absolute_path = [] (const std::filesystem::path& path) {
 		if (path.is_relative())
 		{
-			return GetModulePath().parent_path() / path;
+			return GetProcessImagePath().parent_path() / path;
 		}
-		return path;
+		return std::filesystem::canonical(path);
 	};
 	
 	auto query_registry_string = [] (HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValue, std::wstring& buffer)
@@ -133,37 +136,61 @@ void Boot()
 	Console::Info(Translate("Main::INFO_GameRootDir@1", ConvertUtf16ToUtf8(Global::GameRootDirectory)));
 	Console::Info(Translate("Main::INFO_LaunchGameCmd@1", ConvertUtf16ToUtf8(Global::LaunchGameCmd)));
 
-	GameProcessInformation game_process_information {
+	auto game_process_information = std::make_unique<GameProcessInformation>(
 		L"cstrike-online.exe",
 		L"Counter-Strike Online",
         game_executable_path.wstring(),
-		Global::LaunchGameCmd,
-	};
+		Global::LaunchGameCmd
+	);
 	
-	OCRBackboneInformation ocr_backbone_information {
-		.DBNetPath = convert_to_absolute_path(Global::OCRDetectionModelPath),
-		.CRNNPath = convert_to_absolute_path(Global::OCRRecognitionModelPath),
-		.DictPath = convert_to_absolute_path(Global::OCRDictionaryPath),
-		.KeywordsPath = convert_to_absolute_path(Global::OCRKeywordsPath)
-	};
+	std::unique_ptr<IdleEngine> idle_engine;
 
-	auto idle_engine = std::make_unique<OCRIdleEngine>(std::move(game_process_information), ocr_backbone_information);
-	
+	if (Global::IdleEngineType == L"OCR")
+	{
+		auto ocr_backbone_information = std::make_unique<OCRBackboneInformation> 
+		(
+			convert_to_absolute_path(Global::OCRDetectorJSONPath),
+			convert_to_absolute_path(Global::OCRRecognizerJSONPath),
+			convert_to_absolute_path(Global::OCRKeywordsJSONPath)
+		);
+		idle_engine = std::make_unique<OCRIdleEngine>
+		(
+			std::move(game_process_information),
+			std::move(ocr_backbone_information)
+		);
+	}
+	else if (Global::IdleEngineType == L"Classifier")
+	{
+		idle_engine = std::make_unique<ClassifierIdleEngine>
+		(
+			std::move(game_process_information),
+			convert_to_absolute_path(Global::ClassifierModelJSONPath)
+		);
+	}
+
+	if (!idle_engine)
+	{
+		throw Exception(Translate("IdleEngine::ERROR_UnsupportedIdleEngineType@1", ConvertUtf16ToUtf8(Global::IdleEngineType)));
+	}
+
 	auto command_dispatcher =
 		std::make_unique<CommandDispatcher>(convert_to_absolute_path(Global::ExecutorCommandFilePath));
 
 	auto driver_hotkey_bindings = std::make_unique<DriverHotkeyBindings>(DriverHotkeyBindings {
-		.hkNULL = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '0'),
-		.hkNormalIdle = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '1'),
-		.hkExtendedIdle = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '2'),
-		.hkBatchCombineParts = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '3'),
-		.hkBatchPurchaseItem = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '4'),
-		.hkLocateCursor = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '5'),
+		.null_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '0'),
+		.normal_idle_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '1'),
+		.extended_idle_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '2'),
+		.batch_combine_parts_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '3'),
+		.batch_purchase_item_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '4'),
+		.locate_cursor_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '5'),
 	});
 
-	g_Driver = std::make_unique<Driver>(std::move(driver_hotkey_bindings), std::move(idle_engine), std::move(command_dispatcher));
+	driver = std::make_unique<Driver>(std::move(driver_hotkey_bindings), std::move(idle_engine), std::move(command_dispatcher));
 	SetConsoleCtrlHandler([] (DWORD dwCtrlType) -> BOOL {
-		g_Driver->Terminate();
+		if (g_ctrl_c_callback)
+		{
+			g_ctrl_c_callback();
+		}
 		return TRUE;
 	}, true);
 	
@@ -196,14 +223,14 @@ void Boot()
 			}
 			return CallNextHookEx(nullptr, nCode, wParam, lParam);
 		});
-		g_Driver->RegisterLowLevelKeyboardHook(std::move(disable_alt_enter));
+		driver->RegisterLowLevelKeyboardHook(std::move(disable_alt_enter));
 		Console::Info(Translate("Main::INFO_DisableQuickFullscreen"));
 	}
 	if (Global::SuppressCSOBanner)
 	{
 		auto cso_banner_path = std::filesystem::path(Global::GameRootDirectory) / L"Bin" / L"CSOBanner.exe";
 		auto cso_banner_suppressor = std::make_unique<CSOBannerSuppressor>(cso_banner_path);
-		g_Driver->RegisterOptionalModule(std::move(cso_banner_suppressor));
+		driver->RegisterOptionalModule(std::move(cso_banner_suppressor));
 		Console::Info(Translate("Main::INFO_SuppressCSOBanner"));
 	}
 }

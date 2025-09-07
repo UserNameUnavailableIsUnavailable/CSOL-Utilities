@@ -10,7 +10,7 @@ namespace CSOL_Utilities
 	std::wstring ConvertUtf8ToUtf16(const std::string& u8);
 	std::string ConvertUtf16ToUtf8(const std::wstring& u16);
 	BOOL IsRunningAsAdmin() noexcept;
-	std::filesystem::path GetModulePath(uintptr_t hMod = 0ull);
+	std::filesystem::path GetProcessImagePath(uintptr_t hMod = 0);
 	DWORD GetProcessIdByName(const std::wstring& process_name);
 	void EnumerateProcesses(std::function<bool(const PROCESSENTRY32W& process_entry)> callback);
 	void CaptureWindowAsBmp(HWND hWnd, std::vector<uint8_t>& buffer);

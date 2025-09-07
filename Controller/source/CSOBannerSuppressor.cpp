@@ -6,50 +6,66 @@
 namespace CSOL_Utilities
 {
     CSOBannerSuppressor::CSOBannerSuppressor(std::wstring cso_banner_executable_path) :
-        m_CSOBannerExecutablePath(std::move(cso_banner_executable_path))
+        CSO_Banner_executable_path_(std::move(cso_banner_executable_path))
     {
-        m_Worker = std::thread(
+    }
+
+    CSOBannerSuppressor::~CSOBannerSuppressor() noexcept
+    {
+        Terminate();
+    }
+
+    void CSOBannerSuppressor::Boot()
+    {
+        std::lock_guard lk(boot_lock_);
+        if (is_booted_) return; // 防止重复启动
+        worker_ = std::thread(
             [this] {
 				std::string module_name = "CSOBannerSuppressor";
                 try{
-                    Work(m_StopSource.get_token());
+                    Run(stop_source_.get_token());
                 } catch (std::exception& e) {
                     Console::Error(Translate("Module::ERROR_ModulePanic@2", module_name, e.what()));
                 }
                 Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
             }
         );
+        is_booted_ = true; // 标记为启动
     }
 
-    CSOBannerSuppressor::~CSOBannerSuppressor() noexcept
+    void CSOBannerSuppressor::Resume() noexcept
     {
-        m_StopSource.request_stop();
-        m_RunnableCondition.notify_one();
-        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(m_Worker.native_handle()), 0);
-        m_Worker.join();
+        {
+            std::lock_guard lk(worker_state_lock_);
+            is_worker_runnable_ = true;
+        }
+        worker_runnable_cond_.notify_one();
     }
 
-    void CSOBannerSuppressor::Suspend()
+    void CSOBannerSuppressor::Suspend() noexcept
     {
-        std::unique_lock lk(m_StateLock);
-        m_bRunnable = false;
-        if (m_bFinished)
+        std::unique_lock lk(worker_state_lock_);
+        is_worker_runnable_ = false;
+        if (has_worker_finished_)
         {
             return;
         }
-        m_FinishedCondition.wait(lk, [this] { return m_bFinished; });
+        worker_finished_cond_.wait(lk, [this] { return has_worker_finished_; });
     }
 
-    void CSOBannerSuppressor::Resume()
+    void CSOBannerSuppressor::Terminate() noexcept
     {
-        {
-            std::lock_guard lk(m_StateLock);
-            m_bRunnable = true;
-        }
-        m_RunnableCondition.notify_one();
+        std::lock_guard lk(boot_lock_);
+        if (!is_booted_) return; // 未启动
+        stop_source_.request_stop();
+        worker_runnable_cond_.notify_one();
+        QueueUserAPC([] (ULONG_PTR) {}, reinterpret_cast<HANDLE>(worker_.native_handle()), 0);
+        if (worker_.joinable())
+            worker_.join();
+        is_booted_ = false; // 标记为未启动
     }
 
-    void CSOBannerSuppressor::Work(std::stop_token st)
+    void CSOBannerSuppressor::Run(std::stop_token st)
     {
         const std::wstring cso_banner_executable_name = L"CSOBanner.exe";
         auto find_cso_banner_process = [this, &cso_banner_executable_name] (const PROCESSENTRY32W& process_entry)  -> bool {
@@ -80,7 +96,7 @@ namespace CSOL_Utilities
                 std::filesystem::path p(executable_path);
                 bool ret;
                 std::error_code ec;
-                if (std::filesystem::equivalent(p, m_CSOBannerExecutablePath, ec))
+                if (std::filesystem::equivalent(p, CSO_Banner_executable_path_, ec))
                 {
                     SafeTerminateProcess(hProcess, 1500); /* 安全地结束进程 */
                     CloseHandle(hProcess);
@@ -92,22 +108,22 @@ namespace CSOL_Utilities
         while (true)
         {
             {
-                std::unique_lock lk(m_StateLock);
-                m_RunnableCondition.wait(lk, [this, &st] {
-                    return st.stop_requested() || m_bRunnable;
+                std::unique_lock lk(worker_state_lock_);
+                worker_runnable_cond_.wait(lk, [this, &st] {
+                    return st.stop_requested() || is_worker_runnable_;
                 });
                 if (st.stop_requested())
                 {
                     break;
                 }
-                m_bFinished = false;
+                has_worker_finished_ = false;
             }
             {
-                std::lock_guard lk(m_StateLock);
+                std::lock_guard lk(worker_state_lock_);
                 EnumerateProcesses(find_cso_banner_process);
-                m_bFinished = true;
+                has_worker_finished_ = true;
             }
-            m_FinishedCondition.notify_one();
+            worker_finished_cond_.notify_one();
             SleepEx(5000, true);
         }
     }

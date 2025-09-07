@@ -1,4 +1,9 @@
 {
+    "ERROR_Unexpected@1": "意料之外的错误：{}。请向开发者反馈此问题，邮箱 admin@macrohard.fun。",
+    "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。",
+    "ERROR_FileStream@2": "文件流操作 {} 失败，详细信息：{}。",
+    "ERROR_MandatoryFieldMissing@1": "缺少必填字段：{}。",
+    "ERROR_Win32_API@2": "{} 失败，错误代码：{}。",
     "Main":
     {
         "INFO_Version@1": "CSOL 集成工具控制器（版本：{}），请留意控制器与执行器版本是否匹配。",
@@ -12,7 +17,7 @@
         "INFO_SuppressCSOBanner": "自动检测并关闭 CSO Banner 功能启用",
         "INFO_Author": "本工具由 _CoreDump 开发。",
         "INFO_Feedback": "如遇问题请通过邮箱 admin@macrohard.fun 或 ttyuig@126.com 联系作者，有编程经验者建议通过 Issues 反馈（Gitee 或 GitHub 均可）。",
-        "WARN_Note": "本工具项目开源，请注意甄别，切勿上当受骗。",
+        "WARN_Note": "本工具完全开源，请注意甄别，切勿上当受骗。",
         "INFO_Gitee_URL": "Gitee 项目地址：https://gitee.com/silver1867/csol-24-h。",
         "INFO_GitHub_URL": "GitHub 项目地址：https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities。",
         "INFO_HowToExit": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
@@ -41,6 +46,47 @@
     },
     "IdleEngine":
     {
+        "ERROR_UnsupportedIdleEngineType@1": "不支持的挂机引擎类型：{}。",
+        "INFO_StartGameRoom": "开始游戏，加载游戏场景。",
+        "INFO_GameMapLoaded": "游戏地图加载完成。",
+        "INFO_RoundCompleted": "一局游戏完成。",
+
+        "INFO_Login": "等待游戏登陆。",
+        "WARN_LoginTimeout@1": "等待登录超过预设时间 {} 秒。",
+        "INFO_LoginToLobby": "登陆成功，进入游戏大厅。",
+
+        "INFO_Lobby": "当前位于游戏大厅界面。",
+        "INFO_LobbyToRoom": "进入游戏房间。",
+
+        "INFO_Room": "当前位于游戏房间界面。",
+        "WARN_RoomToLobby": "从房间中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+        "INFO_RoomToLoading": "开始游戏，加载游戏场景。",
+        "WARN_RoomTimeout@1": "等待开始游戏超过预设时间 {} 秒，回到大厅重新创建房间。",
+
+        "INFO_Loading": "当前位于加载界面。",
+        "WARN_LoadingToRoom": "游戏场景加载失败（可能为网络问题，一般表现为重连 1 2 3）。",
+        "INFO_LoadingToRoomTooManyTimes": "加载失败次数过多，将离开当前房间重新创建。",
+        "WARN_LoadingTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应。",
+        "INFO_TryKillGameProcess": "尝试结束游戏进程。",
+        "INFO_LoadingToInGame": "游戏地图加载完成，进入游戏。",
+
+        "INFO_InGame": "当前位于游戏内界面。",
+        "WARN_InGameToLobby": "从游戏中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+        "WARN_InGameToRoom": "从游戏中返回到游戏房间。",
+        "INFO_InGameToRoomTooManyTimes": "从游戏中返回到游戏房间次数过多，离开当前房间重新创建。",
+        "WARN_MaxInGameTimeReached": "游戏内时间达到预设最长时间，游戏进程可能失去响应。",
+        "INFO_InGameToResults": "游戏结算。",
+
+        "INFO_Results": "当前位于游戏结算界面。",
+        "INFO_ResultsToRoom": "结算确认，回到游戏房间。",
+
+        "WARN_ReturnFromInGameToRoomTooManyTimes": "从游戏中返回到游戏房间次数过多，离开当前房间重新创建。",
+        "WARN_FailedToLoadGameMap": "游戏场景加载失败（可能为网络问题，一般表现为重连 1 2 3），离开当前房间重新创建。",
+        "WARN_ReturnFromInGameToLobby": "从游戏中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+        "WARN_ReturnFromRoomToLobby": "从房间中返回到游戏大厅（可能是被强踢或长时间无有效操作，若是自行退出请忽略）。",
+        "WARN_WaitStartGameRoomTimeout@1": "等待开始游戏超过预设时间 {} 秒，回到大厅重新创建房间。",
+        "WARN_WaitLoginTimeout@1": "等待游戏登录超过预设时间 {} 秒。",
+        "WARN_WaitLoadGameMapTimeout@1": "游戏地图加载超过预设时间 {} 秒，可能是游戏失去响应。",
         "GameProcessDetector":
         {
             "INFO_GameProcessNotRunning": "游戏进程未运行，尝试启动游戏。",
@@ -137,5 +183,10 @@
         "INFO_SwitchToBatchPurchaseItemMode": "切换为批量购买物品模式。",
         "INFO_SwitchToLocateCursorMode": "切换为光标定位模式。",
         "ERROR_DriverIsFrozen": "驱动器已经冻结，不允许修改。"
+    },
+    "ResNet":
+    {
+        "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。",
+        "ERROR_FailedToReadLabelFile@1": "读取标签文件失败，错误原因：{}。"
     }
 }

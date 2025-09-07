@@ -31,6 +31,9 @@
 #include <unordered_map>
 #include <string_view>
 #include <type_traits>
+#include <functional>
+#include <cassert>
+#include <algorithm>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
