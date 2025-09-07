@@ -33,3 +33,15 @@ cmake --build build --config Release
 
 > [!NOTE]
 > 需要指出，本项目用到的部分依赖并未在 vcpkg 中提供，因此 `cmake -S . -B build` 会从相应的 GitHub 仓库下载这些依赖。
+
+## 模型部署
+
+构建完成后，控制器需要模型文件才能正常工作。
+模型文件可在 [CSOL-Utilities-Controller-Models](https://huggingface.co/UserNameIsUnavailable/CSOL-Utilities-Controller-Models) 获得。
+运行 `DeployModels.ps1` 脚本可将模型文件部署到构建目录中：
+
+```powershell
+.\DeployModels.ps1 -Path <模型文件所在目录> -Target Release
+```
+
+`-Path` 参数指定模型文件所在目录，`-Target` 参数指定构建类型。

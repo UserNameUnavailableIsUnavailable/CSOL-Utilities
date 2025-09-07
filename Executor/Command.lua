@@ -1,13 +1,13 @@
 if not Command_lua then
     Command_lua = true
     Include("Version.lua")
-    Version:set("Command", "1.5.2")
+    Version:set("Command", "1.5.3")
     Command = {
         CMD_NOP = 0,
         CMD_START_GAME_ROOM = 1,
         CMD_CHOOSE_CHARACTER = 2,
-        CMD_DEFAULT_IDLE = 3,
-        CMD_EXTENDED_IDLE = 4,
+        CMD_DEFAULT_IDLE = 3, -- 执行挂机动作，并进行结算确认
+        CMD_EXTENDED_IDLE = 4, -- 执行挂机动作，并进行结算确认
         CMD_CONFIRM_RESULTS = 5,
         CMD_CREATE_GAME_ROOM = 6,
         CMD_BATCH_COMBINE_PARTS = 7,
@@ -15,7 +15,25 @@ if not Command_lua then
         CMD_LOCATE_CURSOR = 9,
         CMD_CLEAR_POPUPS = 10,
         CMD_DETECT_IN_GAME = 11,
+        CMD_DEFAULT_IDLE_2 = 12, -- 与 CMD_DEFAULT_IDLE 功能相同，但不会进行结算确认
+        CMD_EXTENDED_IDLE_2 = 13, -- 与 CMD_EXTENDED_IDLE 功能相同，但不会进行结算确认
     }
+
+    Command.IDLE_COMMANDS = {
+        Command.CMD_DEFAULT_IDLE,
+        Command.CMD_EXTENDED_IDLE,
+        Command.CMD_DEFAULT_IDLE_2,
+        Command.CMD_EXTENDED_IDLE_2,
+    }
+
+    function Command:is_idle_command(cmd)
+        for _, v in ipairs(Command.IDLE_COMMANDS) do
+            if v == cmd then
+                return true
+            end
+        end
+        return false
+    end
 
     Command.status = 0
     Command.UNCHANGED = 0 -- 与上次相比，命令未发生更新

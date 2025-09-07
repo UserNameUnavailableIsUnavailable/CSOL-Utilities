@@ -14,19 +14,19 @@ PATH = ""
 ---@see PATH
 function Include(path) end
 
----Command Identifier
+---命令标识符
 ---@type integer
 CmdId = 0
 
----Command type
+---命令类型
 ---@type integer
 CmdType = Command.CMD_NOP
 
----Command timepoint
+---命令时间戳
 ---@type integer
 CmdTimepoint = 0
 
----Whether the command is repeatable
+---命令是否可重复
 ---@type boolean
 CmdRepeatable = false
 

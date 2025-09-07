@@ -16,13 +16,15 @@ if not Automation_lua then
     Include("Setting.lua")
     Include("WeaponList.lua")
     Include("Version.lua")
-    Version:set("Automation", "1.5.2")
-    
+    Version:set("Automation", "1.5.3")
+
     ---自动化执行。
     ---@class Automation
     ---@field default_player Player
     ---@field extended_player Player
     ---@field last_reset_or_respawn_time integer
+    ---@field last_use_health_potion_30_timepoint integer
+    ---@field last_use_health_potion_100_timepoint integer
     Automation = {}
 
     ---手动接管标识。
@@ -63,7 +65,7 @@ if not Automation_lua then
         handler = function()
             -- 当前未在挂机
             local cmd = Command:claim()
-            if cmd ~= Command.CMD_DEFAULT_IDLE and cmd ~= Command.CMD_EXTENDED_IDLE then
+            if not Command:is_idle_command(cmd) then
                 return
             end
             local time = Runtime:get_running_time()
@@ -73,11 +75,37 @@ if not Automation_lua then
             end
         end,
     }))
-    
+
+    Automation.last_use_health_potion_30_timepoint = 0
+    Automation.last_use_health_potion_100_timepoint = 0
+
+    --- 定期使用回血道具
+    Runtime:register_interrupt(Interrupt:new({
+        name = "定期使用回血道具",
+        handler = function()
+            -- 当前未在挂机
+            local cmd = Command:claim()
+            if not Command:is_idle_command(cmd) then
+                return
+            end
+            if not Setting.SWITCH_GAME_USE_HEALTH_POTION then
+                return
+            end
+            local time = Runtime:get_running_time()
+            if time - Automation.last_use_health_potion_30_timepoint > 1 * 60 * 1000 then -- 每隔 1 分钟使用一次 30% 回血道具
+                Keyboard:click(Keyboard.FIVE, Delay.MINI) -- 使用 30 点回血道具
+                Automation.last_use_health_potion_30_timepoint = time
+            elseif time - Automation.last_use_health_potion_100_timepoint > 2 * 60 * 1000 then -- 每隔 2 分钟使用一次 100% 回血道具
+                Keyboard:click(Keyboard.SIX, Delay.MINI) -- 使用 100 点回血道具
+                Automation.last_use_health_potion_100_timepoint = time
+            end
+        end,
+    }))
+
     -- 初始化
     Error:register_error_handler("COMMAND_CHANGED", function() end)
-    DateTime:set_time_zone(Setting.FIELD_TIME_ZONE) -- 时区
-    Weapon:set_reload_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 换弹按键
+    DateTime:set_time_zone(Setting.FIELD_TIME_ZONE)                    -- 时区
+    Weapon:set_reload_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1])  -- 换弹按键
     Player:set_respawn_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 复活按键
 
     -- 为默认挂机模式和扩展挂机模式创建两个玩家对象。
@@ -131,9 +159,9 @@ if not Automation_lua then
         if not Setting.SWITCH_CREATE_ROOM_ON_EXCEPTION then
             return
         end
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT)                                            -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
         Mouse:click_several_times_on(Mouse.LEFT, Setting.POSITION_LOBBY_BACK_X, Setting.POSITION_LOBBY_BACK_Y, 5, 100) -- 按 5 次返回，到大厅进入游戏界面
-        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT) -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 10, 100, Delay.SHORT)                                            -- 按 10 次 `Keyboard.ESCAPE`，关闭所有弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_LIST_ROOMS_X, Setting.POSITION_LOBBY_LIST_ROOMS_Y, 500)
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_LOBBY_CREATE_ROOM_1_X, Setting.POSITION_LOBBY_CREATE_ROOM_1_Y, 500)
         Mouse:click_on(
@@ -152,9 +180,16 @@ if not Automation_lua then
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32,
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32,
             300 -- 点击一次间隔 300 毫秒
-        ) -- 向左翻页指定次数
+        )       -- 向左翻页指定次数
+        Mouse:click_several_times_on(
+            Mouse.LEFT,
+            Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X,
+            Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y,
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT --[[v1.5.3 正式版引入]] or 0,
+            300 -- 点击一次间隔 300 毫秒
+        )       -- 向右翻页指定次数
         Mouse:click_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X,
@@ -201,10 +236,10 @@ if not Automation_lua then
         if Setting.SWITCH_LOBBY_CREATE_ROOM_LOCK then
             local password
             if
-                not Setting.SWITCH_LOBBY_CREATE_ROOM_CUSTOMIZE_PASSWORD -- 不使用自定义密码
+                not Setting.SWITCH_LOBBY_CREATE_ROOM_CUSTOMIZE_PASSWORD      -- 不使用自定义密码
             then
                 password = tostring(math.random(10000000, 9999999999999999)) -- 生成 8 ~ 16 位数字密码
-            else -- 使用自定义密码
+            else                                                             -- 使用自定义密码
                 password = Setting.FIELD_LOBBY_CREATE_ROOM_CUSTOM_PASSWORD
             end
             Keyboard:puts(password)
@@ -280,22 +315,16 @@ if not Automation_lua then
             Console:information("角色选项设置有误。随机选择角色。")
             Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
         end
+        Automation.last_use_health_potion_30_timepoint = Runtime:get_running_time()
+        Automation.last_use_health_potion_100_timepoint = Runtime:get_running_time()
         Player:reset() -- 重置玩家对象成员变量
     end
 
-    ---上一次尝试确认结算界面的时间戳。
-    function Automation:try_confirm()
-        local cursor_locked = true
-        if not Mouse:is_cursor_position_locked() then
-            Keyboard:click_several_times(Keyboard.ESCAPE, 3, Delay.MINI, Delay.MINI, true)
-            cursor_locked = Mouse:is_cursor_position_locked()
-        end
-        if cursor_locked then
-            return
-        end
-        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
-        Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+    ---尝试确认结算界面。
+    function Automation:confirm_results()
+        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI)                                     -- 清除所有可能存在的弹窗
+        Automation:choose_golden_zombie_reward()                                                                     -- 选择黄金僵尸奖励
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI)                                     -- 清除所有可能存在的弹窗
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
     end
 
@@ -344,7 +373,7 @@ if not Automation_lua then
             Setting.POSITION_STORE_PURCHASE_OPTION_X,
             Setting.POSITION_STORE_PURCHASE_OPTION_Y,
             30
-        ) -- 弹出界面选项
+        )                                                                                                    -- 弹出界面选项
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_STORE_PURCHASE_X, Setting.POSITION_STORE_PURCHASE_Y, 30) -- 弹出界面兑换按钮
         Mouse:click_on(
             Mouse.LEFT,
@@ -369,24 +398,37 @@ if not Automation_lua then
     end
 
     function Automation:clear_popups()
-        Keyboard:click(Keyboard.ESCAPE, 5000)
+        Keyboard:click(Keyboard.ESCAPE, 2000)
     end
 
     ---任务列表。
     Automation.Task = {
         [Command.CMD_START_GAME_ROOM] = Automation.start_game_room,
         [Command.CMD_CHOOSE_CHARACTER] = Automation.choose_character,
-        [Command.CMD_DEFAULT_IDLE] = function ()
-            Automation:try_confirm()
+        [Command.CMD_DEFAULT_IDLE] = function()
+            Automation:confirm_results()
             Automation.default_player:play()
         end,
-        [Command.CMD_EXTENDED_IDLE] = function ()
-            Automation:try_confirm()
+        [Command.CMD_EXTENDED_IDLE] = function()
+            Automation:confirm_results()
             Automation.extended_player:play()
         end,
-        [Command.CMD_CREATE_GAME_ROOM] = Automation.create_game_room,
-        [Command.CMD_BATCH_COMBINE_PARTS] = Automation.combine_parts,
-        [Command.CMD_BATCH_PURCHASE_ITEM] = function ()
+        [Command.CMD_DEFAULT_IDLE_2] = function()
+            Automation.default_player:play()
+        end,
+        [Command.CMD_EXTENDED_IDLE_2] = function()
+            Automation.extended_player:play()
+        end,
+        [Command.CMD_CONFIRM_RESULTS] = function()
+            Automation:confirm_results()
+        end,
+        [Command.CMD_CREATE_GAME_ROOM] = function()
+            Automation:create_game_room()
+        end,
+        [Command.CMD_BATCH_COMBINE_PARTS] = function()
+            Automation:combine_parts()
+        end,
+        [Command.CMD_BATCH_PURCHASE_ITEM] = function()
             -- 对于新发出的命令，需要更新鼠标光标位置
             if
                 (Command:get_status() & Command.TYPE_CHANGED)

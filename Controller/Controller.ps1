@@ -2,11 +2,8 @@ $Options = @{
 	"--locale-resources-directory" = "$PSScriptRoot\Controller\Locales"
 	"--language" = "zh-CN"
 	"--executor-command-file-path" = "$PSScriptRoot\Executor\Temporary.lua"
-	"--detect-mode" = "OCR"
-	"--OCR-detection-model-path" = "$PSScriptRoot\Controller\Models\OCR\ch_PP-OCRv4_det_infer.onnx"
-	"--OCR-recognition-model-path" = "$PSScriptRoot\Controller\Models\OCR\ch_PP-OCRv4_rec_infer.onnx"
-	"--OCR-dictionary-path" = "$PSScriptRoot\Controller\Models\OCR\dictionary.txt"
-	"--OCR-keywords-path" = "$PSScriptRoot\Controller\Models\OCR\keywords.json"
+	"--idle-engine-type" = "Classifier"
+	"--classifier-model-json-path" = "$PSScriptRoot\Controller\Models\Classifier\ResNet\CSOL-Utilities-ResNet18-800x600.json"
 }
 
 $Flags = @(
@@ -19,7 +16,7 @@ $Parameters = @()
 foreach ($key in $Options.Keys)
 {
 	$val = $Options[$key]
-	if ($val -ne $Null -and $val.Length -gt 0)
+	if ($Null -ne $val -and $val.Length -gt 0)
 	{
 		$Parameters += "$key"
 		$Parameters += "$val"

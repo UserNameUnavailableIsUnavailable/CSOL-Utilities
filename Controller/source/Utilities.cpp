@@ -9,46 +9,82 @@ namespace CSOL_Utilities
 		std::unordered_map<std::string, std::string> g_LanguagePackage;
 	}
 
-	std::filesystem::path GetModulePath(uintptr_t hMod)
+	std::filesystem::path GetProcessImagePath(uintptr_t hMod)
 	{
-		static std::atomic_bool this_path_initialized{ false };
-		static std::mutex this_path_write_lock;
-		static std::wstring this_path(64, L'0');
-
-		auto GetModulePathImpl = [] (uintptr_t hMod, std::wstring& path) {
+		// 获取当前进程的路径不能简单地用 QueryFullProcessImageNameW，因为传入的句柄必须是 PROCESS_QUERY_LIMITED_INFORMATION 或 PROCESS_QUERY_INFORMATION 权限
+		// 而 GetCurrentProcess() 返回的伪句柄并不具备该权限
+		// 需要使用 GetModuleFileNameW 来获取当前进程的路径
+		auto get_self_image_path = [] (std::wstring& path) {
 			while (true)
 			{
-				HMODULE hModule = reinterpret_cast<HMODULE>(hMod);
-				auto length = GetModuleFileNameW(hModule, path.data(), path.capacity());
-				if (length == 0)
+				auto length = GetModuleFileNameW(nullptr, path.data(), path.capacity());
+				if (length > 0)
 				{
-					throw Exception(Translate("Utilities::ERROR_GetModuleFileNameW@1", GetLastError()));
+					if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) // 缓冲区不足
+					{
+						path.resize(path.capacity() + path.capacity() / 2); // 扩容
+						SetLastError(ERROR_SUCCESS); // 重置错误码
+						continue;
+					}
+					else
+					{
+						path.resize(length);
+						return;
+					}
 				}
-				else if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+				else
 				{
-					/* If the function succeeds, the return value is the length of the string that is copied to the buffer, in characters, not including the terminating null character. */
-					path.resize(length); /* 设置字符串长度，length 是不包含末尾空字符的字符串实际长度 */
-					break;
-				}
-				else /* length != 0 && GetLastError() == ERROR_INSUFFICIENT_BUFFER */
-				{
-					path.resize(path.capacity() + path.capacity() / 2); /* 扩容为当前容量的 1.5 倍 */
+					auto err = GetLastError();
+					throw Exception(Translate("ERROR_Win32_API@2", "GetModuleFileNameW", err));
 				}
 			}
 		};
 
-		if (hMod == 0) /* 查询当前可执行文件的路径 */
+		auto get_other_image_path = [] (uintptr_t hMod, std::wstring& path) {
+			while (true)
+			{
+				HMODULE hModule = reinterpret_cast<HMODULE>(hMod);
+				DWORD dwLength = path.capacity();
+				auto ok = QueryFullProcessImageNameW(hModule, 0, path.data(), &dwLength);
+				if (ok)
+				{
+					// MS Docs: On success, dwLength receives the number of characters written to the buffer, not including the null-terminating character.
+					if (dwLength + 1 == path.capacity()) // 恰好填满缓冲区，可能缓冲区不足
+					{
+						path.resize(path.capacity() + path.capacity() / 2); // 扩容
+						SetLastError(ERROR_SUCCESS); // 重置错误码
+						continue;
+					}
+					else
+					{
+						path.resize(dwLength);
+						return;
+					}
+				}
+				else
+				{
+					auto err = GetLastError();
+					throw Exception(Translate("ERROR_Win32_API@2", "QueryFullProcessImageNameW", err));
+				}
+			}
+		};
+		
+		// 单独优化对当前可执行文件路径的查询
+		static std::atomic_bool this_path_initialized{ false };
+		static std::mutex this_path_write_lock;
+		static std::wstring this_path(64, L'0');
+		if (hMod == 0 || hMod == reinterpret_cast<uintptr_t>(GetCurrentProcess())) // 查询当前可执行文件的路径
 		{
-			if (this_path_initialized.load(std::memory_order_acquire)) /* 已经查询过 */
+			if (this_path_initialized.load(std::memory_order_acquire)) // 已经查询过
 			{
 				return this_path;
 			}
 			else
 			{
 				std::lock_guard lk(this_path_write_lock);
-				if (!this_path_initialized.load(std::memory_order_acquire))
+				if (!this_path_initialized.load(std::memory_order_acquire)) // 双重检查法
 				{
-					GetModulePathImpl(hMod, this_path);
+					get_self_image_path(this_path);
 					this_path_initialized.store(true, std::memory_order_release);
 				}
 				return this_path;
@@ -57,7 +93,7 @@ namespace CSOL_Utilities
 		else
 		{
 			std::wstring ret(64, L'\0');
-			GetModulePathImpl(hMod, ret);
+			get_other_image_path(hMod, ret);
 			return ret;
 		}
 	}
@@ -318,7 +354,7 @@ namespace CSOL_Utilities
 			(locale_name + ".json");
 		if (package_path.is_relative())
 		{
-			package_path = GetModulePath().parent_path() / package_path;
+			package_path = GetProcessImagePath().parent_path() / package_path;
 		}
 		if (!std::filesystem::is_regular_file(package_path))
 			throw Exception("Language package not found or is not an regular file.");

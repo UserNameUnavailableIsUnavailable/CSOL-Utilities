@@ -138,12 +138,22 @@ children:
                   value: "true"
             legacy_name: MAP_CHOOSE_RIGHT_SCROLL
             image: assets/lobby_create_room_map_choose_right_scroll.avif
-          - id: LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT
+          - id: LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT
             title: 选择地图时向左翻页次数
-            annotation: "考虑到大灾变季度会不断更新，因此<b style='color: red;'>若需要选择特定靠后季度的地图</b>，需要指定从<b style='color: red;'>最右边起向左翻页</b>的次数。<b style='color: red;'>在选择地图时，将按照指定的翻页次数进行翻页。默认值为 32，即翻页到最左（目前够用，这个游戏以后不知道还会不会有不够用的时候\U0001F605）。</b>"
+            annotation: "选择地图时，向左翻页指定次数。默认值翻页 32 次到最左侧（目前够用）。"
             type: FIELD
             value: "32"
             label: 向左翻页
+            hint: "次"
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+          - id: LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT
+            title: 选择地图时向右翻页次数
+            annotation: "<b style='color: red;'>考虑到大灾变季度不断更新，因此要长期稳定地选择季度靠后的地图（如英雄城寨），就需要先翻页到最左侧，然后再向右翻页指定次数找到指定地图。</b>"
+            type: FIELD
+            value: "0"
+            label: 向右翻页
             hint: "次"
             depends_on:
                 - key: CREATE_ROOM_ON_EXCEPTION
@@ -371,6 +381,17 @@ children:
                 - key: GAME_CHARACTER_USE_SPECIAL_SKILLS
                   value: "true"
             value: math.huge
+          - id: GAME_USE_HEALTH_POTION
+            title: 使用回血道具（30% HP、100% HP）
+            annotation: >-
+                启用后，挂机时会定期使用回血道具（30% HP、100% HP），以保持角色的生命值。
+            type: SWITCH
+            options:
+                - description: 是
+                  content: "true"
+                - description: 否
+                  content: "false"
+            value: "false"
           - id: GAME_ESC_MENU_CANCEL
             title: 游戏内 ESC 菜单中的取消按钮
             type: POSITION
