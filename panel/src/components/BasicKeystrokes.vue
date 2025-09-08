@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { KEYMAP, REVERSE_KEYMAP } from '../scripts/KeyMap';
 
 const props = defineProps<{
+    id?: string // 字段 ID
     label?: string
     value?: string
     hint?: string
@@ -64,10 +65,16 @@ function on_blur() {
     document.removeEventListener("keyup", on_keyup);
 }
 
+const root = ref<HTMLInputElement>();
+onMounted(() => {
+    if (props.id && root.value) {
+        root.value.id = props.id;
+    }
+})
 </script>
 
 <template>
-    <label>
+    <label ref="root">
         <span v-if="label" v-html="label"></span>
         &nbsp;
         <input type="text" readonly @focus="on_focus" @blur="on_blur" :value="display" autocomplete="off" />

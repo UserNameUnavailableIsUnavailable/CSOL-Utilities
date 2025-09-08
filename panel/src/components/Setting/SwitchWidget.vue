@@ -43,7 +43,7 @@ SETTING_ITEM_STATES.set(id, enabled);
 <template>
     <div v-show="enabled">
         <BaseWidget :widget="widget" />
-        <BasicSwitch :label="widget.label" :options="widget.options" v-model:value="setting_item" />
+        <BasicSwitch :id="'SWITCH_' + widget.id" :label="widget.label" :options="widget.options" v-model:value="setting_item" />
         <CodeSnippet :snippet="snippet" />
     </div>
 </template>

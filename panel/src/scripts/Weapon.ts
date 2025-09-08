@@ -31,6 +31,8 @@ export type ConventionalWeapon_T = Weapon_T & {
     attack_button: AttackButton_T; // 攻击按键
     number: WeaponNumber_T; // 武器栏位（主武器、副武器、近战、手雷）
     switch_delay: number; // 切枪延迟
+    horizontal_strafe_mode: string; // 水平扫射方向
+    vertical_strafe_mode: string; // 垂直扫射方向
 };
 
 export type SpecialWeapon_T = Weapon_T & {

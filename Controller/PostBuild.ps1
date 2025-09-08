@@ -29,7 +29,7 @@ function ReplaceDirectory {
 }
 
 # 部署模型到构建目录
-if ($Null -ne $ModelsPath -and $ModelsPath.Length -gt 0) {
+if ($ModelsPath) {
     ReplaceDirectory -Source $ModelsPath -Destination "$PSScriptRoot/build/$BuildType/Models"
 } else {
     Write-Warning "-ModelsPath is not provided, skipping model deployment. Note that you have to manually deploy models for the application to work properly."

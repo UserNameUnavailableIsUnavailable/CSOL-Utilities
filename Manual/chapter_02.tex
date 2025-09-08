@@ -3,7 +3,6 @@
 本集成工具通过实时确定游戏内状态，通过控制器向执行器下达命令，在游戏内执行相应的挂机动作。
 因此，本集成工具完美支持因游戏掉线以及因为各种原因离开房间（如房间长时间未开始游戏导致关闭、被强制踢出等）后重新创建房间继续挂机。
 不过，需要注意的是本工具提供的掉线重连功能无法保证在所有情况下都能成功（如计算机断网、游戏维护等无法正常启动游戏的情形），但在大部分情况下能够正常工作。
-掉线重连目的在于在发生掉线时尽最大努力恢复挂机。该功能受诸多因素影响，并非完全可靠，因此不应过分依赖此功能。
 挂机功能共分为两种：默认挂机模式（1 号功能）及扩展挂机模式（2 号功能），详见下文。
 除灾变挂机外，本工具还可用于梦幻之星等荣誉图挂机。
 
@@ -15,33 +14,13 @@
 
 \item 通过 TCGame 启动游戏，挂机期间需保证 TCGame 处于登录状态（不勾选“自动登录”的情况下，一段时间后登录信息会失效），否则无法正常使用掉线重连功能。如果您的电脑仅进行单账号挂机，则建议您在 TCGame 中勾选“自动登录”，这样每隔一段时间登录信息就会刷新。
 
-\item \textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏运行效果尚未测试过。
+\item \textbf{\color{red}强烈建议}将游戏设置为窗口化运行，全屏模式下挂机可能存在问题。
 
 \item 确保 \lstinline{Executor.lua} 文件正确保存并运行。
 
 \item 运行 \lstinline{Controller.ps1}。
 
-\item 运行 \lstinline{GamingTool.exe}\textbf{\color{red}（使用本工具挂机时，这一条不是强制要求，但在配置坐标位置（详见下文）时必须用此工具去掉游戏窗口边框并居中，否则会导致获取的坐标不准确）}。
-
 \end{itemize}
-
-游戏启动进入大厅界面后（图 \ref{ch2fig-before-make-borderless}），按 \lstinline{Ctrl} \lstinline{Alt} \lstinline{B} 使用 GamingTool 无边框窗口化功能去除游戏窗口边框（图 \ref{ch2fig-after-make-borderless}，同时还会将游戏窗口置于屏幕中央），如不去除边框，将可能导致挂机时使用的游戏按钮坐标不准确（例如，窗口位置被意外地移动）。
-
-\begin{figure}
-    \Centering
-    \includegraphics[width=\textwidth]{assets/before-make-borderless.png}
-    \caption{无边框窗口化前（窗口可随意移动）}
-    \label{ch2fig-before-make-borderless}
-\end{figure}
-
-\begin{figure}
-    \Centering
-    \includegraphics[width=\textwidth]{assets/after-make-borderless.png}
-    \caption{无边框窗口化后（窗口居中、标题栏去除、不可随意移动）}
-    \label{ch2fig-after-make-borderless}
-\end{figure}
-
-有关 GamingTool 更多使用方法，参考 \href{https://gitee.com/silver1867/gaming-tool}{GamingTool 项目链接}。
 
 在使用配置面板时，需要注意️\emotion{⏺️}代表录制按键按钮，按键录制完成后，需点击\emotion{⏹️}结束录制（图 \ref{ch2fig-about-recording}）。
 
@@ -54,9 +33,8 @@
 
 \subsection{通用设置}
 
-将控制器调到模式 5 进行坐标定位。
-
-v1.5 相较 v1.4 的其中一个重要改进在于重写了配置面板，点击此链接 \href{https://www.macrohard.fun/CSOL-Utilities/ConfigPanel}{CSOL 集成工具配置面板} 访问配置面板，并在面板中完成后续配置。\textbf{\color{red}所有的坐标均通过 5 模式坐标定位功能确定。}
+\href{https://www.macrohard.fun/CSOL-Utilities/panel}{CSOL 集成工具配置面板} 访问配置面板，并在面板中完成后续配置。
+\textbf{\color{red}所有的坐标均通过 5 模式坐标定位功能确定。}
 
 按照配置面板上的指引配置完成后，点击“导出”按钮生成配置文件，并将配置文件保存到 \lstinline{Executor} 目录下，保存时\textbf{\color{red}替换}原有的 \lstinline{Setting.lua} 文件。
 

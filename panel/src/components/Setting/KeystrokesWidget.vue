@@ -41,7 +41,7 @@ SETTING_ITEM_STATES.set(id, enabled);
     <div v-show="enabled">
         <BaseWidget :widget="widget" />
         &nbsp;
-        <BasicKeystrokes :label="widget.label" v-model:value="keystrokes" />
+        <BasicKeystrokes :id="'KEYSTROKES_' + widget.id" :label="widget.label" v-model:value="keystrokes" />
         <CodeSnippet :snippet="snippet" />
     </div>
 </template>

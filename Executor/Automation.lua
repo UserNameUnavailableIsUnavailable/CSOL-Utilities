@@ -76,32 +76,6 @@ if not Automation_lua then
         end,
     }))
 
-    Automation.last_use_health_potion_30_timepoint = 0
-    Automation.last_use_health_potion_100_timepoint = 0
-
-    --- 定期使用回血道具
-    Runtime:register_interrupt(Interrupt:new({
-        name = "定期使用回血道具",
-        handler = function()
-            -- 当前未在挂机
-            local cmd = Command:claim()
-            if not Command:is_idle_command(cmd) then
-                return
-            end
-            if not Setting.SWITCH_GAME_USE_HEALTH_POTION then
-                return
-            end
-            local time = Runtime:get_running_time()
-            if time - Automation.last_use_health_potion_30_timepoint > 1 * 60 * 1000 then -- 每隔 1 分钟使用一次 30% 回血道具
-                Keyboard:click(Keyboard.FIVE, Delay.MINI) -- 使用 30 点回血道具
-                Automation.last_use_health_potion_30_timepoint = time
-            elseif time - Automation.last_use_health_potion_100_timepoint > 2 * 60 * 1000 then -- 每隔 2 分钟使用一次 100% 回血道具
-                Keyboard:click(Keyboard.SIX, Delay.MINI) -- 使用 100 点回血道具
-                Automation.last_use_health_potion_100_timepoint = time
-            end
-        end,
-    }))
-
     -- 初始化
     Error:register_error_handler("COMMAND_CHANGED", function() end)
     DateTime:set_time_zone(Setting.FIELD_TIME_ZONE)                    -- 时区
@@ -154,6 +128,32 @@ if not Automation_lua then
         end,
     }))
 
+    Automation.last_use_health_potion_30_timepoint = 0
+    Automation.last_use_health_potion_100_timepoint = 0
+    --- 定期使用回血道具
+    Runtime:register_interrupt(Interrupt:new({
+        name = "定期使用回血道具",
+        handler = function()
+            -- 当前未在挂机
+            local cmd = Command:claim()
+            if not Command:is_idle_command(cmd) then
+                return
+            end
+            if not Setting.SWITCH_GAME_USE_HEALTH_POTION then
+                return
+            end
+            local time = Runtime:get_running_time()
+            if time - Automation.last_use_health_potion_30_timepoint > 1 * 60 * 1000 then -- 每隔 1 分钟使用一次 30% 回血道具
+                Keyboard:click(Keyboard.FIVE, Delay.NORMAL) -- 使用 30 点回血道具
+                Automation.last_use_health_potion_30_timepoint = time
+            elseif time - Automation.last_use_health_potion_100_timepoint > 2 * 60 * 1000 then -- 每隔 2 分钟使用一次 100% 回血道具
+                Keyboard:click(Keyboard.SIX, Delay.NORMAL) -- 使用 100 点回血道具
+                Automation.last_use_health_potion_100_timepoint = time
+            end
+        end,
+    }))
+
+
     ---创建游戏房间。
     function Automation:create_game_room()
         if not Setting.SWITCH_CREATE_ROOM_ON_EXCEPTION then
@@ -180,23 +180,23 @@ if not Automation_lua then
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT --[[v1.5.1 正式版引入]] or 32,
-            300 -- 点击一次间隔 300 毫秒
-        )       -- 向左翻页指定次数
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT  or 32, --[[v1.5.1 正式版引入]]
+            150
+        ) -- 向左翻页指定次数
         Mouse:click_several_times_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT --[[v1.5.3 正式版引入]] or 0,
-            300 -- 点击一次间隔 300 毫秒
-        )       -- 向右翻页指定次数
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT  or 0, --[[v1.5.3 正式版引入]]
+            150
+        ) -- 向右翻页指定次数
         Mouse:click_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_Y,
-            750
+            500
         ) -- 点击一下，激活子窗口
-        Mouse:roll(-(Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_DOWN_COUNT --[[v1.5.1 正式版引入]] or 0), 750) -- 向下滚动指定次数
+        Mouse:roll(-(Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_DOWN_COUNT --[[v1.5.1 正式版引入]] or 0), 500) -- 向下滚动指定次数
         Mouse:click_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_OPTION_X,

@@ -278,10 +278,11 @@ if not Mouse_lua then
     ---@return boolean
     function Mouse:is_cursor_position_locked()
         self:place(32767, 32767, 25, true)
-        local x, y = self:locate()
-        self:move_relative(400, 400, 25, true)
-        local new_x, new_y = self:locate()
-        if math.abs(new_x - x) <= 300 and math.abs(new_y - y) <= 300 then
+        local before_x, before_y = self:locate()
+        self:move_relative(400, 400, 25, true) -- 尝试移动鼠标
+        local after_x, after_y = self:locate()
+        self:move_relative(-400, -400, 25, true) -- 移回原位置
+        if math.abs(after_x - before_x) <= 300 and math.abs(after_y - before_y) <= 300 then
             return true
         end
         return false

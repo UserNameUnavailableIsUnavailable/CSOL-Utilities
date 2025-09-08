@@ -15,7 +15,7 @@ ClassifierIdleEngine::ClassifierIdleEngine(std::unique_ptr<GameProcessInformatio
 	interface_type_ = GAME_INTERFACE_TYPE::UNKNOWN; /* 游戏内状态 */
 }
 
-void ClassifierIdleEngine::DiscriminateGameScene(std::stop_token st)
+void ClassifierIdleEngine::Run(std::stop_token st)
 {
 	while (true)
 	{
@@ -30,7 +30,7 @@ void ClassifierIdleEngine::DiscriminateGameScene(std::stop_token st)
 			}
 		}
 		has_scene_discriminator_finished_ = false;
-		Run();
+		ImplRun();
 		{
 			std::lock_guard lk(threads_state_lock_);
 			has_scene_discriminator_finished_ = true;
@@ -40,7 +40,7 @@ void ClassifierIdleEngine::DiscriminateGameScene(std::stop_token st)
 	}
 }
 
-void ClassifierIdleEngine::Run()
+void ClassifierIdleEngine::ImplRun()
 {
 	thread_local std::vector<uint8_t> buffer;
 	thread_local auto capture_error_count = 0;
@@ -52,6 +52,17 @@ void ClassifierIdleEngine::Run()
 	{
 		return;
 	}
+	if (IsIconic(game_window_handle))
+	{
+		// 尝试恢复窗口
+		ShowWindow(game_window_handle, SW_NORMAL);
+	}
+	if (GetForegroundWindow() != game_window_handle)
+	{
+		// 尝试将窗口置于最前，并激活
+		SetWindowPos(game_window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	}
+	CenterWindowClientArea(game_window_handle); // 将窗口客户区居中
 	auto current_tp = std::chrono::system_clock::now();
 	try
 	{

@@ -70,6 +70,11 @@ target_precompile_headers(Controller
     include/pch.hpp
 )
 
+list(APPEND dependencies "C:/Windows/System32/vcruntime140.dll")
+list(APPEND dependencies "C:/Windows/System32/vcruntime140_1.dll")
+list(APPEND dependencies "C:/Windows/System32/msvcp140.dll")
+list(APPEND dependencies "C:/Windows/System32/msvcp140_1.dll")
+list(APPEND dependencies "C:/Windows/System32/msvcp140_atomic_wait.dll")
 file(GLOB dll_files "${DEPENDENCIES_DIR}/bin/*.dll")
 file(GLOB pdb_files "${DEPENDENCIES_DIR}/bin/*.pdb")
 list(APPEND dependencies ${dll_files})

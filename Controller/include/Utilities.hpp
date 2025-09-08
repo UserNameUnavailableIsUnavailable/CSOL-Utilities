@@ -16,6 +16,7 @@ namespace CSOL_Utilities
 	void CaptureWindowAsBmp(HWND hWnd, std::vector<uint8_t>& buffer);
 	void LoadLanguagePackage(std::unordered_map<std::string, std::string>& lang_pack); /* 根据 locale 加载语言包 */
 	void RemoveWindowBorder(HWND hWnd) noexcept;
+	void CenterWindowClientArea(HWND hWnd) noexcept;
 	void CenterWindow(HWND hWnd) noexcept;
 
 	template <typename... VA>

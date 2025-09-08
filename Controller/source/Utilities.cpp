@@ -1,4 +1,4 @@
-﻿#include "Utilities.hpp"
+#include "Utilities.hpp"
 #include "Exception.hpp"
 #include "Global.hpp"
 
@@ -11,10 +11,11 @@ namespace CSOL_Utilities
 
 	std::filesystem::path GetProcessImagePath(uintptr_t hMod)
 	{
-		// 获取当前进程的路径不能简单地用 QueryFullProcessImageNameW，因为传入的句柄必须是 PROCESS_QUERY_LIMITED_INFORMATION 或 PROCESS_QUERY_INFORMATION 权限
-		// 而 GetCurrentProcess() 返回的伪句柄并不具备该权限
-		// 需要使用 GetModuleFileNameW 来获取当前进程的路径
-		auto get_self_image_path = [] (std::wstring& path) {
+		// 获取当前进程的路径不能简单地用 QueryFullProcessImageNameW，因为传入的句柄必须是
+		// PROCESS_QUERY_LIMITED_INFORMATION 或 PROCESS_QUERY_INFORMATION 权限 而 GetCurrentProcess()
+		// 返回的伪句柄并不具备该权限 需要使用 GetModuleFileNameW 来获取当前进程的路径
+		auto get_self_image_path = [](std::wstring& path)
+		{
 			while (true)
 			{
 				auto length = GetModuleFileNameW(nullptr, path.data(), path.capacity());
@@ -40,7 +41,8 @@ namespace CSOL_Utilities
 			}
 		};
 
-		auto get_other_image_path = [] (uintptr_t hMod, std::wstring& path) {
+		auto get_other_image_path = [](uintptr_t hMod, std::wstring& path)
+		{
 			while (true)
 			{
 				HMODULE hModule = reinterpret_cast<HMODULE>(hMod);
@@ -48,7 +50,8 @@ namespace CSOL_Utilities
 				auto ok = QueryFullProcessImageNameW(hModule, 0, path.data(), &dwLength);
 				if (ok)
 				{
-					// MS Docs: On success, dwLength receives the number of characters written to the buffer, not including the null-terminating character.
+					// MS Docs: On success, dwLength receives the number of characters written to the buffer, not
+					// including the null-terminating character.
 					if (dwLength + 1 == path.capacity()) // 恰好填满缓冲区，可能缓冲区不足
 					{
 						path.resize(path.capacity() + path.capacity() / 2); // 扩容
@@ -68,9 +71,9 @@ namespace CSOL_Utilities
 				}
 			}
 		};
-		
+
 		// 单独优化对当前可执行文件路径的查询
-		static std::atomic_bool this_path_initialized{ false };
+		static std::atomic_bool this_path_initialized{false};
 		static std::mutex this_path_write_lock;
 		static std::wstring this_path(64, L'0');
 		if (hMod == 0 || hMod == reinterpret_cast<uintptr_t>(GetCurrentProcess())) // 查询当前可执行文件的路径
@@ -227,7 +230,7 @@ namespace CSOL_Utilities
 	{
 		auto cchRequiredBufferSizeInChars = MultiByteToWideChar(CP_UTF8, 0, u8.c_str(), -1, nullptr, 0);
 		std::wstring u16(cchRequiredBufferSizeInChars, L'0');
-        u16.resize(cchRequiredBufferSizeInChars);
+		u16.resize(cchRequiredBufferSizeInChars);
 		auto cchWritten = MultiByteToWideChar(CP_UTF8, 0, u8.c_str(), -1, u16.data(), cchRequiredBufferSizeInChars);
 		u16.resize(cchWritten - 1); /* cchWritten 是写入缓冲区的字符数，包含空字符 */
 		return u16;
@@ -235,10 +238,12 @@ namespace CSOL_Utilities
 
 	std::string ConvertUtf16ToUtf8(const std::wstring& u16)
 	{
-		auto cchRequiredBufferSizeInChars = WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, nullptr, 0, nullptr, nullptr);
+		auto cchRequiredBufferSizeInChars =
+			WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, nullptr, 0, nullptr, nullptr);
 		std::string u8;
 		u8.resize(cchRequiredBufferSizeInChars);
-		auto cchWritten = WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, u8.data(), cchRequiredBufferSizeInChars, nullptr, nullptr);
+		auto cchWritten =
+			WideCharToMultiByte(CP_UTF8, 0, u16.c_str(), -1, u8.data(), cchRequiredBufferSizeInChars, nullptr, nullptr);
 		u8.resize(cchWritten - 1); /* cchWritten 是写入缓冲区的字符数，包含空字符 */
 		return u8;
 	}
@@ -259,10 +264,7 @@ namespace CSOL_Utilities
 	void CenterWindow(HWND hWnd) noexcept
 	{
 		WINDOWINFO windowInfo;
-		RECT rcScreen = {
-			.left = 0,
-			.top = 0
-		};
+		RECT rcScreen = {.left = 0, .top = 0};
 		if (IsWindow(hWnd))
 		{
 			GetWindowInfo(hWnd, &windowInfo);
@@ -275,7 +277,8 @@ namespace CSOL_Utilities
 			rcClient.right += lDeltaX;
 			rcClient.top += lDeltaY;
 			rcClient.bottom += lDeltaY;
-			MoveWindow(hWnd	, rcClient.left, rcClient.top, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, TRUE);
+			MoveWindow(hWnd, rcClient.left, rcClient.top, rcClient.right - rcClient.left,
+					   rcClient.bottom - rcClient.top, TRUE);
 		}
 	}
 
@@ -319,7 +322,7 @@ namespace CSOL_Utilities
 		return dwPId;
 	}
 
-	void EnumerateProcesses(std::function<bool (const PROCESSENTRY32W& process_entry)> callback)
+	void EnumerateProcesses(std::function<bool(const PROCESSENTRY32W& process_entry)> callback)
 	{
 		DWORD dwPId = 0;
 		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -332,7 +335,8 @@ namespace CSOL_Utilities
 				do
 				{
 					auto continue_enum = callback(process_entry);
-					if (!continue_enum) break;
+					if (!continue_enum)
+						break;
 				}
 				while (Process32NextW(hSnapshot, &process_entry));
 			}
@@ -350,8 +354,8 @@ namespace CSOL_Utilities
 		{
 			locale_name.erase(encoding_dot_index);
 		}
-		std::filesystem::path package_path = std::filesystem::path(Global::LocaleResourcesDirectory) /
-			(locale_name + ".json");
+		std::filesystem::path package_path =
+			std::filesystem::path(Global::LocaleResourcesDirectory) / (locale_name + ".json");
 		if (package_path.is_relative())
 		{
 			package_path = GetProcessImagePath().parent_path() / package_path;
@@ -398,7 +402,8 @@ namespace CSOL_Utilities
 	/// @param hProcess 进程句柄。
 	/// @param dwMilliseconds 等待进程结束的时延。
 	/// @return 进程是否在指定时间内结束。
-	/// @note `hProcess` 应具有 `SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION` 权限，否则函数将返回 `false`。若 `dwMilliseconds` 为 `0`，则不会检查进程是否结束并直接返回 `false`。
+	/// @note `hProcess` 应具有 `SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION` 权限，否则函数将返回 `false`。若
+	/// `dwMilliseconds` 为 `0`，则不会检查进程是否结束并直接返回 `false`。
 	bool SafeTerminateProcess(HANDLE hProcess, DWORD dwMilliseconds) noexcept
 	{
 		DWORD dwProcessId = GetProcessId(hProcess);
@@ -452,18 +457,67 @@ namespace CSOL_Utilities
 
 		return false;
 	}
-} // namespace CSOL_Utilities
 
-#if defined(Test) && defined(MultiLingual)
-int main()
-{
-	std::locale locale("zh-CN.UTF-8");
-	std::locale::global(locale);
-	CSOL_Utilities::LoadLanguagePackage();
-	for (auto& [key, value] : lang_pack)
+	void CenterWindowClientArea(HWND hWnd) noexcept
 	{
-		std::cout << key << ": " << value << std::endl;
+		if (!hWnd)
+			return;
+
+		WINDOWPLACEMENT wp{sizeof(wp)};
+		if (!GetWindowPlacement(hWnd, &wp))
+			return;
+
+		if (wp.showCmd == SW_SHOWMINIMIZED || wp.showCmd == SW_SHOWMAXIMIZED)
+			return;
+
+		// Determine target monitor work area.
+		HMONITOR hMon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO monitor_info{sizeof(monitor_info)};
+		if (!GetMonitorInfo(hMon, &monitor_info))
+			return;
+		const RECT& rcScreen = monitor_info.rcMonitor;
+
+		const POINT ptScreenCenter { // screen center
+			.x = rcScreen.left + (rcScreen.right - rcScreen.left) / 2,
+			.y = rcScreen.top + (rcScreen.bottom - rcScreen.top) / 2
+		};
+
+		// Get window and client rects in screen coordinates.
+		RECT rcWindow{};
+		if (!GetWindowRect(hWnd, &rcWindow))
+			return;
+
+		RECT rcClient{};
+		if (!GetClientRect(hWnd, &rcClient))
+			return;
+
+		// Map client rect to screen coordinates to compute current non-client margins.
+		POINT left_top{rcClient.left, rcClient.top};
+		POINT right_bottom{rcClient.right, rcClient.bottom};
+		if (!ClientToScreen(hWnd, &left_top) || !ClientToScreen(hWnd, &right_bottom))
+			return;
+
+		// Reconstruct client rect in screen coordinates.
+		rcClient.left = left_top.x;
+		rcClient.top = left_top.y;
+		rcClient.right = right_bottom.x;
+		rcClient.bottom = right_bottom.y;
+
+		const POINT ptClientCenter { // client center
+			.x = rcClient.left + (rcClient.right - rcClient.left) / 2,
+			.y = rcClient.top + (rcClient.bottom - rcClient.top) / 2
+		};
+
+		// Offset from client center to screen center.
+		auto dx = ptScreenCenter.x - ptClientCenter.x;
+		auto dy = ptScreenCenter.y - ptClientCenter.y;
+
+		// New window position.
+		const POINT ptNewWindowTopLeft {
+			.x = rcWindow.left + dx,
+			.y = rcWindow.top + dy
+		};
+
+		SetWindowPos(hWnd, nullptr, ptNewWindowTopLeft.x, ptNewWindowTopLeft.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
-	return 0;
-}
-#endif
+} // namespace CSOL_Utilities

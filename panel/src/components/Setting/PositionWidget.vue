@@ -48,9 +48,9 @@ SETTING_ITEM_STATES.set(id_y, enabled);
 <template>
     <div v-show="enabled">
         <BaseWidget :widget="widget">
-            <BasicField :label="widget.x.label" v-model:value="setting_item_x" />
+            <BasicField :id="'POSITION_' + widget.id + '_X'" :label="widget.x.label" v-model:value="setting_item_x" />
             <br />
-            <BasicField :label="widget.y.label" v-model:value="setting_item_y" />
+            <BasicField :id="'POSITION_' + widget.id + '_Y'" :label="widget.y.label" v-model:value="setting_item_y" />
         </BaseWidget>
         <CodeSnippet :snippet="snippet" />
     </div>

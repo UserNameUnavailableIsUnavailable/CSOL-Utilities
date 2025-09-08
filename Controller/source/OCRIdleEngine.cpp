@@ -47,7 +47,7 @@ OCRIdleEngine::OCRIdleEngine(std::unique_ptr<GameProcessInformation> game_proces
 	}
 }
 
-void OCRIdleEngine::DiscriminateGameScene(std::stop_token st)
+void OCRIdleEngine::Run(std::stop_token st)
 {
 	while (true)
 	{

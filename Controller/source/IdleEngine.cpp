@@ -27,7 +27,7 @@ using namespace CSOL_Utilities;
         scene_discriminator_ = std::thread([this] (std::stop_token st) {
 			std::string module_name = "GameStateRecognizer";
             try {
-                DiscriminateGameScene(st);
+                Run(st);
             } catch (std::exception& e) {
                 Console::Error(Translate("Module::INFO_ModulePanic@2", module_name, e.what()));
             }

@@ -5,13 +5,13 @@ annotation: >-
     简短说明：  
     <ul>
       <li>
-          本配置面板对应于集成工具版本 v1.5.2 及以上版本，支持导入 v1.4.x 及更早版本的配置文件（Setting.lua），并将其导出为 v1.5.2 及以上版本的配置文件；
+          本配置面板对应于集成工具版本 v1.5.3，支持导入 v1.4.x 及更早版本的配置文件（Setting.lua），并导出为 v1.5.3 版本的配置文件。
       </li>
       <li>
-          鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片；
+          鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。
       </li>
       <li>
-          配置坐标时，应使用 GamingTool 去除游戏窗口边框并将窗口居中（Ctrl Alt B），以获取准确的坐标，挂机时不强制要求开启 GamingTool（控制器会自动处理）；
+          <b color: 'red'>配置坐标时，为了确保坐标位置准确，必须先运行 Tool 文件夹下的 Tool.exe 工具将窗口居中（Ctrl Alt C），挂机时不强制要求开启 Tool（控制器会自动居中窗口）。有关 Tool.exe 的更多信息请参阅使用手册。</b>
       </li>
       <li>
           <b>2025/3/19 游戏窗口分辨率更新后，产生了新的 bug，导致使用 GamingTool 去除游戏窗口边框后，点击窗口外任意区域时在游戏窗口周围会出现黑边，并伴随游戏窗口内按钮显示位置与实际位置不匹配的现象，获取坐标时需要以实际位置为准。此问题系游戏本身问题，开启一局游戏并退出或手动切换大厅分辨率（如切换到 1920 × 1080 后再切换回 1024 × 768）后，该问题消失；</b>
@@ -115,7 +115,7 @@ children:
                   value: "true"
             image: assets/lobby_create_room_game_mode_2.avif
           - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL
-            title: 地图选择界面向左滚动按钮
+            title: 地图选择界面向左翻页按钮
             type: POSITION
             x:
                 label: 横坐标
@@ -127,7 +127,7 @@ children:
             legacy_name: MAP_CHOOSE_LEFT_SCROLL
             image: assets/lobby_create_room_map_choose_left_scroll.avif
           - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL
-            title: 地图选择界面向右滚动按钮
+            title: 地图选择界面向右翻页按钮
             type: POSITION
             x:
                 label: 横坐标
@@ -148,6 +148,8 @@ children:
             depends_on:
                 - key: CREATE_ROOM_ON_EXCEPTION
                   value: "true"
+            # 兼容旧版 typo
+            legacy_name: LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT
           - id: LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT
             title: 选择地图时向右翻页次数
             annotation: "<b style='color: red;'>考虑到大灾变季度不断更新，因此要长期稳定地选择季度靠后的地图（如英雄城寨），就需要先翻页到最左侧，然后再向右翻页指定次数找到指定地图。</b>"
@@ -322,7 +324,7 @@ children:
           - id: IN_GAME_SENSITIVITY
             title: 鼠标灵敏度补偿因子
             annotation: >-
-                由于各人游戏内鼠标灵敏度存在较大差异，故引入此选项对转圈时视角移动的灵敏度进行精细化控制。转圈时，补偿因子取倒数乘以游戏内鼠标灵敏度，因此<b>补偿因子越大，转圈时单位时间内视角移动的幅度越小</b>。该选项需要结合游戏内的鼠标灵敏度数值进行设定，具体方法为：在游戏内控制台中，输入 <code class="language-plain">sensitivity</code> 查看游戏内鼠标灵敏度精确数值（或在“选项-鼠标”中查看粗略数值），该值作为补偿因子基础值，在该值的基础上进行适当的增大或减小可调整视角运动幅度。<b style='color: red;'>简言之，若感到转圈半径过小，则增大补偿因子，反之则减小补偿因子</b>。另外，<b style='color: red;'>强烈建议</b>在控制台中通过 <code class="language-plain">m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
+                由于各人游戏内鼠标灵敏度存在较大差异，故引入此选项对转圈时视角移动的灵敏度进行精细化控制。转圈时，补偿因子取倒数乘以游戏内鼠标灵敏度，因此<b style='color: red;'>补偿因子越大，转圈时单位时间内视角移动的幅度越小</b>。该选项需要结合游戏内的鼠标灵敏度数值进行设定，具体方法为：在游戏内控制台中，输入 <code class="language-plain">sensitivity</code> 查看游戏内鼠标灵敏度精确数值（或在“选项-鼠标”中查看粗略数值），该值作为补偿因子基础值，在该值的基础上进行适当的增大或减小可调整视角运动幅度。<b style='color: red;'>简言之，若感到转圈半径过小，则增大补偿因子，反之则减小补偿因子</b>。另外，<b style='color: red;'>强烈建议</b>在控制台中通过 <code class="language-plain">m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
             type: FIELD
             pre_label: 灵敏度
             image: assets/in_game_sensitivity.avif
