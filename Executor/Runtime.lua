@@ -23,10 +23,10 @@ if not Runtime_lua then
     ---@field last_interrupt_id integer 最近一次处理的中断对应标识符
     Runtime = {}
 
-    Runtime.interrupt_mode = 0
     Runtime.INTERRUPT_BURST_MODE = 0
     Runtime.INTERRUPT_SEQUENCE_MODE = 1
     Runtime.INTERRUPT_RANDOM_MODE = 2
+    Runtime.interrupt_mode = Runtime.INTERRUPT_SEQUENCE_MODE
 
     Runtime.interrupt_mask_flag = false
     Runtime.interrupt_busy_flag = false
@@ -127,7 +127,7 @@ if not Runtime_lua then
 
     Runtime.interrupts = {}
 
-    ---默认的中断处理函数（不进行任何操作）。只有中断标志位使能时才允许中断。
+    ---粗发式中断处理。
     function Runtime:interrupt_in_burst()
         local int_status = true
         local int_result --[[@as any]]
@@ -138,7 +138,7 @@ if not Runtime_lua then
             return
         end
         -- 中断开始时，中断标志位使能以屏蔽后续中断
-        for i, interrupt in ipairs(self.interrupts) do
+        for _, interrupt in ipairs(self.interrupts) do
             -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
             if
                 interrupt:is_alive() -- 该中断可用
@@ -161,6 +161,7 @@ if not Runtime_lua then
     end
 
     Runtime.last_interrupt_id = 0
+    ---顺序式中断处理。
     function Runtime:interrupt_in_sequence()
         local int_status = true
         local int_result --[[@as any]]
@@ -170,10 +171,10 @@ if not Runtime_lua then
         then
             return
         end
-        local id = self.last_interrupt_id + 1
-        if id > #self.interrupts then
-            id = 1
+        if (self.last_interrupt_id >= #self.interrupts) then -- 上一次执行的中断是最后一个
+            self.last_interrupt_id = 0
         end
+        local id = self.last_interrupt_id + 1
         local interrupt = self.interrupts[id] or Interrupt -- 如果为空，则用默认的中断模板代替
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
@@ -188,7 +189,7 @@ if not Runtime_lua then
             self.interrupt_busy_flag = false
             self:pop_interrupt_mask_flag() -- 开中断
         end
-        -- 中断处理完毕
+        -- 中断处理完毕，修改最近一次执行的中断 ID
         self.last_interrupt_id = id
         if
             not int_status -- 中断处理出现错误
@@ -197,6 +198,7 @@ if not Runtime_lua then
         end
     end
 
+    ---随机式中断处理。
     function Runtime:interrupt_at_random()
         local int_status = true
         local int_result --[[@as any]]

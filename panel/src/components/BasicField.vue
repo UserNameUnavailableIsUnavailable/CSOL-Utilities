@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 const props = defineProps<{
+    id?: string // 字段 ID
     label?: string // 标签
     value?: string // 绑定的值
     quoted?: boolean // 是否需要
@@ -46,10 +47,16 @@ const raw_value = computed({
         emit("update:value", ret); // 字段值合法，触发更新
     }
 });
+const root = ref<HTMLInputElement>();
+onMounted(() => {
+    if (props.id && root.value) {
+        root.value.id = props.id;
+    }
+})
 </script>
 
 <template>
-    <label>
+    <label ref="root">
         <span v-if="props.label" v-html="props.label"></span>
         &nbsp;
         <input type="text" v-model="raw_value" autocomplete="off" />

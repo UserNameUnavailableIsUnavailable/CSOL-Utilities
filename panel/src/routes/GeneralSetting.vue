@@ -57,7 +57,7 @@ function export_setting() {
                 element?.classList.add('Glimmer');
                 setTimeout(() => {
                     element?.classList.remove("Glimmer")
-                }, 1000);
+                }, 2500);
                 throw Error(`${k} is not set.`);
             }
             code += `\t\t${k} = nil,\n`;
@@ -165,15 +165,33 @@ async function import_setting(event: Event) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use "../styles/basic.scss";
 @keyframes Glimmer {
-    0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
-    50% { box-shadow: 0 0 20px rgba(255, 0, 0, 1); }
-    100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); }
+    0% {
+        box-shadow: 0 0 0px 0px rgba(255, 80, 80, 0.0);
+        background-color: #fff8f8;
+        transform: scale(1);
+    }
+    30% {
+        box-shadow: 0 0 12px 4px rgba(255, 80, 80, 0.5);
+        background-color: #ffeaea;
+        transform: scale(1.03);
+    }
+    70% {
+        box-shadow: 0 0 24px 8px rgba(255, 80, 80, 0.7);
+        background-color: #ffeaea;
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 0 0px 0px rgba(255, 80, 80, 0.0);
+        background-color: #fff8f8;
+        transform: scale(1);
+    }
 }
+
 .Glimmer {
-    animation: glimmer 1.25s ease-in-out;
-    border: 1px solid red;
+    animation: Glimmer 2.5s cubic-bezier(.4,0,.2,1);
+    transition: border 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 </style>

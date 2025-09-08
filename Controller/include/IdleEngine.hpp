@@ -218,7 +218,7 @@ namespace CSOL_Utilities
         std::thread process_watcher_; /* 游戏进程监视器线程 */
         virtual void WatchGameProcess(std::stop_token st); /* 监视游戏进程 */
         std::thread scene_discriminator_; /* 游戏状态判别器线程 */
-        virtual void DiscriminateGameScene(std::stop_token st) = 0; /* 判别游戏状态 */
+        virtual void Run(std::stop_token st) = 0; /* 判别游戏状态 */
         /* 考虑到 dangling resources 问题，这里使用 thread 而非 jthread */
         std::unique_ptr<GameProcessInformation> game_process_info_; /* 游戏进程信息 */
         std::atomic<IDLE_MODE> idle_mode_; /* 挂机模式 */

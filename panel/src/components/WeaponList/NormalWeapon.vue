@@ -25,7 +25,8 @@ watch(() => props.fields, (_fields) => {
     _fields.number = _fields["number"] ?? "Weapon.PRIMARY";
     _fields.switch_delay = _fields["switch_delay"] ?? "100";
     _fields.attack_button = _fields["attack_button"] ?? "Mouse.LEFT";
-
+    _fields.horizontal_strafe_mode = _fields["horizontal_strafe_mode"] ?? "\"random\"";
+    _fields.vertical_strafe_mode = _fields["vertical_strafe_mode"] ?? "\"oscillating\"";
     fields.value = _fields;
 }, {
     immediate: true,
@@ -66,6 +67,21 @@ const check = (s: string) => {
     }
     return false;
 };
+
+const VERTICAL_STRAFE_MODES = [
+    { description: "无", content: "\"none\"" },
+    { description: "固定向上", content: "\"up\"" },
+    { description: "固定向下", content: "\"down\"" },
+    { description: "随机", content: "\"random\"" },
+    { description: "简谐振动（上下交替）", content: "\"oscillating\"" }
+];
+const HORIZONTAL_STRAFE_MODES = [
+    { description: "无", content: "\"none\"" },
+    { description: "固定向左", content: "\"left\"" },
+    { description: "固定向右", content: "\"right\"" },
+    { description: "随机", content: "\"random\"" },
+    { description: "简谐振动（左右交替）", content: "\"oscillating\"" }
+];
 </script>
 
 <template>
@@ -78,6 +94,11 @@ const check = (s: string) => {
     <BasicField label="切换延迟" :value="fields['switch_delay']" @update:value="update_field('switch_delay', $event)" :check="check" />
     <br>
     <BasicSwitch label="攻击按键" :value="fields['attack_button']" @update:value="update_field('attack_button', $event)" :options="weapon_attack_buttons" />
+    <br>
+    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].content)" />
+    <br>
+    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].content)" />
+    <br>
     <div style="max-width: 50%;">
         <CodeSnippet format :snippet="GenerateWeaponCode(fields)" />
     </div>

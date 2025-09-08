@@ -107,6 +107,6 @@ if not Command_lua then
         if self:is_valid() then
             return self.type
         end
-        return Command.NOP
+        return Command.CMD_NOP
     end
 end -- Command_lua

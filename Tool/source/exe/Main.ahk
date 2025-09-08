@@ -79,15 +79,10 @@ AppsKey::
 }
 #UseHook false
 
-
-^!b::
+^!C::
 {
-    DllCall("Tool.dll\MakeForegroundWindowBorderless")
-}
-
-^!+b::
-{
-    DllCall("Tool.dll\MakeForegroundWindowBordered")
+    hForegroundWindow := GetForegroundWindow()
+    DllCall("Tool.dll\CenterWindowClientArea", "Ptr", hForegroundWindow)
 }
 
 #HotIf gameModeToggle

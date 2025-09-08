@@ -34,7 +34,7 @@ const enabled = computed(() => {
     <div v-if="widget" v-show="enabled">
         <BaseWidget :widget="widget" />
         <template v-for="(child, index) in widget.children" :key="index">
-            <SectionWidget v-if="child.type === 'SECTION'" :widget="child as SectionWidget_T" />
+            <SectionWidget :id="'SECTION' + widget.id" v-if="child.type === 'SECTION'" :widget="child as SectionWidget_T" />
             <FieldWidget v-if="child.type === 'FIELD'" :widget="child as FieldWidget_T" />
             <SwitchWidget v-else-if="child.type === 'SWITCH'" :widget="child as SwitchWidget_T" />
             <PositionWidget v-else-if="child.type === 'POSITION'" :widget="child as PositionWidget_T" />

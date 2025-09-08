@@ -36,7 +36,7 @@ SETTING_ITEM_STATES.set(id, enabled);
 <template>
     <div v-show="enabled">
         <BaseWidget :widget="widget" >
-            <BasicField :label="widget.label" v-model:value="field" :quoted="widget.quoted" :hint="widget.hint" />
+            <BasicField :id="'FIELD_' + widget.id" :label="widget.label" v-model:value="field" :quoted="widget.quoted" :hint="widget.hint" />
         </BaseWidget>
         <CodeSnippet :snippet="snippet" />
     </div>

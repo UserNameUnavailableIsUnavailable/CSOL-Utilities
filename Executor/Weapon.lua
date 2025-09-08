@@ -229,7 +229,7 @@
             dy = math.sin(Runtime:get_running_time() / 1000)
         end
         dx = dx * 50 * Setting.FIELD_IN_GAME_SENSITIVITY
-        dy = dy * 50 * Setting.FIELD_IN_GAME_SENSITIVITY
+        dy = dy * 100 * Setting.FIELD_IN_GAME_SENSITIVITY
         dx = math.floor(dx)
         dy = math.floor(dy)
         Mouse:move_relative(dx, dy, 10)

@@ -20,10 +20,10 @@ namespace CSOL_Utilities
             interface_type_.store(GAME_INTERFACE_TYPE::LOGIN, std::memory_order_release);
         }
     protected:
-        virtual void DiscriminateGameScene(std::stop_token st) override;
+        virtual void Run(std::stop_token st) override;
     private:
         Command::TYPE command_type_ = Command::TYPE::CMD_NOP; // 当前命令类型
-        void Run();
+        void ImplRun();
         std::chrono::system_clock::time_point interface_timepoint_; /* 最近一次状态解析时刻 */
         static constexpr std::string_view INTERFACE_TYPE_LOBBY = "LOBBY";
         static constexpr std::string_view INTERFACE_TYPE_ROOM = "ROOM";
