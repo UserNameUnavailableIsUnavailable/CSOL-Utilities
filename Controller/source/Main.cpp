@@ -40,22 +40,22 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	catch (std::exception& e)
 	{
 		Console::Error(Translate("Module::ERROR_ModulePanic@2", module_name, e.what()));
-		Console::Error(Translate("Main::ERROR_Panic"));
+		Console::Error(Translate("ERROR_Panic"));
 		auto _ = std::getchar();
 		dwErrorCode = GetLastError();
 	}
 	// driver.reset(); /* 析构 Driver，结束所有线程 */
 	Console::Info(Translate("Module::INFO_ModuleExited@1", module_name));
-	Console::Info(Translate("Main::INFO_SafelyExited"));
+	Console::Info(Translate("INFO_SafelyExited"));
 	return dwErrorCode;
 }
 
 void InitializeCommandLineArgs(CLI::App& app, int argc, wchar_t* argv[])
 {
-	app.add_option("--locale-resources-directory", Global::LocaleResourcesDirectory);
+	app.add_option("--locale-resources-dir", Global::LocaleResourcesDir);
 	app.add_option("--language", Global::LocaleName);
-	app.add_option("--game-root-directory", Global::GameRootDirectory);
-	app.add_option("--launch-game-command", Global::LaunchGameCmd);
+	app.add_option("--game-root-dir", Global::GameRootDir);
+	app.add_option("--launch-game-cmd", Global::LaunchGameCmd);
 	app.add_option("--executor-command-file-path", Global::ExecutorCommandFilePath);
 	app.add_option("--start-game-room-timeout", Global::StartGameRoomTimeout);
 	app.add_option("--login-timeout", Global::LoginTimeout);
@@ -78,23 +78,42 @@ void Boot(std::unique_ptr<Driver>& driver)
 	std::locale locale(ConvertUtf16ToUtf8(Global::LocaleName));
 	std::locale::global(locale);
 	LoadLanguagePackage(Global::g_LanguagePackage);
-	Console::Info(Translate("Main::INFO_Version@1", "1.5.2"));
-	Console::Warn(Translate("Main::WARN_Note"));
-	Console::Info(Translate("Main::INFO_Author"));
-	Console::Info(Translate("Main::INFO_Feedback"));
-	Console::Info(Translate("Main::INFO_Gitee_URL"));
-	Console::Info(Translate("Main::INFO_GitHub_URL"));
-	Console::Info(Translate("Main::INFO_HowToExit"));
+	Console::Info(Translate("INFO_Version@1", "1.5.2"));
+	Console::Warn(Translate("WARN_OpenSource"));
+	Console::Info(Translate("INFO_Author"));
+	Console::Info(Translate("INFO_Feedback"));
+	Console::Info(Translate("INFO_Gitee"));
+	Console::Info(Translate("INFO_GitHub"));
+	Console::Info(Translate("INFO_HowToExit"));
 	if (!IsRunningAsAdmin())
 	{
-		Console::Warn(Translate("Main::WARN_NotRunningAsAdmin"));
+		Console::Warn(Translate("WARN_NotRunningAsAdmin"));
 	}
-	auto convert_to_absolute_path = [] (const std::filesystem::path& path) {
+	auto convert_to_absolute_path = [] (std::filesystem::path path) {
 		if (path.is_relative())
 		{
-			return GetProcessImagePath().parent_path() / path;
+			path = GetProcessImagePath().parent_path() / path;
 		}
-		return std::filesystem::canonical(path);
+		// 直接使用 Win32 API 规范化路径，std::filesystem::weakly_canonical 在处理 Unicode 字符时会失败
+		auto str = path.wstring();
+		auto src_length = str.length();
+		auto full_path = std::wstring(src_length, L'\0');
+		do
+		{
+			auto dst_length = GetFullPathNameW(str.data(), static_cast<DWORD>(full_path.size()), full_path.data(), nullptr);
+			if (dst_length == 0) // error
+			{
+				throw Exception(Translate("ERROR_Win32_API@2", "GetFullPathNameW", GetLastError()));
+			}
+			else if (dst_length > full_path.size()) // 提供的缓冲区不足
+			{
+				full_path.resize(dst_length);
+				continue;
+			}
+			full_path.resize(dst_length);
+			break;			
+		} while (true);
+		return full_path;
 	};
 	
 	auto query_registry_string = [] (HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValue, std::wstring& buffer)
@@ -103,13 +122,13 @@ void Boot(std::unique_ptr<Driver>& driver)
 		auto ret = RegGetValueW(HKEY_CURRENT_USER, lpSubKey, lpValue, RRF_RT_REG_SZ, nullptr, nullptr, &cbData);
 		if (ret != ERROR_SUCCESS)
 		{
-			throw Exception(Translate("Main::ERROR_RegGetValueW@1", ret));
+			throw Exception(Translate("ERROR_Win32_API@2", "RegGetValueW", ret));
 		}
 		buffer.resize(cbData);
 		ret = RegGetValueW(HKEY_CURRENT_USER, lpSubKey, lpValue, RRF_RT_REG_SZ, nullptr, buffer.data(), &cbData);
 		if (ret != ERROR_SUCCESS)
 		{
-			throw Exception(Translate("Main::ERROR_RegGetValueW@1", ret));
+			throw Exception(Translate("ERROR_Win32_API@2", "RegGetValueW", ret));
 		}
 		buffer.resize(cbData - 1); /* cbData 包含了末尾空字符 */
 	};
@@ -117,24 +136,24 @@ void Boot(std::unique_ptr<Driver>& driver)
 	if (Global::LaunchGameCmd.empty())
 	{
 		std::wstring buffer;
-		Console::Info(Translate("Main::INFO_AutoDetectLaunchGameCmd"));
+		Console::Info(Translate("INFO_AutoDetectLaunchGameCmd"));
 		query_registry_string(HKEY_CURRENT_USER, L"Software\\TCGame", L"setup", buffer);
 		std::filesystem::path tcgame_path = std::filesystem::canonical(buffer) / L"TCGame.exe";
 		Global::LaunchGameCmd = std::format(L"\"{}\" cso", tcgame_path.wstring());
 	}
-	if (Global::GameRootDirectory.empty())
+	if (Global::GameRootDir.empty())
 	{
 		std::wstring buffer;
-		Console::Info(Translate("Main::INFO_AutoDetectGameRootDir"));
+		Console::Info(Translate("INFO_AutoDetectGameRootDir"));
 		query_registry_string(HKEY_CURRENT_USER, L"Software\\TCGame\\csol", L"gamepath", buffer);
-		Global::GameRootDirectory = std::filesystem::canonical(buffer).wstring();
+		Global::GameRootDir = std::filesystem::canonical(buffer).wstring();
 	}
 	
 	std::filesystem::path game_executable_path =
-		std::filesystem::path(Global::GameRootDirectory) / L"Bin" / L"cstrike-online.exe";
+		std::filesystem::path(Global::GameRootDir) / L"Bin" / L"cstrike-online.exe";
 
-	Console::Info(Translate("Main::INFO_GameRootDir@1", ConvertUtf16ToUtf8(Global::GameRootDirectory)));
-	Console::Info(Translate("Main::INFO_LaunchGameCmd@1", ConvertUtf16ToUtf8(Global::LaunchGameCmd)));
+	Console::Info(Translate("INFO_GameRootDir@1", ConvertUtf16ToUtf8(Global::GameRootDir)));
+	Console::Info(Translate("INFO_LaunchGameCmd@1", ConvertUtf16ToUtf8(Global::LaunchGameCmd)));
 
 	auto game_process_information = std::make_unique<GameProcessInformation>(
 		L"cstrike-online.exe",
@@ -172,9 +191,10 @@ void Boot(std::unique_ptr<Driver>& driver)
 	{
 		throw Exception(Translate("IdleEngine::ERROR_UnsupportedIdleEngineType@1", ConvertUtf16ToUtf8(Global::IdleEngineType)));
 	}
-
+	Global::ExecutorCommandFilePath = convert_to_absolute_path(Global::ExecutorCommandFilePath);
+	Console::Info(Translate("INFO_ExecutorCommandFilePath@1", ConvertUtf16ToUtf8(Global::ExecutorCommandFilePath)));
 	auto command_dispatcher =
-		std::make_unique<CommandDispatcher>(convert_to_absolute_path(Global::ExecutorCommandFilePath));
+		std::make_unique<CommandDispatcher>(Global::ExecutorCommandFilePath);
 
 	auto driver_hotkey_bindings = std::make_unique<DriverHotkeyBindings>(DriverHotkeyBindings {
 		.null_mode_hotkey = HotKey(MOD_ALT | MOD_CONTROL | MOD_SHIFT, '0'),
@@ -224,13 +244,13 @@ void Boot(std::unique_ptr<Driver>& driver)
 			return CallNextHookEx(nullptr, nCode, wParam, lParam);
 		});
 		driver->RegisterLowLevelKeyboardHook(std::move(disable_alt_enter));
-		Console::Info(Translate("Main::INFO_DisableQuickFullscreen"));
+		Console::Info(Translate("INFO_DisableQuickFullscreen"));
 	}
 	if (Global::SuppressCSOBanner)
 	{
-		auto cso_banner_path = std::filesystem::path(Global::GameRootDirectory) / L"Bin" / L"CSOBanner.exe";
+		auto cso_banner_path = std::filesystem::path(Global::GameRootDir) / L"Bin" / L"CSOBanner.exe";
 		auto cso_banner_suppressor = std::make_unique<CSOBannerSuppressor>(cso_banner_path);
 		driver->RegisterOptionalModule(std::move(cso_banner_suppressor));
-		Console::Info(Translate("Main::INFO_SuppressCSOBanner"));
+		Console::Info(Translate("INFO_SuppressCSOBanner"));
 	}
 }

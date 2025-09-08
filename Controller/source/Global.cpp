@@ -4,10 +4,10 @@ namespace CSOL_Utilities
 {
     namespace Global
     {
-		std::wstring LocaleResourcesDirectory = L"Locales";
+		std::wstring LocaleResourcesDir = L"Locales";
 		std::wstring LocaleName = L"zh-CN"; /* 区域格式名称 */
 		std::wstring ExecutorCommandFilePath = L"Temporary.lua"; /* 执行器命令文件路径 */
-		std::wstring GameRootDirectory; /* 游戏根目录 */
+		std::wstring GameRootDir; /* 游戏根目录 */
 		std::wstring LaunchGameCmd; /* 启动游戏命令 */
 		std::wstring IdleEngineType = L"Classifier"; /* 检测模式 */
 		std::wstring OCRDetectorJSONPath = L"Models\\OCR\\Chinese_Simplified\\detector.json"; /* 检测模型路径 */

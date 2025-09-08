@@ -45,7 +45,7 @@ Controller: | $(BUILD_DIR)
 Executor: | $(BUILD_DIR)
 	$(MAKE) BUILD_DIR="../$(BUILD_DIR)" --directory="$(EXECUTOR_SOURCE_DIR)"
 Manual: | $(BUILD_DIR)
-	$(MAKE) --directory=$(MANUAL_SOURCE_DIR) BUILD_DIR="build" MANUAL_NAME="$(MANUAL_NAME)"
+	$(MAKE) --directory=$(MANUAL_SOURCE_DIR) BUILD_DIR="../build" MANUAL_NAME="$(MANUAL_NAME)"
 Bundle: | $(BUILD_DIR)
 	Compress-Archive -Path "$(BUILD_DIR)/*" -DestinationPath "$(BUNDLE_NAME)" -Force
 Tool: | $(BUILD_DIR)

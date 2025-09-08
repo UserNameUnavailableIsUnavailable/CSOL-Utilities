@@ -1,5 +1,10 @@
+# 对于陆服用户，控制器运行时会自动检测游戏的根目录和启动命令，因此无需额外设置
+# 对于其他服用户，请自行设置游戏根目录和启动命令
+# 如果您有意向与我合作并为其他区服提供更完善的支持，请通过邮箱 admin@macrohard.fun 或 GitHub Issues 与我联系
 $Options = @{
-	"--locale-resources-directory" = "$PSScriptRoot\Controller\Locales"
+# "--game-root-dir" = "" # 游戏根目录为 cstrike-online.exe 所在的目录
+# "--launch-game-cmd" = "" # 启动游戏的命令，用于实现免登录启动游戏，需要游戏启动器支持（如 TCGame 可通过 "C:\Program Files (x86)\TCGAME\TCGame.exe" cso 直接免登录启动游戏）
+	"--locale-resources-dir" = "$PSScriptRoot\Controller\Locales"
 	"--language" = "zh-CN"
 	"--executor-command-file-path" = "$PSScriptRoot\Executor\Temporary.lua"
 	"--idle-engine-type" = "Classifier"
