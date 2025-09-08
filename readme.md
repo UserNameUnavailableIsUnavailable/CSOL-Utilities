@@ -37,7 +37,7 @@ B 站 ID：_CoreDump
 
 ## 主要功能概览
 
-有关各功能的详细说明，请参阅发布页面提供的使用手册。
+有关各功能的详细说明，请参阅发布页面提供的使用手册，并在 [配置面板](http://www.macrohard.fun/CSOL-Utilities/panel) 中进行相应的配置。
 
 ### 24 H 挂机
 
