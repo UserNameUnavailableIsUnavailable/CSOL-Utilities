@@ -56,6 +56,7 @@ void InitializeCommandLineArgs(CLI::App& app, int argc, wchar_t* argv[])
 	app.add_option("--language", Global::LocaleName);
 	app.add_option("--game-root-dir", Global::GameRootDir);
 	app.add_option("--launch-game-cmd", Global::LaunchGameCmd);
+	app.add_option("--game-window-title", Global::GameWindowTitle);
 	app.add_option("--executor-command-file-path", Global::ExecutorCommandFilePath);
 	app.add_option("--start-game-room-timeout", Global::StartGameRoomTimeout);
 	app.add_option("--login-timeout", Global::LoginTimeout);
@@ -152,12 +153,17 @@ void Boot(std::unique_ptr<Driver>& driver)
 	std::filesystem::path game_executable_path =
 		std::filesystem::path(Global::GameRootDir) / L"Bin" / L"cstrike-online.exe";
 
+	if (!std::filesystem::is_regular_file(game_executable_path))
+	{
+		throw Exception(Translate("ERROR_GameExecutableNotFound@1", ConvertUtf16ToUtf8(game_executable_path.wstring())));
+	}
+
 	Console::Info(Translate("INFO_GameRootDir@1", ConvertUtf16ToUtf8(Global::GameRootDir)));
 	Console::Info(Translate("INFO_LaunchGameCmd@1", ConvertUtf16ToUtf8(Global::LaunchGameCmd)));
 
 	auto game_process_information = std::make_unique<GameProcessInformation>(
-		L"cstrike-online.exe",
-		L"Counter-Strike Online",
+		Global::GameProcessName,
+		Global::GameWindowTitle,
         game_executable_path.wstring(),
 		Global::LaunchGameCmd
 	);

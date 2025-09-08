@@ -52,17 +52,14 @@ namespace CSOL_Utilities
 				{
 					// MS Docs: On success, dwLength receives the number of characters written to the buffer, not
 					// including the null-terminating character.
-					if (dwLength + 1 == path.capacity()) // 恰好填满缓冲区，可能缓冲区不足
-					{
-						path.resize(path.capacity() + path.capacity() / 2); // 扩容
-						SetLastError(ERROR_SUCCESS); // 重置错误码
-						continue;
-					}
-					else
-					{
-						path.resize(dwLength);
-						return;
-					}
+					path.resize(dwLength);
+					return;
+				}
+				else if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) // 缓冲区不足，返回 FALSE 并设置错误码（官方文档并未对此给出说明，已经反馈）
+				{
+					path.resize(path.capacity() + path.capacity() / 2); // 扩容
+					SetLastError(ERROR_SUCCESS); // 重置错误码
+					continue;
 				}
 				else
 				{

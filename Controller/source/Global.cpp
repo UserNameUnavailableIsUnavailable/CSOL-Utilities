@@ -23,5 +23,7 @@ namespace CSOL_Utilities
 		bool RestartGameOnLoadingTimeout = false; /* 如果加载超时则终止游戏进程 */        
 		bool AllowQuickFullScreen = false; /* 允许 Alt Enter 快捷全屏 */
 		bool SuppressCSOBanner = false; /* 自动关闭 CSO Banner */
+		std::wstring GameWindowTitle = L"Counter-Strike Online"; /* 游戏窗口标题 */
+		std::wstring GameProcessName = L"cstrike-online"; /* 游戏进程名称 */
     }
 }

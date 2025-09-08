@@ -24,5 +24,7 @@ namespace CSOL_Utilities
 		extern std::wstring LGHUBAgentName; /* LGHUB Agent 进程名称 */
 		extern bool AllowQuickFullScreen; /* 允许 Alt Enter 快捷全屏 */
 		extern bool SuppressCSOBanner; /* 自动关闭 CSO Banner */
+		extern std::wstring GameWindowTitle; /* 游戏窗口标题 */
+		extern std::wstring GameProcessName; /* 游戏进程名称 */
     }
 }

@@ -237,18 +237,19 @@ using namespace CSOL_Utilities;
             #endif
                 return TRUE; // 继续枚举下一个窗口
             }
-            window_title.resize(window_title_length + 1); // length 不包含 '\0'
-            if (window_title_length != params->window_title.size())
+            if (window_title_length != params->window_title.length()) // 长度不匹配，直接跳过，减轻开销
             {
                 return TRUE; // 继续枚举下一个窗口
             }
+            window_title.resize(window_title_length + 1); // length 不包含 '\0'
             auto iSize = GetWindowTextW(hWnd, window_title.data(), static_cast<int>(window_title.size()));
             window_title.resize(iSize); // iSize 为不含末尾空字符的实际长度
             #ifdef _DEBUG
-            Console::Debug(std::format("窗口句柄：0x{:#x}，窗口标题：{}", reinterpret_cast<std::uintptr_t>(hWnd), ConvertUtf16ToUtf8(window_title)));
+			Console::Debug(std::format("窗口句柄：0x{:#x}，窗口标题：{}", reinterpret_cast<std::uintptr_t>(hWnd),
+									   ConvertUtf16ToUtf8(window_title)));
             #endif
             // 匹配窗口标题
-            if (window_title == params->window_title)
+			if (window_title == params->window_title)
             {
                 params->window_handle = hWnd;
                 // 获取窗口所属进程 ID
@@ -273,6 +274,10 @@ using namespace CSOL_Utilities;
                 }
                 catch (std::exception& e)
                 {
+                    #ifdef _DEBUG
+					Console::Debug(
+						std::format("获取进程（PID：{}）路径失败，错误信息：{}", dwOwnerProcessId, e.what()));
+                    #endif
                     return TRUE; // 继续枚举
                 }
                 // 检查路径是否匹配
