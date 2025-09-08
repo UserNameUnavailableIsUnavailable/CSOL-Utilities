@@ -4,12 +4,12 @@ namespace CSOL_Utilities
 {
     namespace Global
     {
-		extern std::wstring LocaleResourcesDirectory; /* 区域格式资源目录 */
+		extern std::wstring LocaleResourcesDir; /* 区域格式资源目录 */
 		extern std::wstring LocaleName; /* 区域格式名称 */
 		extern std::wstring ExecutorCommandFilePath; /* 执行器命令文件路径 */
 		extern std::wstring g_IdleEngineBackbone; /* 检测模式 */
 		extern std::wstring IdleEngineType; /* 判别模式 */
-		extern std::wstring GameRootDirectory; /* 游戏根目录 */
+		extern std::wstring GameRootDir; /* 游戏根目录 */
 		extern std::wstring LaunchGameCmd; /* 启动游戏命令 */
 		extern std::wstring OCRDetectorJSONPath; /* 检测模型路径 */
 		extern std::wstring OCRRecognizerJSONPath; /* 识别模型路径 */

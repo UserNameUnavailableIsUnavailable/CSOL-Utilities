@@ -498,7 +498,7 @@ children:
                   value: "true"
             image: assets/golden_zombie_kill_rewards_confirm.avif
     - id: CombineParts
-      title: 配件合成
+      title: 制造所批量合成配件
       type: SECTION
       children:
           - id: CRAFT_PARTS_BATCH_COMBINE
@@ -547,7 +547,7 @@ children:
             image: assets/craft_parts_clear.avif
             legacy_name: CRAFT_PARTS_CLEAR
     - id: StorePurchase
-      title: 商店购买
+      title: 商店批量购买金币道具
       type: SECTION
       children:
           - id: STORE_BATCH_PURCHASE

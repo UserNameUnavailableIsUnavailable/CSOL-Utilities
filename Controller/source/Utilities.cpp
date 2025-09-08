@@ -355,7 +355,7 @@ namespace CSOL_Utilities
 			locale_name.erase(encoding_dot_index);
 		}
 		std::filesystem::path package_path =
-			std::filesystem::path(Global::LocaleResourcesDirectory) / (locale_name + ".json");
+			std::filesystem::path(Global::LocaleResourcesDir) / (locale_name + ".json");
 		if (package_path.is_relative())
 		{
 			package_path = GetProcessImagePath().parent_path() / package_path;
