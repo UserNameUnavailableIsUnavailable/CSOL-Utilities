@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const cdn_root = "https://cdn.bootcdn.net/ajax/libs/prism/1.30.0/"
+const cdn_root = "https://www.macrohard.fun/assets/node_modules/prismjs/"; // CDN 根 URL
 
 const default_plugins = new Map<number, Plugin>([
   [
