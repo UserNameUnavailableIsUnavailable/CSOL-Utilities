@@ -44,7 +44,7 @@ void ClassifierIdleEngine::ImplRun()
 {
 	thread_local std::vector<uint8_t> buffer;
 	thread_local auto capture_error_count = 0;
-	thread_local uint64_t room_descriptor = 0; // 房间标识符，每次进入新的房间时增加 1
+	thread_local uint64_t session_identifier = 0;
 	std::chrono::system_clock::time_point recognize_start = std::chrono::system_clock::now();
 	auto interface_type = interface_type_.load(std::memory_order_acquire);
 	auto game_window_handle = game_process_info_->get_window_handle();
@@ -111,6 +111,7 @@ void ClassifierIdleEngine::ImplRun()
 	}
 	// 状态机
 	// 分支数量庞大，但也没有更好的办法了……
+	// 从 LOGIN、LOBBY、RESULTS 状态进入 ROOM 状态时，视为新一轮游戏会话，更新会话标识符
 	switch (interface_type)
 	{
 	case GAME_INTERFACE_TYPE::LOGIN:
@@ -133,7 +134,7 @@ void ClassifierIdleEngine::ImplRun()
 				Console::Info(Translate("IdleEngine::INFO_LoginToLobby"));
 				break; // esac LOBBY
 			case GAME_INTERFACE_TYPE::ROOM: // LOGIN -> ROOM
-				room_descriptor++; // 进入新房间，房间标识符加 1
+				session_identifier++;
 				command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
 				Console::Info(Translate("IdleEngine::INFO_Room"));
 				break; // esac ROOM
@@ -172,7 +173,7 @@ void ClassifierIdleEngine::ImplRun()
 				command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM;
 				break; // esac LOBBY
 			case GAME_INTERFACE_TYPE::ROOM: // LOBBY -> ROOM
-				room_descriptor++; // 进入新房间，房间标识符加 1
+				session_identifier++;
 				command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
 				Console::Info(Translate("IdleEngine::INFO_LobbyToRoom"));
 				break; // esac ROOM
@@ -229,8 +230,10 @@ void ClassifierIdleEngine::ImplRun()
 			case GAME_INTERFACE_TYPE::IN_GAME: // ROOM -> IN_GAME
 				command_type_ = Command::TYPE::CMD_CHOOSE_CHARACTER;
 				Console::Info(Translate("IdleEngine::INFO_InGame"));
+				// 由房间直接转入游戏中，一般是由于用户手动接管导致，直接视为新一轮游戏会话
 				break; // esac IN_GAME
 			case GAME_INTERFACE_TYPE::RESULTS: // ROOM -> RESULTS
+				// 由房间直接转入结果界面，一般是由于用户手动接管导致，直接视为本轮游戏会话结束
 				command_type_ = Command::TYPE::CMD_CONFIRM_RESULTS;
 				Console::Info(Translate("IdleEngine::INFO_Results"));
 				break; // esac RESULTS
@@ -261,11 +264,11 @@ void ClassifierIdleEngine::ImplRun()
 				{
 					// 加载失败
 					thread_local int count = 0;
-					thread_local uint64_t last_room_descriptor = 0;
-					if (last_room_descriptor != room_descriptor)
-					{ // 根据状态标识符判断是否为新的房间
-						count = 0;
-						last_room_descriptor = room_descriptor;
+					thread_local uint64_t last_session_identifier = 0; // 记录最近异常的会话标识符
+					if (last_session_identifier != session_identifier) // 新会话
+					{
+						count = 0; // 加载失败次数先置为 0
+						last_session_identifier = session_identifier; // 记录当前会话标识符
 					}
 					command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
 					if (count + 1 == 3) // 连续三次加载失败
@@ -273,9 +276,9 @@ void ClassifierIdleEngine::ImplRun()
 						command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM; // 离开当前房间重新创建
 						Console::Info(Translate("IdleEngine::INFO_LoadingToRoomTooManyTimes"));
 					}
-					else
+					else // 未达三次加载失败
 					{
-						count++;
+						count++; // 加载失败次数加 1
 					}
 					Console::Warn(Translate("IdleEngine::WARN_LoadingToRoom"));
 				}
@@ -336,11 +339,11 @@ void ClassifierIdleEngine::ImplRun()
 			case GAME_INTERFACE_TYPE::ROOM: // IN_GAME -> ROOM
 				{
 					thread_local int count = 0;
-					thread_local uint64_t last_room_descriptor = 0;
-					if (last_room_descriptor != room_descriptor)
+					thread_local uint64_t last_session_identifier = 0; // 记录最近一次异常的会话标识符
+					if (last_session_identifier != session_identifier)
 					{ // 根据状态标识符判断是否为新的房间
 						count = 0;
-						last_room_descriptor = room_descriptor;
+						last_session_identifier = session_identifier;
 					}
 					command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM;
 					Console::Warn(Translate("IdleEngine::WARN_InGameToRoom"));
@@ -417,6 +420,7 @@ void ClassifierIdleEngine::ImplRun()
 				Console::Info(Translate("IdleEngine::INFO_Lobby"));
 				break; // esac LOBBY
 			case GAME_INTERFACE_TYPE::ROOM: // RESULTS -> ROOM
+				session_identifier++;
 				command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
 				Console::Info(Translate("IdleEngine::INFO_ResultsToRoom"));
 				break; // esac ROOM
@@ -454,6 +458,7 @@ void ClassifierIdleEngine::ImplRun()
 					command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM;
 					break; // esac LOBBY
 				case GAME_INTERFACE_TYPE::ROOM: // UNKNOWN -> ROOM
+					session_identifier++;
 					Console::Info(Translate("IdleEngine::INFO_Room"));
 					command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
 					break; // esac ROOM

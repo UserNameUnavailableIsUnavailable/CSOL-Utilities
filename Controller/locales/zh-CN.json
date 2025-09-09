@@ -89,7 +89,7 @@
         {
             "INFO_GameProcessNotRunning": "游戏进程未运行，尝试启动游戏。",
             "INFO_ProcessDetected@1": "检测到游戏进程，标识符：{}。",
-            "WARN_CreateProcessW@1": "尝试启动游戏进程失败，错误代码：{}，请手动启动游戏。此问题一般是由于未以管理员权限启动控制器。",
+            "WARN_CreateProcessW@1": "尝试启动游戏进程失败，错误代码：{}，请手动启动游戏。此问题一般是由于未以管理员权限启动控制器或游戏启动命令有误。",
             "ERROR_OpenProcess@1": "OpenProcess 失败，错误代码：{}。",
             "INFO_SwitchToDefaultIdleMode": "发生掉线，新建房间后将使用默认挂机模式。",
             "WARN_GameProcessExited": "游戏进程退出，尝试重启游戏。",
