@@ -2,9 +2,9 @@
 # 对于其他服用户，请自行设置游戏根目录和启动命令
 # 如果您有意向与我合作并为其他区服提供更完善的支持，请通过邮箱 admin@macrohard.fun 或 GitHub Issues 与我联系
 $Options = @{
-# "--game-root-dir" = "" # 游戏根目录（即 Bin、Data 所在目录）
-# "--launch-game-cmd" = "" # 启动游戏的命令，用于实现免登录启动游戏，需要游戏启动器支持（如 TCGame 可通过 "C:\Program Files (x86)\TCGAME\TCGame.exe" cso 直接免登录启动游戏）
-#	"--game-window-title" = "Counter-Strike Online" # 游戏窗口标题，留空则默认为 "Counter-Strike Online"，Steam 服应为 "Counter-Strike Nexon"
+#	"--game-root-dir" = "" # 游戏根目录（即 Bin、Data 所在目录）
+#	"--launch-game-cmd" = "" # 启动游戏的命令，用于实现免登录启动游戏，需要游戏启动器支持（如 TCGame 可通过 "C:\Program Files (x86)\TCGAME\TCGame.exe" cso 直接免登录启动游戏）
+#	"--game-window-title" = "" # 游戏窗口标题，留空则默认为 "Counter-Strike Online"，其他区服应根据需要修改，例如 Steam 服应为 "Counter-Strike Nexon"
 	"--locale-resources-dir" = "$PSScriptRoot\Controller\Locales"
 	"--language" = "zh-CN"
 	"--executor-command-file-path" = "$PSScriptRoot\Executor\Temporary.lua"
