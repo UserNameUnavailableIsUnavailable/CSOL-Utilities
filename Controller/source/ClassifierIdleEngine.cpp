@@ -11,36 +11,12 @@ ClassifierIdleEngine::ClassifierIdleEngine(std::unique_ptr<GameProcessInformatio
 										   std::filesystem::path classifier_model_json_path) :
 	IdleEngine(std::move(game_process_information))
 {
+	SetDiscriminationInterval(3000);
 	classifier_ = std::make_unique<Classifier>(classifier_model_json_path);
 	interface_type_ = GAME_INTERFACE_TYPE::UNKNOWN; /* 游戏内状态 */
 }
 
-void ClassifierIdleEngine::Run(std::stop_token st)
-{
-	while (true)
-	{
-		{
-			std::unique_lock lk(threads_state_lock_);
-			scene_discriminator_runnable_.wait(
-				lk, [this, &st]
-				{ return st.stop_requested() || (is_process_watcher_runnable_ && is_scene_discriminator_runnable_); });
-			if (st.stop_requested())
-			{
-				break;
-			}
-		}
-		has_scene_discriminator_finished_ = false;
-		ImplRun();
-		{
-			std::lock_guard lk(threads_state_lock_);
-			has_scene_discriminator_finished_ = true;
-		}
-		scene_discriminator_finished_.notify_one();
-		SleepEx(3000, true);
-	}
-}
-
-void ClassifierIdleEngine::ImplRun()
+void ClassifierIdleEngine::Discriminate()
 {
 	thread_local std::vector<uint8_t> buffer;
 	thread_local auto capture_error_count = 0;
@@ -74,7 +50,7 @@ void ClassifierIdleEngine::ImplRun()
 		capture_error_count++;
 		if (capture_error_count > 9)
 		{
-			throw Exception(Translate("IdleEngine::OCR::ERROR_CaptureWindowAsBmpFailedTooManyTimes"));
+			throw Exception(Translate("ClassifierIdleEngine::ERROR_CaptureFailedTooManyTimes"));
 		}
 		return;
 	}
@@ -86,9 +62,9 @@ void ClassifierIdleEngine::ImplRun()
 		decode_error_count++;
 		if (decode_error_count > 9)
 		{
-			throw Exception("IdleEngine::OCR::ERROR_imdecodeFailedTooManyTimes");
+			throw Exception("ClassifierIdleEngine::ERROR_DecodeFailedTooManyTimes");
 		}
-		Console::Warn(Translate("IdleEngine::OCR::WARN_imdecode"));
+		Console::Warn(Translate("ClassifierIdleEngine::WARN_Decode"));
 		return;
 	}
 	#ifdef _DEBUG

@@ -47,30 +47,10 @@ OCRIdleEngine::OCRIdleEngine(std::unique_ptr<GameProcessInformation> game_proces
 	}
 }
 
-void OCRIdleEngine::Run(std::stop_token st)
+void OCRIdleEngine::Discriminate()
 {
-	while (true)
-	{
-		{
-			std::unique_lock lk(threads_state_lock_);
-			scene_discriminator_runnable_.wait(
-				lk, [this, &st]
-				{ return st.stop_requested() || (is_process_watcher_runnable_ && is_scene_discriminator_runnable_); });
-			if (st.stop_requested())
-			{
-				break;
-			}
-		}
-		has_scene_discriminator_finished_ = false;
-		Analyze();
-		Dispatch();
-		{
-			std::lock_guard lk(threads_state_lock_);
-			has_scene_discriminator_finished_ = true;
-		}
-		scene_discriminator_finished_.notify_one();
-		SleepEx(5000, true);
-	}
+	Analyze();
+	Dispatch();
 }
 
 void OCRIdleEngine::Analyze()

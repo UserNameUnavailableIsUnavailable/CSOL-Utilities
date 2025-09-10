@@ -1,0 +1,44 @@
+\section{多区服挂机设置}
+
+\section{Steam 国际服}
+
+首先，打开 \lstinline{Controller.ps1}，在脚本开头找到如下定义 \verb|$Options| 的代码段：
+
+\begin{minted}{powershell}
+$Options = @{
+	"--game-root-dir" = ''
+	"--launch-game-cmd" = ''
+	"--game-window-title" = ''
+	# 其他选项……
+}
+\end{minted}
+
+\verb|--game-root-dir| 是游戏根目录，也即 \verb|Bin| 和 \verb|Data| 所在目录，在 Steam 中，点击“管理 - 浏览本地文件”即可打开游戏根目录，在地址栏中复制路径后，粘贴到该选项中即可。例如，下图中的路径为：
+
+\begin{minted}{text}
+'C:\Users\Silver\Games\Steam\steamapps\common\CSNZ'
+\end{minted}
+
+\verb|--launch-game-cmd| 是启动游戏的命令。
+在游戏掉线时，会自动执行此命令以重启游戏。
+启动游戏命令需要相应区服的启动器支持（如陆服的 TCGame、国际服的 Steam）。
+需要指出的是，由于游戏本身需要以管理员权限运行，故为保证启动游戏权限足够，游戏启动器也需要以管理员身份运行（TCGame 默认是以管理员身份启动的，Steam 则需要手动以管理员身份运行，否则启动时会申请提权，造成游戏无法正常启动）。
+Steam 支持在命令行中通过 \verb|<Steam.exe 路径> --applaunch <APPID>| 的方式启动游戏。
+Counter-Strike Nexon 的 APPID 为 273110，因此，假设 Steam 安装在默认路径 \verb|C:\Program Files (x86)\Steam|，则启动命令应设置为：
+
+\begin{minted}{text}
+'"C:\Program Files (x86)\Steam\Steam.exe" --applaunch 273110'
+\end{minted}
+
+\verb|--game-window-title| 是游戏窗口标题，对于 Counter-Strike Nexon 应设置为 \verb|"Counter-Strike Nexon"|。
+
+综上所述，对于 Steam 服，\verb|$Options| 应如下所示：
+
+\begin{minted}{powershell}
+$Options = {
+	"--game-root-dir" = 'C:\Users\Silver\Games\Steam\steamapps\common\CSNZ'
+	"--launch-game-cmd" = '"C:\Program Files (x86)\Steam\Steam.exe" --applaunch 273110'
+	"--game-window-title" = 'Counter-Strike Nexon'
+	# 其他选项……
+}
+\end{minted}

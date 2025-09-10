@@ -11,7 +11,6 @@
     "WARN_NotRunningAsAdmin": "检测到程序未以管理员权限运行，这会导致部分功能无法正常使用。",
     "INFO_AutoDetectGameRootDir": "未指定游戏程序根目录，尝试自动检测（仅适用于国服）。",
     "INFO_AutoDetectLaunchGameCmd": "未指定游戏启动命令，尝试自动检测（仅适用于国服）。",
-    "ERROR_RegGetValueW@1": "RegGetValueW 失败，错误代码：{}",
     "INFO_DisableQuickFullscreen": "屏蔽了游戏窗口全屏热键 {{ Alt Enter }}。",
     "INFO_SuppressCSOBanner": "自动检测并关闭 CSO Banner 功能启用",
     "INFO_Author": "本工具由 _CoreDump 开发。",
@@ -127,6 +126,12 @@
             "INFO_TryKillGameProcess": "尝试结束游戏进程。"
         }
     },
+    "ClassifierIdleEngine":
+    {
+        "WARN_Decode": "图片解码失败。",
+        "ERROR_DecodeFailedTooManyTimes": "尝试解码图像错误次数过多。",
+        "ERROR_CaptureFailedTooManyTimes": "尝试截取游戏窗口失败次数过多。"
+    },
     "CSOBannerSuppressor":
     {
         "INFO_CSOBannerSuppressed": "检测到 CSOBanner 正在运行，尝试终止 CSOBanner。"
@@ -139,20 +144,10 @@
     {
         "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。"
     },
-    "Utilities":
+    "CaptureWindowAsBmp":
     {
-        "CaptureWindowAsBmp":
-        {
-            "ERROR_GetModuleFileNameW": "GetModuleFileNameW 失败，错误代码：{}。",
-            "ERROR_InValidWindow": "窗口句柄无效。",
-            "ERROR_GetDC@1": "GetDC 失败，错误代码：{}。",
-            "ERROR_CreateCompatibleDC@1": "CreateCompatibleDC 失败，错误代码：{}。",
-            "ERROR_WindowIsMinimized": "无法截取处于最小化状态的窗口。",
-            "ERROR_GetClientRect@1": "GetClientRect 失败，错误代码：{}。",
-            "ERROR_StretchBlt@1": "StretchBlt 失败，错误代码：{}。",
-            "ERROR_BltBlt@1": "BitBlt 失败，错误代码：{}。",
-            "ERROR_GetDIBits@1": "GetDIBits 失败，错误代码：{}。"
-        }
+        "ERROR_InvalidWindow": "窗口句柄无效。",
+        "ERROR_WindowIsMinimized": "无法截取处于最小化状态的窗口。"
     },
     "Module":
     {
@@ -181,10 +176,5 @@
         "INFO_SwitchToBatchPurchaseItemMode": "切换为批量购买物品模式。",
         "INFO_SwitchToLocateCursorMode": "切换为光标定位模式。",
         "ERROR_DriverIsFrozen": "驱动器已经冻结，不允许修改。"
-    },
-    "ResNet":
-    {
-        "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。",
-        "ERROR_FailedToReadLabelFile@1": "读取标签文件失败，错误原因：{}。"
     }
 }

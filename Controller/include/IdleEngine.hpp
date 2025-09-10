@@ -187,7 +187,22 @@ namespace CSOL_Utilities
         virtual void Resume() noexcept;
         virtual void Suspend() noexcept;
         virtual void Terminate() noexcept;
-		
+		void SetDiscriminationInterval(uint32_t interval) noexcept
+        {
+            discrimination_interval_.store(interval, std::memory_order_release);
+        }
+        uint32_t GetDiscriminationInterval() const noexcept
+        {
+            return discrimination_interval_.load(std::memory_order_acquire);
+        }
+        void SetWatchdogInterval(uint32_t interval) noexcept
+        {
+            watchdog_interval_.store(interval, std::memory_order_release);
+        }
+        uint32_t GetWatchdogInterval() const noexcept
+        {
+            return watchdog_interval_.load(std::memory_order_acquire);
+        }
         void SetIdleMode(IDLE_MODE idle_mode) noexcept
         {
             idle_mode_.store(idle_mode, std::memory_order_release);
@@ -216,11 +231,14 @@ namespace CSOL_Utilities
         // 功能实现
         bool SearchGameWindow(); /* 辅助函数：查找游戏窗口，更新游戏进程信息 */
         std::thread process_watcher_; /* 游戏进程监视器线程 */
-        virtual void WatchGameProcess(std::stop_token st); /* 监视游戏进程 */
+        GAME_PROCESS_STATE process_state_ = GAME_PROCESS_STATE::UNKNOWN;
+        virtual void Watch(); /* 监视游戏进程 */
         std::thread scene_discriminator_; /* 游戏状态判别器线程 */
-        virtual void Run(std::stop_token st) = 0; /* 判别游戏状态 */
+        virtual void Discriminate() = 0; /* 判别游戏状态 */
         /* 考虑到 dangling resources 问题，这里使用 thread 而非 jthread */
         std::unique_ptr<GameProcessInformation> game_process_info_; /* 游戏进程信息 */
         std::atomic<IDLE_MODE> idle_mode_; /* 挂机模式 */
+        std::atomic_uint32_t discrimination_interval_ = 5000; /* 状态判别间隔，单位毫秒 */
+        std::atomic_uint32_t watchdog_interval_ = 1000; /* 进程监视器轮询间隔，单位毫秒 */
     };
 }
