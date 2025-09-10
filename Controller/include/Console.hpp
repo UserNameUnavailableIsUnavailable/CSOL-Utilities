@@ -61,22 +61,22 @@ namespace CSOL_Utilities
 		static void Info(std::string_view s)
 		{
 			auto str = std::format("{}{}", Translate("Console::INFO_HEADER"), s);
-			Console::Println(FOREGROUND_COLOR_GREEN + str + FOREGROUND_COLOR_DEFAULT);
+			Console::Println(GetLocalTimeString() + FOREGROUND_COLOR_GREEN + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Warn(std::string_view s)
 		{
 			auto str = std::format("{}{}", Translate("Console::WARN_HEADER"), s);
-			Console::Println(FOREGROUND_COLOR_BRIGHT_YELLOW + str + FOREGROUND_COLOR_DEFAULT);
+			Console::Println(GetLocalTimeString() + FOREGROUND_COLOR_BRIGHT_YELLOW + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Error(std::string_view s)
 		{
 			auto str = std::format("{}{}", Translate("Console::ERROR_HEADER"), s);
-			Console::Println(FOREGROUND_COLOR_BRIGHT_RED + str + FOREGROUND_COLOR_DEFAULT);
+			Console::Println(GetLocalTimeString() + FOREGROUND_COLOR_BRIGHT_RED + str + FOREGROUND_COLOR_DEFAULT);
 		}
 		static void Debug(std::string_view s)
 		{
 			auto str = std::format("{}{}", Translate("Console::DEBUG_HEADER"), s);
-			Console::Println(FOREGROUND_COLOR_BLUE + str + FOREGROUND_COLOR_DEFAULT);
+			Console::Println(GetLocalTimeString() + FOREGROUND_COLOR_BLUE + str + FOREGROUND_COLOR_DEFAULT);
 		}
 	private:
 		Console();
@@ -88,5 +88,20 @@ namespace CSOL_Utilities
 		}
 
 		std::mutex m_Lock;
+
+		static std::string GetLocalTimeString()
+		{
+			std::string local_time_str(std::size("yyyy-mm-dd HH:MM:SS "), '\0');
+			auto now = std::chrono::system_clock::now();
+			auto timestamp = std::chrono::system_clock::to_time_t(now);
+			std::tm local_time;
+			#if defined(_MSC_VER)
+			localtime_s(&local_time, &timestamp);
+			#else
+			localtime_r(&timestamp, &local_time);
+			#endif
+			strftime(local_time_str.data(), local_time_str.size(), "%Y-%m-%d %H:%M:%S", &local_time);
+			return local_time_str;
+		}
 	};
 } // namespace CSOL_Utilities
