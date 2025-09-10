@@ -2,6 +2,7 @@
     "INFO_Version@1": "CSOL 集成工具控制器（版本：{}），请留意控制器与执行器版本是否匹配。",
     "INFO_ExecutorCommandFilePath@1": "执行器命令文件路径：{}。",
     "INFO_GameRootDir@1": "游戏程序根目录：{}。",
+    "INFO_GameWindowTitle@1": "游戏窗口标题：{}。",
     "INFO_LaunchGameCmd@1": "游戏启动命令：{}。",
     "ERROR_Unexpected@1": "意料之外的错误：{}。",
     "ERROR_FileNotFound@1": "{} 不存在或不是常规文件。",

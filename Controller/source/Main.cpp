@@ -150,6 +150,8 @@ void Boot(std::unique_ptr<Driver>& driver)
 		Global::GameRootDir = std::filesystem::canonical(buffer).wstring();
 	}
 	
+	Console::Info(Translate("INFO_GameWindowTitle@1", ConvertUtf16ToUtf8(Global::GameWindowTitle)));
+
 	std::filesystem::path game_executable_path =
 		std::filesystem::path(Global::GameRootDir) / L"Bin" / L"cstrike-online.exe";
 
