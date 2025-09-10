@@ -79,7 +79,7 @@ void Boot(std::unique_ptr<Driver>& driver)
 	std::locale locale(ConvertUtf16ToUtf8(Global::LocaleName));
 	std::locale::global(locale);
 	LoadLanguagePackage(Global::g_LanguagePackage);
-	Console::Info(Translate("INFO_Version@1", "1.5.2"));
+	Console::Info(Translate("INFO_Version@1", Global::Version));
 	Console::Warn(Translate("WARN_OpenSource"));
 	Console::Info(Translate("INFO_Author"));
 	Console::Info(Translate("INFO_Feedback"));

@@ -4,6 +4,7 @@ namespace CSOL_Utilities
 {
     namespace Global
     {
+		const std::string_view Version = "1.5.3"; /* 版本号 */
 		std::wstring LocaleResourcesDir = L"Locales";
 		std::wstring LocaleName = L"zh-CN"; /* 区域格式名称 */
 		std::wstring ExecutorCommandFilePath = L"Temporary.lua"; /* 执行器命令文件路径 */

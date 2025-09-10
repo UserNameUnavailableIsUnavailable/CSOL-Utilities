@@ -4,6 +4,7 @@ namespace CSOL_Utilities
 {
     namespace Global
     {
+		extern const std::string_view Version; /* 版本号 */
 		extern std::wstring LocaleResourcesDir; /* 区域格式资源目录 */
 		extern std::wstring LocaleName; /* 区域格式名称 */
 		extern std::wstring ExecutorCommandFilePath; /* 执行器命令文件路径 */
