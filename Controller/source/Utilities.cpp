@@ -106,7 +106,7 @@ namespace CSOL_Utilities
 		}
 		if (!IsWindow(hWnd))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_InvalidWindow"));
+			throw Exception(Translate("CaptureWindowAsBmp::ERROR_InvalidWindow"));
 		}
 		auto release_dc = [](HDC hdc) { ReleaseDC(NULL, hdc); };
 
@@ -118,7 +118,7 @@ namespace CSOL_Utilities
 
 		if (!hdcWindow)
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_GetDC@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "GetDC", GetLastError()));
 		}
 		DWORD dwBmpSize = 0;
 		DWORD dwSizeofDIB = 0;
@@ -129,18 +129,18 @@ namespace CSOL_Utilities
 
 		if (!hdcMemDC)
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_CreateCompatibleDC@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "CreateCompatibleDC", GetLastError()));
 		}
 		if (IsIconic(hWnd))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_WindowIsMinimized"));
+			throw Exception(Translate("CaptureWindowAsBmp::ERROR_WindowIsMinimized"));
 		}
 
 		/* 获取窗口的相对区域 */
 		RECT rcClient;
 		if (!GetClientRect(hWnd, &rcClient))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::GetClientRect@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "GetClientRect", GetLastError()));
 		}
 
 		/* 获取窗口左上角绝对坐标 */
@@ -154,7 +154,7 @@ namespace CSOL_Utilities
 						ptLeftTopOfClient.x, ptLeftTopOfClient.y, rcClient.right - rcClient.left,
 						rcClient.bottom - rcClient.top, SRCCOPY))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_StretchBlt@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "StretchBlt", GetLastError()));
 		}
 
 		std::unique_ptr<std::remove_pointer_t<HBITMAP>, BOOL (*)(HGDIOBJ)> hbmScreen(
@@ -163,7 +163,7 @@ namespace CSOL_Utilities
 
 		if (!hbmScreen)
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_CreateCompatibleDC@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "CreateCompatibleDC", GetLastError()));
 		}
 
 		SelectObject(hdcMemDC.get(), hbmScreen.get());
@@ -171,7 +171,7 @@ namespace CSOL_Utilities
 		if (!BitBlt(hdcMemDC.get(), 0, 0, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
 					hdcWindow.get(), 0, 0, SRCCOPY))
 		{
-			throw Exception(Translate("Utilties::ERROR_BltBlt@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "BitBlt", GetLastError()));
 		}
 
 		BITMAP bmpScreen{};
@@ -219,7 +219,7 @@ namespace CSOL_Utilities
 					   buffer.data() + bmp_body_offset, reinterpret_cast<BITMAPINFO*>(&BitmapInfoHeader),
 					   DIB_RGB_COLORS))
 		{
-			throw Exception(Translate("Utilities::CaptureWindowAsBmp::ERROR_GetDIBits@1", GetLastError()));
+			throw Exception(Translate("ERROR_Win32_API@2", "GetDIBits", GetLastError()));
 		}
 	}
 

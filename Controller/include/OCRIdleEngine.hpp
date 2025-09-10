@@ -37,7 +37,7 @@ namespace CSOL_Utilities
         aho_corasick::trie trie_;
 		std::function<void (HWND)> remove_window_border_;
     private:
-        virtual void Run(std::stop_token st) override;
+        virtual void Discriminate() override;
 		void SetInGameState(GAME_INTERFACE_TYPE state) noexcept
 		{
             if (game_interface_type_.load(std::memory_order_acquire) == state) return; /* 前后两个状态相同，不发生更新，这样保持此状态开始时刻不变 */
