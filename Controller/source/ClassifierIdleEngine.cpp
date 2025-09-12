@@ -11,7 +11,7 @@ ClassifierIdleEngine::ClassifierIdleEngine(std::unique_ptr<GameProcessInformatio
 										   std::filesystem::path classifier_model_json_path) :
 	IdleEngine(std::move(game_process_information))
 {
-	SetDiscriminationInterval(3000);
+	SetDiscriminationInterval(2500);
 	classifier_ = std::make_unique<Classifier>(classifier_model_json_path);
 	interface_type_ = GAME_INTERFACE_TYPE::UNKNOWN; /* 游戏内状态 */
 }

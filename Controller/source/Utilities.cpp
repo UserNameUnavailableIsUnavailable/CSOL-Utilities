@@ -16,20 +16,24 @@ namespace CSOL_Utilities
 		// 返回的伪句柄并不具备该权限 需要使用 GetModuleFileNameW 来获取当前进程的路径
 		auto get_self_image_path = [](std::wstring& path)
 		{
+			if (path.size() == 0)
+			{
+				path.resize(128); // 初始缓冲区
+			}
 			while (true)
 			{
-				auto length = GetModuleFileNameW(nullptr, path.data(), path.capacity());
+				auto length = GetModuleFileNameW(nullptr, path.data(), path.size());
 				if (length > 0)
 				{
 					if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) // 缓冲区不足
 					{
-						path.resize(path.capacity() + path.capacity() / 2); // 扩容
+						path.resize(path.size() + path.size() / 2); // 扩容
 						SetLastError(ERROR_SUCCESS); // 重置错误码
 						continue;
 					}
 					else
 					{
-						path.resize(length);
+						path.resize(length); // 调整为实际长度
 						return;
 					}
 				}
@@ -43,16 +47,20 @@ namespace CSOL_Utilities
 
 		auto get_other_image_path = [](uintptr_t hMod, std::wstring& path)
 		{
+			if (path.size() == 0)
+			{
+				path.resize(128); // 初始缓冲区
+			}
 			while (true)
 			{
 				HMODULE hModule = reinterpret_cast<HMODULE>(hMod);
-				DWORD dwLength = path.capacity();
+				DWORD dwLength = path.size();
 				auto ok = QueryFullProcessImageNameW(hModule, 0, path.data(), &dwLength);
 				if (ok)
 				{
 					// MS Docs: On success, dwLength receives the number of characters written to the buffer, not
 					// including the null-terminating character.
-					path.resize(dwLength);
+					path.resize(dwLength); // 调整为实际长度
 					return;
 				}
 				else if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) // 缓冲区不足，返回 FALSE 并设置错误码（官方文档并未对此给出说明，已经反馈）
@@ -72,7 +80,7 @@ namespace CSOL_Utilities
 		// 单独优化对当前可执行文件路径的查询
 		static std::atomic_bool this_path_initialized{false};
 		static std::mutex this_path_write_lock;
-		static std::wstring this_path(64, L'0');
+		static std::wstring this_path(128, L'0');
 		if (hMod == 0 || hMod == reinterpret_cast<uintptr_t>(GetCurrentProcess())) // 查询当前可执行文件的路径
 		{
 			if (this_path_initialized.load(std::memory_order_acquire)) // 已经查询过
@@ -92,9 +100,9 @@ namespace CSOL_Utilities
 		}
 		else
 		{
-			std::wstring ret(64, L'\0');
-			get_other_image_path(hMod, ret);
-			return ret;
+			std::wstring path(128, L'\0');
+			get_other_image_path(hMod, path);
+			return path;
 		}
 	}
 

@@ -73,28 +73,11 @@ namespace CSOL_Utilities
             {
                 return true; /* 继续遍历 */
             }
-            thread_local std::wstring executable_path;
+            thread_local std::wstring executable_path(128, '\0');
             auto hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, false, process_entry.th32ProcessID);
             if (hProcess)
             {
-                BOOL bSuccess;
-                DWORD dwSize;
-                while (true)
-                {
-                    dwSize = executable_path.capacity();
-                    bSuccess = QueryFullProcessImageNameW(hProcess, 0, executable_path.data(), &dwSize);
-                    if (!bSuccess)
-                    {
-                        executable_path.resize(executable_path.capacity() + executable_path.capacity() / 2);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                executable_path.resize(dwSize);
-                std::filesystem::path p(executable_path);
-                bool ret;
+                auto p = GetProcessImagePath(reinterpret_cast<uintptr_t>(hProcess));
                 std::error_code ec;
                 if (std::filesystem::equivalent(p, CSO_Banner_executable_path_, ec))
                 {

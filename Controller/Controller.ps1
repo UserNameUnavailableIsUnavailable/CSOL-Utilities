@@ -34,10 +34,47 @@ foreach ($f in $Flags)
 	$Parameters += $f
 }
 
+# 关闭快速编辑模式，防止鼠标点击后程序无响应
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public static class ConsoleMode {
+    const int STD_INPUT_HANDLE = -10;
+    const uint ENABLE_QUICK_EDIT = 0x0040;
+    const uint ENABLE_EXTENDED_FLAGS = 0x0080;
+
+    [DllImport("kernel32.dll", SetLastError=true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
+
+    [DllImport("kernel32.dll", SetLastError=true)]
+    public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+
+    [DllImport("kernel32.dll", SetLastError=true)]
+    public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+
+    public static void DisableQuickEdit() {
+        var handle = GetStdHandle(STD_INPUT_HANDLE);
+        uint mode;
+        if (GetConsoleMode(handle, out mode)) {
+            // Clear Quick Edit, keep Extended Flags
+            mode &= ~ENABLE_QUICK_EDIT;
+            mode |= ENABLE_EXTENDED_FLAGS;
+            SetConsoleMode(handle, mode);
+        }
+    }
+}
+"@
+
+[ConsoleMode]::DisableQuickEdit()
+
 $CurrentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+
+# 确保以管理员权限运行
 if (-not $CurrentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
-    Start-Process -FilePath powershell -Verb RunAs -ArgumentList "-NoExit -Command `"& { Set-Location `'$PSScriptRoot`'; .\Controller.ps1 }`""
+	$ArgumentList = "-NoProfile -NoLogo -NoExit -Command `"& { Set-Location -Path `"$PSScriptRoot`"; &`"$PSCommandPath`" }`""
+    Start-Process -FilePath powershell -Verb RunAs -ArgumentList $ArgumentList
 }
 else
 {
