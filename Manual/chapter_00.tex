@@ -177,7 +177,6 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 \begin{figure}[H]
     \Centering
     \parbox[l]{\textwidth}{点击其中一个配置项，这里选择默认的“桌面”（图 \ref{ch0fig-script}）。}
-    \ref{ch0fig-select-config}
     \includegraphics[width=\textwidth]{assets/intro/select_config.png}
     \caption{选择一个配置}
     \label{ch0fig-select-config}
@@ -265,7 +264,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 控制器有点像汽车上的档位，只是这里的每个档位具有不同功能。
 
-控制器会在 \lstinline{Executor} 目录下创建临时文件 \lstinline{$~cmd.lua}，并实时向该临时文件中写入命令，指挥执行器模块执行相应的命令。
+控制器会在 \lstinline{Executor} 目录下创建临时文件，并实时向该临时文件中写入命令，指挥执行器模块执行相应的命令。
 每条命令都有一定的有效期（2 秒左右），超过有效期的命令不会被执行。
 每条命令执行完毕都需要一定的时间，因此\textbf{\color{red}控制器切换模式不会立即停止当前命令的执行，而是需要等待当前命令执行完毕才会完成模式切换}。
 

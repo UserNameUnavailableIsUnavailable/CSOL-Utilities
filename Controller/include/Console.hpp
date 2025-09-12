@@ -100,7 +100,7 @@ namespace CSOL_Utilities
 			#else
 			localtime_r(&timestamp, &local_time);
 			#endif
-			strftime(local_time_str.data(), local_time_str.size(), "%Y-%m-%d %H:%M:%S", &local_time);
+			strftime(local_time_str.data(), local_time_str.size(), "%Y-%m-%d %H:%M:%S ", &local_time);
 			return local_time_str;
 		}
 	};

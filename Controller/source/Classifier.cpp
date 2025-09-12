@@ -10,12 +10,12 @@ Classifier::Classifier(std::filesystem::path json_path)
 {
     if (!std::filesystem::is_regular_file(json_path))
     {
-        throw Exception(Translate("ResNet::ERROR_FileNotFound@1", ConvertUtf16ToUtf8(json_path)));
+        throw Exception(Translate("ERROR_FileNotFound@1", ConvertUtf16ToUtf8(json_path)));
     }
     std::ifstream json_fstream(json_path);
     if (!json_fstream)
     {
-        throw Exception(Translate("ResNet::ERROR_FailedToReadLabelFile@1", ConvertUtf16ToUtf8(json_path)));
+        throw Exception(Translate("ERROR_FailedToReadLabelFile@1", ConvertUtf16ToUtf8(json_path)));
     }
     nlohmann::json metadata_json;
     json_fstream >> metadata_json;
