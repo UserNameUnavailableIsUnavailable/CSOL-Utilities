@@ -321,11 +321,11 @@ void ClassifierIdleEngine::Discriminate()
 						count = 0;
 						last_session_identifier = session_identifier;
 					}
-					command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM;
+					command_type_ = Command::TYPE::CMD_START_GAME_ROOM; // 重新开始游戏
 					Console::Warn(Translate("IdleEngine::WARN_InGameToRoom"));
 					if (count + 1 == 3)
 					{
-						command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM;
+						command_type_ = Command::TYPE::CMD_CREATE_GAME_ROOM; // 离开当前房间重新创建
 						Console::Info(Translate("IdleEngine::INFO_InGameToRoomTooManyTimes"));
 					}
 					else

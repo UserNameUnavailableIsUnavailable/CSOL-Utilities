@@ -129,7 +129,7 @@ if not Player_lua then
     ---回合重置或复活。
     function Player:reset_round_or_respawn()
         if Mouse:is_cursor_position_locked() then
-            Keyboard:click(self.RESPAWN_KEY, 20)
+            Keyboard:click(self.RESPAWN_KEY, 50)
             return
         end
         -- 存在其他弹窗的影响
@@ -141,7 +141,7 @@ if not Player_lua then
             30,
             true
         )
-        Keyboard:click(self.RESPAWN_KEY, 20, true) -- 回合重置
+        Keyboard:click(self.RESPAWN_KEY, 50, true) -- 回合重置
     end
 
     ---发动角色技能。

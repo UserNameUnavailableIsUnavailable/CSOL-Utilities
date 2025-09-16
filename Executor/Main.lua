@@ -14,7 +14,7 @@ if not Main_lua then
     Runtime:enable_interrupt() -- 开中断
 
     local function interpret()
-        local cmd = Command:claim() -- 领取任务
+        local cmd = Command:fetch() -- 领取任务
         local task = Automation.Task[cmd]
         if (task) then task() end -- 执行任务
         Command:finish() -- 任务执行完毕

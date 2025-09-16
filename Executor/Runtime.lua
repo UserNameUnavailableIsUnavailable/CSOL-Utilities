@@ -26,7 +26,7 @@ if not Runtime_lua then
     Runtime.INTERRUPT_BURST_MODE = 0
     Runtime.INTERRUPT_SEQUENCE_MODE = 1
     Runtime.INTERRUPT_RANDOM_MODE = 2
-    Runtime.interrupt_mode = Runtime.INTERRUPT_SEQUENCE_MODE
+    Runtime.interrupt_mode = Runtime.INTERRUPT_BURST_MODE -- 默认采用猝发式中断
 
     Runtime.interrupt_mask_flag = false
     Runtime.interrupt_busy_flag = false
