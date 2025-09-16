@@ -64,7 +64,7 @@ if not Automation_lua then
         name = "复活、回合重置功能",
         handler = function()
             -- 当前未在挂机
-            local cmd = Command:claim()
+            local cmd = Command:fetch()
             if not Command:is_idle_command(cmd) then
                 return
             end
@@ -135,7 +135,7 @@ if not Automation_lua then
         name = "定期使用回血道具",
         handler = function()
             -- 当前未在挂机
-            local cmd = Command:claim()
+            local cmd = Command:fetch()
             if not Command:is_idle_command(cmd) then
                 return
             end

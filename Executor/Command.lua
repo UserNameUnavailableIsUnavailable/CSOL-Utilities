@@ -103,7 +103,7 @@ if not Command_lua then
     end
 
     ---领取待执行命令。
-    function Command:claim()
+    function Command:fetch()
         if self:is_valid() then
             return self.type
         end
