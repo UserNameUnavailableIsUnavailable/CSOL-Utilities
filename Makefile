@@ -2,7 +2,7 @@
 .SHELLFLAGS := -NoProfile -Command
 # 项目
 PROJECT_NAME := CSOL-Utilities
-VERSION = v1.5.3
+VERSION = v1.5.3.2
 PLATFORM = x64
 DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
 
@@ -33,11 +33,12 @@ BUNDLE_NAME = build/$(DISTRO).zip
 
 VPATH = $(BUILD_DIR)
 
-TARGETS = Controller Executor Manual Bundle Tool
+TARGETS = Controller Executor Manual Tool
 
-.PHONY: all clean $(TARGETS)
+.PHONY: all clean $(TARGETS) Bundle
 
 all: $(TARGETS)
+	$(MAKE) Bundle
 
 Controller: | $(BUILD_DIR)
 	$(MAKE) --directory="$(CONTROLLER_SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE=$(CONTROLLER_BUILD_TYPE) MODELS_PATH="$(MODELS_PATH)"

@@ -8,7 +8,7 @@ if not Main_lua then
             _VERSION
         )
     )
-    Version:set("Main", "1.5.2")
+    Version:set("Main", "1.5.3")
     Version:assert()
     ---注册完所有中断处理函数后，开中断。
     Runtime:enable_interrupt() -- 开中断

@@ -32,7 +32,7 @@ namespace CSOL_Utilities
 		static void Set(Command::TYPE cmd_type, Command::MODE mode = Command::CMD_DEFAULT);
 		static std::string Get();
 		static void Get(std::string& s);
-		static constexpr const char* NOP() { return "CommandType = Command.CMD_NOP\r\n"; }
+		static constexpr std::string_view NOP() { return "Command.directives={id=0,type=Command.CMD_NOP,timepoint=0,repeatable=false}"; }
 		static constexpr std::string_view QueryCommandString(Command::TYPE cmd_type) noexcept
 		{
 			switch (cmd_type)
@@ -93,14 +93,11 @@ namespace CSOL_Utilities
 
 		std::atomic_bool m_SpinLock;
 		
-		TYPE m_CmdType = TYPE::CMD_NOP;
-		uint64_t m_Id = 0;
-		bool m_Repeatable = false; /* 是否可重复 */
-		bool m_AutoRenew = false; /* 自动刷新 */
-		std::chrono::time_point<std::chrono::system_clock> m_Timepoint = std::chrono::system_clock::time_point(); /* 命令下达时刻 */
-		static constexpr std::string_view COMMAND_FORMAT = "CmdId = {}\r\n"
-															 "CmdType = {}\r\n"
-															 "CmdTimepoint = {}\r\n"
-															 "CmdRepeatable = {}\r\n";
+		TYPE type_ = TYPE::CMD_NOP;
+		uint64_t id_ = 0;
+		bool repeatable_ = false; /* 是否可重复 */
+		bool auto_renew_ = false; /* 自动刷新 */
+		std::chrono::time_point<std::chrono::system_clock> timepoint_ = std::chrono::system_clock::time_point(); /* 命令下达时刻 */
+		static constexpr std::string_view DIRECTIVES_TEMPLATE = "Command.directives={{id={}, type={},timepoint={},repeatable={}}}"; /* 指令模板 */
 	};
 } // namespace CSOL_Utilities

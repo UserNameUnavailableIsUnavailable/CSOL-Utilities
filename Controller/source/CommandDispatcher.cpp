@@ -33,21 +33,31 @@ void CommandDispatcher::Run(std::stop_token st)
 }
 
 CommandDispatcher::CommandDispatcher(std::filesystem::path command_file_path) :
-	cmd_file_path_(command_file_path), file_handle(INVALID_HANDLE_VALUE,
-												   [](HANDLE h)
-												   {
-													   if (h && h != INVALID_HANDLE_VALUE)
-													   {
-														   CloseHandle(h);
-													   }
-												   })
+	cmd_file_path_(std::move(command_file_path))
 {
-	file_handle.reset(CreateFileW(cmd_file_path_.wstring().c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS,
-								  FILE_ATTRIBUTE_HIDDEN, NULL));
-	if (file_handle.get() == INVALID_HANDLE_VALUE)
+	command_buffer_ = reinterpret_cast<BYTE*>(VirtualAlloc(nullptr, COMMAND_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+	if (!command_buffer_)
 	{
-		throw Exception(Translate("CommandDispatcher::ERROR_CreateFileW@2",
-								  ConvertUtf16ToUtf8(cmd_file_path_.wstring()), GetLastError()));
+		throw Exception(Translate("ERROR_Win32_API@2", "VirtualAlloc", GetLastError()));
+	}
+
+	constexpr auto attrbutes =
+		FILE_FLAG_NO_BUFFERING |
+		FILE_FLAG_WRITE_THROUGH;
+
+	file_handle_ = CreateFileW(
+		cmd_file_path_.wstring().c_str(),
+		GENERIC_WRITE,
+		FILE_SHARE_READ,
+		NULL,
+		CREATE_ALWAYS,
+		attrbutes,
+		NULL
+	);
+	if (file_handle_ == INVALID_HANDLE_VALUE)
+	{
+		throw Exception(Translate("ERROR_Win32_API@2", "CreateFileW",
+								  ConvertUtf16ToUtf8(cmd_file_path_.wstring())));
 	}
 }
 
@@ -105,26 +115,42 @@ void CommandDispatcher::Terminate() noexcept
 	if (worker_.joinable())
 		worker_.join();
 	booted_ = false; // 标记为未启动
+	WriteCommandFile(Command::NOP());
 }
 
-void CommandDispatcher::WriteCommandFile(const std::string& command_string)
+void CommandDispatcher::WriteCommandFile(std::string_view directives)
 {
 	DWORD dwBytesWritten = 0;
-	SetFilePointer(file_handle.get(), 0, NULL, FILE_BEGIN);
-	auto write_ok = WriteFile(file_handle.get(), command_string.c_str(), command_string.length() * sizeof(char),
+	SetFilePointer(file_handle_, 0, NULL, FILE_BEGIN);
+	memset(command_buffer_, ' ', COMMAND_BUFFER_SIZE); // 用空格清空缓冲区
+	assert(directives.length() < COMMAND_BUFFER_SIZE); // 命令不可能超过缓冲区大小
+	memcpy(command_buffer_, directives.data(), directives.length() * sizeof(char)); // 拷贝命令内容
+	auto ok = WriteFile(file_handle_, command_buffer_, COMMAND_BUFFER_SIZE,
 							  &dwBytesWritten, NULL);
-	if (write_ok)
+	FlushFileBuffers(file_handle_);
+	if (ok)
 	{
-		SetFilePointer(file_handle.get(), dwBytesWritten, NULL, FILE_BEGIN);
-		SetEndOfFile(file_handle.get());
+		// 直接写入 COMMAND_BUFFER_SIZE 字节，文件大小固定，因此不需要截断文件
+		// SetFilePointer(file_handle_, dwBytesWritten, NULL, FILE_BEGIN);
+		// SetEndOfFile(file_handle_);
 	}
 	else
 	{
-		Console::Warn(Translate("CommandDispatcher::ERROR_WriteFile@1", GetLastError()));
+		Console::Warn(Translate("ERROR_Win32_API@2", "WriteFile", GetLastError()));
 	}
 }
 
 CommandDispatcher::~CommandDispatcher() noexcept
 {
 	Terminate();
+	if (file_handle_ && file_handle_ != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(file_handle_);
+		file_handle_ = INVALID_HANDLE_VALUE;
+	}
+	if (command_buffer_)
+	{
+		VirtualFree(command_buffer_, 0, MEM_RELEASE);
+		command_buffer_ = nullptr;
+	}
 }
