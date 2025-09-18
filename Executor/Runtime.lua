@@ -129,7 +129,7 @@ if not Runtime_lua then
 
     ---粗发式中断处理。
     function Runtime:interrupt_in_burst()
-        local int_status = true
+        local int_status
         local int_result --[[@as any]]
         int_result = "INTERRUPT_HANDLER_SUCCESS"
         if
@@ -141,29 +141,28 @@ if not Runtime_lua then
         for _, interrupt in ipairs(self.interrupts) do
             -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
             if
-                interrupt:is_alive() -- 该中断可用
-                and (not interrupt:is_maskable() or not self:is_interrupt_masked()) -- 该中断不可屏蔽，或处于开中断状态
+                not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
             then
                 self:push_interrupt_mask_flag()
                 self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
                 self.interrupt_busy_flag = true
-                int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+                int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
                 self.interrupt_busy_flag = false
                 self:pop_interrupt_mask_flag() -- 开中断
             end
-        end
-        -- 中断处理完毕
-        if
-            not int_status -- 中断处理出现错误
-        then
-            error(int_result) -- 将中断处理过程中引发的错误上抛
+            -- 当前中断处理完毕
+            if
+                not int_status -- 中断处理出现错误
+            then
+                error(int_result) -- 将中断处理过程中引发的错误上抛
+            end
         end
     end
 
     Runtime.last_interrupt_id = 0
     ---顺序式中断处理。
     function Runtime:interrupt_in_sequence()
-        local int_status = true
+        local int_status
         local int_result --[[@as any]]
         int_result = "INTERRUPT_HANDLER_SUCCESS"
         if
@@ -179,13 +178,12 @@ if not Runtime_lua then
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
         if
-            interrupt:is_alive() -- 该中断可用
-            and (not interrupt:is_maskable() or not self:is_interrupt_masked()) -- 该中断不可屏蔽，或处于开中断状态
+            not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
         then
             self:push_interrupt_mask_flag()
             self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
             self.interrupt_busy_flag = true
-            int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+            int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
             self.interrupt_busy_flag = false
             self:pop_interrupt_mask_flag() -- 开中断
         end
@@ -200,7 +198,7 @@ if not Runtime_lua then
 
     ---随机式中断处理。
     function Runtime:interrupt_at_random()
-        local int_status = true
+        local int_status
         local int_result --[[@as any]]
         int_result = "INTERRUPT_HANDLER_SUCCESS"
         if
@@ -215,13 +213,12 @@ if not Runtime_lua then
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
         if
-            interrupt:is_alive() -- 该中断可用
-            and (not interrupt:is_maskable() or not self:is_interrupt_masked()) -- 该中断不可屏蔽，或处于开中断状态
+            not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
         then
             self:push_interrupt_mask_flag()
             self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
             self.interrupt_busy_flag = true
-            int_status, int_result = pcall(Interrupt.handle, interrupt) -- 处理中断
+            int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
             self.interrupt_busy_flag = false
             self:pop_interrupt_mask_flag() -- 开中断
         end

@@ -102,12 +102,12 @@ if not Automation_lua then
 
     Runtime.last_command_update_timepoint = 0
     Runtime:register_interrupt(Interrupt:new({
-        name = "命令即时响应功能",
+        name = "接收命令",
         handler = function()
             if Runtime:get_running_time() - Runtime.last_command_update_timepoint < 100 then
                 return
             end
-            Command:update() -- 更新命令
+            Command:receive() -- 更新命令
             Runtime.last_command_update_timepoint = Runtime:get_running_time()
             -- 命令类型发生变化，需要立即停止当前执行
             if (Command:get_status() & Command.TYPE_CHANGED) == Command.TYPE_CHANGED then

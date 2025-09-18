@@ -7,7 +7,7 @@ $Options = @{
 #	"--game-window-title" = "" # 游戏窗口标题，留空则默认为 "Counter-Strike Online"，其他区服应根据需要修改，例如 Steam 服应为 "Counter-Strike Nexon"
 	"--locale-resources-dir" = "$PSScriptRoot\Controller\Locales"
 	"--language" = "zh-CN"
-	"--executor-command-file-path" = "$PSScriptRoot\Executor\Temporary.lua"
+	"--executor-command-file-path" = "$PSScriptRoot\Executor\Directives.lua"
 	"--idle-engine-type" = "Classifier"
 	"--classifier-model-json-path" = "$PSScriptRoot\Controller\Models\Classifier\ResNet\CSOL-Utilities-ResNet18-800x600.json"
 }

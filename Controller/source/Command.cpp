@@ -1,6 +1,4 @@
 ﻿#include "Command.hpp"
-#include "Utilities.hpp"
-#include "Exception.hpp"
 
 namespace CSOL_Utilities
 {
@@ -11,21 +9,21 @@ namespace CSOL_Utilities
 
 		while (!self.m_SpinLock.compare_exchange_strong(expected, true, std::memory_order_seq_cst)) {}
 
-		if (self.m_AutoRenew) // 自动续期
+		if (self.auto_renew_) // 自动续期
 		{
 			auto tp = std::chrono::system_clock::now();
-			if (tp - self.m_Timepoint > std::chrono::milliseconds(4000)) // 超过 4 秒触发续期
+			if (tp - self.timepoint_ > std::chrono::milliseconds(4000)) // 超过 4 秒触发续期
 			{
-				self.m_Timepoint = tp;
+				self.timepoint_ = tp;
 			}
 		}
 
 		auto new_size =
-			std::formatted_size(COMMAND_FORMAT, self.m_Id, QueryCommandString(self.m_CmdType),
-								static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.m_Timepoint)), self.m_Repeatable);
+			std::formatted_size(DIRECTIVES_TEMPLATE, self.id_, QueryCommandString(self.type_),
+								static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.timepoint_)), self.repeatable_);
 		s.resize(new_size);
-		std::format_to(s.data(), COMMAND_FORMAT, self.m_Id, QueryCommandString(self.m_CmdType),
-					   static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.m_Timepoint)), self.m_Repeatable);
+		std::format_to(s.data(), DIRECTIVES_TEMPLATE, self.id_, QueryCommandString(self.type_),
+					   static_cast<int64_t>(std::chrono::system_clock::to_time_t(self.timepoint_)), self.repeatable_);
 		self.m_SpinLock.store(true, std::memory_order_release);
 	}
 
@@ -45,17 +43,17 @@ namespace CSOL_Utilities
 
 		auto now = std::chrono::system_clock::now();
 
-		if (self.m_CmdType == cmd_type && /* 连续下达同一命令 */
-			std::chrono::duration_cast<std::chrono::milliseconds>(now - self.m_Timepoint) < QueryCommandCoolDownTime(cmd_type))
+		if (self.type_ == cmd_type && /* 连续下达同一命令 */
+			std::chrono::duration_cast<std::chrono::milliseconds>(now - self.timepoint_) < QueryCommandCoolDownTime(cmd_type))
 		{
 			return; /* 冷却时间尚未结束 */
 		}
 
-		self.m_Id++;
-		self.m_CmdType = cmd_type;
-		self.m_Timepoint = static_cast<bool>(mode & CMD_ZERO_TIMESTAMP) ? std::chrono::time_point<std::chrono::system_clock>() : std::chrono::system_clock::now() ;
-		self.m_Repeatable = static_cast<bool>(mode & CMD_REPEATABLE);
-		self.m_AutoRenew = static_cast<bool>(mode & CMD_AUTO_REFRESH);
+		self.id_++;
+		self.type_ = cmd_type;
+		self.timepoint_ = static_cast<bool>(mode & CMD_ZERO_TIMESTAMP) ? std::chrono::time_point<std::chrono::system_clock>() : std::chrono::system_clock::now() ;
+		self.repeatable_ = static_cast<bool>(mode & CMD_REPEATABLE);
+		self.auto_renew_ = static_cast<bool>(mode & CMD_AUTO_REFRESH);
 		self.m_SpinLock.store(false, std::memory_order_release); // 解锁
 	}
 

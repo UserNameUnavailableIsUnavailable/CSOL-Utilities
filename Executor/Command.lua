@@ -52,28 +52,34 @@ if not Command_lua then
         return self.status
     end
 
+    ---指令的默认内容。
+    ---读取命令文件后，`Command.directives` 会被更新为最新的命令内容。
+    Command.directives = {
+        id = 0,
+        type = Command.CMD_NOP,
+        timepoint = 0,
+        repeatable = true,
+    }
+
     ---读取命令文件。
-    function Command:update()
+    function Command:receive()
         local status = 0
-        pcall(Include, "Temporary.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
-        CmdId = CmdId or 0
-        CmdType = CmdType or Command.CMD_NOP
-        CmdTimepoint = CmdTimepoint or 0
-        if CmdId ~= self.id then
-            self.id = CmdId
+        pcall(Include, "Directives.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
+        if Command.directives.id ~= self.id then
+            self.id = Command.directives.id
             self.finished = false -- 新的命令，将完成状态设置为 false
             status = status | Command.IDENTIFIER_CHANGED
         end
-        if CmdType ~= self.type then
-            self.type = CmdType
+        if Command.directives.type ~= self.type then
+            self.type = Command.directives.type
             status = status | Command.TYPE_CHANGED
         end
-        if CmdTimepoint ~= self.timepoint then
-            self.timepoint = CmdTimepoint
+        if Command.directives.timepoint ~= self.timepoint then
+            self.timepoint = Command.directives.timepoint
             status = status | Command.TIMEPOINT_CHANGED
         end
-        if CmdRepeatable ~= self.repeatable then
-            self.repeatable = not self.repeatable
+        if Command.directives.repeatable ~= self.repeatable then
+            self.repeatable = Command.directives.repeatable
             status = status | Command.REPEATABILITY_CHANGED
         end
         Command.status = status
