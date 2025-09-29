@@ -5,15 +5,22 @@
 
 namespace CSOL_Utilities
 {
-    class Exception : public std::exception
+class Exception : public std::exception
+{
+  public:
+    Exception(std::string s) : m_ErrorString(s)
     {
-    public:
-        Exception(std::string s) : m_ErrorString(s) {}
-        virtual const char* what() const noexcept override { return m_ErrorString.c_str(); }
-    private:
-        std::string m_ErrorString;
-    };
-}
+    }
+    virtual const char *what() const noexcept override
+    {
+        return m_ErrorString.c_str();
+    }
 
-#define DetailedQuickThrow(string) \
-	throw CSOL_Utilities::Exception(CSOL_Utilities::Translate("Exception::DETAILED_QUICK_THROW_TEMPLATE@4", __FILE__, __LINE__, __func__, string))
+  private:
+    std::string m_ErrorString;
+};
+} // namespace CSOL_Utilities
+
+#define DetailedQuickThrow(string)                                                                                     \
+    throw CSOL_Utilities::Exception(                                                                                   \
+        CSOL_Utilities::Translate("Exception::DETAILED_QUICK_THROW_TEMPLATE@4", __FILE__, __LINE__, __func__, string))

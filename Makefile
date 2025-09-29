@@ -10,7 +10,7 @@ DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
 BUILD_DIR = build/$(DISTRO)
 
 # Controller
-# 模型文件路径需在命令行参数中指定，需为 **绝对路径**
+# 模型文件路径需在命令行参数中指定，须为 **绝对路径**
 MODELS_PATH :=
 # 源代码目录
 CONTROLLER_SOURCE_DIR := Controller
