@@ -14,7 +14,8 @@ $Options = @{
 
 $Flags = @(
 	"--suppress-CSOBanner",
-	"--default-idle-after-reconnection"
+	"--default-idle-after-reconnection",
+    "--restart-game-on-loading-timeout"
 )
 
 $Parameters = @()

@@ -1,8 +1,9 @@
 #include "Classifier.hpp"
-#include "Utilities.hpp"
-#include "Exception.hpp"
-#include "ModelUtilities.hpp"
+
 #include <nlohmann/json.hpp>
+
+#include "Exception.hpp"
+#include "Utilities.hpp"
 
 using namespace CSOL_Utilities;
 
@@ -49,9 +50,9 @@ Classifier::Classifier(std::filesystem::path json_path)
     {
         throw Exception(Translate("ERROR_MandatoryFieldMissing@1", "labels"));
     }
-    for (auto& item : metadata_json["labels"])
+    for (auto &item : metadata_json["labels"])
     {
-        for (auto& [key, value] : item.items())
+        for (auto &[key, value] : item.items())
         {
             int index = std::stoi(key);
             labels_.emplace(index, value.get<std::string>());
@@ -99,17 +100,17 @@ Classifier::Classifier(std::filesystem::path json_path)
     auto output_names = session_->GetOutputNames();
     std::swap(input_names_, input_names);
     std::swap(output_names_, output_names);
-    for (auto& name : input_names_)
+    for (auto &name : input_names_)
     {
         input_names_c_str_.emplace_back(name.c_str());
     }
-    for (auto& name : output_names_)
+    for (auto &name : output_names_)
     {
         output_names_c_str_.emplace_back(name.c_str());
     }
 }
 
-std::vector<float> Classifier::Preprocess(const cv::Mat& image)
+std::vector<float> Classifier::Preprocess(const cv::Mat &image)
 {
     cv::Mat processed_image;
     // 上下左右各填充 50 像素
@@ -122,9 +123,9 @@ std::vector<float> Classifier::Preprocess(const cv::Mat& image)
     {
         cv::cvtColor(processed_image, processed_image, cv::COLOR_BGRA2BGR);
     }
-    #ifdef _DEBUG
+#ifdef _DEBUG
     cv::imwrite("preprocessed_image.bmp", processed_image);
-    #endif
+#endif
     // reshape to 1D
     processed_image = processed_image.reshape(1, 1);
     std::vector<float> raw_image;
@@ -143,24 +144,21 @@ std::vector<float> Classifier::Preprocess(const cv::Mat& image)
     return raw_tensor;
 }
 
-std::string Classifier::Run(const cv::Mat& image)
+std::string Classifier::Run(const cv::Mat &image)
 {
     std::vector<float> raw_tensor = Preprocess(image);
     assert(!raw_tensor.empty());
     std::array<int64_t, 4> shape{1, input_channels_, input_height_, input_width_};
     Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
-    // 重要：创建 tensor 后，tensor 内部保存 raw_tensor 的指针，因此 raw_tensor 变量必须在 tensor 生命周期内有效
-    auto input_tensor = Ort::Value::CreateTensor<float>(memory_info, raw_tensor.data(), raw_tensor.size(), shape.data(), shape.size());
+    // 重要：创建 tensor 后，tensor 内部保存 raw_tensor 的指针，因此 raw_tensor
+    // 变量必须在 tensor 生命周期内有效
+    auto input_tensor =
+        Ort::Value::CreateTensor<float>(memory_info, raw_tensor.data(), raw_tensor.size(), shape.data(), shape.size());
     assert(input_tensor.IsTensor());
-    auto output_tensors = session_->Run(
-        Ort::RunOptions(),
-        input_names_c_str_.data(),
-        &input_tensor,
-        input_names_c_str_.size(),
-        output_names_c_str_.data(),
-        output_names_c_str_.size()
-    );
-    float* output_tensor = output_tensors.front().GetTensorMutableData<float>();
+    auto output_tensors =
+        session_->Run(Ort::RunOptions(), input_names_c_str_.data(), &input_tensor, input_names_c_str_.size(),
+                      output_names_c_str_.data(), output_names_c_str_.size());
+    float *output_tensor = output_tensors.front().GetTensorMutableData<float>();
     // softmax 归一化
     std::vector<float> probabilities(labels_.size());
     for (size_t i = 0; i < labels_.size(); ++i)
@@ -168,15 +166,15 @@ std::string Classifier::Run(const cv::Mat& image)
         probabilities[i] = std::exp(output_tensor[i]);
     }
     float sum = std::accumulate(probabilities.begin(), probabilities.end(), 0.0f);
-    for (auto& p : probabilities)
+    for (auto &p : probabilities)
     {
         p /= sum;
     }
-	auto max_item = std::max_element(probabilities.begin(), probabilities.end());
+    auto max_item = std::max_element(probabilities.begin(), probabilities.end());
     // 置信度检测
     if (*max_item < confidence_threshold_)
     {
-		return {}; // 置信度过低，返回空字符串
-	}
-	return labels_[std::distance(probabilities.begin(), max_item)];
+        return {}; // 置信度过低，返回空字符串
+    }
+    return labels_[std::distance(probabilities.begin(), max_item)];
 }

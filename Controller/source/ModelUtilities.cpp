@@ -2,7 +2,7 @@
 
 namespace CSOL_Utilities
 {
-std::vector<Ort::AllocatedStringPtr> GetInputNames(Ort::Session& session)
+std::vector<Ort::AllocatedStringPtr> GetInputNames(Ort::Session &session)
 {
     Ort::AllocatorWithDefaultOptions allocator;
     const size_t numInputNodes = session.GetInputCount();
@@ -20,7 +20,7 @@ std::vector<Ort::AllocatedStringPtr> GetInputNames(Ort::Session& session)
     return inputNamesPtr;
 }
 
-std::vector<Ort::AllocatedStringPtr> GetOutputNames(Ort::Session& session)
+std::vector<Ort::AllocatedStringPtr> GetOutputNames(Ort::Session &session)
 {
     Ort::AllocatorWithDefaultOptions allocator;
     const size_t numOutputNodes = session.GetOutputCount();
@@ -36,4 +36,4 @@ std::vector<Ort::AllocatedStringPtr> GetOutputNames(Ort::Session& session)
     }
     return outputNamesPtr;
 }
-}
+} // namespace CSOL_Utilities
