@@ -7,7 +7,7 @@
     Include("Mouse.lua")
     Include("Keyboard.lua")
     Include("Version.lua")
-    Version:set("Weapon", "1.5.2")
+    Version:set("Weapon", "1.5.3")
     Version:require("Weapon", "Setting", "1.5.2", nil)
 
     ---@class Weapon 武器类
@@ -23,11 +23,11 @@
     ---@field purchase_sequence table 购买按键序列
     ---@field reloading_required boolean 是否需要换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
     ---@field reload_key string 重新装填按键
-    ---@field attack_duration integer 攻击持续时间，默认为 1000 毫秒
+    ---@field attack_duration integer 攻击持续时间，单位为秒，默认为 10 秒
     ---@field horizontal_strafe_mode string|nil 武器水平扫射模式，`"none"` 为无扫射，`"left"` 为固定向左，`"right"` 为固定向右，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（左右交替扫射）。该字段缺省值为 `"random"`。
     ---@field vertical_strafe_mode string|nil 武器垂直扫射模式，`"none"` 为无扫射，`"up"` 为固定向上，`"down"` 为固定向下，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（上下交替扫射）。该字段缺省值为 `"oscillating"`。
-    ---@field horizontal_strafe_direction integer 水平扫射方向，`1` 为右，`0` 为静止，`-1` 为左。
-    ---@field vertical_strafe_direction integer 垂直扫射方向，`1` 为上，`0` 为静止，`-1` 为下。
+    ---@field dx integer|fun():integer 每一轮水平扫射的距离
+    ---@field dy integer|fun():integer 每一轮垂直扫射的距离
     Weapon = {}
 
     Weapon.NULL = Keyboard.ZERO
@@ -42,11 +42,11 @@
     Weapon.purchase_sequence = {}
     Weapon.reloading_required = true
     Weapon.reload_key = Keyboard.R
-    Weapon.attack_duration = 10 * 1000
-    Weapon.horizontal_strafe_direction = 0
-    Weapon.vertical_strafe_direction = 0
+    Weapon.attack_duration = 10
     Weapon.horizontal_strafe_mode = "random"
     Weapon.vertical_strafe_mode = "oscillating"
+    Weapon.dx = 0
+    Weapon.dy = 0
 
     ---设置换弹按键。
     ---@param key string
@@ -174,9 +174,8 @@
     end
 
     ---切换到指定武器，不考虑切枪延迟。
-    ---@return nil
     function Weapon:switch_without_delay()
-        Keyboard:click(self.number, 10)
+        Keyboard:click(self.number, 0)
     end
 
     ---按下 `Keyboard.G` 键丢弃武器。
@@ -218,48 +217,12 @@
         Mouse:release(self.attack_button)
     end
 
-    ---使用武器时进行扫射。
-    function Weapon:strafe()
-        local dx = self.horizontal_strafe_direction
-        local dy = self.vertical_strafe_direction
-        if self.horizontal_strafe_mode == "oscillating" then
-            dx = math.sin(Runtime:get_running_time() / 1000)
-        end
-        if self.vertical_strafe_mode == "oscillating" then
-            dy = math.sin(Runtime:get_running_time() / 1000)
-        end
-        dx = dx * 50 * Setting.FIELD_IN_GAME_SENSITIVITY
-        dy = dy * 100 * Setting.FIELD_IN_GAME_SENSITIVITY
-        dx = math.floor(dx)
-        dy = math.floor(dy)
-        Mouse:move_relative(dx, dy, 10)
-    end
-
-    ---攻击迭代。
-    ---@param round integer 攻击轮次。`round == 0` 时，攻击开始；`round > 0` 时，攻击可以进行（可通过返回 `nil` 提前结束）；`round < 0` 时，攻击需要提前结束（必须正确处理此情形）。
-    ---@param begin_timepoint integer 攻击开始的时刻
-    ---@return function|nil # 下一轮需要进行的攻击操作，返回 `nil` 表示结束当前武器的攻击。
-    function Weapon:next_attack_action(round, begin_timepoint)
-        if round == 0 then
-            -- 初始化扫射方向
-            if self.horizontal_strafe_mode == "none" then
-                self.horizontal_strafe_direction = 0
-            elseif self.horizontal_strafe_mode == "left" then
-                self.horizontal_strafe_direction = -1
-            elseif self.horizontal_strafe_mode == "right" then
-                self.horizontal_strafe_direction = 1
-            elseif self.horizontal_strafe_mode == "random" then
-                self.horizontal_strafe_direction = Utility:random_direction()
-            end
-            if self.vertical_strafe_mode == "none" then
-                self.vertical_strafe_direction = 0
-            elseif self.vertical_strafe_mode == "up" then
-                self.vertical_strafe_direction = -1
-            elseif self.vertical_strafe_mode == "down" then
-                self.vertical_strafe_direction = 1
-            elseif self.vertical_strafe_mode == "random" then
-                self.vertical_strafe_direction = Utility:random_direction()
-            end
+    ---开火迭代器。
+    ---@param round integer 攻击轮次。`round == 0` 时，开始开火；`round > 0` 时，持续开火（可通过返回 `nil` 提前结束）；`round < 0` 时，开火需要提前结束（必须正确处理此情形）。
+    ---@param begin_timepoint integer 开始开火的时刻
+    ---@return function|nil # 下一轮需要进行的开火操作，返回 `nil` 表示停止开火。
+    function Weapon:fire_interator(round, begin_timepoint)
+        if round == 0 then -- 初始化扫射方向
             return function()
                 Mouse:press(self.attack_button) -- 按下攻击按钮，开始攻击
             end
@@ -270,9 +233,61 @@
             end
         end
         if round > 0 then
-            return function()
-               self:strafe() -- 扫射
+            return function() end -- 保持开火状态
+        end
+    end
+
+    ---扫射迭代器。
+    ---@param round integer 扫射轮次。`round == 0` 时，扫射开始；`round > 0` 时，扫射可以进行（可通过返回 `nil` 提前结束）；`round < 0` 时，扫射需要提前结束（必须正确处理此情形）。
+    ---@param begin_timepoint integer 扫射开始的时刻
+    ---@return function|nil # 下一轮需要进行的扫射操作，返回 `nil` 表示结束当前武器的扫射。
+    function Weapon:strafe_interator(round, begin_timepoint)
+        if round < 0 then
+            return nil -- 强制结束扫射
+        end
+        
+        if round == 0 then -- 初始化扫射方向
+            if self.horizontal_strafe_mode == "none" then
+                self.dx = 0
+            elseif self.horizontal_strafe_mode == "left" then
+                self.dx = math.ceil(- 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.horizontal_strafe_mode == "right" then
+                self.dx = math.ceil(50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.horizontal_strafe_mode == "random" then
+                self.dx = math.ceil(Utility:random_direction() * 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.horizontal_strafe_mode == "oscillating" then
+                self.dx = function()
+                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                end
             end
+            if self.vertical_strafe_mode == "none" then
+                self.dy = 0
+            elseif self.vertical_strafe_mode == "up" then
+                self.dy = math.ceil(- 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.vertical_strafe_mode == "down" then
+                self.dy = math.ceil(100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.vertical_strafe_mode == "random" then
+                self.dy = math.ceil(Utility:random_direction() * 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+            elseif self.vertical_strafe_mode == "oscillating" then
+                self.dy = function()
+                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                end
+            end
+        end
+        return function()
+            local dx = 0
+            local dy = 0
+            if type(self.dx) == "function" then
+                dx = self.dx()
+            else
+                dx = self.dx --[[@as integer]]
+            end
+            if type(self.dy) == "function" then
+                dy = self.dy()
+            else
+                dy = self.dy --[[@as integer]]
+            end
+            Mouse:move_relative(dx, dy, 10) -- 移动鼠标进行扫射
         end
     end
 
@@ -281,15 +296,20 @@
         local timepoint = Runtime:get_running_time()
         local round = 0
         repeat
-            local act = self:next_attack_action(round, timepoint)
+            local fire = self:fire_interator(round, timepoint)
+            local strafe = self:strafe_interator(round, timepoint)
             round = round + 1
-            if act then
-                act()
+            if fire and strafe then
+                fire()
+                strafe()
             else
                 break
             end
-        until Runtime:get_running_time() - timepoint > self.attack_duration
-        local disposal = self:next_attack_action(-1, timepoint) -- 强制结束攻击
+        until Runtime:get_running_time() - timepoint > self.attack_duration * 1000
+        local disposal
+        disposal = self:fire_interator(-1, timepoint) -- 强制结束攻击
+        if disposal then disposal() end
+        disposal = self:strafe_interator(-1, timepoint) -- 强制结束扫射
         if disposal then disposal() end
     end
 end -- Weapon_lua

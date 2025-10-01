@@ -22,7 +22,7 @@ const raw_value = computed({
     get() {
         let ret = props.value;
         if (!ret) { // 处理空值
-            return props.quoted ? `""` : "";
+            return "";
         }
         if (props.check && !props.check(ret)) {
             legal.value = false; // 设置为非法

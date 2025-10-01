@@ -1,6 +1,6 @@
 <!-- Armor 和 PartWeapon 使用的配置控件 -->
 <script lang="ts" setup>
-import { GenerateWeaponCode } from '../../scripts/Weapon';
+import { GenerateWeaponCode, HORIZONTAL_STRAFE_MODES, VERTICAL_STRAFE_MODES } from '../../scripts/Weapon';
 import CodeSnippet from '../CodeSnippet.vue';
 import { computed, ref, watch } from 'vue';
 import BasicKeystrokes from '../BasicKeystrokes.vue';
@@ -13,6 +13,7 @@ import { ResolveWeapon } from '../../scripts/Weapon';
 const props = defineProps<{
     fields: Record<string, string>
     type: "Conventional" | "Special"
+    remarks?: string[]
 }>();
 
 const emit = defineEmits<{
@@ -44,11 +45,11 @@ watch(() => props.type, () => {
         .then(response => response.text())
         .then(text => {
             const listing = YAML.load(text) as {
-                Conventional: { weapon: string, name: string, file: string }[]
-                Special: { weapon: string, name: string, file: string }[]
+                Conventional: { id: string, zh_CN: string, file: string }[]
+                Special: { id: string, zh_CN: string, file: string }[]
             };
             listing[props.type].forEach(e => {
-                options.value.push({ description: e.name, content: e.weapon, remark: e.file });
+                options.value.push({ description: e.zh_CN, content: e.id, remark: e.file });
             });
         });
 }, {
@@ -60,6 +61,8 @@ const fields = ref<Record<string, string>>({});
 watch(() => props.fields, (_fields) => {
     _fields.name = _fields["name"] ?? "\"\"";
     _fields.purchase_sequence = _fields["purchase_sequence"] ?? "{}";
+    _fields.horizontal_strafe_mode = _fields["horizontal_strafe_mode"] ?? "\"random\"";
+    _fields.vertical_strafe_mode = _fields["vertical_strafe_mode"] ?? "\"none\"";
     fields.value = _fields;
 }, {
     immediate: true,
@@ -89,7 +92,7 @@ async function update_template(weapon: string) {
                 const ast = luaparse.parse(code).body[0].expression;
                 const template_weapon: Record<string, string> = {};
                 ResolveWeapon(ast, template_weapon);
-                fields.value["template_name"] = `"${item.description}"`;
+                fields.value["template_name"] = `"${item.content}"`;
                 for (const k in template_weapon) {
                     if (
                         // 排除用户自行定义的字段
@@ -111,7 +114,9 @@ const raw_template_name = computed({
     },
     async set(v: string) {
         await update_template(v);
-        emit("update:fields", fields.value)
+        emit("update:fields", fields.value);
+        const name = options.value.find(e => e.content === v)?.description ?? "";
+        fields.value["name"] = `"${name}"`;
     }
 })
 </script>
@@ -124,6 +129,25 @@ const raw_template_name = computed({
         @update:value="update_field('purchase_sequence', $event)" />
     <br>
     <BasicSelect label="模板" v-model:value="raw_template_name" :options="options" />
+    <br>
+    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].content)" />
+    <br>
+    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].content)" />
+    <div>
+        <ul>
+            <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
+            <li>
+                J 键可切换 T / CT 阵营武器购买界面。
+            </li>
+            <li>
+                扫射方向即使用武器攻击时视角的运动方向，分解为水平和垂直两个方向。水平方向一般选为随机，垂直方向按实际需求进行调整。例如，刷狂戮巨蚊、鹞子风筝时可选为固定向上。
+            </li>
+            <li>
+                对于部分定制类武器（尤其是 4 号位武器），扫射方向不会生效。
+            </li>
+        </ul>
+    </div>
+
     <div style="max-width: 50%;">
         <CodeSnippet format :snippet="GenerateWeaponCode(fields)" />
     </div>

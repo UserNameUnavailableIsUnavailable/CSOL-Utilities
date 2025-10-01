@@ -22,6 +22,7 @@ if not Automation_lua then
     ---@class Automation
     ---@field default_player Player
     ---@field extended_player Player
+    ---@field active_player Player|nil
     ---@field last_reset_or_respawn_time integer
     ---@field last_use_health_potion_30_timepoint integer
     ---@field last_use_health_potion_100_timepoint integer
@@ -83,6 +84,8 @@ if not Automation_lua then
     Player:set_respawn_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 复活按键
 
     -- 为默认挂机模式和扩展挂机模式创建两个玩家对象。
+
+    Automation.active_player = nil -- 当前活动的玩家对象
 
     ---默认模式挂机玩家对象。
     Automation.default_player = Player:new({
@@ -153,6 +156,28 @@ if not Automation_lua then
         end,
     }))
 
+    local last_anti_shock_timepoint = 0
+    Runtime:register_interrupt(Interrupt:new({
+        name = "防震枪",
+        handler = function()
+            local cmd = Command:fetch()
+            if
+                not Command:is_idle_command(cmd) or
+                not Automation.active_player
+            then
+                return
+            end
+            local current_weapon = Automation.active_player:get_current_weapon()
+            local tp = Runtime:get_running_time()
+            if
+                current_weapon and
+                tp - last_anti_shock_timepoint > 1000 -- 每隔 1 秒执行一次
+            then
+                current_weapon:switch_without_delay() -- 切换到当前武器，防止震枪
+                last_anti_shock_timepoint = tp
+            end
+        end
+    }))
 
     ---创建游戏房间。
     function Automation:create_game_room()
@@ -407,17 +432,25 @@ if not Automation_lua then
         [Command.CMD_CHOOSE_CHARACTER] = Automation.choose_character,
         [Command.CMD_DEFAULT_IDLE] = function()
             Automation:confirm_results()
+            Automation.active_player = Automation.default_player
             Automation.default_player:play()
+            Automation.active_player = nil
         end,
         [Command.CMD_EXTENDED_IDLE] = function()
             Automation:confirm_results()
+            Automation.active_player = Automation.extended_player
             Automation.extended_player:play()
+            Automation.active_player = nil
         end,
         [Command.CMD_DEFAULT_IDLE_2] = function()
+            Automation.active_player = Automation.default_player
             Automation.default_player:play()
+            Automation.active_player = nil
         end,
         [Command.CMD_EXTENDED_IDLE_2] = function()
+            Automation.active_player = Automation.extended_player
             Automation.extended_player:play()
+            Automation.active_player = nil
         end,
         [Command.CMD_CONFIRM_RESULTS] = function()
             Automation:confirm_results()

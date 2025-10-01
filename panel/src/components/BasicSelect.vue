@@ -16,7 +16,10 @@ const value = computed({
     get() {
         return props.value;
     },
-    set(v: string) {
+    set(v: string|undefined) {
+        if (!v) {
+            v = props.options[0]?.content;
+        }
         emit("update:value", v);
     }
 })

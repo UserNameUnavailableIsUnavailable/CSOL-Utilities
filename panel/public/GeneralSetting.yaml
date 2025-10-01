@@ -293,6 +293,7 @@ children:
             title: 自定义房间密码
             type: FIELD
             label: 密码
+            value: ""
             hint: 由数字、大小写字母组成
             quoted: true
             depends_on:
@@ -376,7 +377,7 @@ children:
             value: "true"
           - id: GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN
             title: 角色技能冷却时间
-            annotation: 角色技能冷却时间，单位为秒，默认为 <code>math.huge</code>，代表 +∞（即处于不启用状态），请按需修改。
+            annotation: 角色技能冷却时间，单位为秒，默认为 <code class="language-lua">math.huge</code>，代表 +∞（即处于不启用状态），请按需修改。
             type: FIELD
             legacy_name: CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME
             depends_on:
