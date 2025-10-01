@@ -1,20 +1,30 @@
 Conventional:
-  - weapon: 神鬼开天
-    name: 神鬼开天
-    file: 神鬼开天.lua
-  - weapon: 魔神开天
-    name: 魔神开天
-    file: 魔神开天.lua
-  - weapon: 万钧神威
-    name: 万钧神威
-    file: 万钧神威.lua
+  - id: TwinShadowAxes
+    en_US: Twin Shadow Axes
+    zh_CN: 神鬼开天
+    file: TwinShadowAxes.lua
+  - id: TwinLightAxes
+    en_US: Twin Light Axes
+    zh_CN: 魔神开天
+    file: TwinLightAxes.lua
+  - id: Brionac
+    en_US: Brionac
+    zh_CN: 万钧神威
+    file: Brionac.lua
 Special:
-  - weapon: 圣翼皓印
-    name: 圣翼皓印
-    file: 圣翼皓印.lua
-  - weapon: 炽翼魔印
-    name: 炽翼魔印
-    file: 炽翼魔印.lua
-  - weapon: 【幽浮】控制核心
-    name: 【幽浮】控制核心
-    file: 【幽浮】控制核心.lua
+  - id: Sandalphon
+    en_US: Sandalphon
+    zh_CN: 圣翼皓印
+    file: Sandalphon.lua
+  - id: Belial
+    en_US: Belial
+    zh_CN: 炽翼魔印
+    file: Belial.lua
+  - id: Hellhound
+    en_US: Hellhound
+    zh_CN: 【幽浮】控制核心
+    file: Hellhound.lua
+  - id: Lycaon
+    en_US: Lycaon
+    zh_CN: 夙狼夜契
+    file: Lycaon.lua

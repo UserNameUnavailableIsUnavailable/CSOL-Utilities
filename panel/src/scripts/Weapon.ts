@@ -1,5 +1,21 @@
 import * as LuaASTUtil from "./LuaASTUtil";
 
+export const VERTICAL_STRAFE_MODES = [
+    { description: "无", content: "\"none\"" },
+    { description: "固定向上", content: "\"up\"" },
+    { description: "固定向下", content: "\"down\"" },
+    { description: "随机", content: "\"random\"" },
+    { description: "简谐振动（上下交替）", content: "\"oscillating\"" }
+];
+
+export const HORIZONTAL_STRAFE_MODES = [
+    { description: "无", content: "\"none\"" },
+    { description: "固定向左", content: "\"left\"" },
+    { description: "固定向右", content: "\"right\"" },
+    { description: "随机", content: "\"random\"" },
+    { description: "简谐振动（左右交替）", content: "\"oscillating\"" }
+];
+
 export type AttackButton_T = "Mouse.LEFT" | "Mouse.RIGHT"; // 攻击按键类型
 export const AttackButton_T = {
     LEFT: "Mouse.LEFT" as "Mouse.LEFT", // 左键
@@ -87,7 +103,7 @@ export function GenerateWeaponCode(weapon: Record<string, string>) {
 }
 
 export function ResolveWeaponList(ast: any) {
-    const armor: Record<string, string> = {};
+    let armor: Record<string, string>|null = null;
     const default_part_weapons = new Array<Record<string, string>>();
     const extended_part_weapons = new Array<Record<string, string>>();
     const default_conventional_weapons = new Array<Record<string, string>>();
@@ -112,6 +128,7 @@ export function ResolveWeaponList(ast: any) {
                 let variable_name = LuaASTUtil.GenerateLuaCodeFromAST(node.variables[index], 0)
                 if (variable_name === "Armor" || variable_name === "AC") {
                     const weapon_new_call = ConvertTableCallExpressionToCallExpression(node.init[index]) ;
+                    armor = {};
                     ResolveWeapon(weapon_new_call, armor);
                 } else if (variable_name === "DefaultPartWeapons" || variable_name === "PartWeaponList") {
                     let weapons = node.init[index].fields

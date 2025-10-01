@@ -25,7 +25,7 @@
 
     <h2>护甲</h2>
     <div v-if="armor" class="weapon-widget">
-        <NullWeapon v-model:fields="armor" @update:fields="dirty++" />
+        <NullWeapon v-model:fields="armor" @update:fields="dirty++" :remarks="armor_remarks" />
         <button class="widget-button" v-if="armor" @click="delete_armor()">删除</button>
     </div>
     <button class="widget-button" v-if="!armor" @click="add_armor()">添加</button>
@@ -33,15 +33,15 @@
     <div v-show="tag==='default'">
         <h2>配件武器</h2>
         <div class="weapon-widget" v-for="w, id in default_part_weapons" :key="id">
-            <NullWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_part_weapons)" />
+            <NullWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_part_weapons)" :remarks="part_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, default_part_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_part_weapon(default_part_weapons)">添加</button>
 
         <h2>常规武器</h2>
         <div class="weapon-widget" v-for="w, id in default_conventional_weapons" :key="id">
-            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)"  type="Conventional" />
-            <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)" />
+            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" />
+            <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)" :remarks="normal_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, default_conventional_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_conventional_weapon(false, default_conventional_weapons)">添加（生成普通代码）</button>
@@ -49,7 +49,7 @@
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in default_special_weapons" :key="id">
-            <CustomizedWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_special_weapons)" type="Special" />
+            <CustomizedWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_special_weapons)" type="Special" :remarks="customized_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, default_special_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_special_weapon(default_special_weapons)">添加</button>
@@ -58,15 +58,15 @@
     <div v-show="tag==='extended'">
         <h2>配件武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_part_weapons" :key="id">
-            <NullWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_part_weapons)" />
+            <NullWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_part_weapons)" :remarks="part_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, extended_part_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_part_weapon(extended_part_weapons)">添加</button>
 
         <h2>常规武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_conventional_weapons" :key="id">
-            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)"  type="Conventional" />
-            <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)" />
+            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" />
+            <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)" :remarks="normal_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, extended_conventional_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_conventional_weapon(false, extended_conventional_weapons)">添加（生成普通代码）</button>
@@ -74,7 +74,7 @@
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_special_weapons" :key="id">
-            <CustomizedWeapon v-bind:fields="unref(w)" @update:fields="update_weapon(id, $event, extended_special_weapons)" type="Special" />
+            <CustomizedWeapon v-bind:fields="unref(w)" @update:fields="update_weapon(id, $event, extended_special_weapons)" type="Special" :remarks="customized_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, extended_special_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_special_weapon(extended_special_weapons)">添加</button>
@@ -113,6 +113,28 @@ import { SaveAs } from '../scripts/Utilities';
 
 const tag = ref("default");
 
+const armor_remarks = [
+    "J 键可切换 T / CT 阵营武器购买界面。",
+    "若装备购买界面中没有护甲，可将护甲购买序列设置为：B R。"
+];
+
+const part_weapon_remarks = [
+    "J 键可切换 T / CT 阵营武器购买界面。",
+    "配件武器不参与攻击，仅使用其增益效果（如安装生命配件、伤害配件的武器）。"
+];
+
+const normal_weapon_remarks = [
+    "J 键可切换 T / CT 阵营武器购买界面。",
+    "攻击持续时间不建议过长，取值在 0 ~ 20 秒为宜，可依据武器弹夹容量进行适当调整。",
+    "扫射方向即使用武器攻击时视角的运动方向，分解为水平和垂直两个方向。水平方向一般选为随机，垂直方向按实际需求进行调整。例如，刷狂戮巨蚊、鹞子风筝时可选为固定向上。"
+];
+
+const customized_weapon_remarks = [
+    "J 键可切换 T / CT 阵营武器购买界面。",
+    "扫射方向即使用武器攻击时视角的运动方向，分解为水平和垂直两个方向。水平方向一般选为随机，垂直方向按实际需求进行调整。例如，刷狂戮巨蚊、鹞子风筝时可选为固定向上。",
+    "对于部分定制类武器（尤其是 4 号位武器），扫射方向不会生效。"
+];
+
 type WeaponFields = Record<string, string>;
 type WeaponList = Record<number, Ref<WeaponFields>>;
 
@@ -120,7 +142,7 @@ type WeaponList = Record<number, Ref<WeaponFields>>;
 let weapon_id = 0;
 const dirty = ref(0);
 // 护甲
-const armor = ref<WeaponFields>();
+const armor = ref<WeaponFields|null>();
 
 function add_armor() {
     armor.value = {
@@ -131,7 +153,7 @@ function add_armor() {
 }
 
 function delete_armor() {
-    armor.value = undefined;
+    armor.value = null;
     dirty.value++;
 }
 
@@ -286,7 +308,8 @@ function export_weapon_list() {
     `\tWeaponList_lua = true\n` +
     `\tInclude("Version.lua")\n`+
     `\tVersion:set("WeaponList", "${VERSION}")\n` +
-    `\tVersion:require("WeaponList", "Setting", "1.5.2")\n` +
+    `\tVersion:require("WeaponList", "Setting", "1.5.3")\n` +
+    `\tVersion:require("WeaponList", "Weapon", "1.5.3")\n` +
     `\t${blocks.join("\n")}\n` +
     `end\n`;
     console.log(ret);

@@ -4,6 +4,7 @@ if not Player_lua then
     Include("Keyboard.lua")
     Include("Weapon.lua")
     Include("Mouse.lua")
+    Include("Interrupt.lua")
     Include("Runtime.lua")
     Include("Utility.lua")
     Include("DateTime.lua")
@@ -22,6 +23,7 @@ if not Player_lua then
     ---@field private last_part_weapon_index integer 最近一次购买的配件武器序号
     ---@field private last_buy_special_weapon_time integer 最近一次购买特殊武器的时间
     ---@field private last_special_weapon_index integer 最近一次购买的特殊武器序号
+    ---@field private current_weapon Weapon | nil 当前使用的武器
     Player = {}
 
     Player.RESPAWN_KEY = Keyboard.R
@@ -38,6 +40,7 @@ if not Player_lua then
     Player.part_weapons = {}
     Player.conventional_weapons = {}
     Player.special_weapons = {}
+    Player.current_weapon = nil
 
     ---在新一局游戏开始时重置玩家状态。
     function Player:reset()
@@ -49,6 +52,19 @@ if not Player_lua then
         self.last_part_weapon_index = 0
         self.last_buy_special_weapon_time = 0
         self.last_special_weapon_index = 0
+        self.current_weapon = nil
+    end
+
+    ---获取当前使用的武器。
+    ---@return Weapon|nil current_weapon 当前使用的武器
+    function Player:get_current_weapon()
+        return self.current_weapon
+    end
+
+    ---设置当前使用的武器。
+    ---@param weapon Weapon|nil 当前使用的武器
+    function Player:set_current_weapon(weapon)
+        self.current_weapon = weapon
     end
 
     ---设置复活按键。
@@ -210,7 +226,9 @@ if not Player_lua then
             self.last_secondary_weapon = weapon
         end
         self:start_move() -- 开始移动
+        self:set_current_weapon(weapon) -- 记录当前使用的武器
         weapon:attack() -- 使用武器攻击
+        self:set_current_weapon(nil) -- 攻击结束后，清空当前使用的武器记录
         self:stop_move() -- 结束移动
         if Setting.SWITCH_GAME_CHARACTER_USE_SPECIAL_SKILLS then
             self:activate_special_skill() -- 激活角色特殊技能
@@ -264,9 +282,10 @@ if not Player_lua then
             self.special_weapons[index]:purchase()
             self.last_buy_special_weapon_time = current_time
         end
-
+        self:set_current_weapon(self.special_weapons[index]) -- 记录当前使用的武器
         -- 使用武器
         self.special_weapons[index]:attack()
+        self:set_current_weapon(nil) -- 攻击结束后，清空当前使用的武器记录
         Player.last_part_weapon_index = index
         if self.last_weapon then
             -- 使用后切换回原来的武器
