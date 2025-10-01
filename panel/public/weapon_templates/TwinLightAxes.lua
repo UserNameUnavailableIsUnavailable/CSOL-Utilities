@@ -6,7 +6,7 @@ Weapon:new({
     switch_delay = Delay.LONG,
     number = Weapon.MELEE,
     purchase_sequence = {},
-    last_whirl_time = 0,
+    last_light_vortex_time = 0,
     template_name = "TwinLightAxes",
     ---@param self TwinLightAxes
     ---@param round integer

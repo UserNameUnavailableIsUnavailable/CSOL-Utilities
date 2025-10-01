@@ -11,11 +11,11 @@ Weapon:new({
     number = Weapon.GRENADE ,
     purchase_sequence = {},
     template_name = "Sandalphon",
-    discharging = false, -- 是否在释放光印
-    discharge_start_tp = 0, --  光印释放的时刻。
-    charge_start_tp = 0, -- 充能开始的时刻。
-    DISCHARGE_TIME = 27, -- 光印释放时间。
-    RECHARGE_TIME = 13, -- 充能时间。
+    lightening = false, -- 是否在释放光印
+    lightening_start_timepoint = 0, --  光印释放的时刻。
+    charge_start_timepoint = 0, -- 充能开始的时刻。
+    LIGHTENING_TIME = 27, -- 光印释放时间。
+    CHARGE_TIME = 13, -- 充能时间。
     ---为该武器重写 `use` 方法。
     ---@param self Sandalphon
     attack = function (self)
