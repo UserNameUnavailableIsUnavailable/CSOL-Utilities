@@ -9,7 +9,7 @@ Weapon:new({
     purchase_sequence = {},
     number = Weapon.GRENADE,
     template_name = "Lycaon",
-    last_strike_timepoint = 0,
+    last_phantom_rush_timepoint = 0,
     garrison = false,
     cooldown_time = 30,
     ---@param self Lycaon
