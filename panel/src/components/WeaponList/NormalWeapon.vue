@@ -90,15 +90,6 @@ const check = (s: string) => {
     <div>
         <ul>
             <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
-            <li>
-                J 键可切换 T / CT 阵营武器购买界面。
-            </li>
-            <li>
-                攻击持续时间不建议过长，取值在 0 ~ 20 秒为宜，可依据武器弹夹容量进行适当调整。
-            </li>
-            <li>
-                扫射方向即使用武器攻击时视角的运动方向，分解为水平和垂直两个方向。水平方向一般选为随机，垂直方向按实际需求进行调整。例如，刷狂戮巨蚊、鹞子风筝时可选为固定向上。
-            </li>
         </ul>
     </div>
     <div style="max-width: 50%;">
