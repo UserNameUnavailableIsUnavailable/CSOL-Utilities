@@ -136,15 +136,6 @@ const raw_template_name = computed({
     <div>
         <ul>
             <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
-            <li>
-                J 键可切换 T / CT 阵营武器购买界面。
-            </li>
-            <li>
-                扫射方向即使用武器攻击时视角的运动方向，分解为水平和垂直两个方向。水平方向一般选为随机，垂直方向按实际需求进行调整。例如，刷狂戮巨蚊、鹞子风筝时可选为固定向上。
-            </li>
-            <li>
-                对于部分定制类武器（尤其是 4 号位武器），扫射方向不会生效。
-            </li>
         </ul>
     </div>
 

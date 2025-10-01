@@ -40,15 +40,6 @@ function update_field(key: string, value: string) {
     <div>
         <ul>
             <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
-            <li>
-                J 键可切换 T / CT 阵营武器购买界面。
-            </li>
-            <li>
-                若装备购买界面中没有护甲，可将护甲购买序列设置为：B R。
-            </li>
-            <li>
-                配件武器不参与攻击，仅使用其增益效果（如安装生命配件、伤害配件的武器）。
-            </li>
         </ul>
     </div>
     <div style="max-width: 50%;">
