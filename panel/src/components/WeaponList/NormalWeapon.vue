@@ -41,15 +41,15 @@ function update_field(key: string, value: string) {
 }
 
 const weapon_number_options = [
-    { description: "主武器", content: "Weapon.PRIMARY" },
-    { description: "副武器", content: "Weapon.SECONDARY" },
-    { description: "近战武器", content: "Weapon.MELEE" },
-    { description: "手雷", content: "Weapon.GRENADE" }
+    { text: "主武器", value: "Weapon.PRIMARY" },
+    { text: "副武器", value: "Weapon.SECONDARY" },
+    { text: "近战武器", value: "Weapon.MELEE" },
+    { text: "手雷", value: "Weapon.GRENADE" }
 ];
 
 const weapon_attack_buttons = [
-    { description: "左键", content: "Mouse.LEFT" },
-    { description: "右键", content: "Mouse.RIGHT" }
+    { text: "左键", value: "Mouse.LEFT" },
+    { text: "右键", value: "Mouse.RIGHT" }
 ];
 
 const check = (s: string) => {
@@ -84,9 +84,9 @@ const check = (s: string) => {
     <br>
     <BasicField label="每轮攻击持续时间（秒）" :value="fields['attack_duration']" @update:value="update_field('attack_duration', $event)" :check="check" />
     <br>
-    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].content)" />
+    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].value)" />
     <br>
-    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].content)" />
+    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].value)" />
     <div>
         <ul>
             <li v-for="remark in remarks" :key="remark" v-html="remark"></li>

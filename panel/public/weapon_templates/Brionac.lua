@@ -7,6 +7,7 @@ Weapon:new({
     number = Weapon.MELEE,
     purchase_sequence = {},
     template_name = "Brionac",
+    attack_duration = 20,
     last_throw_time = 0,
     ---重写 attack 方法，按照下面定义的方式进行攻击。
     ---若您需要使用万钧神威进行挂机且没有编程经验，则请勿修改此函数。
