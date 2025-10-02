@@ -40,7 +40,7 @@
 
         <h2>常规武器</h2>
         <div class="weapon-widget" v-for="w, id in default_conventional_weapons" :key="id">
-            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" />
+            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" language="zh_CN" />
             <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, default_conventional_weapons)" :remarks="normal_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, default_conventional_weapons)">删除</button>
         </div>
@@ -49,7 +49,7 @@
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in default_special_weapons" :key="id">
-            <CustomizedWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_special_weapons)" type="Special" :remarks="customized_weapon_remarks" />
+            <CustomizedWeapon :fields="unref(w)" @update:fields="update_weapon(id, $event, default_special_weapons)" type="Special" :remarks="customized_weapon_remarks" language="zh_CN" />
             <button class="widget-button" @click="remove_weapon(id, default_special_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_special_weapon(default_special_weapons)">添加</button>
@@ -65,7 +65,7 @@
 
         <h2>常规武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_conventional_weapons" :key="id">
-            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" />
+            <CustomizedWeapon v-if="unref(w)['template_name']" :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)"  type="Conventional" :remarks="customized_weapon_remarks" language="zh_CN" />
             <NormalWeapon v-else :fields="unref(w)" @update:fields="update_weapon(id, $event, extended_conventional_weapons)" :remarks="normal_weapon_remarks" />
             <button class="widget-button" @click="remove_weapon(id, extended_conventional_weapons)">删除</button>
         </div>
@@ -74,7 +74,7 @@
 
         <h2>特殊武器</h2>
         <div class="weapon-widget" v-for="w, id in extended_special_weapons" :key="id">
-            <CustomizedWeapon v-bind:fields="unref(w)" @update:fields="update_weapon(id, $event, extended_special_weapons)" type="Special" :remarks="customized_weapon_remarks" />
+            <CustomizedWeapon v-bind:fields="unref(w)" @update:fields="update_weapon(id, $event, extended_special_weapons)" type="Special" :remarks="customized_weapon_remarks" language="zh_CN" />
             <button class="widget-button" @click="remove_weapon(id, extended_special_weapons)">删除</button>
         </div>
         <button class="widget-button" @click="add_special_weapon(extended_special_weapons)">添加</button>
@@ -115,7 +115,7 @@ const tag = ref("default");
 
 const armor_remarks = [
     "J 键可切换 T / CT 阵营武器购买界面。",
-    "若装备购买界面中没有护甲，可将护甲购买序列设置为：B R。"
+    "若装备购买界面中没有护甲，可将护甲购买序列设置为：<code class=\"language-plain\">B R</code>。"
 ];
 
 const part_weapon_remarks = [

@@ -9,11 +9,13 @@ import BasicSelect from '../BasicSelect.vue';
 import YAML from "js-yaml";
 import luaparse from "luaparse";
 import { ResolveWeapon } from '../../scripts/Weapon';
+import type { Language } from '../../scripts/Language';
 
 const props = defineProps<{
     fields: Record<string, string>
     type: "Conventional" | "Special"
     remarks?: string[]
+    language: Language
 }>();
 
 const emit = defineEmits<{
@@ -32,31 +34,48 @@ function remove_surrounding_quotes(s: string) {
     return s;
 }
 
-const options = ref<{ description: string, content: string, remark: string }[]>([]);
+const options = ref<{ text: string, value: string, file: string }[]>([]);
+
+type WeaponTemplateInfo_T = {
+    id: string,
+    en_US: string,
+    zh_CN: string,
+    file: string
+}
 
 // 类型发生更新
-watch(() => props.type, () => {
-    options.value = [{
-        description: '无',
-        content: "nil",
-        remark: "nil"
-    }];
-    fetch(`${TEMPLATE_BASE_URL}/listing.yaml`)
-        .then(response => response.text())
-        .then(text => {
-            const listing = YAML.load(text) as {
-                Conventional: { id: string, zh_CN: string, file: string }[]
-                Special: { id: string, zh_CN: string, file: string }[]
-            };
-            listing[props.type].forEach(e => {
-                options.value.push({ description: e.zh_CN, content: e.id, remark: e.file });
-            });
+options.value = [{
+    text: '⸺',
+    value: "nil",
+    file: "nil"
+}];
+
+// 下载武器模板列表
+let listing: {
+    Conventional: WeaponTemplateInfo_T[],
+    Special: WeaponTemplateInfo_T[]
+} | null = null;
+
+fetch(`${TEMPLATE_BASE_URL}/listing.yaml`)
+    .then(response => response.text())
+    .then(text => {
+        listing = YAML.load(text) as {
+            Conventional: WeaponTemplateInfo_T[],
+            Special: WeaponTemplateInfo_T[]
+        };
+        listing[props.type].forEach(e => {
+            options.value.push({ text: e[props.language], value: e.id, file: e.file });
         });
-}, {
-    immediate: true
-});
+        update_template(remove_surrounding_quotes(props.fields["template_name"] ?? "nil"));
+        emit("update:fields", fields.value);
+    });
 
 const fields = ref<Record<string, string>>({});
+
+const user_defined_fields = [
+    "name", "purchase_sequence", "template_name",
+    "horizontal_strafe_mode", "vertical_strafe_mode"
+];
 
 watch(() => props.fields, (_fields) => {
     _fields.name = _fields["name"] ?? "\"\"";
@@ -69,37 +88,44 @@ watch(() => props.fields, (_fields) => {
     deep: true
 });
 
+watch(() => props.language, () => {
+    options.value.length = 1;
+    listing?.[props.type].forEach(e => {
+        options.value.push({ text: e[props.language], value: e.id, file: e.file });
+    });
+});
+
 function update_field(key: string, value: string) {
     fields.value[key] = value;
     emit("update:fields", fields.value);
 }
 
 // 将模板合并到武器中
-async function update_template(weapon: string) {
-    if (weapon === "nil") {
+async function update_template(template_name: string) {
+    if (template_name === "nil") {
         fields.value["template_name"] = "nil";
         return;
     }
-    const item = options.value.find(e => e.content === weapon);
+    const item = options.value.find(e => e.value === template_name);
     if (!item) {
-        alert("找不到指定的武器模板。");
+        alert(`找不到指定的武器模板：${template_name}`);
         fields.value["template_name"] = "nil";
     } else { // 下载、解析武器模板，将武器模板字段合并到当前武器字段中
-        await fetch(TEMPLATE_BASE_URL + `/${item.remark}`)
+        await fetch(TEMPLATE_BASE_URL + `/${item.file}`)
             .then(response => response.text())
             .then(code => {
                 // @ts-ignore
                 const ast = luaparse.parse(code).body[0].expression;
                 const template_weapon: Record<string, string> = {};
                 ResolveWeapon(ast, template_weapon);
-                fields.value["template_name"] = `"${item.content}"`;
+                fields.value["template_name"] = `"${item.value}"`;
+                for (const k in fields.value) {
+                    if (!user_defined_fields.includes(k)) { // 非用户定义字段，删除
+                        delete fields.value[k];
+                    }
+                }
                 for (const k in template_weapon) {
-                    if (
-                        // 排除用户自行定义的字段
-                        k !== "name" &&
-                        k !== "purchase_sequence" &&
-                        k !== "template_name"
-                    ) {
+                    if (!user_defined_fields.includes(k)) { // 非用户定义字段，使用模板字段
                         fields.value[k] = template_weapon[k];
                     }
                 }
@@ -115,10 +141,11 @@ const raw_template_name = computed({
     async set(v: string) {
         await update_template(v);
         emit("update:fields", fields.value);
-        const name = options.value.find(e => e.content === v)?.description ?? "";
+        const name = options.value.find(e => e.value === v)?.text ?? "";
         fields.value["name"] = `"${name}"`;
     }
-})
+});
+
 </script>
 
 <template>
@@ -130,12 +157,12 @@ const raw_template_name = computed({
     <br>
     <BasicSelect label="模板" v-model:value="raw_template_name" :options="options" />
     <br>
-    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].content)" />
+    <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].value)" />
     <br>
-    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].content)" />
+    <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].value)" />
     <div>
         <ul>
-            <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
+            <li v-for="remark in remarks" :key="remark" v-html="remark"></li>
         </ul>
     </div>
 

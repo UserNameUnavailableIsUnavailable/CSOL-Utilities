@@ -250,27 +250,27 @@
             if self.horizontal_strafe_mode == "none" then
                 self.dx = 0
             elseif self.horizontal_strafe_mode == "left" then
-                self.dx = math.ceil(- 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dx = math.ceil(- 50 / Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.horizontal_strafe_mode == "right" then
-                self.dx = math.ceil(50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dx = math.ceil(50 / Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.horizontal_strafe_mode == "random" then
-                self.dx = math.ceil(Utility:random_direction() * 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dx = math.ceil(Utility:random_direction() * 50 /Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.horizontal_strafe_mode == "oscillating" then
                 self.dx = function()
-                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 50 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 50 / Setting.FIELD_IN_GAME_SENSITIVITY)
                 end
             end
             if self.vertical_strafe_mode == "none" then
                 self.dy = 0
             elseif self.vertical_strafe_mode == "up" then
-                self.dy = math.ceil(- 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dy = math.ceil(- 100 / Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.vertical_strafe_mode == "down" then
-                self.dy = math.ceil(100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dy = math.ceil(100 / Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.vertical_strafe_mode == "random" then
-                self.dy = math.ceil(Utility:random_direction() * 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                self.dy = math.ceil(Utility:random_direction() * 100 / Setting.FIELD_IN_GAME_SENSITIVITY)
             elseif self.vertical_strafe_mode == "oscillating" then
                 self.dy = function()
-                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 100 * Setting.FIELD_IN_GAME_SENSITIVITY)
+                    return math.ceil(math.sin(Runtime:get_running_time() / 1000) * 100 / Setting.FIELD_IN_GAME_SENSITIVITY)
                 end
             end
         end

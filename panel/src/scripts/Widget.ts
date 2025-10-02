@@ -25,7 +25,7 @@ export type FieldWidget_T = BaseWidget_T & {
 
 export type SwitchWidget_T = BaseWidget_T & {
     label: string
-    options: { content: string, description: string }[]
+    options: { text: string, value: string }[]
     value?: string,
 };
 

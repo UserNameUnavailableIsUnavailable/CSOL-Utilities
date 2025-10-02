@@ -39,7 +39,7 @@ function update_field(key: string, value: string) {
     <BasicKeystrokes label="购买按键序列" :value="fields.purchase_sequence" @update:value="update_field('purchase_sequence', $event)" />
     <div>
         <ul>
-            <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
+            <li v-for="remark in remarks" :key="remark" v-html="remark"></li>
         </ul>
     </div>
     <div style="max-width: 50%;">

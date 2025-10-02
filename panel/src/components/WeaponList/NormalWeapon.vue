@@ -89,7 +89,7 @@ const check = (s: string) => {
     <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].content)" />
     <div>
         <ul>
-            <li v-for="remark in remarks" :key="remark">{{ remark }}</li>
+            <li v-for="remark in remarks" :key="remark" v-html="remark"></li>
         </ul>
     </div>
     <div style="max-width: 50%;">
