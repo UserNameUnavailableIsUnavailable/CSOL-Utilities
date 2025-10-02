@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const widget = reactive(props.widget);
 
-const setting_item = ref(widget.value ?? widget.options[0].content);  // 缺省时选中第一个选项
+const setting_item = ref(widget.value ?? widget.options[0].value);  // 缺省时选中第一个选项
 
 const id = `SWITCH_${widget.id}`;
 

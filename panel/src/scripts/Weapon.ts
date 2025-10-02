@@ -1,19 +1,19 @@
 import * as LuaASTUtil from "./LuaASTUtil";
 
 export const VERTICAL_STRAFE_MODES = [
-    { description: "无", content: "\"none\"" },
-    { description: "固定向上", content: "\"up\"" },
-    { description: "固定向下", content: "\"down\"" },
-    { description: "随机", content: "\"random\"" },
-    { description: "简谐振动（上下交替）", content: "\"oscillating\"" }
+    { text: "无", value: "\"none\"" },
+    { text: "固定向上", value: "\"up\"" },
+    { text: "固定向下", value: "\"down\"" },
+    { text: "随机", value: "\"random\"" },
+    { text: "简谐振动（上下交替）", value: "\"oscillating\"" }
 ];
 
 export const HORIZONTAL_STRAFE_MODES = [
-    { description: "无", content: "\"none\"" },
-    { description: "固定向左", content: "\"left\"" },
-    { description: "固定向右", content: "\"right\"" },
-    { description: "随机", content: "\"random\"" },
-    { description: "简谐振动（左右交替）", content: "\"oscillating\"" }
+    { text: "无", value: "\"none\"" },
+    { text: "固定向左", value: "\"left\"" },
+    { text: "固定向右", value: "\"right\"" },
+    { text: "随机", value: "\"random\"" },
+    { text: "简谐振动（左右交替）", value: "\"oscillating\"" }
 ];
 
 export type AttackButton_T = "Mouse.LEFT" | "Mouse.RIGHT"; // 攻击按键类型

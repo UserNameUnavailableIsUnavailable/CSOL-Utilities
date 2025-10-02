@@ -5,7 +5,7 @@ const props = defineProps<{
     id?: string // 字段 ID
     label?: string // 标签
     value?: string // 绑定的值
-    options: { description: string, content: string }[] // 选项
+    options: { text: string, value: string }[] // 选项
 }>();
 
 const emit = defineEmits<{
@@ -30,8 +30,8 @@ onMounted(() => {
         <span v-if="props.label" v-html="props.label"></span>
         &nbsp;
         <template v-for="opt in props.options">
-            <input type="radio" :checked="value === opt.content" @change="value = opt.content" autocomplete="off" >
-            <label v-html="opt.description"></label>
+            <input type="radio" :checked="value === opt.value" @change="value = opt.value" autocomplete="off" >
+            <label v-html="opt.text"></label>
             &nbsp;
         </template>
     </label>
