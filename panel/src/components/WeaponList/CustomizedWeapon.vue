@@ -73,7 +73,7 @@ fetch(`${TEMPLATE_BASE_URL}/listing.yaml`)
 const fields = ref<Record<string, string>>({});
 
 const user_defined_fields = [
-    "name", "purchase_sequence", "template_name",
+    "name", "purchase_sequence", "template_name", "attack_duration",
     "horizontal_strafe_mode", "vertical_strafe_mode"
 ];
 
@@ -82,6 +82,8 @@ watch(() => props.fields, (_fields) => {
     _fields.purchase_sequence = _fields["purchase_sequence"] ?? "{}";
     _fields.horizontal_strafe_mode = _fields["horizontal_strafe_mode"] ?? "\"random\"";
     _fields.vertical_strafe_mode = _fields["vertical_strafe_mode"] ?? "\"none\"";
+    _fields.attack_duration = _fields["attack_duration"] ?? "10";
+    _fields.template_name = _fields["template_name"] ?? "nil";
     fields.value = _fields;
 }, {
     immediate: true,
@@ -156,6 +158,9 @@ const raw_template_name = computed({
         @update:value="update_field('purchase_sequence', $event)" />
     <br>
     <BasicSelect label="模板" v-model:value="raw_template_name" :options="options" />
+    <br>
+    <BasicField label="每轮攻击持续时间（秒）" :value="fields['attack_duration']"
+        @update:value="update_field('attack_duration', $event)" />
     <br>
     <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].value)" />
     <br>

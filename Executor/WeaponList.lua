@@ -1,7 +1,7 @@
 if not WeaponList_lua then
     WeaponList_lua = true
     Include("Version.lua")
-    Version:set("WeaponList", "1.5.3")
+    Version:set("WeaponList", "1.5.4")
     Version:require("WeaponList", "Setting", "1.5.3")
     Version:require("WeaponList", "Weapon", "1.5.3")
     Armor =
@@ -77,6 +77,7 @@ if not WeaponList_lua then
                 template_name = "Lycaon",
                 horizontal_strafe_mode = "random",
                 vertical_strafe_mode = "none",
+                attack_duration = 10,
                 switch_delay = 600,
                 number = Weapon.GRENADE,
                 last_phantom_rush_timepoint = 0,
@@ -109,6 +110,7 @@ if not WeaponList_lua then
                 template_name = "Brionac",
                 horizontal_strafe_mode = "random",
                 vertical_strafe_mode = "none",
+                attack_duration = 20,
                 switch_delay = Delay.LONG,
                 number = Weapon.MELEE,
                 last_throw_time = 0,
@@ -149,7 +151,7 @@ if not WeaponList_lua then
                 attack_button = Mouse.RIGHT,
                 horizontal_strafe_mode = "random",
                 vertical_strafe_mode = "oscillating",
-                attack_duration = 10
+                attack_duration = 7
             }
         ),
         Weapon:new(
@@ -215,6 +217,7 @@ if not WeaponList_lua then
                 template_name = "Lycaon",
                 horizontal_strafe_mode = "random",
                 vertical_strafe_mode = "none",
+                attack_duration = 10,
                 switch_delay = 600,
                 number = Weapon.GRENADE,
                 last_phantom_rush_timepoint = 0,
