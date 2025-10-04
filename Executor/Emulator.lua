@@ -1,8 +1,9 @@
 ---该文件定义了罗技 G HUB 的其中部分函数，仅用于建立测试环境（需要在本机上提供 Lua 5.4 运行环境）。
 ---当在 G HUB 中运行时，不会运行此脚本。
 if not Emulator_lua then
-    Version:set("Emulator", "1.5.2")
     Emulator_lua = true
+    Include("Version.lua")
+    Version:set("Emulator", "1.5.2")
 
     RunningInEmulator = false -- 在 G HUB 中运行
 
