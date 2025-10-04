@@ -7,8 +7,8 @@
     Include("Mouse.lua")
     Include("Keyboard.lua")
     Include("Version.lua")
-    Version:set("Weapon", "1.5.3")
-    Version:require("Weapon", "Setting", "1.5.2", nil)
+    Version:set("Weapon", "1.5.4")
+    Version:require("Weapon", "Setting", "1.5.4", nil)
 
     ---@class Weapon 武器类
     ---@field NULL string 配件武器
@@ -81,7 +81,7 @@
         if type(weapon.name) ~= "string" then
             Error:throw({
                 name = "ILLEGAL_WEAPON_NAME_TYPE",
-                message = ("武器名称必须具有 `string` 类型，但获取到的类型为 `%s`"):format(
+                message = ("武器名称必须具有 `string` 类型，但获取到的类型为 `%s`。"):format(
                     type(weapon.name)
                 ),
                 parameters = {},
@@ -141,7 +141,7 @@
                 parameters = { weapon.switch_delay },
             })
         end
-        Console:information("新增武器/装备：" .. weapon.name)
+        Console:info("新增武器/装备：" .. weapon.name)
         return weapon
     end
 
@@ -150,11 +150,11 @@
         Runtime:push_interrupt_mask_flag()
         Runtime:disable_interrupt() -- 暂时关中断，完成原子操作
         for _, key in ipairs(self.purchase_sequence) do
-            Keyboard:click(key, Delay.LONG, true)
+            Keyboard:click(key, Delay.MEDIUM, true)
         end
         Runtime:pop_interrupt_mask_flag()
         if self.number == Weapon.GRENADE or self.number == Weapon.NULL then
-            Keyboard:click(Weapon.MELEE, Delay.LONG, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
+            Keyboard:click(Weapon.MELEE, Delay.MEDIUM, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
         end
         if not Mouse:is_cursor_position_locked() then
             -- 清除当前界面上的所有窗口，防止购买资金不足或关闭死亡购买界面。
@@ -186,12 +186,14 @@
     end
 
     ---确认武器购买资金不足提示框（预设按钮在 Setting.lua 中）。
+    ---@deprecated 此函数已经废弃，`Weapon:purchase` 会自动处理购买界面。
     function Weapon:in_case_insufficient_funds()
         Mouse:click_on(Mouse.LEFT, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_X, Setting.GAME_INSUFFIENT_FUNDS_CONFIRM_Y)
         Keyboard:click(Keyboard.ZERO, Delay.SHORT)
     end
 
     ---关闭死亡状态下的预购买菜单（点击“重复购买”按钮，不点击“取消购买”以避免与大厅界面按钮冲突）。
+    ---@deprecated 此函数已经废弃，`Weapon:purchase` 会自动处理购买界面。
     function Weapon:close_dead_purchase_menu()
         Mouse:click_on(
             Mouse.LEFT,
@@ -202,17 +204,17 @@
     end
 
     ---使用特殊武器的函数，在创建特殊武器对象时重写此函数。
-    ---@deprecated 从 v1.5.3 起，此函数被 `attack` 代替
+    ---@deprecated 从 v1.5.3 起，此函数被 `attack` 代替。
     function Weapon:use() end
 
     ---开始使用该武器攻击。
-    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中
+    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中。
     function Weapon:start_attack()
         Mouse:press(self.attack_button)
     end
 
     ---停止使用该武器攻击。
-    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中
+    ---@deprecated 此函数功能已经整合到 `Weapon.attack` 中。
     function Weapon:stop_attack()
         Mouse:release(self.attack_button)
     end

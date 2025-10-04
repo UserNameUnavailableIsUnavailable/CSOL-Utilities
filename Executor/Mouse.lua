@@ -77,10 +77,10 @@ if not Mouse_lua then
     end
 
     ---移动鼠标光标到某位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param x integer | nil 横坐标。
-    ---@param y integer | nil 纵坐标。
-    ---@param delay integer | nil 移动鼠标光标后的延迟时间，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param x integer|nil 横坐标。
+    ---@param y integer|nil 纵坐标。
+    ---@param delay integer|nil 移动鼠标光标后的延迟时间，默认为 `Delay.SHORT`。
+   ---@param precise boolean|nil 是否精确定时
     function Mouse:place(x, y, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and self:is_position_valid(x, y) then
@@ -100,10 +100,10 @@ if not Mouse_lua then
     end
 
     ---相对移动鼠标光标。当 `Runtime:is_paused` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param rightward integer | nil 向右移动的偏移量，负数表示向左。
-    ---@param downward integer | nil 向下移动的偏移量，负数表示向上。
-    ---@param delay integer | nil 移动光标后的延迟，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时。
+    ---@param rightward integer|nil 向右移动的偏移量，负数表示向左。
+    ---@param downward integer|nil 向下移动的偏移量，负数表示向上。
+    ---@param delay integer|nil 移动光标后的延迟，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时。
     function Mouse:move_relative(rightward, downward, delay, precise)
         rightward, downward = rightward or 0, downward or 0
         if not self:is_frozen() and math.type(rightward) == "integer" and math.type(downward) == "integer" then
@@ -114,8 +114,8 @@ if not Mouse_lua then
 
     ---按下按钮。
     ---@param button integer
-    ---@param delay integer | nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param delay integer|nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     function Mouse:press(button, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and Mouse:is_button_value_valid(button) then
@@ -127,8 +127,8 @@ if not Mouse_lua then
 
     ---弹起按钮。
     ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param delay integer | nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param delay integer|nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     ---@return nil
     function Mouse:release(button, delay, precise)
         delay = delay or Delay.SHORT
@@ -141,8 +141,8 @@ if not Mouse_lua then
 
     ---单击一次按钮。
     ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param delay integer | nil 单击某个按钮后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param delay integer|nil 单击某个按钮后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     function Mouse:click(button, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and Mouse:is_button_value_valid(button) then
@@ -153,8 +153,8 @@ if not Mouse_lua then
 
     ---双击一次按钮。
     ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param delay integer | nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param delay integer|nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     function Mouse:double_click(button, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and Mouse:is_button_value_valid(button) then
@@ -167,10 +167,10 @@ if not Mouse_lua then
 
     ---使用鼠标单击屏幕上某个位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param button integer 鼠标按钮。
-    ---@param x integer | nil 横坐标。
-    ---@param y integer | nil 纵坐标。
-    ---@param delay integer | nil 点击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param x integer|nil 横坐标。
+    ---@param y integer|nil 纵坐标。
+    ---@param delay integer|nil 点击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     ---@see Mouse.locate 获取 `(x, y)` 。
     function Mouse:click_on(button, x, y, delay, precise)
         delay = delay or Delay.SHORT
@@ -186,8 +186,8 @@ if not Mouse_lua then
     ---@param button integer 鼠标按钮。
     ---@param x integer 横坐标。
     ---@param y integer 纵坐标。
-    ---@param delay integer | nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param delay integer|nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     ---@see Mouse.locate 获取 `(x, y)` 。
     function Mouse:double_click_on(button, x, y, delay, precise)
         delay = delay or Delay.SHORT
@@ -203,10 +203,10 @@ if not Mouse_lua then
 
     ---重复点击鼠标按钮若干次。
     ---@param button integer
-    ---@param times integer | nil
-    ---@param interval integer | nil
-    ---@param delay integer | nil
-    ---@param precise boolean | nil
+    ---@param times integer|nil
+    ---@param interval integer|nil
+    ---@param delay integer|nil
+    ---@param precise boolean|nil
     function Mouse:click_several_times(button, times, interval, delay, precise)
         interval = interval or Delay.SHORT
         delay = delay or Delay.SHORT
@@ -224,12 +224,12 @@ if not Mouse_lua then
 
     ---使用鼠标重复点击屏幕上的某个位置若干次。当 `Runtime.is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param button integer 鼠标按钮。
-    ---@param x integer | nil 横坐标。
-    ---@param y integer | nil 纵坐标。
-    ---@param times integer | nil 重复次数。
-    ---@param interval integer | nil 间隔时间。
-    ---@param delay integer | nil 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param x integer|nil 横坐标。
+    ---@param y integer|nil 纵坐标。
+    ---@param times integer|nil 重复次数。
+    ---@param interval integer|nil 间隔时间。
+    ---@param delay integer|nil 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
+    ---@param precise boolean|nil 是否精确定时
     function Mouse:click_several_times_on(button, x, y, times, interval, delay, precise)
         interval = interval or Delay.SHORT
         delay = delay or Delay.SHORT
@@ -262,9 +262,9 @@ if not Mouse_lua then
     end
 
     ---滚动鼠标滚轮。
-    ---@param times integer | nil 滚动次数，正数表示向上滚动，负数表示向下滚动。
-    ---@param delay integer | nil 滚动后的延迟，单位为毫秒。
-    ---@param precise boolean | nil 是否精确定时
+    ---@param times integer|nil 滚动次数，正数表示向上滚动，负数表示向下滚动。
+    ---@param delay integer|nil 滚动后的延迟，单位为毫秒。
+    ---@param precise boolean|nil 是否精确定时
     function Mouse:roll(times, delay, precise)
         times = times or 0
         delay = delay or Delay.SHORT

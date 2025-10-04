@@ -1,7 +1,7 @@
 if not Setting_lua then
     Setting_lua = true
     Include("Version.lua")
-    Version:set("Setting", "1.5.3")
+    Version:set("Setting", "1.5.4")
     Setting = {
         FIELD_TIME_ZONE = 8,
         SWITCH_CREATE_ROOM_ON_EXCEPTION = true,

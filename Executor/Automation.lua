@@ -16,7 +16,7 @@ if not Automation_lua then
     Include("Setting.lua")
     Include("WeaponList.lua")
     Include("Version.lua")
-    Version:set("Automation", "1.5.3")
+    Version:set("Automation", "1.5.4")
 
     ---自动化执行。
     ---@class Automation
@@ -40,7 +40,7 @@ if not Automation_lua then
                 Keyboard:reset()
                 Mouse:reset()
                 if not Runtime.manual_flag then
-                    Console:information("开始手动接管，冻结键鼠操作。")
+                    Console:info("开始手动接管，冻结键鼠操作。")
                     Keyboard:freeze()
                     Mouse:freeze()
                 end
@@ -49,7 +49,7 @@ if not Automation_lua then
                 Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT)
             then
                 if Runtime.manual_flag then
-                    Console:information("中止手动接管，恢复键鼠操作。")
+                    Console:info("中止手动接管，恢复键鼠操作。")
                     Keyboard:unfreeze()
                     Mouse:unfreeze()
                 end
@@ -337,7 +337,7 @@ if not Automation_lua then
         then
             Keyboard:click(tostring(Setting.FIELD_GAME_CHARACTER_OPTION), Delay.NORMAL)
         else
-            Console:information("角色选项设置有误。随机选择角色。")
+            Console:info("角色选项设置有误。随机选择角色。")
             Keyboard:click(Keyboard.ZERO, Delay.NORMAL)
         end
         Automation.last_use_health_potion_30_timepoint = Runtime:get_running_time()
@@ -417,7 +417,7 @@ if not Automation_lua then
             and not Keyboard:is_modifier_pressed(Keyboard.SHIFT)
         then
             local x, y = Mouse:locate()
-            Console:information("位置坐标：(%d, %d)", x, y)
+            Console:info(("位置坐标：(%d, %d)"):format(x, y))
             Runtime:sleep(500)
         end
     end

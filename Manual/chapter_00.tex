@@ -33,66 +33,66 @@
 将解除锁定后的压缩包解压，\textbf{\color{red}解压路径不能包含非英文字符}。
 Windows 文件系统不区分文件名的大小写。因此，若您在接下来的步骤中遇到名称相同但大小写不同的文件名，应将其视为完全一样的文件名。
 
-Windows 默认情况下严格阻止运行任何 Powershell 脚本文件（后缀为 \lstinline{.ps1}），因此若您是第一次使用本工具，需要做如下配置。
+% Windows 默认情况下严格阻止运行任何 Powershell 脚本文件（后缀为 \lstinline{.ps1}），因此若您是第一次使用本工具，需要做如下配置。
 
-对于 Windows 11 23H2 及以上版本的用户修改较为简单：打开“设置”，点击“系统”→“开发者选项”（图 \ref{ch0fig-win11-23h2-0}），在“Powershell”下拉选项中打开图示选项即可（图 \ref{ch0fig-win11-23h2-1}）。下面针对 Windows 11 23H2 以下版本用户的设置步骤可忽略。
+% 对于 Windows 11 23H2 及以上版本的用户修改较为简单：打开“设置”，点击“系统”→“开发者选项”（图 \ref{ch0fig-win11-23h2-0}），在“Powershell”下拉选项中打开图示选项即可（图 \ref{ch0fig-win11-23h2-1}）。下面针对 Windows 11 23H2 以下版本用户的设置步骤可忽略。
 
-\begin{figure}[H]
-    \Centering
-    \includegraphics[width=\textwidth]{assets/intro/win11_23h2_00.png}
-    \caption{点击“开发者选项”}
-    \label{ch0fig-win11-23h2-0}
-\end{figure}
+% \begin{figure}[H]
+%     \Centering
+%     \includegraphics[width=\textwidth]{assets/intro/win11_23h2_00.png}
+%     \caption{点击“开发者选项”}
+%     \label{ch0fig-win11-23h2-0}
+% \end{figure}
 
-\begin{figure}[H]
-    \Centering
-    \includegraphics[width=\textwidth]{assets/intro/win11_23h2_01.png}
-    \caption{修改执行策略}
-    \label{ch0fig-win11-23h2-1}
-\end{figure}
+% \begin{figure}[H]
+%     \Centering
+%     \includegraphics[width=\textwidth]{assets/intro/win11_23h2_01.png}
+%     \caption{修改执行策略}
+%     \label{ch0fig-win11-23h2-1}
+% \end{figure}
 
-对于 Windows 11 23H2 以下版本的用户，需按照以下步骤操作：
+% 对于 Windows 11 23H2 以下版本的用户，需按照以下步骤操作：
 
-按下 \lstinline{Win} \lstinline{R}，输入 \lstinline{powershell}。然后，\textbf{\color{red}按下 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter} 以管理员权限打开 Powershell 窗口}（图 \ref{ch0fig-run-pwsh-as-admin}）。
+% 按下 \lstinline{Win} \lstinline{R}，输入 \lstinline{powershell}。然后，\textbf{\color{red}按下 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter} 以管理员权限打开 Powershell 窗口}（图 \ref{ch0fig-run-pwsh-as-admin}）。
 
-\begin{figure}[H]
-    \Centering
-    \includegraphics[width=\textwidth]{assets/intro/run_pwsh_as_admin.png}
-    \caption{在“运行”中输入 \lstinline{powershell}，并按 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter}}
-    \label{ch0fig-run-pwsh-as-admin}
-\end{figure}
+% \begin{figure}[H]
+%     \Centering
+%     \includegraphics[width=\textwidth]{assets/intro/run_pwsh_as_admin.png}
+%     \caption{在“运行”中输入 \lstinline{powershell}，并按 \lstinline{Ctrl} \lstinline{Shift} \lstinline{Enter}}
+%     \label{ch0fig-run-pwsh-as-admin}
+% \end{figure}
 
-在 Powershell 窗口输入下面的命令：
+% 在 Powershell 窗口输入下面的命令：
 
-\begin{minted}{powershell}
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-\end{minted}
+% \begin{minted}{powershell}
+% Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+% \end{minted}
 
-回车运行上述命令（图 \ref{ch0fig-change-execution-policy}），过程中可能需要您输入“Y”确认（图 \ref{ch0fig-confirm-execution-policy}）。运行完成后即可关闭窗口。
+% 回车运行上述命令（图 \ref{ch0fig-change-execution-policy}），过程中可能需要您输入“Y”确认（图 \ref{ch0fig-confirm-execution-policy}）。运行完成后即可关闭窗口。
 
-\begin{figure}[H]
-    \Centering
-    \includegraphics[width=\textwidth]{assets/intro/confirm_execution_policy_00.png}
-    \caption{键入修改执行策略的命令}
-    \label{ch0fig-change-execution-policy}
-\end{figure}
+% \begin{figure}[H]
+%     \Centering
+%     \includegraphics[width=\textwidth]{assets/intro/confirm_execution_policy_00.png}
+%     \caption{键入修改执行策略的命令}
+%     \label{ch0fig-change-execution-policy}
+% \end{figure}
 
-\begin{figure}[H]
-    \Centering
-    \includegraphics[width=\textwidth]{assets/intro/confirm_execution_policy_01.png}
-    \caption{确认修改执行策略}
-    \label{ch0fig-confirm-execution-policy}
-\end{figure}
-
+% \begin{figure}[H]
+%     \Centering
+%     \includegraphics[width=\textwidth]{assets/intro/confirm_execution_policy_01.png}
+%     \caption{确认修改执行策略}
+%     \label{ch0fig-confirm-execution-policy}
+% \end{figure}
+% 
 \subsection{罗技软件导入 Lua \lstinline{Executor}（执行器） 模块}
 
-鼠标右键点击集成工具文件夹中的 \lstinline{install.ps1}，点击在 Powershell 中运行（图 \ref{ch0fig-run-install-script}），您会看到在目录中生成了一个新文件 \lstinline{Executor.lua}（如果已经存在此文件，则会生成新的文件并覆盖它），如果没有看到，请刷新一下文件管理器页面。
-\textbf{\color{red} 如果变动了安装路径（如：移动集成工具文件夹位置、将集成工具文件夹重命名），则需要重新运行一次 \lstinline{install.ps1}，并重新在 Logitech G Hub 中导入并执行“保存并运行”操作（详见下文）。}
+双击运行集成工具文件夹中的 \lstinline{Install.cmd}，点击在 Powershell 中运行（图 \ref{ch0fig-run-install-script}），您会看到在目录中生成了一个新文件 \lstinline{Executor.lua}（如果已经存在此文件，则会生成新的文件并覆盖它），如果没有看到，请刷新一下文件管理器页面。
+\textbf{\color{red} 如果变动了安装路径（如：移动集成工具文件夹位置、将集成工具文件夹重命名），则需要重新运行一次 \lstinline{Install.cmd}，并重新在 Logitech G Hub 中导入并执行“保存并运行”操作（详见下文）。}
 
 \begin{figure}[H]
     \Centering
     \includegraphics[width=\textwidth]{assets/intro/install.png}
-    \caption{运行 \lstinline{install.ps1}}
+    \caption{运行 \lstinline{Install.cmd}}
     \label{ch0fig-run-install-script}
 \end{figure}
 
@@ -240,7 +240,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 \begin{figure}[H]
     \Centering
-    \parbox[l]{\textwidth}{在 Powershell 中运行 \lstinline{Controller.ps1}（图 \ref{ch0fig-run-controller}），控制器将在初始化运行环境后启动。}
+    \parbox[l]{\textwidth}{双击运行 \lstinline{Controller.cmd}（图 \ref{ch0fig-run-controller}），控制器将在初始化运行环境后启动。}
     \includegraphics[width=\textwidth]{assets/intro/run_controller.png}
     \caption{运行控制器}
     \label{ch0fig-run-controller}
