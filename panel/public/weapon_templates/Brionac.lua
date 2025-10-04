@@ -30,8 +30,6 @@ Weapon:new({
                 end
             end
         end
-        if round < 0 then
-            return function() Mouse:release(Mouse.RIGHT) end
-        end
+        return function() Mouse:release(Mouse.RIGHT) end
     end
 })

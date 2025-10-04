@@ -7,6 +7,7 @@
     Include("Mouse.lua")
     Include("Keyboard.lua")
     Include("Version.lua")
+    Include("Exception.lua")
     Version:set("Weapon", "1.5.4")
     Version:require("Weapon", "Setting", "1.5.4", nil)
 
@@ -22,7 +23,7 @@
     ---@field switch_delay integer 切换延迟
     ---@field purchase_sequence table 购买按键序列
     ---@field reloading_required boolean 是否需要换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
-    ---@field reload_key string 重新装填按键
+    ---@field reload_key KEYBOARD_KEY 重新装填按键
     ---@field attack_duration integer 攻击持续时间，单位为秒，默认为 10 秒
     ---@field horizontal_strafe_mode string|nil 武器水平扫射模式，`"none"` 为无扫射，`"left"` 为固定向左，`"right"` 为固定向右，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（左右交替扫射）。该字段缺省值为 `"random"`。
     ---@field vertical_strafe_mode string|nil 武器垂直扫射模式，`"none"` 为无扫射，`"up"` 为固定向上，`"down"` 为固定向下，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（上下交替扫射）。该字段缺省值为 `"oscillating"`。
@@ -48,101 +49,42 @@
     Weapon.dx = 0
     Weapon.dy = 0
 
+    ---@class WeaponInitializer
+    ---@field name? string
+    ---@field number? string
+    ---@field attack_button? integer
+    ---@field switch_delay? integer
+    ---@field purchase_sequence? table
+    ---@field reloading_required? boolean
+    ---@field reload_key? KEYBOARD_KEY
+    ---@field attack_duration? integer
+    ---@field horizontal_strafe_mode? string
+    ---@field vertical_strafe_mode? string
+
     ---设置换弹按键。
-    ---@param key string
+    ---@param key Constants.KEYBOARD_SCANCODE|Constants.KEYBOARD_NAME
     function Weapon:set_reload_key(key)
-        if not Keyboard:is_key_valid(key) then
-            Error:throw({
-                name = "INVALID_KEY_NAME",
-                message = "无效的按键名称",
-                parameters = { key },
-            })
-        end
         self.reload_key = key
     end
 
     ---获取换弹按键。
-    ---@return string RELOAD_KEY 换弹按键
+    ---@return KEYBOARD_KEY
     function Weapon:get_reload_key()
         return self.reload_key
     end
 
     ---创建一个武器对象。
-    ---@param init table 初始化列表
+    ---@param init WeaponInitializer 初始化列表
     ---@return Weapon weapon 武器对象
     function Weapon:new(init)
-        local weapon = init or {}
+        local weapon = init
         -- 基武器的 `__index` 指向自身
         self.__index = self
         -- 将模板武器 `weapon` 的元表设置为 `self`
         -- 这样，访问新武器中的缺省成员时，会调用模板武器的 `__index` 找到缺省值
         setmetatable(weapon, self)
-        -- 参数列表有效性校验
-        if type(weapon.name) ~= "string" then
-            Error:throw({
-                name = "ILLEGAL_WEAPON_NAME_TYPE",
-                message = ("武器名称必须具有 `string` 类型，但获取到的类型为 `%s`。"):format(
-                    type(weapon.name)
-                ),
-                parameters = {},
-            })
-        end
-        if
-            type(weapon.number) ~= "string"
-            or not (
-                weapon.number == Weapon.NULL
-                or weapon.number == Weapon.PRIMARY
-                or weapon.number == Weapon.SECONDARY
-                or weapon.number == Weapon.MELEE
-                or weapon.number == Weapon.GRENADE
-            )
-        then
-            Error:throw({
-                name = "ILLEGAL_WEAPON_NUMBER_TYPE",
-                message = ("武器栏位必须为 `Weapon.NULL`、`Weapon.PRIMARY`、`Weapon.SECONDARY`、`Weapon.MELEE`、`Weapon.GRENADE`，但实际获取到的值为 `%s`"):format(
-                    weapon.number
-                ),
-                parameters = {},
-            })
-        end
-        if not Mouse:is_button_value_valid(weapon.attack_button) then
-            Error:throw({
-                name = "ILLEGAL_WEAPON_ATTACK_BUTTON",
-                message = ("武器攻击按钮必须为合法的鼠标按钮，但实际获取到的值为 `%s`"):format(
-                    weapon.attack_button
-                ),
-                parameters = {},
-            })
-        end
-        if type(weapon.purchase_sequence) ~= "table" then
-            Error:throw({
-                name = "ILLEGAL_WEAPON_PURCHASE_SEQUENCE_TYPE",
-                message = ("武器购买按键序列必须具有 `table` 类型，但实际获取到的类型为 `%s`"):format(
-                    type(weapon.purchase_sequence)
-                ),
-                parameters = {},
-            })
-        end
-        for i = 1, #weapon.purchase_sequence do
-            if not Keyboard:is_key_valid(weapon.purchase_sequence[i]) then
-                Error:throw({
-                    name = "ILLEGAL_WEAPON_PURCHASE_SEQUENCE_KEY",
-                    message = ("武器购买按键序列由合法键盘按键构成，但获取到了非法按键 `%s`"):format(
-                        type(weapon.purchase_sequence[i])
-                    ),
-                    parameters = {},
-                })
-            end
-        end
-        if math.floor(weapon.switch_delay) ~= weapon.switch_delay or weapon.switch_delay < 0 then
-            Error:throw({
-                name = "ILLEGAL_WEAPON_SWITCH_DELAY",
-                message = "无效的武器切换延迟",
-                parameters = { weapon.switch_delay },
-            })
-        end
         Console:info("新增武器/装备：" .. weapon.name)
-        return weapon
+        return weapon --[[@as Weapon]]
     end
 
     ---根据 `purchase_sequence` 字段中预设的按键序列购买武器。

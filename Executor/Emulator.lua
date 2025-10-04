@@ -88,9 +88,9 @@ if not Emulator_lua then
             op(key)
         elseif type(key) == "string" then
             local hit = false
-            for k, v in pairs(Constants.keyboard_names) do
+            for k, v in pairs(Constants.KEYBOARD_NAME) do
                 if v == key then
-                    op(Constants.keyboard_scancodes[k])
+                    op(Constants.KEYBOARD_SCANCODE[k])
                     hit = true
                     break
                 end

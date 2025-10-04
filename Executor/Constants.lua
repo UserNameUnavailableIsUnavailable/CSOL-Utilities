@@ -2,7 +2,8 @@ if not Constants_lua then
     Version:set("Constants", "1.5.2")
     Constants_lua = true
     Constants = {
-        keyboard_scancodes = {
+        ---@enum Constants.KEYBOARD_SCANCODE 键盘按键扫描码
+        KEYBOARD_SCANCODE = {
             ESCAPE = 0x01,
             F1 = 0x3b,
             F2 = 0x3c,
@@ -121,7 +122,8 @@ if not Constants_lua then
             NUM_DECIMAL = 0x53,
             NUM_ENTER = 0x11c,
         },
-        keyboard_names = {
+        ---@enum Constants.KEYBOARD_NAME 键盘按键名称
+        KEYBOARD_NAME = {
             -- 功能区
             ESCAPE = "escape",
             F1 = "f1",
@@ -243,13 +245,22 @@ if not Constants_lua then
             NUM_ZERO = "num0",
             NUM_DECIMAL = "numperiod",
             NUM_ENTER = "numenter",
+            -- 注意：这三个不区分左右的修饰键只能用于 `is_modifier_pressed` 中
+            CTRL = "ctrl",
+            SHIFT = "shift",
+            ALT = "alt",
         },
-        mouse_buttons = {
+        ---@alias KEYBOARD_SCANCODE Constants.KEYBOARD_SCANCODE
+        ---@alias KEYBOARD_NAME Constants.KEYBOARD_NAME
+        ---@alias KEYBOARD_KEY KEYBOARD_NAME|KEYBOARD_SCANCODE
+        ---@enum Constants.MOUSE_BUTTON 鼠标按钮
+        MOUSE_BUTTON = {
             LEFT = 1, -- 左键
             MIDDLE = 2, -- 中键
             RIGHT = 3, -- 右键
             BACK = 4, -- 后退（X1）
             FORWARD = 5, -- 前进（X2）
         },
+        ---@alias MOUSE_BUTTON Constants.MOUSE_BUTTON
     }
 end

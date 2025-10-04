@@ -4,25 +4,25 @@ if not Mouse_lua then
     Include("Emulator.lua")
     Include("Context.lua")
     Include("Runtime.lua")
-    Include("Error.lua")
+    Include("Exception.lua")
     Include("Delay.lua")
     Include("Version.lua")
     Version:set("Mouse", "1.5.2")
 
     ---@class Mouse
-    ---@field LEFT integer 鼠标左键。
-    ---@field MIDDLE integer 鼠标中键。
-    ---@field RIGHT integer 鼠标右键。
-    ---@field BACKWARD integer 鼠标侧键（后退）。
-    ---@field FORWARD integer 鼠标侧键（前进）。
+    ---@field LEFT MOUSE_BUTTON 鼠标左键。
+    ---@field MIDDLE MOUSE_BUTTON 鼠标中键。
+    ---@field RIGHT MOUSE_BUTTON 鼠标右键。
+    ---@field BACKWARD MOUSE_BUTTON 鼠标侧键（后退）。
+    ---@field FORWARD MOUSE_BUTTON 鼠标侧键（前进）。
     ---@field DOUBLE_CLICK_INTERVAL integer 双击时间间隔150ms（人手实际双击间隔时间一般为此值）
     ---@field unreleased table 鼠标按下但未释放的按钮，`true` 表示按下。
     Mouse = {
-        LEFT = Constants.mouse_buttons.LEFT,
-        MIDDLE = Constants.mouse_buttons.MIDDLE,
-        RIGHT = Constants.mouse_buttons.RIGHT,
-        BACKWARD = Constants.mouse_buttons.BACK,
-        FORWARD = Constants.mouse_buttons.FORWARD,
+        LEFT = Constants.MOUSE_BUTTON.LEFT,
+        MIDDLE = Constants.MOUSE_BUTTON.MIDDLE,
+        RIGHT = Constants.MOUSE_BUTTON.RIGHT,
+        BACKWARD = Constants.MOUSE_BUTTON.BACK,
+        FORWARD = Constants.MOUSE_BUTTON.FORWARD,
     }
 
     local valid_mouse_buttons = {}
@@ -49,14 +49,14 @@ if not Mouse_lua then
     end
 
     --检查按钮名是否有效。
-    ---@param button_name any
+    ---@param val any 按钮值。
     ---@return boolean # 有效返回 `true`，无效返回 `false`。
-    function Mouse:is_button_value_valid(button_name)
-        if math.type(button_name) ~= "integer" then
+    function Mouse:is_button_value_valid(val)
+        if math.type(val) ~= "integer" then
             return false
         end
         for _, v in pairs(valid_mouse_buttons) do
-            if v == button_name then
+            if v == val then
                 return true
             end
         end
@@ -67,7 +67,7 @@ if not Mouse_lua then
     ---@type integer
     Mouse.DOUBLE_CLICK_INTERVAL = 150
 
-    ---@type {[integer]: boolean}
+    ---@type {[MOUSE_BUTTON]: boolean}
     Mouse.unreleased = {}
 
     ---获取鼠标光标位置
@@ -90,7 +90,7 @@ if not Mouse_lua then
     end
 
     ---判断某个按钮是否按下。
-    ---@param button integer 按钮值，如 `Mouse.LEFT`。
+    ---@param button MOUSE_BUTTON 按钮值，如 `Mouse.LEFT`。
     ---@return nil
     function Mouse:is_pressed(button)
         if not self:is_button_value_valid(button) then
@@ -113,7 +113,7 @@ if not Mouse_lua then
     end
 
     ---按下按钮。
-    ---@param button integer
+    ---@param button MOUSE_BUTTON
     ---@param delay integer|nil 按下某个按钮后的延迟时间，默认为 `Delay.SHORT`。
     ---@param precise boolean|nil 是否精确定时
     function Mouse:press(button, delay, precise)
@@ -126,7 +126,7 @@ if not Mouse_lua then
     end
 
     ---弹起按钮。
-    ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---@param button MOUSE_BUTTON 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer|nil 释放某个按钮后的延迟时间，默认为 `Delay.SHORT`。
     ---@param precise boolean|nil 是否精确定时
     ---@return nil
@@ -140,7 +140,7 @@ if not Mouse_lua then
     end
 
     ---单击一次按钮。
-    ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---@param button MOUSE_BUTTON 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer|nil 单击某个按钮后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
     ---@param precise boolean|nil 是否精确定时
     function Mouse:click(button, delay, precise)
@@ -152,7 +152,7 @@ if not Mouse_lua then
     end
 
     ---双击一次按钮。
-    ---@param button integer 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
+    ---@param button MOUSE_BUTTON 按钮值，如 `Mouse.LEFT`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param delay integer|nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
     ---@param precise boolean|nil 是否精确定时
     function Mouse:double_click(button, delay, precise)
@@ -166,7 +166,7 @@ if not Mouse_lua then
     end
 
     ---使用鼠标单击屏幕上某个位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param button integer 鼠标按钮。
+    ---@param button MOUSE_BUTTON 鼠标按钮。
     ---@param x integer|nil 横坐标。
     ---@param y integer|nil 纵坐标。
     ---@param delay integer|nil 点击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
@@ -183,7 +183,7 @@ if not Mouse_lua then
     end
 
     ---使用鼠标双击屏幕上某个位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param button integer 鼠标按钮。
+    ---@param button MOUSE_BUTTON 鼠标按钮。
     ---@param x integer 横坐标。
     ---@param y integer 纵坐标。
     ---@param delay integer|nil 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
@@ -202,7 +202,7 @@ if not Mouse_lua then
     end
 
     ---重复点击鼠标按钮若干次。
-    ---@param button integer
+    ---@param button MOUSE_BUTTON
     ---@param times integer|nil
     ---@param interval integer|nil
     ---@param delay integer|nil
@@ -223,7 +223,7 @@ if not Mouse_lua then
     end
 
     ---使用鼠标重复点击屏幕上的某个位置若干次。当 `Runtime.is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param button integer 鼠标按钮。
+    ---@param button MOUSE_BUTTON 鼠标按钮。
     ---@param x integer|nil 横坐标。
     ---@param y integer|nil 纵坐标。
     ---@param times integer|nil 重复次数。
@@ -288,7 +288,7 @@ if not Mouse_lua then
         return false
     end
 
-    Error:register_fatal_disposal(function()
+    Runtime:register_fatal_handler(function()
         Mouse:reset()
     end)
 end -- Mouse_lua

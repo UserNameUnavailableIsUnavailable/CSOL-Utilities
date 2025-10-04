@@ -12,7 +12,7 @@ if not Player_lua then
     Version:set("Player", "1.5.4")
 
     ---@class Player
-    ---@field RESPAWN_KEY string 复活或回合重置按键
+    ---@field respawn_key KEYBOARD_KEY 复活或回合重置按键
     ---@field private run_direction integer 跑动方向（前后），1 表示向前，0 表示静止，-1 表示向后
     ---@field private strafe_direction integer 扫射方向（左右），1 表示向右，0 表示静止，-1 表示向左
     ---@field private last_activate_special_skill_time integer 最近一次发动角色技能的时间
@@ -26,7 +26,15 @@ if not Player_lua then
     ---@field private current_weapon Weapon|nil 当前使用的武器
     Player = {}
 
-    Player.RESPAWN_KEY = Keyboard.R
+    ---@class PlayerInitializer
+    ---@field respawn_key? KEYBOARD_KEY
+    ---@field armor? Weapon
+    ---@field part_weapons? Weapon[]
+    ---@field conventional_weapons? Weapon[]
+    ---@field special_weapons? Weapon[]
+    ---@field current_weapon? Weapon|nil
+
+    Player.respawn_key = Keyboard.R
     Player.run_direction = 1
     Player.last_activate_special_skill_time = 0
     Player.last_weapon = Weapon
@@ -68,33 +76,26 @@ if not Player_lua then
     end
 
     ---设置复活按键。
-    ---@param key string 按键
+    ---@param key KEYBOARD_KEY 按键
     function Player:set_respawn_key(key)
-        if not Keyboard:is_key_valid(key) then
-            Error:throw({
-                name = "INVALID_KEY_NAME",
-                message = "无效的键盘按键。",
-                parameters = { key },
-            })
-        end
-        self.RESPAWN_KEY = key
+        self.respawn_key = key
     end
 
     ---获取复活按键。
-    ---@return string RESPAWN_KEY 复活按键
+    ---@return KEYBOARD_KEY respawn_key 复活按键
     function Player:get_respawn_key()
-        return self.RESPAWN_KEY
+        return self.respawn_key
     end
 
-    ---@brief 创建Player实例
-    ---@param init table 初始化列表
+    ---@brief 创建 Player 实例
+    ---@param init PlayerInitializer 初始化列表
     ---@return Player player 玩家对象
-    ---@remark 如果选择直接创建Player实例，则默认使用类中预定义好的若干内容
+    ---@remark 如果选择直接创建 Player 实例，则默认使用类中预定义好的若干内容
     function Player:new(init)
-        local player = init or {}
+        local player = init
         self.__index = self
         setmetatable(player, self)
-        return player
+        return player --[[@as Player]]
     end
 
     ---向随机的方向移动
@@ -145,7 +146,7 @@ if not Player_lua then
     ---回合重置或复活。
     function Player:reset_round_or_respawn()
         if Mouse:is_cursor_position_locked() then
-            Keyboard:click(self.RESPAWN_KEY, 50)
+            Keyboard:click(self.respawn_key, 50)
             return
         end
         -- 存在其他弹窗的影响
@@ -157,7 +158,7 @@ if not Player_lua then
             30,
             true
         )
-        Keyboard:click(self.RESPAWN_KEY, 50, true) -- 回合重置
+        Keyboard:click(self.respawn_key, 50, true) -- 回合重置
     end
 
     ---发动角色技能。

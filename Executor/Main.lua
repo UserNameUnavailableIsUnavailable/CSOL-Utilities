@@ -18,15 +18,24 @@ if not Main_lua then
         local task = Automation.Task[cmd]
         if (task) then task() end -- 执行任务
         Command:finish() -- 任务执行完毕
-        Runtime:sleep(100)
     end
 
     function Main()
         while Runtime:runnable() do
-            local ok, err_msg = pcall(interpret)
-            if not ok then
-                Error:catch(err_msg --[[@as string]])
-            end
+            Runtime:try_catch_finally(
+                function ()
+                    interpret()
+                    Runtime:sleep(100) -- sleep 会抛出错误，因此不可放到 finally 中
+                end,
+                ---处理异常
+                ---@param e Exception
+                function (e)
+                    Console:debug(([[捕获到异常：%s]]):format(tostring(e)))
+                    if (not Automation:is_ignored_error(e.name)) then
+                        Runtime:fatal()
+                    end
+                end
+            )
         end
     end
 end -- Main_lua

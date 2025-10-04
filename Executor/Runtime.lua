@@ -4,9 +4,10 @@ if not Runtime_lua then
     Include("Emulator.lua")
     Include("Context.lua")
     Include("Interrupt.lua")
+    Include("Exception.lua")
     Include("JSON.lua")
     Include("Version.lua")
-    Version:set("Runtime", "1.5.2")
+    Version:set("Runtime", "1.5.4")
 
     ---@class Runtime 运行时
     ---@field interrupts Interrupt[] 中断列表。
@@ -18,9 +19,11 @@ if not Runtime_lua then
     ---@field interrupt_busy_flag boolean 中断忙标志，用于避免中断嵌套。`true` 表示当前正在受理其他中断，`false` 表示空闲。
     ---@field interrupt_mask_flag_stack boolean[] 存放中断屏蔽标志位的栈。
     ---@field interrupt_context Context[] 中断发生时保存的中断现场。
-    ---@field expected_sleep_time number 根据最近睡眠情况推测的一轮睡眠时间
-    ---@field actual_sleep_time number 最近一次实际的一轮睡眠时间
-    ---@field last_interrupt_id integer 最近一次处理的中断对应标识符
+    ---@field expected_sleep_time number 根据最近睡眠情况推测的一轮睡眠时间。
+    ---@field actual_sleep_time number 最近一次实际的一轮睡眠时间。
+    ---@field last_interrupt_id integer 最近一次处理的中断对应标识符。
+    ---@field last_exception Exception 最近一次发生的异常。
+    ---@field fatal_handlers function[] 灾难错误处理函数列表。
     Runtime = {}
 
     Runtime.INTERRUPT_BURST_MODE = 0
@@ -32,16 +35,18 @@ if not Runtime_lua then
     Runtime.interrupt_busy_flag = false
     Runtime.interrupt_context = {}
 
+    Runtime.expected_sleep_time = 10
+    Runtime.actual_sleep_time = 10
+
+    Runtime.interrupt_mask_flag_stack = {}
+    Runtime.last_exception = Exception
+    Runtime.fatal_handlers = {}
+
     ---获取当前程序运行时间，单位为毫秒。
     ---@return integer
     function Runtime:get_running_time()
         return GetRunningTime()
     end
-
-    Runtime.expected_sleep_time = 10
-    Runtime.actual_sleep_time = 10
-
-    Runtime.interrupt_mask_flag_stack = {}
 
     ---将中断标志位压栈。
     function Runtime:push_interrupt_mask_flag()
@@ -74,8 +79,8 @@ if not Runtime_lua then
     end
 
     ---挂起当前执行流，挂起后，可以处理中断事件。除了 `Runtime` 内部方法外，其他地方都应当调用 `Runtime:sleep`，而非直接调用罗技 API 中的 Sleep，这样可以进行中断处理。
-    ---@param milliseconds integer | nil 挂起的时间。
-    ---@param precise boolean | nil 是否需要尽力保证精度。
+    ---@param milliseconds integer|nil 挂起的时间。
+    ---@param precise boolean|nil 是否需要尽力保证精度。
     ---@return nil
     function Runtime:sleep(milliseconds, precise)
         milliseconds = milliseconds or 0
@@ -129,9 +134,8 @@ if not Runtime_lua then
 
     ---粗发式中断处理。
     function Runtime:interrupt_in_burst()
-        local int_status
-        local int_result --[[@as any]]
-        int_result = "INTERRUPT_HANDLER_SUCCESS"
+        local status
+        local result
         if
             Runtime.interrupt_busy_flag -- 当前有正在处理的中断，跳过
         then
@@ -146,15 +150,15 @@ if not Runtime_lua then
                 self:push_interrupt_mask_flag()
                 self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
                 self.interrupt_busy_flag = true
-                int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
+                status, result = pcall(function() interrupt:handle() end) -- 处理中断
                 self.interrupt_busy_flag = false
                 self:pop_interrupt_mask_flag() -- 开中断
             end
             -- 当前中断处理完毕
             if
-                not int_status -- 中断处理出现错误
+                not status -- 中断处理出现错误
             then
-                error(int_result) -- 将中断处理过程中引发的错误上抛
+                self:throw(result) -- 将中断处理过程中引发的错误上抛
             end
         end
     end
@@ -192,7 +196,7 @@ if not Runtime_lua then
         if
             not int_status -- 中断处理出现错误
         then
-            error(int_result) -- 将中断处理过程中引发的错误上抛
+            self:throw(self.last_exception) -- 将中断处理过程中引发的错误上抛
         end
     end
 
@@ -226,7 +230,7 @@ if not Runtime_lua then
         if
             not int_status -- 中断处理出现错误
         then
-            error(int_result) -- 将中断处理过程中引发的错误上抛
+            self:throw(self.last_exception) -- 将中断处理过程中引发的错误上抛
         end
     end
 
@@ -315,5 +319,65 @@ if not Runtime_lua then
     ---@return boolean
     function Runtime:runnable()
         return not RunningInEmulator or IsEmulating()
+    end
+
+    ---抛出一个错误。
+    ---@param e any 错误对象
+    function Runtime:throw(e)
+        if type(e) == "nil" then return
+        elseif type(e) == "table" then
+            e = Exception:new(e)
+        else
+            e = Exception:new({
+                name = "__INTERNAL_ERROR__",
+                message = tostring(e),
+            })
+        end
+        
+        self.last_exception = e --[[@as Exception]]
+        error(e)
+    end
+
+    ---尝试执行一段代码，并捕获其中的错误。
+    ---@param try fun() 需要执行的代码块
+    ---@param catch fun(e: Exception) 错误处理函数
+    ---@param finally fun()|nil 最终处理函数
+    function Runtime:try_catch_finally(try, catch, finally)
+        local ok, result = pcall(try)
+        if not ok then
+            catch(result)
+        end
+        if finally then
+            finally()
+        end
+    end
+
+    ---注册灾难错误处理函数。
+    ---@param f fun() 处理函数
+    ---@return integer index 为处理函数分配的索引号
+    function Runtime:register_fatal_handler(f)
+            self.fatal_handlers[#self.fatal_handlers + 1] = f
+            return #self.fatal_handlers
+    end
+
+    ---注销灾难错误处理函数。
+    ---@param index integer 处理函数的索引号
+    ---@return boolean
+    function Runtime:unregister_fatal_handler(index)
+        if self.fatal_handlers[index] then
+            self.fatal_handlers[index] = function () end -- 占位，避免索引号变动
+            return true
+        end
+        return false
+    end
+
+    ---发生灾难错误时的处理函数。
+    function Runtime:fatal()
+        for _, f in pairs(self.fatal_handlers) do
+            if type(f) == "function" then
+                pcall(f)
+            end
+        end
+        error(("程序发生灾难错误，无法继续运行。最近一次错误：%s"):format(tostring(self.last_exception)))
     end
 end -- Runtime_lua

@@ -1,58 +1,40 @@
 if not Interrupt_lua then
     Interrupt_lua = true
 
-    Include("Error.lua")
+    Include("Exception.lua")
     Include("Version.lua")
     Version:set("Interrupt", "1.5.2")
 
     ---@class Interrupt
+    ---@field name string|nil 中断名称
+    ---@field handler function 中断处理函数
+    ---@field parameters any[]|nil 中断处理函数参数列表
+    ---@field maskable boolean|nil 是否可屏蔽
+    ---@field alive boolean|nil 是否存活
     Interrupt = {}
 
-    Interrupt.name = "ANONYMOUS_INTERRUPT"
+    ---@class InterruptInitializer
+    ---@field name? string
+    ---@field handler function
+    ---@field parameters? any[]
+    ---@field maskable? boolean
+    ---@field alive? boolean
 
+    Interrupt.name = "<ANONYMOUS_INTERRUPT>"
     Interrupt.handler = function(...) end
-
     Interrupt.parameters = {}
-
     Interrupt.maskable = true
-
     Interrupt.alive = true
-
     Interrupt.result = nil
 
     ---创建中断。
-    ---@param init function | table 中断处理函数或初始化列表
+    ---@param init function|InterruptInitializer 中断处理函数或初始化列表
     ---@return Interrupt
     function Interrupt:new(init)
         local interrupt = {}
-        if type(init) ~= "table" and type(init) ~= "function" then
-            Error:throw({
-                name = "INVALID_INTERRUPT_INIT_TYPE",
-                message = "无效的中断对象初始化列表",
-                parameters = { type(init) },
-            })
-        end
         if type(init) == "function" then
             interrupt.handler = init
         else -- table
-            if type(init.name) ~= "string" and type(init.name) ~= "nil" then
-                Error:throw({
-                    name = "INVALID_INTERRUPT_NAME_TYPE",
-                    message = ("无效的名称类型："):format(type(init.name)),
-                })
-            end
-            if type(init.handler) ~= "function" and type(init.handler) ~= "nil" then
-                Error:throw({
-                    name = "INVALID_INTERRUPT_HANDLER_TYPE",
-                    message = ("无效的处理函数类型："):format(type(init.handler)),
-                })
-            end
-            if type(init.parameters) ~= "table" and type(init.parameters) ~= "nil" then
-                Error:throw({
-                    name = "INVALID_INTERRUPT_PARAMETERS_TYPE",
-                    message = ("无效的参数列表类型："):format(type(init.parameters)),
-                })
-            end
             -- 只接受下面的字段，其他字段忽略
             interrupt = {
                 name = init.name,
@@ -64,7 +46,7 @@ if not Interrupt_lua then
         end
         self.__index = self
         setmetatable(interrupt, self)
-        return interrupt
+        return interrupt --[[@as Interrupt]]
     end
 
     function Interrupt:is_alive()

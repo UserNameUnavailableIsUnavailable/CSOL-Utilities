@@ -4,7 +4,7 @@ if not Automation_lua then
     Include("Console.lua")
     Include("JSON.lua")
     Include("Context.lua")
-    Include("Error.lua")
+    Include("Exception.lua")
     Include("Runtime.lua")
     Include("Keyboard.lua")
     Include("Mouse.lua")
@@ -26,7 +26,46 @@ if not Automation_lua then
     ---@field last_reset_or_respawn_time integer
     ---@field last_use_health_potion_30_timepoint integer
     ---@field last_use_health_potion_100_timepoint integer
-    Automation = {}
+    ---@field ignored_error_names string[]
+    Automation = {
+        ignored_error_names = {},
+    }
+
+    ---检查指定异常名称是否在忽略列表中。
+    ---@param error_name string 异常名称
+    ---@return boolean
+    function Automation:is_ignored_error(error_name)
+        for _, name in ipairs(self.ignored_error_names) do
+            if name == error_name then
+                return true
+            end
+        end
+        return false
+    end
+
+    ---增加忽略的异常名称。
+    ---@param error_name string 异常名称
+    ---@return boolean
+    function Automation:add_ignored_error(error_name)
+        if not self:is_ignored_error(error_name) then
+            table.insert(self.ignored_error_names, error_name)
+            return true
+        end
+        return false
+    end
+
+    ---移除忽略的异常名称。
+    ---@param error_name string 异常名称
+    ---@return boolean
+    function Automation:remove_ignored_error(error_name)
+        for i, name in ipairs(self.ignored_error_names) do
+            if name == error_name then
+                table.remove(self.ignored_error_names, i)
+                return true
+            end
+        end
+        return false
+    end
 
     ---手动接管标识。
     Runtime.manual_flag = false
@@ -78,7 +117,6 @@ if not Automation_lua then
     }))
 
     -- 初始化
-    Error:register_error_handler("COMMAND_CHANGED", function() end)
     DateTime:set_time_zone(Setting.FIELD_TIME_ZONE)                    -- 时区
     Weapon:set_reload_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1])  -- 换弹按键
     Player:set_respawn_key(Setting.KEYSTROKES_GAME_RESET_ROUND_KEY[1]) -- 复活按键
@@ -104,6 +142,7 @@ if not Automation_lua then
     })
 
     Runtime.last_command_update_timepoint = 0
+    Automation:add_ignored_error("__COMMAND_CHANGED__")
     Runtime:register_interrupt(Interrupt:new({
         name = "接收命令",
         handler = function()
@@ -121,12 +160,11 @@ if not Automation_lua then
                 Automation.default_player:reset()
                 Automation.extended_player:reset()
 
-                local e = {
-                    name = "COMMAND_CHANGED",
+                local e = Exception:new({
+                    name = "__COMMAND_CHANGED__",
                     message = "命令变更",
-                    parameters = {},
-                }
-                Error:throw(e) -- 主动触发运行时错误
+                })
+                Runtime:throw(e) -- 主动触发运行时异常
             end
         end,
     }))

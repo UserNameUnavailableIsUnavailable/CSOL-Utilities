@@ -1,4 +1,9 @@
 {
     "cmake.sourceDirectory": "${workspaceFolder}/Controller",
-    "cmake.buildDirectory": "${workspaceFolder}/Controller/build"
+    "cmake.buildDirectory": "${workspaceFolder}/Controller/build",
+  "Lua.workspace.ignoreDir": [
+    "vcpkg_installed",
+    "build",
+    "dist"
+  ]
 }
