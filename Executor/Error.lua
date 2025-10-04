@@ -2,7 +2,7 @@ if not Error_lua then
     Error_lua = true
     Include("JSON.lua")
     Include("Version.lua")
-    Version:set("Error", "1.5.2")
+    Version:set("Error", "1.5.4")
 
     ---@class Error
     ---@field name string 错误名称
@@ -86,7 +86,7 @@ if not Error_lua then
         self.message = message
         self.parameters = parameters
 
-        error(("❌%s❌"):format(error_json_string))
+        error(error_json_string)
     end
 
     ---错误处理函数，调用者不应该捕获 catch 抛出的错误。
@@ -99,22 +99,9 @@ if not Error_lua then
         if type(error_string) ~= "string" then
             error_init = {
                 name = "INVALID_ERROR_TYPE",
-                message = ("传入的错误信息必须为 `string`，但接受到的类型为 `%s`"):format(
+                message = ("传入的错误信息必须为 `string`，但接收到的类型为 `%s`。"):format(
                     type(error_string)
                 ),
-            }
-            goto FATAL
-        end
-
-        error_json_string = error_string:match("❌(.-)❌")
-
-        if not error_json_string then
-            error_init = {
-                name = "INVALID_ERROR_STRING_FORMAT",
-                message = ("传入的错误信息格式错误（缺少由 ❌ 包裹 JSON 格式的错误信息）"):format(
-                    type(error_string)
-                ),
-                parameters = { error_string },
             }
             goto FATAL
         end
@@ -124,7 +111,7 @@ if not Error_lua then
         if not ok then
             error_init = {
                 name = "INVALID_ERROR_JSON_FORMAT",
-                message = "错误信息不是有效的 JSON 格式",
+                message = "未知错误信息格式（无法解析 JSON 格式的错误信息）。",
                 parameters = { error_json_string, result },
             }
             goto FATAL

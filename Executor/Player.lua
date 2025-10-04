@@ -9,7 +9,7 @@ if not Player_lua then
     Include("Utility.lua")
     Include("DateTime.lua")
     Include("Version.lua")
-    Version:set("Player", "1.5.2")
+    Version:set("Player", "1.5.4")
 
     ---@class Player
     ---@field RESPAWN_KEY string 复活或回合重置按键
@@ -23,7 +23,7 @@ if not Player_lua then
     ---@field private last_part_weapon_index integer 最近一次购买的配件武器序号
     ---@field private last_buy_special_weapon_time integer 最近一次购买特殊武器的时间
     ---@field private last_special_weapon_index integer 最近一次购买的特殊武器序号
-    ---@field private current_weapon Weapon | nil 当前使用的武器
+    ---@field private current_weapon Weapon|nil 当前使用的武器
     Player = {}
 
     Player.RESPAWN_KEY = Keyboard.R
@@ -73,7 +73,7 @@ if not Player_lua then
         if not Keyboard:is_key_valid(key) then
             Error:throw({
                 name = "INVALID_KEY_NAME",
-                message = "无效的键盘按键",
+                message = "无效的键盘按键。",
                 parameters = { key },
             })
         end
@@ -198,7 +198,7 @@ if not Player_lua then
         weapon:switch() -- 切换到购买的武器
     end
 
-    ---随机使用常规武器列表中的武器。
+    ---随机购买并使用常规武器列表中的武器进行攻击。
     function Player:attack_with_conventional_weapons()
         if not self.conventional_weapons or 0 == #self.conventional_weapons then
             return
@@ -239,14 +239,6 @@ if not Player_lua then
 
     ---按序购买配件武器。
     function Player:buy_part_weapons()
-        local current_time = DateTime:get_local_timestamp()
-        if
-            math.abs(current_time - self.last_buy_part_weapon_time) < 20 -- 每隔 20 秒购买一次
-        then
-            return
-        else
-            self.last_buy_part_weapon_time = current_time
-        end
         -- 非空且至少有一件武器
         if not self.part_weapons or #self.part_weapons == 0 then
             return
@@ -261,7 +253,7 @@ if not Player_lua then
         Player.last_part_weapon_index = index
     end
 
-    ---使用特殊武器。
+    ---按序购买并使用特殊武器列表中的武器进行攻击。
     function Player:attack_with_special_weapons()
         Player.playing_flag = true
         -- 非空且至少有一件武器
@@ -297,7 +289,13 @@ if not Player_lua then
     ---使用玩家对象进行游戏。
     function Player:play()
         self:buy_armor()
-        self:buy_part_weapons()
+        local current_time = DateTime:get_local_timestamp()
+        if
+            math.abs(current_time - self.last_buy_part_weapon_time) > 30 -- 每隔 30 秒购买一次
+        then
+            self:buy_part_weapons()
+            self.last_buy_part_weapon_time = current_time
+        end
         self:attack_with_conventional_weapons()
         self:attack_with_special_weapons()
     end

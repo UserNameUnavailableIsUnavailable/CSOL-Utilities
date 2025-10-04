@@ -308,8 +308,8 @@ function export_weapon_list() {
     `\tWeaponList_lua = true\n` +
     `\tInclude("Version.lua")\n`+
     `\tVersion:set("WeaponList", "${VERSION}")\n` +
-    `\tVersion:require("WeaponList", "Setting", "1.5.3")\n` +
-    `\tVersion:require("WeaponList", "Weapon", "1.5.3")\n` +
+    `\tVersion:require("WeaponList", "Setting", "1.5.4")\n` +
+    `\tVersion:require("WeaponList", "Weapon", "1.5.4")\n` +
     `\t${blocks.join("\n")}\n` +
     `end\n`;
     console.log(ret);

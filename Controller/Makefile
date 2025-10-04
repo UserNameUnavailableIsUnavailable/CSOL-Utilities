@@ -24,6 +24,6 @@ all: | $(SUBDIR)
 # 复制的编译结果到构建目录
 	Copy-Item -Destination "$(SUBDIR)" -Path "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)/*" -Recurse -Force
 # 复制 Controller.ps1 到构建目录
-	Copy-Item -Path "$(CURRENT_SOURCE_DIR)/Controller.ps1" -Destination "$(BUILD_DIR)/Controller.ps1" -Force
+	Copy-Item -Path "$(CURRENT_SOURCE_DIR)/Controller.ps1","$(CURRENT_SOURCE_DIR)/Controller.cmd" -Destination "$(BUILD_DIR)" -Force
 $(SUBDIR):
 	New-Item -Type Directory -Path $(SUBDIR) -Force

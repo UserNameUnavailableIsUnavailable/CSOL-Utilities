@@ -85,13 +85,13 @@ if not Version_lua then
     end
 
     function Version:assert()
-        Console:information(
+        Console:info(
             "执行版本断言检查。如检查不通过，请按照手册中更新步骤进行更新。"
         )
         for _, value in ipairs(self.requirements) do
             value()
         end
-        Console:information("版本断言检查通过。")
+        Console:info("版本断言检查通过。")
         self.requirements = {} -- 通过，释放空间
     end
 end
