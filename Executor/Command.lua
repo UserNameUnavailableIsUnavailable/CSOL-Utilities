@@ -1,7 +1,11 @@
-if not Command_lua then
-    Command_lua = true
+if not __COMMAND_LUA__ then
+    __COMMAND_LUA__ = true
+    local __version__ = "1.5.3"
+
     Include("Version.lua")
-    Version:set("Command", "1.5.3")
+
+    Version:set("Command", __version__)
+
     Command = {
         CMD_NOP = 0,
         CMD_START_GAME_ROOM = 1,
@@ -26,6 +30,8 @@ if not Command_lua then
         Command.CMD_EXTENDED_IDLE_2,
     }
 
+    ---判断一个命令是否为挂机命令。
+    ---@param cmd any
     function Command:is_idle_command(cmd)
         for _, v in ipairs(Command.IDLE_COMMANDS) do
             if v == cmd then
@@ -85,6 +91,8 @@ if not Command_lua then
         Command.status = status
     end
 
+    ---判断当前命令是否有效。
+    ---@return boolean
     function Command:is_valid()
         local current_time = DateTime:get_local_timestamp() -- 本地时间戳
         local expired = current_time - self.timepoint > 5 -- 命令是否过期
@@ -100,6 +108,7 @@ if not Command_lua then
         return true
     end
 
+    ---标记当前命令为已完成。
     function Command:finish()
         if not self.repeatable then
             self.finished = true
@@ -115,4 +124,4 @@ if not Command_lua then
         end
         return Command.CMD_NOP
     end
-end -- Command_lua
+end -- __COMMAND_LUA__

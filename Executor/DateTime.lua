@@ -1,14 +1,16 @@
-if not DateTime_lua then
-    DateTime_lua = true
+if not __DATE_TIME_LUA__ then
+    __DATE_TIME_LUA__ = true
+    local __version__ = "1.5.2"
 
     Include("Emulator.lua")
     Include("Version.lua")
-    Version:set("DateTime", "1.5.2")
+    Version:set("DateTime", __version__)
+
     ---@class DateTime
-    ---@field TIME_ZONE number 时区
+    ---@field private time_zone number 时区
     DateTime = {}
 
-    DateTime.TIME_ZONE = 8
+    DateTime.time_zone = 8
 
     ---判断 `year` 是否为闰年。
     ---@param year integer
@@ -70,11 +72,11 @@ if not DateTime_lua then
         if not tz then
             return
         end
-        self.TIME_ZONE = tz
+        self.time_zone = tz
     end
 
     function DateTime:get_time_zone()
-        return self.TIME_ZONE
+        return self.time_zone
     end
 
     ---获取操作系统本地时间，并将其转换为 UNIX 时间戳。
@@ -93,7 +95,7 @@ if not DateTime_lua then
             hour --[[@as integer]],
             minute --[[@as integer]],
             second --[[@as integer]],
-            self.TIME_ZONE
+            self.time_zone
         )
     end
-end -- DateTime_lua
+end -- __DATE_TIME_LUA__

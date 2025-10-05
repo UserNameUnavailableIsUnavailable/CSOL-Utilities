@@ -1,6 +1,9 @@
-if not Constants_lua then
-    Version:set("Constants", "1.5.2")
-    Constants_lua = true
+if not __CONSTANTS_LUA__ then
+    __CONSTANTS_LUA__ = true
+    local __version__ = "1.5.4"
+
+    Version:set("Constants", __version__)
+
     Constants = {
         ---@enum Constants.KEYBOARD_SCANCODE 键盘按键扫描码
         KEYBOARD_SCANCODE = {
@@ -263,4 +266,4 @@ if not Constants_lua then
         },
         ---@alias MOUSE_BUTTON Constants.MOUSE_BUTTON
     }
-end
+end -- __CONSTANTS_LUA__

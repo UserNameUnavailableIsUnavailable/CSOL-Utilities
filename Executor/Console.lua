@@ -1,9 +1,12 @@
 if not Console_lua then
     Console_lua = true
+    local __version__ = "1.5.4"
 
     Include("Emulator.lua")
     Include("Version.lua")
-    Version:set("Console", "1.5.4")
+
+    Version:set("Console", __version__)
+
     Console = {}
 
     ---在控制台上打印字符串，不换行。

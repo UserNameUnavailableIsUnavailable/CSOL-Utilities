@@ -1,5 +1,6 @@
-if not Keyboard_lua then
-    Keyboard_lua = true
+if not __KEYBOARD_LUA__ then
+    __KEYBOARD_LUA__ = true
+    local __version__ = "1.5.4"
 
     Include("Emulator.lua")
     Include("Context.lua")
@@ -8,7 +9,7 @@ if not Keyboard_lua then
     Include("Delay.lua")
     Include("Constants.lua")
     Include("Version.lua")
-    Version:set("Keyboard", "1.5.4")
+    Version:set("Keyboard", __version__)
 
     ---@class Keyboard
     ---@field ESCAPE KEYBOARD_NAME
@@ -279,8 +280,8 @@ if not Keyboard_lua then
     end
 
     ---@param key KEYBOARD_KEY|KEYBOARD_KEY[] 按键名称，如 `Keyboard.F1`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param delay integer|nil 按下按键后的延迟时间。可以直接使用预定义于Delay表中的字段，如 `Delay.NORMAL`。
-    ---@param precise boolean|nil 是否精确定时
+    ---@param delay? integer 按下按键后的延迟时间。可以直接使用预定义于Delay表中的字段，如 `Delay.NORMAL`。
+    ---@param precise? boolean|nil 是否精确定时
     ---按下按键。
     function Keyboard:press(key, delay, precise)
         if not self:is_frozen() then
@@ -304,8 +305,8 @@ if not Keyboard_lua then
 
     ---弹起按键。
     ---@param key KEYBOARD_KEY|KEYBOARD_KEY[]able 按键名称，如 `Keyboard.ESCAPE`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param delay integer|nil 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
-    ---@param precise boolean|nil 是否精确定时
+    ---@param delay? integer 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
+    ---@param precise? boolean 是否精确定时
     function Keyboard:release(key, delay, precise)
         if not self:is_frozen() then
             if type(key) == "string" and self:is_key_valid(key) then
@@ -328,8 +329,8 @@ if not Keyboard_lua then
 
     ---按下，而后弹起按键（视为一次点击）。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param key KEYBOARD_KEY|KEYBOARD_KEY[] 按键名称，如 `Keyboard.ESCAPE`
-    ---@param delay integer|nil 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
-    ---@param precise boolean|nil 是否精确定时
+    ---@param delay? integer 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
+    ---@param precise? boolean 是否精确定时
     function Keyboard:click(key, delay, precise)
         if not self:is_frozen() then
             if type(key) == "string" and self:is_key_valid(key) then
@@ -359,10 +360,10 @@ if not Keyboard_lua then
 
     ---点击某个按键若干次。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param key KEYBOARD_KEY 按键名称，如 `Keyboard.ESCAPE`。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
-    ---@param times integer|nil 重复次数。
-    ---@param interval integer|nil 间隔
-    ---@param delay integer|nil 操作完成后的延迟时间
-    ---@param precise boolean|nil 是否精确定时
+    ---@param times? integer 重复次数。
+    ---@param interval? integer 间隔
+    ---@param delay? integer 操作完成后的延迟时间
+    ---@param precise? boolean 是否精确定时
     function Keyboard:click_several_times(key, times, interval, delay, precise)
         interval = interval or Delay.SHORT
         delay = delay or Delay.SHORT
@@ -400,9 +401,9 @@ if not Keyboard_lua then
 
     ---通过键盘输入由字母和数字构成的字符串序列
     ---@param s string ASCII 字符
-    ---@param interval integer|nil
-    ---@param delay integer|nil
-    ---@param precise boolean|nil
+    ---@param interval? integer
+    ---@param delay? integer
+    ---@param precise? boolean
     function Keyboard:puts(s, interval, delay, precise)
         interval = interval or Delay.SHORT
         delay = delay or Delay.SHORT
@@ -525,4 +526,4 @@ if not Keyboard_lua then
     Runtime:register_fatal_handler(function()
         Keyboard:reset()
     end)
-end -- Keyboard_lua
+end -- __KEYBOARD_LUA__

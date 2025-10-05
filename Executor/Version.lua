@@ -1,11 +1,13 @@
-if not Version_lua then
-    Version_lua = true
+if not __VERSION_LUA__ then
+    __VERSION_LUA__ = true
+    local __version__ = "1.5.2"
+    
     ---@class Version
-    ---@field records table<string, string>
-    ---@field requirements function[]
+    ---@field private records table<string, string>
+    ---@field private requirements function[]
     Version = {
         records = {
-            Version = "1.5.2",
+            Version = __version__,
         },
         requirements = {},
     }
@@ -94,4 +96,4 @@ if not Version_lua then
         Console:info("版本断言检查通过。")
         self.requirements = {} -- 通过，释放空间
     end
-end
+end -- __VERSION_LUA__

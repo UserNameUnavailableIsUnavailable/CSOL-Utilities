@@ -1,8 +1,12 @@
-if not Delay_lua then
-    Delay_lua = true
+if not __DELAY_LUA__ then
+    __DELAY_LUA__ = true
+    local __version__ = "1.5.2"
 
     Include("Version.lua")
-    Version:set("Delay", "1.5.2")
+    Version:set("Delay", __version__)
+
+    ---基础时延。
+    ---@enum Delay
     Delay = {
         MINI_MINI = 5,
         MINI = 10,
@@ -13,4 +17,4 @@ if not Delay_lua then
         LONG_LONG = 500,
         REFRESH = 1000,
     }
-end -- Delay_lua
+end -- __DELAY_LUA__

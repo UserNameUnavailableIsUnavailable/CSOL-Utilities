@@ -1,5 +1,6 @@
-﻿if not Weapon_lua then
-    Weapon_lua = true
+﻿if not __WEAPON_LUA__ then
+    __WEAPON_LUA__ = true
+    local __version__ = "1.5.4"
 
     Include("Runtime.lua")
     Include("Delay.lua")
@@ -8,8 +9,23 @@
     Include("Keyboard.lua")
     Include("Version.lua")
     Include("Exception.lua")
-    Version:set("Weapon", "1.5.4")
-    Version:require("Weapon", "Setting", "1.5.4", nil)
+    Version:set("Weapon", __version__)
+    Version:require("Weapon", "Setting", __version__, nil)
+
+    ---@class WeaponInitializer
+    ---@field public name? string
+    ---@field public number? string
+    ---@field public attack_button? integer
+    ---@field public switch_delay? integer
+    ---@field public purchase_sequence? table
+    ---@field public reloading_required? boolean
+    ---@field public reload_key? KEYBOARD_KEY
+    ---@field public attack_duration? integer
+    ---@field public horizontal_strafe_mode? string
+    ---@field public vertical_strafe_mode? string
+    ---@field public fire_interator? fun(self: Weapon, round: integer, begin_timepoint: integer): (function|nil)
+    ---@field public strafe_interator? fun(self: Weapon, round: integer, begin_timepoint: integer): (function|nil)
+    ---@field public attack? fun(self: Weapon)
 
     ---@class Weapon 武器类
     ---@field NULL string 配件武器
@@ -17,18 +33,18 @@
     ---@field SECONDARY string 副武器
     ---@field MELEE string 近战武器
     ---@field GRENADE string 手雷
-    ---@field name string 武器名
-    ---@field number string 武器栏位
-    ---@field attack_button integer 攻击按钮
-    ---@field switch_delay integer 切换延迟
-    ---@field purchase_sequence table 购买按键序列
-    ---@field reloading_required boolean 是否需要换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
-    ---@field reload_key KEYBOARD_KEY 重新装填按键
-    ---@field attack_duration integer 攻击持续时间，单位为秒，默认为 10 秒
-    ---@field horizontal_strafe_mode string|nil 武器水平扫射模式，`"none"` 为无扫射，`"left"` 为固定向左，`"right"` 为固定向右，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（左右交替扫射）。该字段缺省值为 `"random"`。
-    ---@field vertical_strafe_mode string|nil 武器垂直扫射模式，`"none"` 为无扫射，`"up"` 为固定向上，`"down"` 为固定向下，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（上下交替扫射）。该字段缺省值为 `"oscillating"`。
-    ---@field dx integer|fun():integer 每一轮水平扫射的距离
-    ---@field dy integer|fun():integer 每一轮垂直扫射的距离
+    ---@field protected name string 武器名
+    ---@field protected number string 武器栏位
+    ---@field protected attack_button MOUSE_BUTTON 攻击按钮
+    ---@field protected switch_delay integer 切换延迟
+    ---@field protected purchase_sequence table 购买按键序列
+    ---@field protected reloading_required boolean 是否需要换弹（连续两次随机到相同的需要换弹的武器时，将其丢弃并重新购买）
+    ---@field protected reload_key KEYBOARD_KEY 重新装填按键
+    ---@field protected attack_duration integer 攻击持续时间，单位为秒，默认为 10 秒
+    ---@field protected horizontal_strafe_mode string|nil 武器水平扫射模式，`"none"` 为无扫射，`"left"` 为固定向左，`"right"` 为固定向右，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（左右交替扫射）。该字段缺省值为 `"random"`。
+    ---@field protected vertical_strafe_mode string|nil 武器垂直扫射模式，`"none"` 为无扫射，`"up"` 为固定向上，`"down"` 为固定向下，`"random"` 为随机方向扫射，`"oscillating"` 为简谐扫射（上下交替扫射）。该字段缺省值为 `"oscillating"`。
+    ---@field protected dx integer|fun():integer 每一轮水平扫射的距离
+    ---@field protected dy integer|fun():integer 每一轮垂直扫射的距离
     Weapon = {}
 
     Weapon.NULL = Keyboard.ZERO
@@ -49,17 +65,72 @@
     Weapon.dx = 0
     Weapon.dy = 0
 
-    ---@class WeaponInitializer
-    ---@field name? string
-    ---@field number? string
-    ---@field attack_button? integer
-    ---@field switch_delay? integer
-    ---@field purchase_sequence? table
-    ---@field reloading_required? boolean
-    ---@field reload_key? KEYBOARD_KEY
-    ---@field attack_duration? integer
-    ---@field horizontal_strafe_mode? string
-    ---@field vertical_strafe_mode? string
+    ---判断武器是否需要换弹。
+    ---@return boolean
+    ---@nodiscard
+    function Weapon:is_reloading_required()
+        return self.reloading_required
+    end
+
+    ---获取武器名称。
+    ---@return string
+    ---@nodiscard
+    function Weapon:get_name()
+        return self.name
+    end
+
+    ---获取武器栏位。
+    ---@return string
+    ---@nodiscard
+    function Weapon:get_number()
+        return self.number
+    end
+
+    ---获取攻击按钮。
+    ---@return MOUSE_BUTTON
+    ---@nodiscard
+    function Weapon:get_attack_button()
+        return self.attack_button
+    end
+
+    ---获取武器切换延迟。
+    ---@return integer
+    ---@nodiscard
+    function Weapon:get_switch_delay()
+        return self.switch_delay
+    end
+
+    ---获取武器一轮攻击时长。
+    ---@return integer
+    ---@nodiscard
+    function Weapon:get_attack_duration()
+        return self.attack_duration
+    end
+
+    ---获取武器水平扫射模式。
+    ---@return string
+    ---@nodiscard
+    function Weapon:get_horizontal_strafe_mode()
+        return self.horizontal_strafe_mode
+    end
+
+    ---获取武器垂直扫射模式。
+    ---@return string
+    ---@nodiscard
+    function Weapon:get_vertical_strafe_mode()
+        return self.vertical_strafe_mode
+    end
+
+    ---获取武器购买按键序列。
+    ---@return KEYBOARD_KEY[]
+    ---@nodiscard
+    function Weapon:get_purchase_sequence()
+        local ret = {}
+        -- 通过元表实现购买按键序列的只读，这样可以防止外部修改购买按键序列。
+        ret.__index = self.purchase_sequence
+        setmetatable(ret, self.purchase_sequence)
+        return ret
+    end
 
     ---设置换弹按键。
     ---@param key Constants.KEYBOARD_SCANCODE|Constants.KEYBOARD_NAME
@@ -165,7 +236,7 @@
     ---@param round integer 攻击轮次。`round == 0` 时，开始开火；`round > 0` 时，持续开火（可通过返回 `nil` 提前结束）；`round < 0` 时，开火需要提前结束（必须正确处理此情形）。
     ---@param begin_timepoint integer 开始开火的时刻
     ---@return function|nil # 下一轮需要进行的开火操作，返回 `nil` 表示停止开火。
-    function Weapon:fire_interator(round, begin_timepoint)
+    function Weapon:fire_iterator(round, begin_timepoint)
         if round == 0 then -- 初始化扫射方向
             return function()
                 Mouse:press(self.attack_button) -- 按下攻击按钮，开始攻击
@@ -185,7 +256,7 @@
     ---@param round integer 扫射轮次。`round == 0` 时，扫射开始；`round > 0` 时，扫射可以进行（可通过返回 `nil` 提前结束）；`round < 0` 时，扫射需要提前结束（必须正确处理此情形）。
     ---@param begin_timepoint integer 扫射开始的时刻
     ---@return function|nil # 下一轮需要进行的扫射操作，返回 `nil` 表示结束当前武器的扫射。
-    function Weapon:strafe_interator(round, begin_timepoint)
+    function Weapon:strafe_iterator(round, begin_timepoint)
         if round < 0 then
             return nil -- 强制结束扫射
         end
@@ -240,8 +311,8 @@
         local timepoint = Runtime:get_running_time()
         local round = 0
         repeat
-            local fire = self:fire_interator(round, timepoint)
-            local strafe = self:strafe_interator(round, timepoint)
+            local fire = self:fire_iterator(round, timepoint)
+            local strafe = self:strafe_iterator(round, timepoint)
             round = round + 1
             if fire and strafe then
                 fire()
@@ -251,9 +322,9 @@
             end
         until Runtime:get_running_time() - timepoint > self.attack_duration * 1000
         local disposal
-        disposal = self:fire_interator(-1, timepoint) -- 强制结束攻击
+        disposal = self:fire_iterator(-1, timepoint) -- 强制结束攻击
         if disposal then disposal() end
-        disposal = self:strafe_interator(-1, timepoint) -- 强制结束扫射
+        disposal = self:strafe_iterator(-1, timepoint) -- 强制结束扫射
         if disposal then disposal() end
     end
-end -- Weapon_lua
+end -- __WEAPON_LUA__

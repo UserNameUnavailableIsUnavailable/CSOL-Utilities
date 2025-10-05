@@ -38,11 +38,11 @@ const VERSION = inject("VERSION") as string;
 
 /// 导出设置。
 function export_setting() {
-    let code = "if not Setting_lua\n" +
-        "then\n" +
-        "\tSetting_lua = true\n" +
+    let code = "if not __SETTING_LUA__ then\n" +
+        "\t__SETTING_LUA__ = true\n" +
+        `\tlocal __version__ = "${VERSION}"\n` +
         `\tInclude("Version.lua")\n` +
-        `\tVersion:set("Setting", "${VERSION}")\n` +
+        `\tVersion:set("Setting", __version__)\n` +
         "\tSetting = {\n";
 
     SETTING_ITEMS.forEach((v, k) => {
@@ -66,7 +66,7 @@ function export_setting() {
         }
     });
     code += "\t}\n";
-    code += "end\n";
+    code += "end -- __SETTING_LUA__\n";
     code = formatText(code)
     console.log(code);
     try {

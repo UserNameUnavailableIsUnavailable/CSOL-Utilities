@@ -1,7 +1,10 @@
-if not Setting_lua then
-    Setting_lua = true
+if not __SETTING_LUA__ then
+    __SETTING_LUA__ = true
+    local __version__ = "1.5.4"
+
     Include("Version.lua")
-    Version:set("Setting", "1.5.4")
+    Version:set("Setting", __version__)
+
     Setting = {
         FIELD_TIME_ZONE = 8,
         SWITCH_CREATE_ROOM_ON_EXCEPTION = true,
@@ -85,4 +88,4 @@ if not Setting_lua then
         POSITION_STORE_CONFIRM_PURCHASE_X = 37019,
         POSITION_STORE_CONFIRM_PURCHASE_Y = 38993
     }
-end
+end -- __SETTING_LUA__

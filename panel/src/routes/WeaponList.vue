@@ -304,14 +304,14 @@ function export_weapon_list() {
     blocks.push(`ExtendedPartWeapons = ${generate_weapon_list_code(unref(extended_part_weapons))}`);
     blocks.push(`ExtendedConventionalWeapons = ${generate_weapon_list_code(unref(extended_conventional_weapons))}`);
     blocks.push(`ExtendedSpecialWeapons = ${generate_weapon_list_code(unref(extended_special_weapons))}`);
-    const ret = `if not WeaponList_lua then\n` +
-    `\tWeaponList_lua = true\n` +
-    `\tInclude("Version.lua")\n`+
-    `\tVersion:set("WeaponList", "${VERSION}")\n` +
-    `\tVersion:require("WeaponList", "Setting", "1.5.4")\n` +
-    `\tVersion:require("WeaponList", "Weapon", "1.5.4")\n` +
+    const ret = `if not __WEAPON_LIST_LUA__ then\n` +
+    `\t__WEAPON_LIST_LUA__ = true\n` +
+    `\tlocal __version__ = "${VERSION}"\n` +
+    `\tInclude("Version.lua")\n` +
+    `\tVersion:set("WeaponList", __version__)\n` +
+    `\tVersion:require("WeaponList", "Weapon", __version__)\n` +
     `\t${blocks.join("\n")}\n` +
-    `end\n`;
+    `end -- __WEAPON_LIST_LUA__\n`;
     console.log(ret);
     const code = formatText(ret);
     SaveAs("WeaponList.lua", code);

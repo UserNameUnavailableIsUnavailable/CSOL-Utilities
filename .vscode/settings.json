@@ -2,6 +2,7 @@
     "cmake.sourceDirectory": "${workspaceFolder}/Controller",
     "cmake.buildDirectory": "${workspaceFolder}/Controller/build",
   "Lua.workspace.ignoreDir": [
+    "ConfigPanel.old",
     "vcpkg_installed",
     "build",
     "dist"

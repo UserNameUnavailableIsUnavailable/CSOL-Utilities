@@ -1,26 +1,27 @@
-if not Interrupt_lua then
-    Interrupt_lua = true
+if not __INTERRUPT_LUA__ then
+    __INTERRUPT_LUA__ = true
+    local __version__ = "1.5.2"
 
     Include("Exception.lua")
     Include("Version.lua")
-    Version:set("Interrupt", "1.5.2")
+    Version:set("Interrupt", __version__)
 
     ---@class Interrupt
-    ---@field name string|nil 中断名称
-    ---@field handler function 中断处理函数
-    ---@field parameters any[]|nil 中断处理函数参数列表
-    ---@field maskable boolean|nil 是否可屏蔽
-    ---@field alive boolean|nil 是否存活
+    ---@field private name string|nil 中断名称
+    ---@field private handler function 中断处理函数
+    ---@field private parameters table 中断处理函数参数列表
+    ---@field private maskable boolean 是否可屏蔽
+    ---@field private alive boolean 是否存活
     Interrupt = {}
 
     ---@class InterruptInitializer
     ---@field name? string
     ---@field handler function
-    ---@field parameters? any[]
+    ---@field parameters? table
     ---@field maskable? boolean
     ---@field alive? boolean
 
-    Interrupt.name = "<ANONYMOUS_INTERRUPT>"
+    Interrupt.name = "__ANONYMOUS_INTERRUPT__"
     Interrupt.handler = function(...) end
     Interrupt.parameters = {}
     Interrupt.maskable = true
@@ -49,23 +50,30 @@ if not Interrupt_lua then
         return interrupt --[[@as Interrupt]]
     end
 
+    ---判断中断是否能够运行。
+    ---@return boolean
     function Interrupt:is_alive()
         return self.alive
     end
 
+    ---判断中断是否可屏蔽。
+    ---@return boolean
     function Interrupt:is_maskable()
         return self.maskable
     end
 
+    ---终止中断。终止后，此中断将不再被执行。
     function Interrupt:kill()
         self.alive = false
     end
 
+    ---执行中断处理函数，并返回结果。
+    ---@return ...
     function Interrupt:handle()
         if not self.alive then
             return
         end
-        self.result = table.pack(self.handler(table.unpack(self.parameters)))
+        self.result = table.pack(self.handler(self.parameters))
         if
             #self.result <= 1 -- 无返回值或单返回值
         then
@@ -79,4 +87,4 @@ if not Interrupt_lua then
     function Interrupt:get_result()
         return self.result
     end
-end -- Interrupt_lua
+end -- __INTERRUPT_LUA__

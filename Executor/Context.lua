@@ -1,5 +1,5 @@
-if not Context_lua then
-    Context_lua = true
+if not __CONTEXT_LUA__ then
+    __CONTEXT_LUA__ = true
 
     Include("Version.lua")
     Version:set("Context", "1.5.2")
@@ -24,4 +24,4 @@ if not Context_lua then
         setmetatable(obj, self)
         return obj
     end
-end -- Context_lua
+end -- __CONTEXT_LUA__

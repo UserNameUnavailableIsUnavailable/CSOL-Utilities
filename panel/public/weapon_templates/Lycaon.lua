@@ -18,7 +18,7 @@ Weapon:new({
             if current_tp - self.last_phantom_rush_timepoint > self.cooldown_time then
                 self:switch()
                 Mouse:click(Mouse.RIGHT, 500)
-                Keyboard:click(self.reload_key, 500)
+                Keyboard:click(self:get_reload_key(), 500)
                 self.last_phantom_rush_timepoint = current_tp
             end
     end

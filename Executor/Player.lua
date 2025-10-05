@@ -1,5 +1,6 @@
-if not Player_lua then
-    Player_lua = true
+if not __PLAYER_LUA__ then
+    __PLAYER_LUA__ = true
+    local __version__ = "1.5.4"
 
     Include("Keyboard.lua")
     Include("Weapon.lua")
@@ -9,7 +10,10 @@ if not Player_lua then
     Include("Utility.lua")
     Include("DateTime.lua")
     Include("Version.lua")
-    Version:set("Player", "1.5.4")
+    Include("Setting.lua")
+    Include("Delay.lua")
+
+    Version:set("Player", __version__)
 
     ---@class Player
     ---@field respawn_key KEYBOARD_KEY 复活或回合重置按键
@@ -70,7 +74,7 @@ if not Player_lua then
     end
 
     ---设置当前使用的武器。
-    ---@param weapon Weapon|nil 当前使用的武器
+    ---@param weapon Weapon? 当前使用的武器
     function Player:set_current_weapon(weapon)
         self.current_weapon = weapon
     end
@@ -191,7 +195,7 @@ if not Player_lua then
     ---重新购买需要换弹的武器。
     ---@param weapon Weapon
     local function repurchase_reloading_required_weapon(weapon)
-        if weapon.reloading_required then
+        if weapon:is_reloading_required() then
             weapon:switch() -- 切换到该武器
             weapon:abandon() -- 丢弃
         end
@@ -210,9 +214,9 @@ if not Player_lua then
         local weapon = self.conventional_weapons[math.random(count)]
         if
             -- 随机到最近一次使用的主武器
-            weapon.number == Weapon.PRIMARY and weapon.name == self.last_primary_weapon.name or
+            weapon.number == Weapon.PRIMARY and weapon.name == self.last_primary_weapon:get_name() or
              -- 随机到最近一次使用的副武器
-            weapon.number == Weapon.SECONDARY and weapon.name == self.last_secondary_weapon.name
+            weapon.number == Weapon.SECONDARY and weapon.name == self.last_secondary_weapon:get_name()
         then
             repurchase_reloading_required_weapon(weapon)
         else -- 其余武器正常购买
@@ -300,4 +304,4 @@ if not Player_lua then
         self:attack_with_conventional_weapons()
         self:attack_with_special_weapons()
     end
-end -- Player_lua
+end -- __PLAYER_LUA__

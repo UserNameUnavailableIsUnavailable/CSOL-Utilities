@@ -1,14 +1,21 @@
-if not Main_lua then
-    Main_lua = true
+if not __MAIN_LUA__ then
+    __MAIN_LUA__ = true
+    local __version__ = "1.5.4"
+
     Include("Automation.lua")
+    Include("Command.lua")
+    Include("Runtime.lua")
     Include("Version.lua")
+    Include("Console.lua")
+    Include("Exception.lua")
+
     assert(
         _VERSION >= "Lua 5.4",
-        ([[当前 Lua 环境版本为 %s，执行器需要 Lua 5.4 及以上版本，请确保使用最新版本的 Logitech G Hub。]]):format(
-            _VERSION
-        )
+        ([[当前 Lua 环境版本为 %s，执行器需要 Lua 5.4 及以上版本，请确保使用最新版本的 Logitech G Hub。]])
+        :format(_VERSION)
     )
-    Version:set("Main", "1.5.3")
+
+    Version:set("Main", __version__)
     Version:assert()
     ---注册完所有中断处理函数后，开中断。
     Runtime:enable_interrupt() -- 开中断
@@ -20,7 +27,7 @@ if not Main_lua then
         Command:finish() -- 任务执行完毕
     end
 
-    function Main()
+    function StartUp()
         while Runtime:runnable() do
             Runtime:try_catch_finally(
                 function ()
@@ -31,11 +38,17 @@ if not Main_lua then
                 ---@param e Exception
                 function (e)
                     Console:debug(([[捕获到异常：%s]]):format(tostring(e)))
-                    if (not Automation:is_ignored_error(e.name)) then
+                    if (not Automation:is_ignored_error(e:get_name())) then
                         Runtime:fatal()
                     end
                 end
             )
         end
     end
-end -- Main_lua
+
+    ---程序入口。
+    ---@param args? table 参数
+    function Main(args)
+        StartUp()
+    end
+end -- __MAIN_LUA__

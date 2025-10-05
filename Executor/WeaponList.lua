@@ -1,9 +1,9 @@
-if not WeaponList_lua then
-    WeaponList_lua = true
+if not __WEAPON_LIST_LUA__ then
+    __WEAPON_LIST_LUA__ = true
+    local __version__ = "1.5.4"
     Include("Version.lua")
-    Version:set("WeaponList", "1.5.4")
-    Version:require("WeaponList", "Setting", "1.5.3")
-    Version:require("WeaponList", "Weapon", "1.5.3")
+    Version:set("WeaponList", __version__)
+    Version:require("WeaponList", "Weapon", __version__)
     Armor =
         Weapon:new(
         {
@@ -88,7 +88,7 @@ if not WeaponList_lua then
                     if current_tp - self.last_phantom_rush_timepoint > self.cooldown_time then
                         self:switch()
                         Mouse:click(Mouse.RIGHT, 500)
-                        Keyboard:click(self.reload_key, 500)
+                        Keyboard:click(self:get_reload_key(), 500)
                         self.last_phantom_rush_timepoint = current_tp
                     end
                 end
@@ -114,7 +114,7 @@ if not WeaponList_lua then
                 switch_delay = Delay.LONG,
                 number = Weapon.MELEE,
                 last_throw_time = 0,
-                fire_interator = function(self, round, begin_timepoint)
+                fire_iterator = function(self, round, begin_timepoint)
                     if round == 0 then
                         self.last_throw_time = begin_timepoint
                         return function()
@@ -125,15 +125,13 @@ if not WeaponList_lua then
                         return function()
                             local tp = Runtime:get_running_time()
                             if tp - self.last_throw_time > 4000 then
-                                Keyboard:click(Weapon.reload_key, 0)
+                                Keyboard:click(self:get_reload_key(), 0)
                                 self.last_throw_time = tp
                             end
                         end
                     end
-                    if round < 0 then
-                        return function()
-                            Mouse:release(Mouse.RIGHT)
-                        end
+                    return function()
+                        Mouse:release(Mouse.RIGHT)
                     end
                 end
             }
@@ -228,11 +226,11 @@ if not WeaponList_lua then
                     if current_tp - self.last_phantom_rush_timepoint > self.cooldown_time then
                         self:switch()
                         Mouse:click(Mouse.RIGHT, 500)
-                        Keyboard:click(self.reload_key, 500)
+                        Keyboard:click(self:get_reload_key(), 500)
                         self.last_phantom_rush_timepoint = current_tp
                     end
                 end
             }
         )
     }
-end
+end -- __WEAPON_LIST_LUA__

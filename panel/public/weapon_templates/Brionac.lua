@@ -15,7 +15,7 @@ Weapon:new({
     ---@param round integer
     ---@param begin_timepoint integer
     ---@return function
-    fire_interator = function(self, round, begin_timepoint)
+    fire_iterator = function(self, round, begin_timepoint)
         if round == 0 then
             self.last_throw_time = begin_timepoint
             return function() Mouse:press(Mouse.RIGHT) end
@@ -25,7 +25,7 @@ Weapon:new({
                 local tp = Runtime:get_running_time()
                 -- 每隔 4 秒投掷一次
                 if tp - self.last_throw_time > 4000 then
-                    Keyboard:click(Weapon.reload_key, 0)
+                    Keyboard:click(self:get_reload_key(), 0)
                     self.last_throw_time = tp
                 end
             end

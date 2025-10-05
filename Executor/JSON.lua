@@ -1,7 +1,5 @@
--- This file is modified based on https://github.com/rxi/json.lua
---
--- json.lua
---
+-- This file is forked from https://github.com/rxi/json.lua
+
 -- Copyright (c) 2020 rxi
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -22,11 +20,14 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-if not JSON_lua then
-    JSON_lua = true
+if not __JSON_LUA__ then
+    __JSON_LUA__ = true
+    local __version__ = "1.5.2"
+
     Include("Version.lua")
-    Version:set("JSON", "1.5.2")
-    JSON = { _version = "0.1.2" }
+    Version:set("JSON", __version__)
+    ---@class JSON
+    JSON = {}
 
     -------------------------------------------------------------------------------
     -- Encode
@@ -128,6 +129,9 @@ if not JSON_lua then
         error("unexpected type '" .. t .. "'")
     end
 
+    ---将 Lua 对象编码为 JSON 字符串。
+    ---@param val any
+    ---@return string
     function JSON.encode(val)
         return (encode(val))
     end
@@ -361,6 +365,9 @@ if not JSON_lua then
         decode_error(str, idx, "unexpected character '" .. chr .. "'")
     end
 
+    ---将 JSON 字符串解码为 Lua 对象。
+    ---@param str string
+    ---@return any
     function JSON.decode(str)
         if type(str) ~= "string" then
             error("expected argument of type string, got " .. type(str))
@@ -372,4 +379,4 @@ if not JSON_lua then
         end
         return res
     end
-end -- JSON_lua
+end -- __JSON_LUA__

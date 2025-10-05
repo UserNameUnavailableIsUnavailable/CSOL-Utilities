@@ -1,5 +1,7 @@
-if not Automation_lua then
-    Automation_lua = true
+if not __AUTOMATION_LUA__ then
+    __AUTOMATION_LUA__ = true
+    local __version__ = "1.5.4"
+
     Include("Delay.lua")
     Include("Console.lua")
     Include("JSON.lua")
@@ -16,7 +18,8 @@ if not Automation_lua then
     Include("Setting.lua")
     Include("WeaponList.lua")
     Include("Version.lua")
-    Version:set("Automation", "1.5.4")
+
+    Version:set("Automation", __version__)
 
     ---自动化执行。
     ---@class Automation
@@ -142,7 +145,7 @@ if not Automation_lua then
     })
 
     Runtime.last_command_update_timepoint = 0
-    Automation:add_ignored_error("__COMMAND_CHANGED__")
+    Automation:add_ignored_error("__ERROR_COMMAND_CHANGED__")
     Runtime:register_interrupt(Interrupt:new({
         name = "接收命令",
         handler = function()
@@ -161,7 +164,7 @@ if not Automation_lua then
                 Automation.extended_player:reset()
 
                 local e = Exception:new({
-                    name = "__COMMAND_CHANGED__",
+                    name = "__ERROR_COMMAND_CHANGED__",
                     message = "命令变更",
                 })
                 Runtime:throw(e) -- 主动触发运行时异常
@@ -422,8 +425,8 @@ if not Automation_lua then
     Automation.buy_button_x = 0
     Automation.buy_button_y = 0
     ---购买商店物品。
-    ---@param buy_button_x integer|nil 横坐标。
-    ---@param buy_button_y integer|nil 纵坐标。
+    ---@param buy_button_x? integer 横坐标。
+    ---@param buy_button_y? integer 纵坐标。
     function Automation:purchase_item(buy_button_x, buy_button_y)
         if not Setting.SWITCH_STORE_BATCH_PURCHASE then
             return
@@ -513,4 +516,4 @@ if not Automation_lua then
         [Command.CMD_LOCATE_CURSOR] = Automation.locate_cursor,
         [Command.CMD_CLEAR_POPUPS] = Automation.clear_popups,
     }
-end -- Automation_lua
+end -- __AUTOMATION_LUA__

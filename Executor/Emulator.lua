@@ -1,11 +1,13 @@
 ---该文件定义了罗技 G HUB 的其中部分函数，仅用于建立测试环境（需要在本机上提供 Lua 5.4 运行环境）。
 ---当在 G HUB 中运行时，不会运行此脚本。
-if not Emulator_lua then
-    Emulator_lua = true
-    Include("Version.lua")
-    Version:set("Emulator", "1.5.2")
+if not __EMULATOR_LUA__ then
+    __EMULATOR_LUA__ = true
+    local __version__ = "1.5.2"
 
-    RunningInEmulator = false -- 在 G HUB 中运行
+    Include("Version.lua")
+    Version:set("Emulator", __version__)
+
+    __RunningInEmulator__ = false -- 在 G HUB 中运行
 
     if
         not require -- 没有提供 require，说明在 G HUB 中运行
@@ -18,7 +20,7 @@ if not Emulator_lua then
     package.cpath = package.cpath .. ";" .. PATH:format("?.dll")
     local LGHUB_Emulator = require("LGHUB_Emulator")
 
-    RunningInEmulator = true -- 本地运行
+    __RunningInEmulator__ = true -- 本地运行
 
     LGHUB_Emulator.InitializeRunningTime()
 
@@ -212,7 +214,7 @@ if not Emulator_lua then
         )
     end
 
-    function IsEmulating()
+    function __IsEmulating__()
         return LGHUB_Emulator.IsEmulating()
     end
-end
+end -- __EMULATOR_LUA__

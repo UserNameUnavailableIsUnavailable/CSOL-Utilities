@@ -1,5 +1,6 @@
-if not Runtime_lua then
-    Runtime_lua = true
+if not __RUNTIME_LUA__ then
+    __RUNTIME_LUA__ = true
+    local __version__ = "1.5.4"
 
     Include("Emulator.lua")
     Include("Context.lua")
@@ -7,23 +8,23 @@ if not Runtime_lua then
     Include("Exception.lua")
     Include("JSON.lua")
     Include("Version.lua")
-    Version:set("Runtime", "1.5.4")
+    Version:set("Runtime", __version__)
 
     ---@class Runtime 运行时
-    ---@field interrupts Interrupt[] 中断列表。
-    ---@field interrupt_mode integer 中断模式
-    ---@field INTERRUPT_BURST_MODE integer 猝发中断模式。
-    ---@field INTERRUPT_SEQUENCE_MODE integer 顺序中断模式。
-    ---@field INTERRUPT_RANDOM_MODE integer 随机中断模式。
-    ---@field interrupt_mask_flag boolean 中断屏蔽标志位。`true` 屏蔽中断，`false` 允许受理中断。
-    ---@field interrupt_busy_flag boolean 中断忙标志，用于避免中断嵌套。`true` 表示当前正在受理其他中断，`false` 表示空闲。
-    ---@field interrupt_mask_flag_stack boolean[] 存放中断屏蔽标志位的栈。
-    ---@field interrupt_context Context[] 中断发生时保存的中断现场。
-    ---@field expected_sleep_time number 根据最近睡眠情况推测的一轮睡眠时间。
-    ---@field actual_sleep_time number 最近一次实际的一轮睡眠时间。
-    ---@field last_interrupt_id integer 最近一次处理的中断对应标识符。
-    ---@field last_exception Exception 最近一次发生的异常。
-    ---@field fatal_handlers function[] 灾难错误处理函数列表。
+    ---@field private interrupts Interrupt[] 中断列表。
+    ---@field private interrupt_mode integer 中断模式
+    ---@field private INTERRUPT_BURST_MODE integer 猝发中断模式。
+    ---@field private INTERRUPT_SEQUENCE_MODE integer 顺序中断模式。
+    ---@field private INTERRUPT_RANDOM_MODE integer 随机中断模式。
+    ---@field private interrupt_mask_flag boolean 中断屏蔽标志位。`true` 屏蔽中断，`false` 允许受理中断。
+    ---@field private interrupt_busy_flag boolean 中断忙标志，用于避免中断嵌套。`true` 表示当前正在受理其他中断，`false` 表示空闲。
+    ---@field private interrupt_mask_flag_stack boolean[] 存放中断屏蔽标志位的栈。
+    ---@field private interrupt_context Context[] 中断发生时保存的中断现场。
+    ---@field private expected_sleep_time number 根据最近睡眠情况推测的一轮睡眠时间。
+    ---@field private actual_sleep_time number 最近一次实际的一轮睡眠时间。
+    ---@field private last_interrupt_id integer 最近一次处理的中断对应标识符。
+    ---@field private last_exception Exception 最近一次发生的异常。
+    ---@field private fatal_handlers function[] 灾难错误处理函数列表。
     Runtime = {}
 
     Runtime.INTERRUPT_BURST_MODE = 0
@@ -79,9 +80,8 @@ if not Runtime_lua then
     end
 
     ---挂起当前执行流，挂起后，可以处理中断事件。除了 `Runtime` 内部方法外，其他地方都应当调用 `Runtime:sleep`，而非直接调用罗技 API 中的 Sleep，这样可以进行中断处理。
-    ---@param milliseconds integer|nil 挂起的时间。
-    ---@param precise boolean|nil 是否需要尽力保证精度。
-    ---@return nil
+    ---@param milliseconds? integer 挂起的时间。
+    ---@param precise? boolean 是否需要尽力保证精度。
     function Runtime:sleep(milliseconds, precise)
         milliseconds = milliseconds or 0
         milliseconds = math.floor(milliseconds) -- 防止提供小数时间，若类型非 `number` 会返回 `nil`
@@ -132,33 +132,38 @@ if not Runtime_lua then
 
     Runtime.interrupts = {}
 
-    ---粗发式中断处理。
+    ---猝发式中断处理。
     function Runtime:interrupt_in_burst()
-        local status
-        local result
         if
             Runtime.interrupt_busy_flag -- 当前有正在处理的中断，跳过
         then
             return
         end
+        local exception = nil
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         for _, interrupt in ipairs(self.interrupts) do
             -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
             if
                 not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
             then
-                self:push_interrupt_mask_flag()
-                self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
-                self.interrupt_busy_flag = true
-                status, result = pcall(function() interrupt:handle() end) -- 处理中断
-                self.interrupt_busy_flag = false
-                self:pop_interrupt_mask_flag() -- 开中断
-            end
-            -- 当前中断处理完毕
-            if
-                not status -- 中断处理出现错误
-            then
-                self:throw(result) -- 将中断处理过程中引发的错误上抛
+                self:try_catch_finally(
+                    function()
+                        self:push_interrupt_mask_flag()
+                        self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                        self.interrupt_busy_flag = true
+                        interrupt:handle()
+                    end,
+                    function(e)
+                        exception = e
+                    end,
+                    function()
+                        self.interrupt_busy_flag = false
+                        self:pop_interrupt_mask_flag() -- 开中断
+                        if exception then
+                            self:throw(exception) -- 将中断处理过程中引发的错误上抛
+                        end
+                    end
+                )
             end
         end
     end
@@ -166,9 +171,6 @@ if not Runtime_lua then
     Runtime.last_interrupt_id = 0
     ---顺序式中断处理。
     function Runtime:interrupt_in_sequence()
-        local int_status
-        local int_result --[[@as any]]
-        int_result = "INTERRUPT_HANDLER_SUCCESS"
         if
             Runtime.interrupt_busy_flag -- 当前有正在处理的中断，跳过
         then
@@ -179,24 +181,32 @@ if not Runtime_lua then
         end
         local id = self.last_interrupt_id + 1
         local interrupt = self.interrupts[id] or Interrupt -- 如果为空，则用默认的中断模板代替
+        local exception = nil
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
         if
             not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
         then
-            self:push_interrupt_mask_flag()
-            self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
-            self.interrupt_busy_flag = true
-            int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
-            self.interrupt_busy_flag = false
-            self:pop_interrupt_mask_flag() -- 开中断
-        end
-        -- 中断处理完毕，修改最近一次执行的中断 ID
-        self.last_interrupt_id = id
-        if
-            not int_status -- 中断处理出现错误
-        then
-            self:throw(self.last_exception) -- 将中断处理过程中引发的错误上抛
+            self:try_catch_finally(
+                function()
+                    self:push_interrupt_mask_flag()
+                    self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                    self.interrupt_busy_flag = true
+                    interrupt:handle()
+                end,
+                function(e)
+                    exception = e
+                end,
+                function()
+                    self.interrupt_busy_flag = false
+                    self:pop_interrupt_mask_flag() -- 开中断
+                    self.last_interrupt_id = id
+                    -- 中断处理完毕，修改最近一次执行的中断 ID
+                    if exception then
+                        self:throw(self.last_exception) -- 将中断处理过程中引发的错误上抛
+                    end
+                end
+            )
         end
     end
 
@@ -214,23 +224,27 @@ if not Runtime_lua then
         if #self.interrupts > 0 then
             interrupt = self.interrupts[math.random(1, #self.interrupts)]
         end
+        local exception = nil
         -- 中断开始时，中断标志位使能以屏蔽后续中断
         -- 执行中断处理，若处理过程中出现错误，则先暂存错误，目的是确保 `interrupt_flag` 正常恢复
         if
             not interrupt:is_maskable() or not self:is_interrupt_masked() -- 该中断不可屏蔽，或处于开中断状态
         then
-            self:push_interrupt_mask_flag()
-            self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
-            self.interrupt_busy_flag = true
-            int_status, int_result = pcall(function() interrupt:handle() end) -- 处理中断
-            self.interrupt_busy_flag = false
-            self:pop_interrupt_mask_flag() -- 开中断
-        end
-        -- 中断处理完毕
-        if
-            not int_status -- 中断处理出现错误
-        then
-            self:throw(self.last_exception) -- 将中断处理过程中引发的错误上抛
+            Runtime:try_catch_finally(
+                function()
+                    self:push_interrupt_mask_flag()
+                    self:disable_interrupt() -- 关中断，避免在中断处理过程中再次触发中断，导致中断嵌套
+                    self.interrupt_busy_flag = true
+                    interrupt:handle()
+                end,
+                function(e)
+                    exception = e
+                end,
+                function()
+                    self.interrupt_busy_flag = false
+                    self:pop_interrupt_mask_flag() -- 开中断
+                end
+            )
         end
     end
 
@@ -295,7 +309,6 @@ if not Runtime_lua then
     end
 
     ---保护中断现场。把所有按下但未释放的键盘按键和鼠标按钮全部弹起，避免干扰中断处理，随后可以进行上下文切换。
-    ---@return nil
     function Runtime:save_context()
         for _, obj in pairs(self.interrupt_context) do
             obj:save_callback()
@@ -312,28 +325,18 @@ if not Runtime_lua then
     ---判断是否在模拟环境中运行。
     ---@return boolean
     function Runtime:emulating()
-        return RunningInEmulator
+        return __RunningInEmulator__
     end
 
     ---判定运行状态，若在 LGHUB 中运行，则返回 true；若在模拟器中运行，则只有在模拟状态下才返回 true。
     ---@return boolean
     function Runtime:runnable()
-        return not RunningInEmulator or IsEmulating()
+        return not __RunningInEmulator__ or __IsEmulating__()
     end
 
     ---抛出一个错误。
-    ---@param e any 错误对象
+    ---@param e Exception 异常对象
     function Runtime:throw(e)
-        if type(e) == "nil" then return
-        elseif type(e) == "table" then
-            e = Exception:new(e)
-        else
-            e = Exception:new({
-                name = "__INTERNAL_ERROR__",
-                message = tostring(e),
-            })
-        end
-        
         self.last_exception = e --[[@as Exception]]
         error(e)
     end
@@ -343,9 +346,22 @@ if not Runtime_lua then
     ---@param catch fun(e: Exception) 错误处理函数
     ---@param finally fun()|nil 最终处理函数
     function Runtime:try_catch_finally(try, catch, finally)
-        local ok, result = pcall(try)
+        local exception
+        local ok = xpcall(try, function(e)
+            if Exception:is_instance(e) then
+                exception = e
+            elseif type(e) == "table" then
+                exception = Exception:new(e)
+            else
+                exception = Exception:new({
+                    name = "__UNKNOWN_ERROR__",
+                    message = tostring(e),
+                })
+            end
+            exception:set_traceback(debug.traceback()) -- 记录堆栈
+        end)
         if not ok then
-            catch(result)
+            catch(exception)
         end
         if finally then
             finally()
@@ -380,4 +396,4 @@ if not Runtime_lua then
         end
         error(("程序发生灾难错误，无法继续运行。最近一次错误：%s"):format(tostring(self.last_exception)))
     end
-end -- Runtime_lua
+end -- __RUNTIME_LUA__

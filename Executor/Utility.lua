@@ -1,10 +1,12 @@
-﻿if not Utility_lua then
-    Utility_lua = true
+﻿if not __UTILITY_LUA__ then
+    __UTILITY_LUA__ = true
+    local __version__ = "1.5.2"
 
     Include("Emulator.lua")
     Include("Runtime.lua")
     Include("Version.lua")
-    Version:set("Utility", "1.5.2")
+
+    Version:set("Utility", __version__)
     Utility = {}
 
     ---等概率随机正负方向。
