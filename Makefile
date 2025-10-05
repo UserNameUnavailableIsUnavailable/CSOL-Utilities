@@ -2,7 +2,7 @@
 .SHELLFLAGS := -NoProfile -Command
 # 项目
 PROJECT_NAME := CSOL-Utilities
-VERSION = v1.5.4.1
+VERSION = v1.5.4
 PLATFORM = x64
 DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
 
