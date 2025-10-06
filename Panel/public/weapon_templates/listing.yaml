@@ -1,0 +1,30 @@
+Conventional:
+  - id: TwinShadowAxes
+    en_US: Twin Shadow Axes
+    zh_CN: 神鬼开天
+    file: TwinShadowAxes.lua
+  - id: TwinLightAxes
+    en_US: Twin Light Axes
+    zh_CN: 魔神开天
+    file: TwinLightAxes.lua
+  - id: Brionac
+    en_US: Brionac
+    zh_CN: 万钧神威
+    file: Brionac.lua
+Special:
+  - id: Sandalphon
+    en_US: Sandalphon
+    zh_CN: 圣翼皓印
+    file: Sandalphon.lua
+  - id: Belial
+    en_US: Belial
+    zh_CN: 炽翼魔印
+    file: Belial.lua
+  - id: Hellhound
+    en_US: Hellhound
+    zh_CN: 【幽浮】控制核心
+    file: Hellhound.lua
+  - id: Lycaon
+    en_US: Lycaon
+    zh_CN: 夙狼夜契
+    file: Lycaon.lua

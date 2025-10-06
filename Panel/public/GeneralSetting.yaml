@@ -1,0 +1,595 @@
+﻿id: GeneralSetting
+type: SECTION
+title: 通用设定
+annotation: >-
+    简短说明：  
+    <ul>
+      <li>
+          本配置面板对应于集成工具版本 v1.5.3，支持导入 v1.4.x 及更早版本的配置文件（Setting.lua），并导出为 v1.5.3 版本的配置文件。
+      </li>
+      <li>
+          鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。
+      </li>
+      <li>
+          <b color: 'red'>配置坐标时，为了确保坐标位置准确，必须先运行 Tool 文件夹下的 Tool.exe 工具将窗口居中（Ctrl Alt C），挂机时不强制要求开启 Tool（控制器会自动居中窗口）。有关 Tool.exe 的更多信息请参阅使用手册。</b>
+      </li>
+      <li>
+          <b>2025/3/19 游戏窗口分辨率更新后，产生了新的 bug，导致使用 GamingTool 去除游戏窗口边框后，点击窗口外任意区域时在游戏窗口周围会出现黑边，并伴随游戏窗口内按钮显示位置与实际位置不匹配的现象，获取坐标时需要以实际位置为准。此问题系游戏本身问题，开启一局游戏并退出或手动切换大厅分辨率（如切换到 1920 × 1080 后再切换回 1024 × 768）后，该问题消失；</b>
+      </li>
+      <li>
+          每个选项控件的下方会显示此选项对应的 Lua 源代码，有编程经验者可根据需要复制；
+      </li>
+      <li>
+          问题反馈渠道：admin@macrohard.fun（回复较及时）、ttyuig@126.com。
+      </li>
+    </ul>
+children:
+    - id: SYSTEM_SETTINGS
+      title: 系统设定
+      type: SECTION
+      children:
+          - id: TIME_ZONE
+            title: 时区
+            annotation: >-
+                操作系统时区，单位为小时。例如，对于 UTC-07:30，此处应填写 -7.5。此设定<b style='color:
+                red'>必须</b>保证正确，否则会因时间不匹配导致控制器和执行器无法正确交互。
+            label: "UTC + "
+            value: "8"
+            hint: "<a href='ms-settings:dateandtime'>Windows 10 / 11 用户点此查看操作系统时区</a>"
+            type: FIELD
+            image: assets/time_zone.avif
+    - id: CreateRoom
+      title: 自动创建房间
+      annotation: >-
+          挂机出现异常情况后，重新创建房间挂机。所谓异常情况是指：游戏掉线（控制器将会尝试重启游戏）后成功重启、游戏进行过程中被强制踢出、游戏进行过程中因网络波动多次回退到房间等候室等其他导致挂机无法正常进行的情况。
+      type: SECTION
+      children:
+          - id: CREATE_ROOM_ON_EXCEPTION
+            title: 自动创建房间功能开关
+            annotation: 自动创建房间功能，可最大限度保证挂机正常进行，建议启用。
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "true"
+          - id: LOBBY_LIST_ROOMS
+            title: 显示房间列表
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_label: HALL_ROOM_LIST
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_list_rooms.avif
+          - id: LOBBY_BACK
+            title: 从游戏大厅返回主页/离开房间回到游戏大厅
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            legacy_name: HALL_BACK
+            image: assets/lobby_back.avif
+          - id: LOBBY_CREATE_ROOM_1
+            title: 在大厅内新建房间
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            legacy_name: HALL_CREATE_ROOM
+            image: assets/lobby_create_room_1.avif
+          - id: LOBBY_CREATE_ROOM_GAME_MODE_1
+            title: 游戏模式选框-1
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: GAME_MODE
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_game_mode_1.avif
+          - id: LOBBY_CREATE_ROOM_GAME_MODE_2
+            title: 游戏模式选框-2
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: ZOMBIE_SCENARIO_MODE
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_game_mode_2.avif
+          - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL
+            title: 地图选择界面向左翻页按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            legacy_name: MAP_CHOOSE_LEFT_SCROLL
+            image: assets/lobby_create_room_map_choose_left_scroll.avif
+          - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL
+            title: 地图选择界面向右翻页按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            legacy_name: MAP_CHOOSE_RIGHT_SCROLL
+            image: assets/lobby_create_room_map_choose_right_scroll.avif
+          - id: LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT
+            title: 选择地图时向左翻页次数
+            annotation: "选择地图时，向左翻页指定次数。默认值翻页 32 次到最左侧（目前够用）。"
+            type: FIELD
+            value: "32"
+            label: 向左翻页次数
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            # 兼容旧版 typo
+            legacy_name: LOBBY_CREATR_ROOM_MAP_SCROLL_LEFT_COUNT
+          - id: LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT
+            title: 选择地图时向右翻页次数
+            annotation: "<b style='color: red;'>考虑到大灾变季度不断更新，因此要长期稳定地选择季度靠后的地图（如英雄城寨），就需要先翻页到最左侧，然后再向右翻页指定次数找到指定地图。</b>"
+            type: FIELD
+            value: "0"
+            label: 向右翻页次数
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+          - id: LOBBY_CREATE_ROOM_MAP_SCROLL_DOWN_COUNT
+            title: 向下翻页次数
+            annotation: 有的灾变季度有地图较多，选择该季度靠后的地图需要向下翻页，一次翻页对应向下滚动一格滚轮。
+            type: FIELD
+            value: "0"
+            label: 向下翻页次数
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+          - id: LOBBY_CREATE_ROOM_MAP_OPTION
+            title: 选择游戏地图
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: MAP_TRAP
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_map_option.avif
+          - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH
+            title: 完成地图选择
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: FINISH_CHOOSE
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_map_choose_finish.avif
+          - id: LOBBY_CREATE_ROOM_DIFFICULTY_1
+            title: 游戏难度选择-1
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: GAME_DIFFICULTY
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_difficulty_1.avif
+          - id: LOBBY_CREATE_ROOM_DIFFICULTY_2
+            title: 游戏难度选择-2
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: GAME_DIFFICULTY_OPTION
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            image: assets/lobby_create_room_difficulty_2.avif
+          - id: LOBBY_CREATE_ROOM_LOCK
+            title: 房间密码
+            annotation: 自动创建房间时，为房间添加密码，实现担任锁房挂机，亦可防止恶意举报。
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "true"
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+            legacy_name: USE_PASSWORD
+          - id: LOBBY_CREATE_ROOM_PASSWORD_CHECKBOX
+            title: 房间密码选框
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: ROOM_USE_PASSWORD
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+            image: assets/lobby_create_room_password_checkbox.avif
+          - id: LOBBY_CREATE_ROOM_PASSWORD_TEXTBOX
+            title: 密码输入框
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: ROOM_PASSWORD_BOX
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+            image: assets/lobby_create_room_password_textbox.avif
+          - id: LOBBY_CREATE_ROOM_PASSWORD_CONFIRM
+            title: 房间密码确认按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+            legacy_name: ROOM_PASSWORD_CONFIRM
+            image: assets/lobby_create_room_password_confirm.avif
+          - id: LOBBY_CREATE_ROOM_CUSTOMIZE_PASSWORD
+            title: 房间密码内容
+            type: SWITCH
+            options:
+                - text: 自定义密码
+                  value: "true"
+                - text: 随机密码
+                  value: "false"
+            value: "true"
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+            legacy_name: ROOM_USE_CUSTOM_PASSWORD
+          - id: LOBBY_CREATE_ROOM_CUSTOM_PASSWORD
+            title: 自定义房间密码
+            type: FIELD
+            label: 密码
+            value: ""
+            hint: 由数字、大小写字母组成
+            quoted: true
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_CUSTOMIZE_PASSWORD
+                  value: "true"
+            legacy_name: ROOM_CUSTOM_PASSWORD
+          - id: LOBBY_CREATE_ROOM_2
+            title: 创建房间
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CREATE_ROOM_ON_EXCEPTION
+                  value: "true"
+                - key: LOBBY_CREATE_ROOM_LOCK
+                  value: "true"
+            image: assets/lobby_create_room_2.avif
+            legacy_name: CREATE_ROOM
+    - id: Idle
+      title: 挂机设定
+      type: SECTION
+      children:
+          - id: IN_GAME_SENSITIVITY
+            title: 鼠标灵敏度补偿因子
+            annotation: >-
+                由于各人游戏内鼠标灵敏度存在较大差异，故引入此选项对转圈时视角移动的灵敏度进行精细化控制。该选项需要结合游戏内的鼠标灵敏度数值进行设定，具体方法为：在游戏内控制台中，输入 <code class="language-plain">sensitivity</code> 查看游戏内鼠标灵敏度精确数值（或在“选项-鼠标”中查看粗略数值），该值作为补偿因子基础值，在该值的基础上进行适当的增大或减小可调整视角运动的灵敏度。<b style='color: red;'>若感到转圈半径过小（即灵敏度过高），则增大此处的灵敏度数值，反之则减小该值</b>。另外，<b style='color: red;'>强烈建议</b>在控制台中通过 <code class="language-plain">m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
+            type: FIELD
+            pre_label: 灵敏度
+            image: assets/in_game_sensitivity.avif
+          - id: ROOM_START_GAME
+            title: 开始游戏按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: ROOM_START_GAME
+            image: assets/room_start_game.avif
+          - id: GAME_CHOOSE_TERRORISTS
+            title: 角色所属阵营
+            type: SWITCH
+            options:
+                - text: 恐怖分子（T 阵营）
+                  value: "true"
+                - text: 反恐精英（CT 阵营）
+                  value: "false"
+            legacy_name: CHOOSE_T_CLASS
+            value: "true"
+          - id: GAME_CHOOSE_TERRORISTS_TAB
+            title: T 阵营选项卡
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: GAME_CHOOSE_TERRORISTS
+                  value: "true"
+            image: assets/game_choose_terrorists_tab.avif
+            legacy_name: CHOOSE_T_CLASS
+          - id: GAME_CHARACTER_OPTION
+            title: 角色选项
+            annotation: 角色选项，可取 0 ~ 9。
+            type: FIELD
+            legacy_name: CLASS_OPTION
+          - id: GAME_CHARACTER_USE_SPECIAL_SKILLS
+            title: 按周期发动角色特殊技能
+            type: SWITCH
+            options:
+                - text: 是
+                  value: "true"
+                - text: 否
+                  value: "false"
+            legacy_name: USE_SPECIAL_ABILITY
+            value: "true"
+          - id: GAME_CHARACTER_SPECIAL_SKILLS_COOLDOWN
+            title: 角色技能冷却时间
+            annotation: 角色技能冷却时间，单位为秒，默认为 <code class="language-lua">math.huge</code>，代表 +∞（即处于不启用状态），请按需修改。
+            type: FIELD
+            legacy_name: CLASS_SPECIAL_ABILITY_COOL_DOWN_TIME
+            depends_on:
+                - key: GAME_CHARACTER_USE_SPECIAL_SKILLS
+                  value: "true"
+            value: math.huge
+          - id: GAME_USE_HEALTH_POTION
+            title: 使用回血道具（30% HP、100% HP）
+            annotation: >-
+                启用后，挂机时会定期使用回血道具（30% HP、100% HP），以保持角色的生命值。
+            type: SWITCH
+            options:
+                - text: 是
+                  value: "true"
+                - text: 否
+                  value: "false"
+            value: "false"
+          - id: GAME_ESC_MENU_CANCEL
+            title: 游戏内 ESC 菜单中的取消按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: ZS_GAME_ESC_MENU_CANCEL
+            image: assets/game_esc_menu_cancel.avif
+          - id: GAME_INSUFFICIENT_FUNDS_CONFIRM
+            title: 资金不足，无法购买确认按钮
+            annotation: 此设定目前已经弃用，置为 0 即可。
+            type: POSITION
+            x:
+                label: 横坐标
+                value: "0"
+            y:
+                label: 纵坐标
+                value: "0"
+            legacy_name: GAME_INSUFFICIENT_FUNDS_CONFIRM
+
+            image: assets/game_insufficient_funds_confirm.avif
+          - id: GAME_PURCHASE_BEFORE_RESPAWN
+            title: "复活购买菜单<i style='color: red;'>重复购买</i>或<i style='color: red;'>取消按钮</i>"
+            annotation: 此设定目前已经弃用，置为 0 即可。
+            legacy_name: GAME_DEAD_PURCHASE_MENU_REBUY
+            type: POSITION
+            x:
+                label: 横坐标
+                value: "0"
+            y:
+                label: 纵坐标
+                value: "0"
+            image: assets/game_purchase_before_respawn.avif
+          - id: GAME_RESET_ROUND_KEY
+            title: 换弹、复活、回合重置按键
+            label: 按键
+            annotation: 默认为 R。如果修改了换弹按钮，则需要修改此项。回合重置、复活、使用特殊武器（如神鬼开天、圣翼皓印等）的按键均受此影响。
+            type: KEYSTROKES
+            value: "{Keyboard.R}"
+          - id: GAME_RESET_ROUND_ON_FAILURE
+            title: 在通关失败时重置当前回合
+            annotation: 定期（时间间隔 8 秒左右）执行一次回合重置，防止通关失败。
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "true"
+          - id: GAME_CONFIRM_RESULTS
+            title: 结算确认按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            legacy_name: GAME_ROUND_CONFIRM
+            image: assets/game_confirm_result.avif
+          - id: AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS
+            title: 自动选择黄金僵尸击败奖励
+            annotation: >-
+                防止结算时卡在黄金僵尸奖励界面，根据自己需要谨慎开启（尤其是当你每次需要选择特定的奖励时），发生挂机卡在黄金僵尸奖励界面的情况后，可以再打开本配置面板进行配置。
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "false"
+          - id: GOLDEN_ZOMBIE_KILL_REWARDS_OPTION
+            title: 黄金僵尸奖励选项
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS
+                  value: "true"
+            image: assets/golden_zombie_kill_rewards_option.avif
+          - id: GOLDEN_ZOMBIE_KILL_REWARDS_SELECT
+            title: 黄金僵尸奖励选择按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS
+                  value: "true"
+            image: assets/golden_zombie_kill_rewards_select.avif
+          - id: GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM
+            title: 黄金僵尸奖励选择确认按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS
+                  value: "true"
+            image: assets/golden_zombie_kill_rewards_confirm.avif
+    - id: CombineParts
+      title: 制造所批量合成配件
+      type: SECTION
+      children:
+          - id: CRAFT_PARTS_BATCH_COMBINE
+            title: 制造所自动合成配件功能开关
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "true"
+          - id: CRAFT_PARTS_FILL
+            title: 自动添加按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CRAFT_PARTS_BATCH_COMBINE
+                  value: "true"
+            image: assets/craft_parts_fill.avif
+            legacy_name: CRAFT_PARTS_AUTO_FILL
+          - id: CRAFT_PARTS_COMBINE
+            title: 开始合成按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CRAFT_PARTS_BATCH_COMBINE
+                  value: "true"
+            image: assets/craft_parts_combine.avif
+            legacy_name: CRAFT_PARTS_COMBINE
+          - id: CRAFT_PARTS_CLEAR
+            title: 清空按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: CRAFT_PARTS_BATCH_COMBINE
+                  value: "true"
+            image: assets/craft_parts_clear.avif
+            legacy_name: CRAFT_PARTS_CLEAR
+    - id: StorePurchase
+      title: 商店批量购买金币道具
+      type: SECTION
+      children:
+          - id: STORE_BATCH_PURCHASE
+            title: 商店批量购买功能开关
+            type: SWITCH
+            options:
+                - text: 启用
+                  value: "true"
+                - text: 禁用
+                  value: "false"
+            value: "true"
+          - id: STORE_PURCHASE_OPTION
+            title: 购买物品选项
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: STORE_BATCH_PURCHASE
+                  value: "true"
+            image: assets/store_purchase_option.avif
+            legacy_name: STORE_BUY_OPTION
+          - id: STORE_PURCHASE
+            title: 弹窗中的兑换按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: STORE_BATCH_PURCHASE
+                  value: "true"
+            image: assets/store_purchase.avif
+            legacy_name: STORE_BUY
+          - id: STORE_CONFIRM_PURCHASE
+            title: 弹窗中的确认兑换按钮
+            type: POSITION
+            x:
+                label: 横坐标
+            y:
+                label: 纵坐标
+            depends_on:
+                - key: STORE_BATCH_PURCHASE
+                  value: "true"
+            image: assets/store_confirm_purchase.avif
+            legacy_name: STORE_BUY_CONFIRM
