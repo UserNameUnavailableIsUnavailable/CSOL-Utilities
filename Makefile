@@ -1,23 +1,20 @@
 ﻿SHELL := pwsh.exe
-.SHELLFLAGS := -NoProfile -Command
+.SHELLFLAGS := -NoProfile -NoLogo -Command
+
 # 项目
-PROJECT_NAME := CSOL-Utilities
-VERSION = v1.5.4
-PLATFORM = x64
-DISTRO = $(PROJECT_NAME)-$(VERSION)-$(PLATFORM)
+PROJECT := CSOL-Utilities
+VERSION := v1.5.4
+PLATFORM := x64
+DISTRO = $(PROJECT)-$(VERSION)-$(PLATFORM)
 
-# 所有的构建文件放在此目录下
-BUILD_DIR = build/$(DISTRO)
-
-# Controller
-# 模型文件路径需在命令行参数中指定，须为 **绝对路径**
-MODELS_PATH :=
 # 源代码目录
-CONTROLLER_SOURCE_DIR := Controller
- # 构建结束后，将构建的文件复制到此处
-CONTROLLER_BUILD_DIR = $(BUILD_DIR)
-# Release 或 Debug
-CONTROLLER_BUILD_TYPE = Release
+SOURCE_DIR := .
+# 构建目录
+BUILD_DIR := ./build
+# 构建类型
+BUILD_TYPE := Release
+# 发布目录
+DIST_DIR := ./dist/$(DISTRO)
 
 # Executor
 # 源代码目录
@@ -29,7 +26,7 @@ MANUAL_NAME := $(DISTRO).pdf
 MANUAL_SOURCE_DIR := Manual
 
 # 压缩包
-BUNDLE_NAME = build/$(DISTRO).zip
+BUNDLE := ./dist/$(DISTRO).zip
 
 VPATH = $(BUILD_DIR)
 
@@ -41,16 +38,18 @@ all: $(TARGETS)
 	$(MAKE) Bundle
 
 Controller: | $(BUILD_DIR)
-	$(MAKE) --directory="$(CONTROLLER_SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE=$(CONTROLLER_BUILD_TYPE) MODELS_PATH="$(MODELS_PATH)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Controller" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(DIST_DIR)/Controller"
 Executor: | $(BUILD_DIR)
-	$(MAKE) BUILD_DIR="../$(BUILD_DIR)" --directory="$(EXECUTOR_SOURCE_DIR)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Executor" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" DIST_DIR="../$(DIST_DIR)/Executor"
 Manual: | $(BUILD_DIR)
-	$(MAKE) --directory=$(MANUAL_SOURCE_DIR) BUILD_DIR="../build" MANUAL_NAME="$(MANUAL_NAME)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Manual" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../build" DIST_DIR="../$(DIST_DIR)" MANUAL_NAME="$(MANUAL_NAME)"
 Bundle: | $(BUILD_DIR)
-	Compress-Archive -Path "$(BUILD_DIR)/*" -DestinationPath "$(BUNDLE_NAME)" -Force
+	Compress-Archive -Path "$(DIST_DIR)/*" -DestinationPath "$(BUNDLE)" -Force
 Tool: | $(BUILD_DIR)
-	$(MAKE) --directory=Tool BUILD_DIR="../$(BUILD_DIR)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Tool" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(DIST_DIR)/Tool"
 $(BUILD_DIR):
 	New-Item -Type Directory -Path $(BUILD_DIR) -Force
 clean:
 	Remove-Item -Force -Recurse -Path $(BUILD_DIR)
+$(DIST_DIR):
+	New-Item -Type Directory -Path $(DIST_DIR) -Force

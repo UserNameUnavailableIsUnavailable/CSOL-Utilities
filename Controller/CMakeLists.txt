@@ -3,33 +3,26 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-message(STATUS "vcpkg root: $ENV{VCPKG_ROOT}")
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+message(STATUS "Controller CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "Controller CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
-project(Controller LANGUAGES CXX)
+set(DEPENDENCIES_DIR "${CMAKE_CURRENT_BINARY_DIR}/dependencies")
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/dependencies")
-
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows")
-
-find_package(onnxruntime CONFIG REQUIRED)
-find_package(aho_corasick CONFIG REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
 find_package(Clipper2 CONFIG REQUIRED)
-find_package(CLI11 CONFIG REQUIRED)
+find_package(onnxruntime CONFIG REQUIRED)
+find_package(aho_corasick CONFIG REQUIRED)
 
 include_directories(
     Controller
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${DEPENDENCIES_DIR}/include
 )
 get_target_property(OPENCV_INCLUDES opencv_core INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "OpenCV include path: ${OPENCV_INCLUDES}")
 
 add_executable(
     Controller
@@ -89,10 +82,10 @@ if (dependencies)
     add_custom_command(TARGET Controller POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${dependencies}
-            "${CMAKE_BINARY_DIR}/$<CONFIG>"
+            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>"
     )
 endif()
 
-add_custom_command(TARGET Controller POST_BUILD
-    COMMAND pwsh -NoLogo -NoProfile -File "\"${CMAKE_SOURCE_DIR}/PostBuild.ps1\"" -BuildType "$<CONFIG>" -ModelsPath "\"${MODELS_PATH}\"" -LocalesPath "\"${CMAKE_SOURCE_DIR}/Locales\""
-)
+# add_custom_command(TARGET Controller POST_BUILD
+#     COMMAND pwsh -NoLogo -NoProfile -File "\"${CMAKE_CURRENT_SOURCE_DIR}/PostBuild.ps1\"" -BuildPath "\"${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>\"" -ModelsPath "\"${MODELS_PATH}\""
+# )

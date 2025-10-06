@@ -1,29 +1,49 @@
-BUILD_DIR := build
-SUBDIR = $(BUILD_DIR)/Controller
 SHELL := pwsh.exe
 .SHELLFLAGS := -NoLogo -NoProfile -Command
-# 模型文件路径，需在命令行参数中指定
-MODELS_PATH :=
-# 汇总构建目录，可由命令行参数指定（将在汇总目录下创建 Controller 子文件夹）
-# 源代码目录
-CURRENT_SOURCE_DIR := .
-# 所有的构建文件放在此目录下
-CURRENT_BUILD_DIR := build
-# Release 或 Debug
-BUILD_TYPE := Release
 
-all: | $(SUBDIR)
-# 使用 cmake 构建 Controller
-	$$ErrorActionPreference = 'Stop' # 遇到错误时停止执行
-	cmake -S . -B "$(CURRENT_BUILD_DIR)" -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DMODELS_PATH="$(MODELS_PATH)"
-	cmake --build "$(CURRENT_BUILD_DIR)" --config $(BUILD_TYPE)
-# 如果目录存在，则删除目录下的所有文件
-	if (Test-Path "$(SUBDIR)") { Remove-Item -Force -Recurse "$(SUBDIR)/*" }
-# 重新创建目录
-	New-Item -Type Directory -Path "$(SUBDIR)" -Force
-# 复制的编译结果到构建目录
-	Copy-Item -Destination "$(SUBDIR)" -Path "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)/*" -Recurse -Force
-# 复制 Controller.ps1 到构建目录
-	Copy-Item -Path "$(CURRENT_SOURCE_DIR)/Controller.ps1","$(CURRENT_SOURCE_DIR)/Controller.cmd" -Destination "$(BUILD_DIR)" -Force
-$(SUBDIR):
-	New-Item -Type Directory -Path $(SUBDIR) -Force
+# 源代码目录
+SOURCE_DIR := ..
+# 构建类型
+BUILD_TYPE := Release
+# 构建目录
+BUILD_DIR := ../build
+# 发布目录
+DIST_DIR := ../dist/Controller
+
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Controller
+CURRENT_BUILD_DIR = $(BUILD_DIR)/Controller/$(BUILD_TYPE)
+# 模型文件路径
+MODELS_DIR = $(CURRENT_SOURCE_DIR)/models
+BUILD_MODELS_DIR = $(CURRENT_BUILD_DIR)/models
+# 本地化文件路径
+LOCALES_DIR = $(CURRENT_SOURCE_DIR)/locales
+BUILD_LOCALES_DIR = $(CURRENT_BUILD_DIR)/locales
+
+.PHONY: all build clean install models exe
+
+all: build install
+
+build: | $(CURRENT_BUILD_DIR) exe $(BUILD_MODELS_DIR) $(BUILD_LOCALES_DIR)
+	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.ps1" "$(CURRENT_BUILD_DIR)/Controller.ps1" -Force
+	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.cmd" "$(CURRENT_BUILD_DIR)/Controller.cmd" -Force
+exe: | $(CURRENT_BUILD_DIR)
+	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)"
+	cmake --build "$(BUILD_DIR)" --config "$(BUILD_TYPE)" --target Controller
+install:
+	if (Test-Path "$(DIST_DIR)") { Remove-Item -Recurse -Force "$(DIST_DIR)" -ErrorAction SilentlyContinue }
+	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(DIST_DIR)" -Force
+clean:
+	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
+models:
+# 下载模型文件
+	&$(CURRENT_SOURCE_DIR)/models.ps1 -Path "$(MODELS_DIR)"
+$(CURRENT_BUILD_DIR):
+	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null
+$(BUILD_MODELS_DIR): models
+# MODELS_DIR 文件夹发生变化，先删除旧的，再复制新的
+	if (Test-Path "$(BUILD_MODELS_DIR)") { Remove-Item -Recurse -Force "$(BUILD_MODELS_DIR)" -ErrorAction SilentlyContinue }
+	Copy-Item -Recurse "$(MODELS_DIR)" "$(BUILD_MODELS_DIR)" -Force -Exclude ".git*"
+$(BUILD_LOCALES_DIR): $(LOCALES_DIR)
+# LOCALES_DIR 文件夹发生变化，先删除旧的，再复制新的
+	if (Test-Path "$(BUILD_LOCALES_DIR)") { Remove-Item -Recurse -Force "$(BUILD_LOCALES_DIR)" -ErrorAction SilentlyContinue }
+	Copy-Item -Recurse "$(LOCALES_DIR)" "$(BUILD_LOCALES_DIR)" -Force

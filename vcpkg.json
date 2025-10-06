@@ -9,6 +9,7 @@
         "thread"
       ]
     },
-    "clipper2"
+    "clipper2",
+    "lua"
   ]
 }

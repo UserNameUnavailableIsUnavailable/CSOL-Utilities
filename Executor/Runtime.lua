@@ -243,6 +243,9 @@ if not __RUNTIME_LUA__ then
                 function()
                     self.interrupt_busy_flag = false
                     self:pop_interrupt_mask_flag() -- 开中断
+                    if exception then
+                        self:throw(exception) -- 将中断处理过程中引发的错误上抛
+                    end
                 end
             )
         end

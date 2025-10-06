@@ -1,7 +1,13 @@
 .mypy_cache/
-/.vs/
-/.VSCodeCounter/
+.venv/
+.vs/
+.VSCodeCounter/
 build/
 test/
-/.venv/
-/.vscode/
+vcpkg_installed/
+dist/
+tmp/
+temp/
+*.zip
+*.tar
+*.tar.gz
