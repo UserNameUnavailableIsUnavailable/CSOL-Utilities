@@ -4,10 +4,11 @@ SHELL := pwsh.exe
 .SHELLFLAGS := -NoLogo -NoProfile -Command
 
 SOURCE_DIR := ..
-CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Manual
 BUILD_DIR := ../build
-CURRENT_BUILD_DIR = $(BUILD_DIR)/Manual
 DIST_DIR := ../dist
+
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Manual
+CURRENT_BUILD_DIR = $(BUILD_DIR)/Manual
 MANUAL_NAME := CSOL-Utilities
 
 _SOURCE := main.tex $(wildcard chapter_*.tex)

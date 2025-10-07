@@ -1,13 +1,14 @@
 SHELL := pwsh.exe
 .SHELLFLAGS := -NoLogo -NoProfile -Command
-# 源代码目录
+
 SOURCE_DIR := ..
-CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Executor
-# 构建目录
 BUILD_DIR := ../build
+DIST_DIR := ../dist
+
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Executor
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Executor
-# 发布目录
-DIST_DIR := ../dist/Executor
+CURRENT_DIST_DIR = $(DIST_DIR)/Executor
+
 # 源码文件
 SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/*.lua)
 
@@ -20,10 +21,10 @@ build: | $(CURRENT_BUILD_DIR) $(addprefix $(CURRENT_BUILD_DIR)/,$(notdir $(SOURC
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.ps1" "$(BUILD_DIR)/Install.ps1" -Force
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.cmd" "$(BUILD_DIR)/Install.cmd" -Force
 install:
-	if (Test-Path "$(DIST_DIR)") { Remove-Item -Recurse -Force "$(DIST_DIR)" -ErrorAction SilentlyContinue }
-	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(DIST_DIR)" -Force
-	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.ps1" "$(DIST_DIR)/Install.ps1" -Force
-	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.cmd" "$(DIST_DIR)/Install.cmd" -Force
+	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" -ErrorAction SilentlyContinue }
+	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(CURRENT_DIST_DIR)" -Force
+	Copy-Item "$(BUILD_DIR)/Install.ps1" "$(DIST_DIR)/Install.ps1" -Force
+	Copy-Item "$(BUILD_DIR)/Install.cmd" "$(DIST_DIR)/Install.cmd" -Force
 clean:
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null
 $(CURRENT_BUILD_DIR)/%.lua: %.lua | $(CURRENT_BUILD_DIR)
