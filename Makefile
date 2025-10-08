@@ -1,7 +1,16 @@
 ﻿SHELL := pwsh.exe
 .SHELLFLAGS := -NoProfile -NoLogo -Command
 
-# 项目
+# 通用代理设置，通过 gnumake PROXY="protocol://proxy:port" 进行设定
+PROXY ?= ""
+
+# 传递给子 Makefile 的环境变量
+# 设置后，CMake 会使用这里的代理设置来下载依赖
+export HTTP_PROXY ?= $(PROXY)
+export HTTPS_PROXY ?= $(PROXY)
+export NO_PROXY ?= "localhost,::1"
+
+# 项目设定
 PROJECT := CSOL-Utilities
 VERSION := v1.5.4.2
 ARCH := Win64
@@ -26,10 +35,12 @@ BUNDLE_NAME := $(DISTRO).zip
 
 TARGETS = Controller Executor Manual Tool Bundle
 
-.PHONY: all clean $(TARGETS)
+.PHONY: all clean environment $(TARGETS)
 
 all: $(TARGETS)
-
+environment:
+	Write-Host "HTTP_PROXY: $(HTTP_PROXY)" -ForegroundColor GREEN
+	Write-Host "HTTPS_PROXY: $(HTTPS_PROXY)" -ForegroundColor GREEN
 Controller: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Controller" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(CURRENT_DIST_DIR)"
 Executor: | $(BUILD_DIR) $(CURRENT_DIST_DIR)

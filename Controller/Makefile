@@ -32,3 +32,5 @@ install:
 	Copy-Item "$(BUILD_DIR)/Controller.cmd" "$(DIST_DIR)/Controller.cmd" -Force
 clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
+$(CURRENT_BUILD_DIR):
+	New-Item -Type Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null

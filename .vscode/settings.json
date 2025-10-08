@@ -1,7 +1,8 @@
 {
   "cmake.sourceDirectory": "${workspaceFolder}",
   "cmake.buildDirectory": "${workspaceFolder}/build",
-  "cmake.generator": "Ninja",
+  "cmake.installPrefix": "${workspaceFolder}/dist",
+  "cmake.generator": "Visual Studio 17 2022",
   "Lua.workspace.ignoreDir": [
     "ConfigPanel.old",
     "vcpkg_installed",

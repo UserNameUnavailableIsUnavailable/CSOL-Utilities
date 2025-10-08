@@ -5,16 +5,42 @@ if (onnxruntime_installed)
     return()
 endif()
 set(VERSION "1.22.0")
+
 set(ZIP_NAME "onnxruntime-win-x64-${VERSION}")
 set(ZIP_URL "https://github.com/microsoft/onnxruntime/releases/download/v${VERSION}/${ZIP_NAME}.zip")
-set(ZIP_PATH "${CMAKE_BINARY_DIR}/downloads/${ZIP_NAME}.zip")
+set(ZIP_PATH "${DOWNLOADS_DIR}/${ZIP_NAME}.zip")
 set(EXTRACT_DIR "${CMAKE_BINARY_DIR}/downloads")
 
-# Download the zip file
-file(DOWNLOAD
-    "${ZIP_URL}"
-    "${ZIP_PATH}"
-)
+# Check if HTTP_PROXY or HTTPS_PROXY is set
+if(DEFINED ENV{HTTPS_PROXY})
+    execute_process(
+        COMMAND curl -L -x "$ENV{HTTPS_PROXY}" -o "${ZIP_PATH}" "${ZIP_URL}"
+        RESULT_VARIABLE CURL_RESULT
+        OUTPUT_VARIABLE CURL_OUTPUT
+    )
+    message(STATUS "Download ${ZIP_URL} using HTTPS proxy: $ENV{HTTPS_PROXY}")
+elseif(DEFINED ENV{HTTP_PROXY})
+    execute_process(
+        COMMAND curl -L -x "$ENV{HTTP_PROXY}" -o "${ZIP_PATH}" "${ZIP_URL}"
+        RESULT_VARIABLE CURL_RESULT
+        OUTPUT_VARIABLE CURL_OUTPUT
+        ERROR_VARIABLE CURL_ERROR
+    )
+    message(STATUS "Download ${ZIP_URL} using HTTP proxy: $ENV{HTTP_PROXY}")
+else()
+    message(STATUS "Download ${ZIP_URL} without proxy")
+    execute_process(
+        COMMAND curl -L -o "${ZIP_PATH}" "${ZIP_URL}"
+        RESULT_VARIABLE CURL_RESULT
+        OUTPUT_VARIABLE CURL_OUTPUT
+        ERROR_VARIABLE CURL_ERROR
+    )
+endif()
+
+# Check if the download was successful
+if (NOT CURL_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to download ${ZIP_URL}: ${CURL_ERROR}")
+endif()
 
 # Extract the zip file
 file(ARCHIVE_EXTRACT

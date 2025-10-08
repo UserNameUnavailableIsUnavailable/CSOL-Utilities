@@ -3,12 +3,12 @@ CompileFlags:
     - -std=c++20
     - -Ibuild/vcpkg_installed/x64-windows/include
     - -Ibuild/vcpkg_installed/x64-windows/include/opencv4
+    - -Ibuild/dependencies/include
     - -D_DEBUG
 ---
 If:
   PathMatch: Controller/.*
 CompileFlags:
   Add:
-    - -Ibuild/Controller/dependencies/include
     - -IController/include
     - -include pch.hpp
