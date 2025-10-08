@@ -1,20 +1,16 @@
-SHELL := pwsh.exe
-.SHELLFLAGS := -NoLogo -NoProfile -Command
-
 BUILD_TYPE := Release
 SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
 ARCH := Win64
 CMAKE_GENERATOR := Visual Studio 17 2022
-
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool/source
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
 CURRENT_DIST_DIR := $(DIST_DIR)/Tool
 AHK_SOURCE_FILE := $(CURRENT_SOURCE_DIR)/exe/Main.ahk
 TARGET_EXE := $(CURRENT_BUILD_DIR)/Tool.exe
 TARGET_DLL := $(CURRENT_BUILD_DIR)/Tool.dll
-
+include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 # AHK2EXE 是 GUI 程序，使用 Start-Process 调用以等待其完成，否则执行将是异步的，进而导致后续命令找不到生成的文件
 AHK2EXE = Start-Process -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe" -Wait -ArgumentList
 

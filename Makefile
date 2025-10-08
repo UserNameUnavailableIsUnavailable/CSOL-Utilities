@@ -1,7 +1,4 @@
-﻿SHELL := pwsh.exe
-.SHELLFLAGS := -NoProfile -NoLogo -Command
-
-# 通用代理设置，通过 gnumake PROXY="protocol://proxy:port" 进行设定
+﻿# 通用代理设置，通过 gnumake PROXY="protocol://proxy:port" 进行设定
 PROXY ?= ""
 
 # 传递给子 Makefile 的环境变量
@@ -34,6 +31,8 @@ MANUAL_NAME := $(DISTRO).pdf
 BUNDLE_NAME := $(DISTRO).zip
 
 TARGETS = Controller Executor Manual Tool Bundle
+
+include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 
 .PHONY: all clean environment $(TARGETS)
 

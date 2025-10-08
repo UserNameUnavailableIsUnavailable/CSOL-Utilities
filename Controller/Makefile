@@ -1,6 +1,3 @@
-SHELL := pwsh.exe
-.SHELLFLAGS := -NoLogo -NoProfile -Command
-
 # 源代码目录
 SOURCE_DIR := ..
 # 构建类型
@@ -15,6 +12,8 @@ CMAKE_GENERATOR := Visual Studio 17 2022
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Controller
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Controller/$(BUILD_TYPE)
 CURRENT_DIST_DIR = $(DIST_DIR)/Controller
+
+include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 
 .PHONY: all build clean install
 

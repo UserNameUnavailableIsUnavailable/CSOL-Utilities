@@ -1,8 +1,5 @@
 # 注意：手册构建需要 pygmentize 支持代码高亮
 
-SHELL := pwsh.exe
-.SHELLFLAGS := -NoLogo -NoProfile -Command
-
 SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
@@ -15,6 +12,8 @@ _SOURCE := main.tex $(wildcard chapter_*.tex)
 SOURCE = $(addprefix $(CURRENT_SOURCE_DIR)/,$(_SOURCE))
 # 生成的手册，main.tex -> main.pdf
 TARGET := $(CURRENT_BUILD_DIR)/main.pdf
+
+include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 
 .PHONY: all build clean install
 
