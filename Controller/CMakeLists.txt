@@ -82,10 +82,24 @@ if (dependencies)
     add_custom_command(TARGET Controller POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${dependencies}
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>"
+            "$<TARGET_FILE_DIR:Controller>"
     )
-endif()
 
-# add_custom_command(TARGET Controller POST_BUILD
-#     COMMAND pwsh -NoLogo -NoProfile -File "\"${CMAKE_CURRENT_SOURCE_DIR}/PostBuild.ps1\"" -BuildPath "\"${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>\"" -ModelsPath "\"${MODELS_PATH}\""
-# )
+# embed manifest
+add_custom_command(TARGET Controller POST_BUILD
+    COMMAND mt -manifest "${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml" "-outputresource:\"$<TARGET_FILE:Controller>;#1\""
+)
+
+# copy ${CMAKE_CURRENT_SOURCE_DIR}/locales to $<TARGET_FILE_DIR:Controller>/locales
+add_custom_command(TARGET Controller POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/locales"
+        "$<TARGET_FILE_DIR:Controller>/locales"
+)
+
+# run models.ps1 to fetch models (models located in ${CMAKE_CURRENT_SOURCE_DIR}/models)
+# then copy these models to $<TARGET_FILE_DIR:Controller>/models
+add_custom_command(TARGET Controller POST_BUILD
+    COMMAND pwsh -NoProfile -NoLogo -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/models.ps1" -InstallDir "$<TARGET_FILE_DIR:Controller>/models"
+)
+endif()

@@ -9,6 +9,8 @@ BUILD_TYPE := Release
 BUILD_DIR := ../build
 # 发布目录
 DIST_DIR := ../dist
+ARCH := Win64
+CMAKE_GENERATOR := Visual Studio 17 2022
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Controller
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Controller/$(BUILD_TYPE)
@@ -28,13 +30,13 @@ build: | $(CURRENT_BUILD_DIR) exe $(BUILD_MODELS_DIR) $(BUILD_LOCALES_DIR)
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.ps1" "$(BUILD_DIR)/Controller.ps1" -Force
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.cmd" "$(BUILD_DIR)/Controller.cmd" -Force
 exe: | $(CURRENT_BUILD_DIR)
-	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)"
+	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -DCMAKE_BUILD_TYPE="$(BUILD_TYPE)"
 	cmake --build "$(BUILD_DIR)" --config "$(BUILD_TYPE)" --target Controller
 install:
-	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" -ErrorAction SilentlyContinue }
-	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(DIST_DIR)" -Force
-	Copy-Item "$(BUILD_DIR)/Controller.ps1" "$(DIST_DIR)/Install.ps1" -Force
-	Copy-Item "$(BUILD_DIR)/Controller.cmd" "$(DIST_DIR)/Install.cmd" -Force
+	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
+	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(CURRENT_DIST_DIR)" -Force
+	Copy-Item "$(BUILD_DIR)/Controller.ps1" "$(DIST_DIR)/Controller.ps1" -Force
+	Copy-Item "$(BUILD_DIR)/Controller.cmd" "$(DIST_DIR)/Controller.cmd" -Force
 clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 models:

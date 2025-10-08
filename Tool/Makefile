@@ -5,6 +5,8 @@ BUILD_TYPE := Release
 SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
+ARCH := Win64
+CMAKE_GENERATOR := Visual Studio 17 2022
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool/source
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
@@ -21,7 +23,7 @@ AHK2EXE = Start-Process -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.
 all: build install
 build: | $(CURRENT_BUILD_DIR) dll exe
 install:
-	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" -ErrorAction SilentlyContinue }
+	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
 	New-Item -Type Directory -Path $(CURRENT_DIST_DIR) -Force | Out-Null
 	Copy-Item -Path "$(TARGET_DLL)" -Destination "$(CURRENT_DIST_DIR)" -Force
 	Copy-Item -Path "$(TARGET_EXE)" -Destination "$(CURRENT_DIST_DIR)" -Force
@@ -29,7 +31,7 @@ clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 exe: | $(TARGET_EXE)
 dll: | $(CURRENT_BUILD_DIR)
-	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)"
+	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) --target Tool
 $(TARGET_EXE): | $(CURRENT_BUILD_DIR)
 	$(AHK2EXE) "/in $(AHK_SOURCE_FILE)"

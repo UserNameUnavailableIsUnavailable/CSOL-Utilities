@@ -1,7 +1,8 @@
 #include "Utilities.hpp"
-
+#include <shellscalingapi.h>
 #include "Exception.hpp"
 #include "Global.hpp"
+// #include "Console.hpp"
 
 namespace CSOL_Utilities
 {
@@ -109,128 +110,146 @@ std::filesystem::path GetProcessImagePath(uintptr_t hMod)
     }
 }
 
-void CaptureWindowAsBmp(HWND hWnd, std::vector<uint8_t> &buffer)
+/// 将指定窗口捕获为 BMP 格式的位图数据。
+/// @param window_handle 窗口句柄。如果为 `NULL`，则捕获整个屏幕。
+/// @param buffer 用于接收 BMP 数据的缓冲区。
+/// @throw `Exception` 捕获失败时抛出异常。
+/// @note 对于高分辨率屏幕，需要在清单中配置高分辨率适配的选项。参见：https://learn.microsoft.com/windows/win32/hidpi/setting-the-default-dpi-awareness-for-a-process。
+void CaptureWindowAsBmp(HWND window_handle, std::vector<uint8_t> &buffer)
 {
-    if (!hWnd)
+    DWORD dwScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+    DWORD dwScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    // Console::Info(std::format("Screen Size: {}x{}", dwScreenWidth, dwScreenHeight));
+
+    if (!window_handle)
     {
-        hWnd = GetDesktopWindow();
+        window_handle = GetDesktopWindow();
     }
-    if (!IsWindow(hWnd))
+    if (!IsWindow(window_handle))
     {
         throw Exception(Translate("CaptureWindowAsBmp::ERROR_InvalidWindow"));
     }
-    auto release_dc = [](HDC hdc) { ReleaseDC(NULL, hdc); };
-
-    std::unique_ptr<std::remove_pointer_t<HDC>, decltype(release_dc)> hdcScreen(GetDC(NULL), release_dc);
-
-    auto release_hwnd_dc = [&hWnd](HDC hdc) { ReleaseDC(NULL, hdc); };
-
-    std::unique_ptr<std::remove_pointer_t<HDC>, decltype(release_hwnd_dc)> hdcWindow(GetDC(hWnd), release_hwnd_dc);
-
-    if (!hdcWindow)
-    {
-        throw Exception(Translate("ERROR_Win32_API@2", "GetDC", GetLastError()));
-    }
-    DWORD dwBmpSize = 0;
-    DWORD dwSizeofDIB = 0;
-    HANDLE hDIB = NULL;
-
-    std::unique_ptr<std::remove_pointer_t<HDC>, BOOL (*)(HGDIOBJ)> hdcMemDC(CreateCompatibleDC(hdcWindow.get()),
-                                                                            &DeleteObject);
-
-    if (!hdcMemDC)
-    {
-        throw Exception(Translate("ERROR_Win32_API@2", "CreateCompatibleDC", GetLastError()));
-    }
-    if (IsIconic(hWnd))
+    if (IsIconic(window_handle))
     {
         throw Exception(Translate("CaptureWindowAsBmp::ERROR_WindowIsMinimized"));
     }
 
-    /* 获取窗口的相对区域 */
-    RECT rcClient;
-    if (!GetClientRect(hWnd, &rcClient))
+    RECT rcLogicalClient;
+    RECT rcPhysicalClient;
+    POINT pt;
+
+    if (!GetClientRect(window_handle, &rcLogicalClient))
     {
         throw Exception(Translate("ERROR_Win32_API@2", "GetClientRect", GetLastError()));
     }
+    
+    assert(rcLogicalClient.left == 0 && rcLogicalClient.top == 0);
 
-    /* 获取窗口左上角绝对坐标 */
-    POINT ptLeftTopOfClient{0, 0}; /* 需要将各字段坐标初始化为 0，表示左上角坐标 */
-    ClientToScreen(hWnd, &ptLeftTopOfClient);
+    DWORD dwLogicalWidth = rcLogicalClient.right - rcLogicalClient.left;
+    DWORD dwLogicalHeight = rcLogicalClient.bottom - rcLogicalClient.top;
 
-    /* 从整个屏幕截图中裁剪出客户端窗口部分 */
-    SetStretchBltMode(hdcWindow.get(), HALFTONE);
-    if (!StretchBlt(hdcWindow.get(),                                        /* 窗口部分 */
-                    0, 0, rcClient.right, rcClient.bottom, hdcScreen.get(), /* 整个屏幕 */
-                    ptLeftTopOfClient.x, ptLeftTopOfClient.y, rcClient.right - rcClient.left,
-                    rcClient.bottom - rcClient.top, SRCCOPY))
+    // Console::Info(std::format("Logical Client Size: {}x{}", dwLogicalWidth, dwLogicalHeight));
+
+    pt.x = rcLogicalClient.left;
+    pt.y = rcLogicalClient.top;
+    ClientToScreen(window_handle, &pt);
+    rcPhysicalClient.left = pt.x;
+    rcPhysicalClient.top = pt.y;
+    pt.x = rcLogicalClient.right;
+    pt.y = rcLogicalClient.bottom;
+    ClientToScreen(window_handle, &pt);
+    rcPhysicalClient.right = pt.x;
+    rcPhysicalClient.bottom = pt.y;
+    
+    DWORD dwPhysicalWidth = rcPhysicalClient.right - rcPhysicalClient.left;
+    DWORD dwPhysicalHeight = rcPhysicalClient.bottom - rcPhysicalClient.top;
+    // Console::Info(std::format("Physical Client Rect: left={}, top={}, right={}, bottom={}", rcPhysicalClient.left, rcPhysicalClient.top, rcPhysicalClient.right, rcPhysicalClient.bottom));
+    // Console::Info(std::format("Physical Client Size: {}x{}", dwPhysicalWidth, dwPhysicalHeight));
+
+    auto release_screen_dc = [](HDC hdc) { ReleaseDC(nullptr, hdc); };
+    std::unique_ptr<std::remove_pointer_t<HDC>, decltype(release_screen_dc)> hdcScreen(GetDC(nullptr), release_screen_dc);
+    if (!hdcScreen)
     {
-        throw Exception(Translate("ERROR_Win32_API@2", "StretchBlt", GetLastError()));
+        throw Exception(Translate("ERROR_Win32_API@2", "GetDC", GetLastError()));
     }
-
-    std::unique_ptr<std::remove_pointer_t<HBITMAP>, BOOL (*)(HGDIOBJ)> hbmScreen(
-        CreateCompatibleBitmap(hdcWindow.get(), rcClient.right - rcClient.left, rcClient.bottom - rcClient.top),
-        &DeleteObject);
-
-    if (!hbmScreen)
+    // auto release_hwnd_dc = [&window_handle](HDC hdc) { ReleaseDC(window_handle, hdc); };
+    // std::unique_ptr<std::remove_pointer_t<HDC>, decltype(release_hwnd_dc)> hdcWindow(GetDC(window_handle), release_hwnd_dc);
+    // if (!hdcWindow)
+    // {
+    //     throw Exception(Translate("ERROR_Win32_API@2", "GetDC", GetLastError()));
+    // }
+    std::unique_ptr<std::remove_pointer_t<HDC>, BOOL (*)(HGDIOBJ)> hdcMemDC(CreateCompatibleDC(hdcScreen.get()), &DeleteObject);
+    if (!hdcMemDC)
     {
         throw Exception(Translate("ERROR_Win32_API@2", "CreateCompatibleDC", GetLastError()));
     }
 
-    SelectObject(hdcMemDC.get(), hbmScreen.get());
+    // SetStretchBltMode(hdcWindow.get(), HALFTONE); // 设置拉伸模式为高质量
+    // 从屏幕 DC 复制到窗口的 DC
+    // if (!StretchBlt(hdcWindow.get(), 0, 0, dwPhysicalWidth, dwPhysicalHeight, hdcScreen.get(), rcPhysicalClient.left, rcPhysicalClient.top, dwPhysicalWidth, dwPhysicalHeight, SRCCOPY))
+    // {
+    //     throw Exception(Translate("ERROR_Win32_API@2", "StretchBlt", GetLastError()));
+    // }
 
-    if (!BitBlt(hdcMemDC.get(), 0, 0, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top, hdcWindow.get(),
-                0, 0, SRCCOPY))
+    // 创建兼容位图
+    std::unique_ptr<std::remove_pointer_t<HBITMAP>, BOOL (*)(HGDIOBJ)> hdcBitmap(
+        CreateCompatibleBitmap(hdcScreen.get(), dwPhysicalWidth, dwPhysicalHeight), &DeleteObject);
+    if (!hdcBitmap)
+    {
+        throw Exception(Translate("ERROR_Win32_API@2", "CreateCompatibleBitmap", GetLastError()));
+    }
+
+    SelectObject(hdcMemDC.get(), hdcBitmap.get()); // 将位图选入内存 DC
+
+    // 从窗口的 DC 复制到内存 DC
+    if (!BitBlt(hdcMemDC.get(), 0, 0, dwPhysicalWidth, dwPhysicalHeight, hdcScreen.get(), rcPhysicalClient.left, rcPhysicalClient.top, SRCCOPY))
     {
         throw Exception(Translate("ERROR_Win32_API@2", "BitBlt", GetLastError()));
     }
 
-    BITMAP bmpScreen{};
-    GetObjectW(hbmScreen.get(), sizeof(BITMAP), &bmpScreen); /* 获取位图信息 */
-    BITMAPINFOHEADER BitmapInfoHeader;
-    BITMAPFILEHEADER BitmapFileHeader;
+    BITMAP bmp;
+    GetObjectW(hdcBitmap.get(), sizeof(BITMAP), &bmp); /* 获取位图信息 */
 
-    BitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
-    BitmapInfoHeader.biWidth = bmpScreen.bmWidth;
-    BitmapInfoHeader.biHeight = bmpScreen.bmHeight;
-    BitmapInfoHeader.biPlanes = 1;
-    BitmapInfoHeader.biBitCount = 32; /* 每个像素 32 位 */
-    BitmapInfoHeader.biCompression = BI_RGB;
-    BitmapInfoHeader.biSizeImage = 0;
-    BitmapInfoHeader.biXPelsPerMeter = 0;
-    BitmapInfoHeader.biYPelsPerMeter = 0;
-    BitmapInfoHeader.biClrUsed = 0;
-    BitmapInfoHeader.biClrImportant = 0;
-
-    dwBmpSize = ((bmpScreen.bmWidth * BitmapInfoHeader.biBitCount + 31) / 32) /* 宽度向上取整 */
-                * 4 * bmpScreen.bmHeight;
-
-    auto required_size = sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader) + dwBmpSize;
-
-    buffer.resize(required_size);
-
-    dwSizeofDIB = dwBmpSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-
-    BitmapFileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-    BitmapFileHeader.bfSize = dwSizeofDIB;
-    BitmapFileHeader.bfType = 0x4D42; // BM.
-    BitmapFileHeader.bfReserved1 = 0;
-    BitmapFileHeader.bfReserved2 = 0;
-
-    auto file_header_offset = 0;
-    auto info_header_offset = sizeof(BitmapFileHeader);
-    auto bmp_body_offset = info_header_offset + sizeof(BitmapInfoHeader);
-
-    memcpy_s(buffer.data() + file_header_offset, buffer.size() - file_header_offset, &BitmapFileHeader,
-             sizeof(BitmapFileHeader));
-
-    memcpy_s(buffer.data() + info_header_offset, buffer.size() - info_header_offset, &BitmapInfoHeader,
-             sizeof(BitmapInfoHeader));
-    if (!GetDIBits(hdcWindow.get(), hbmScreen.get(), 0, static_cast<UINT>(bmpScreen.bmHeight),
-                   buffer.data() + bmp_body_offset, reinterpret_cast<BITMAPINFO *>(&BitmapInfoHeader), DIB_RGB_COLORS))
+    BITMAPFILEHEADER bfh{
+        .bfType = 0x4D42, // BM
+        .bfSize = 0,      // 之后会重新计算
+        .bfReserved1 = 0,
+        .bfReserved2 = 0,
+        .bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER),
+    };
+    BITMAPINFOHEADER bih{
+        .biSize = sizeof(BITMAPINFOHEADER),
+        .biWidth = bmp.bmWidth,
+        .biHeight = bmp.bmHeight,
+        .biPlanes = 1,
+        .biBitCount = 32, /* 每个像素 32 位 */
+        .biCompression = BI_RGB,
+        .biSizeImage = 0,
+        .biXPelsPerMeter = 0,
+        .biYPelsPerMeter = 0,
+        .biClrUsed = 0,
+        .biClrImportant = 0,
+    };
+    DWORD dwBmpSize = ((bmp.bmWidth * bih.biBitCount + 31) / 32) /* 宽度向上取整 */
+                       * 4 * bmp.bmHeight;                     /* 每行字节数 * 高度 */
+    DWORD dwTotalSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + dwBmpSize;
+    bfh.bfSize = dwTotalSize;
+    buffer.resize(dwTotalSize);
+    memcpy(buffer.data(), &bfh, sizeof(BITMAPFILEHEADER));
+    memcpy(buffer.data() + sizeof(BITMAPFILEHEADER), &bih, sizeof(BITMAPINFOHEADER));
+    BITMAPINFO bmi;
+    bmi.bmiHeader = bih;
+    bmi.bmiColors[0] = {0, 0, 0, 0};
+    if (!GetDIBits(hdcScreen.get(), hdcBitmap.get(), 0, (UINT)bmp.bmHeight,
+                   buffer.data() + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER), &bmi,
+                   DIB_RGB_COLORS))
     {
         throw Exception(Translate("ERROR_Win32_API@2", "GetDIBits", GetLastError()));
     }
+    std::ofstream ofs("debug.bmp", std::ios::binary);
+    ofs.write(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+    ofs.close();
 }
 
 std::wstring ConvertUtf8ToUtf16(const std::string &u8)
@@ -270,9 +289,9 @@ void RemoveWindowBorder(HWND hWnd) noexcept
 void CenterWindow(HWND hWnd) noexcept
 {
     WINDOWINFO windowInfo;
-    RECT rcScreen = {.left = 0, .top = 0};
     if (IsWindow(hWnd))
     {
+        RECT rcScreen{};
         GetWindowInfo(hWnd, &windowInfo);
         RECT &rcClient = windowInfo.rcClient;
         rcScreen.right = GetSystemMetrics(SM_CXSCREEN);

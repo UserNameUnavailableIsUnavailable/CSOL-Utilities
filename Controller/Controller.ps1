@@ -71,13 +71,17 @@ public static class ConsoleMode {
 
 $CurrentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 
+Push-Location
+Set-Location $PSScriptRoot
+
 # 确保以管理员权限运行
 if (-not $CurrentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 {
-	$ArgumentList = "-NoProfile -NoLogo -NoExit -Command `"& { Set-Location -Path `"$PSScriptRoot`"; &`"$PSCommandPath`" }`""
-    Start-Process -FilePath powershell -Verb RunAs -ArgumentList $ArgumentList
+	$ArgumentList = "-NoExit -NoProfile -NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    Start-Process -WorkingDirectory $PSScriptRoot -FilePath powershell -Verb RunAs -ArgumentList $ArgumentList
 }
 else
 {
     & "$PSScriptRoot\Controller\Controller.exe" $Parameters
 }
+Pop-Location

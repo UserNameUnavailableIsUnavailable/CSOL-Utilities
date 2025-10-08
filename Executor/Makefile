@@ -21,7 +21,7 @@ build: | $(CURRENT_BUILD_DIR) $(addprefix $(CURRENT_BUILD_DIR)/,$(notdir $(SOURC
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.ps1" "$(BUILD_DIR)/Install.ps1" -Force
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.cmd" "$(BUILD_DIR)/Install.cmd" -Force
 install:
-	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" -ErrorAction SilentlyContinue }
+	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
 	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(CURRENT_DIST_DIR)" -Force
 	Copy-Item "$(BUILD_DIR)/Install.ps1" "$(DIST_DIR)/Install.ps1" -Force
 	Copy-Item "$(BUILD_DIR)/Install.cmd" "$(DIST_DIR)/Install.cmd" -Force

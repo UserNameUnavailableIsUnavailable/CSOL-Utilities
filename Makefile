@@ -3,9 +3,10 @@
 
 # 项目
 PROJECT := CSOL-Utilities
-VERSION := v1.5.4
-PLATFORM := x64
-DISTRO = $(PROJECT)-$(VERSION)-$(PLATFORM)
+VERSION := v1.5.4.2
+ARCH := Win64
+DISTRO = $(PROJECT)-$(VERSION)-$(ARCH)
+CMAKE_GENERATOR := Visual Studio 17 2022
 
 # 源代码目录
 SOURCE_DIR := .

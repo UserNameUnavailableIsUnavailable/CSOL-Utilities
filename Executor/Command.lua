@@ -70,7 +70,11 @@ if not __COMMAND_LUA__ then
     ---读取命令文件。
     function Command:receive()
         local status = 0
-        pcall(Include, "Directives.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
+        local ok, message = pcall(Include, "Directives.lua") -- 若读取命令文件失败，则仍保留上次的命令不变
+        if not ok then
+            Console:debug(([[读取命令文件失败，错误信息：%s]]):format(tostring(message)))
+            return
+        end
         if Command.directives.id ~= self.id then
             self.id = Command.directives.id
             self.finished = false -- 新的命令，将完成状态设置为 false
