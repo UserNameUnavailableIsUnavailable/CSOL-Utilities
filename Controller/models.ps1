@@ -16,13 +16,14 @@ if (-not (Test-Path $DownloadDir)) {
 }
 
 if ($InstallDir) {
-    if (-not (Test-Path $InstallDir)) {
+    if (Test-Path $InstallDir) {
+        Remove-Item -Path $InstallDir -Recurse -Force -ErrorAction Stop
         New-Item -ItemType Directory -Path $InstallDir -ErrorAction Stop | Out-Null
     }
-    Get-ChildItem -Path $DownloadDir | Where-Object {
+    Get-ChildItem -Path $DownloadDir -Force | Where-Object {
         -not $_.Name.StartsWith(".git") # exclude .git stuff
     } | ForEach-Object {
-        Write-Output "Copying $($_.FullName) to $InstallDir"
+        Write-Host "Copying $($_.FullName) to $InstallDir" -ForegroundColor Green
         Copy-Item -Path $_.FullName -Destination $InstallDir -Recurse -Force
     }
 }

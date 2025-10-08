@@ -85,11 +85,12 @@ if (dependencies)
             "$<TARGET_FILE_DIR:Controller>"
     )
 
-# embed manifest
+# embed manifest into Controller.exe
 add_custom_command(TARGET Controller POST_BUILD
     COMMAND mt -manifest "${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml" "-outputresource:\"$<TARGET_FILE:Controller>;#1\""
 )
 
+# assets: locales
 # copy ${CMAKE_CURRENT_SOURCE_DIR}/locales to $<TARGET_FILE_DIR:Controller>/locales
 add_custom_command(TARGET Controller POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -97,6 +98,7 @@ add_custom_command(TARGET Controller POST_BUILD
         "$<TARGET_FILE_DIR:Controller>/locales"
 )
 
+# assets: models
 # run models.ps1 to fetch models (models located in ${CMAKE_CURRENT_SOURCE_DIR}/models)
 # then copy these models to $<TARGET_FILE_DIR:Controller>/models
 add_custom_command(TARGET Controller POST_BUILD
