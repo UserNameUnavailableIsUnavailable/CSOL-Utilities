@@ -36,7 +36,7 @@ include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 
 .PHONY: all clean environment $(TARGETS)
 
-all: $(TARGETS)
+all: $(__CHECK_PWSH_INSTALLATION__) $(TARGETS)
 environment:
 	Write-Host "HTTP_PROXY: $(HTTP_PROXY)" -ForegroundColor GREEN
 	Write-Host "HTTPS_PROXY: $(HTTPS_PROXY)" -ForegroundColor GREEN
