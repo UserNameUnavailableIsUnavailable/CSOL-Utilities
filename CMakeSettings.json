@@ -1,15 +1,40 @@
 {
   "configurations": [
     {
-      "name": "Controller",
+      "name": "Debug",
       "generator": "Visual Studio 17 2022 Win64",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}/build/${name}",
-      "installRoot": "${projectDir}/dist/${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "--target Controller --config Debug",
-      "ctestCommandArgs": ""
+      "buildRoot": "${projectDir}/build",
+      "installRoot": "${projectDir}/dist",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "Release",
+      "generator": "Visual Studio 17 2022 Win64",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}/build",
+      "installRoot": "${projectDir}/dist",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "RelWithDebInfo",
+      "generator": "Visual Studio 17 2022 Win64",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}/build",
+      "installRoot": "${projectDir}/dist",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "name": "MinSizeRel",
+      "generator": "Visual Studio 17 2022 Win64",
+      "configurationType": "MinSizeRel",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}/build",
+      "installRoot": "${projectDir}/dist",
+      "intelliSenseMode": "windows-msvc-x64"
     }
   ]
 }
