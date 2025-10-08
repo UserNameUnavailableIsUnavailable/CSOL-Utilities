@@ -3,6 +3,9 @@ param(
     [String]$InstallDir  # dir to store models, optional
 )
 
+Write-Host "HTTP_PROXY: $env:HTTP_PROXY" -ForegroundColor Green
+Write-Host "HTTPS_PROXY: $env:HTTPS_PROXY" -ForegroundColor Green
+
 $DownloadDir = "$PSScriptRoot/models" # Temporary download directory
 
 if (-not (Test-Path $DownloadDir)) {
@@ -11,7 +14,9 @@ if (-not (Test-Path $DownloadDir)) {
 } else {
     Push-Location
     Set-Location $DownloadDir
-    git pull # update models
+    git fetch # fetch latest changes
+    git merge origin/main # merge latest changes
+    git lfs pull # update models
     Pop-Location
 }
 
