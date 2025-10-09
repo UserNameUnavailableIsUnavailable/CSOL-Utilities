@@ -23,7 +23,7 @@ children:
       type: SECTION
       annotation: >-
           核心预设包括时区、执行器挂起/恢复按键等选项。若设置不正确，执行器将无法正常工作。
-          <b style="color: red">修改核心预设后，请立即导出 Setting.lua，按照手册中的操作步骤重新加载执行器后再进行后续配置。</b>
+          <b style="color: red">修改核心预设后，请立即导出 Setting.lua（若之前已经配置过 Setting.lua，则请先导入后再修改并导出），按照手册中的操作步骤重新加载执行器后再进行后续配置。</b>
       children:
           - id: TIME_ZONE
             title: 时区
