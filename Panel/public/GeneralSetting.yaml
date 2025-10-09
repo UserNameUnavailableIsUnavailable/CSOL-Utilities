@@ -37,11 +37,11 @@ children:
             image: assets/time_zone.avif
           - id: EXECUTOR_SUSPEND
             type: SELECT
-            title: 执行器挂起按键
+            title: 执行器开始手动接管组合键
             label: 选项
             quoted: true
             annotation: >-
-              此选项用于挂起执行器，挂起后，执行器将临时冻结所有键盘/鼠标操作。
+              开始手动接管（暂停），执行器将无法执行任何键盘/鼠标操作。
             value: "\"LEFT_CTRL_AND_RIGHT_CTRL\""
             options:
               - text: 左 Ctrl + 右 Ctrl
@@ -60,10 +60,10 @@ children:
             quoted: true
             type: SELECT
             label: 选项
-            title: 执行器恢复按键
+            title: 执行器结束手动接管组合键
             value: "\"LEFT_ALT_AND_RIGHT_ALT\""
             annotation: >-
-              恢复执行器，键盘/鼠标的冻结状态将被解除。
+              结束手动接管（恢复），执行器恢复正常工作。
             options:
               - text: 左 Ctrl + 右 Ctrl
                 value: "\"LEFT_CTRL_AND_RIGHT_CTRL\""
