@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { type FieldWidget_T, type KeystrokesWidget_T, type PositionWidget_T, type SectionWidget_T, type SwitchWidget_T } from "../../scripts/Widget";
+import { type FieldWidget_T, type KeystrokesWidget_T, type PositionWidget_T, type SectionWidget_T, type SwitchWidget_T, type SelectWidget_T } from "../../scripts/Widget";
 import { computed, inject, reactive, type Ref } from 'vue';
 import BaseWidget from "./BaseWidget.vue";
 import SwitchWidget from "./SwitchWidget.vue";
 import PositionWidget from "./PositionWidget.vue";
 import FieldWidget from "./FieldWidget.vue";
 import KeystrokesWidget from "./KeystrokesWidget.vue";
+import SelectWidget from "./SelectWidget.vue";
 
 const props = defineProps<{
     widget: SectionWidget_T
@@ -37,6 +38,7 @@ const enabled = computed(() => {
             <SectionWidget :id="'SECTION' + widget.id" v-if="child.type === 'SECTION'" :widget="child as SectionWidget_T" />
             <FieldWidget v-if="child.type === 'FIELD'" :widget="child as FieldWidget_T" />
             <SwitchWidget v-else-if="child.type === 'SWITCH'" :widget="child as SwitchWidget_T" />
+            <SelectWidget v-else-if="child.type === 'SELECT'" :widget="child as SelectWidget_T" />
             <PositionWidget v-else-if="child.type === 'POSITION'" :widget="child as PositionWidget_T" />
             <KeystrokesWidget v-else-if="child.type === 'KEYSTROKES'" :widget="child as KeystrokesWidget_T" />
         </template>

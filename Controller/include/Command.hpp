@@ -21,13 +21,14 @@ class Command
         CMD_DETECT_IN_GAME,
         CMD_DEFAULT_IDLE_2,
         CMD_EXTENDED_IDLE_2,
+        CMD_WAIT_FOR_LOADING,
     };
 
     using MODE = unsigned int;
     static constexpr const MODE CMD_DEFAULT = 0;
-    static constexpr const MODE CMD_REPEATABLE = 1 << 1;
-    static constexpr const MODE CMD_AUTO_REFRESH = 1 << 2;
-    static constexpr const MODE CMD_ZERO_TIMESTAMP = 1 << 3;
+    static constexpr const MODE CMD_REPEATABLE = 1 << 1; // 可重复，执行器会在有效期内重复执行该命令
+    static constexpr const MODE CMD_AUTO_REFRESH = 1 << 2; // 为当前命令自动续期，无需外部调用 Set
+    static constexpr const MODE CMD_ZERO_TIMESTAMP = 1 << 3; // 命令时间戳设为 0
 
     static void Set(Command::TYPE cmd_type, Command::MODE mode = Command::CMD_DEFAULT);
     static std::string Get();
@@ -69,6 +70,8 @@ class Command
             return "Command.CMD_DEFAULT_IDLE_2";
         case Command::TYPE::CMD_EXTENDED_IDLE_2:
             return "Command.CMD_EXTENDED_IDLE_2";
+        case Command::TYPE::CMD_WAIT_FOR_LOADING:
+            return "Command.CMD_WAIT_FOR_LOADING";
         default:
             return "Command.NOP";
         }

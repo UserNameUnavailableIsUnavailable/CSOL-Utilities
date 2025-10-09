@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "element-plus": "^2.11.4",
     "js-yaml": "^4.1.0",
     "lua-fmt": "^2.6.0",
     "luaparse": "^0.3.1",

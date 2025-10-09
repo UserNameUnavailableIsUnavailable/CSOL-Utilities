@@ -9,7 +9,7 @@ export NO_PROXY ?= "localhost,::1"
 
 # 项目设定
 PROJECT := CSOL-Utilities
-VERSION := v1.5.4.2
+VERSION := v1.5.5
 ARCH := Win64
 DISTRO = $(PROJECT)-$(VERSION)-$(ARCH)
 CMAKE_GENERATOR := Visual Studio 17 2022

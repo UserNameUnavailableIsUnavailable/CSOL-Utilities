@@ -21,6 +21,7 @@ if not __COMMAND_LUA__ then
         CMD_DETECT_IN_GAME = 11,
         CMD_DEFAULT_IDLE_2 = 12, -- 与 CMD_DEFAULT_IDLE 功能相同，但不会进行结算确认
         CMD_EXTENDED_IDLE_2 = 13, -- 与 CMD_EXTENDED_IDLE 功能相同，但不会进行结算确认
+        CMD_WAIT_FOR_LOADING = 14,
     }
 
     Command.IDLE_COMMANDS = {

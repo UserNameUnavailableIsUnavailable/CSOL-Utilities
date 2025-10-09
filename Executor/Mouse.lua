@@ -1,7 +1,8 @@
 if not __MOUSE_LUA__ then
     __MOUSE_LUA__ = true
-    local __version__ = "1.5.4"
+    local __version__ = "1.5.5"
 
+    Include("Constants.lua")
     Include("Emulator.lua")
     Include("Context.lua")
     Include("Runtime.lua")
@@ -25,6 +26,23 @@ if not __MOUSE_LUA__ then
         BACKWARD = Constants.MOUSE_BUTTON.BACK,
         FORWARD = Constants.MOUSE_BUTTON.FORWARD,
     }
+
+    ---将鼠标移动到虚拟坐标 (x, y)。
+    ---@param x any 横坐标。
+    ---@param y any 纵坐标。
+    ---@return boolean # 成功返回 `true`，失败返回 `false`。
+    local function __move_mouse_to_virtual__(x, y)
+        if (type(x) == "number") then
+            x = math.floor(x)
+            y = math.floor(y)
+            -- 罗技手册中指明，坐标范围为 0 到 65535。
+            if 0 <= x and x < 65536 and 0 <= y and y < 65536 then
+                MoveMouseToVirtual(x, y)
+                return true
+            end
+        end
+        return false
+    end
 
     local valid_mouse_buttons = {}
     for k, v in pairs(Mouse) do
@@ -85,7 +103,7 @@ if not __MOUSE_LUA__ then
     function Mouse:place(x, y, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and self:is_position_valid(x, y) then
-            MoveMouseToVirtual(x--[[@as integer]], y--[[@as integer]])
+            __move_mouse_to_virtual__(x, y)
         end
         Runtime:sleep(delay, precise)
     end
@@ -168,36 +186,42 @@ if not __MOUSE_LUA__ then
 
     ---使用鼠标单击屏幕上某个位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param button MOUSE_BUTTON 鼠标按钮。
-    ---@param x integer 横坐标。
-    ---@param y integer 纵坐标。
+    ---@param x? integer 横坐标。
+    ---@param y? integer 纵坐标。
     ---@param delay? integer 点击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
     ---@param precise? boolean 是否精确定时
     ---@see Mouse.locate 获取 `(x, y)` 。
     function Mouse:click_on(button, x, y, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and self:is_button_value_valid(button) and self:is_position_valid(x, y) then
-            MoveMouseToVirtual(x--[[@as integer]], y--[[@as integer]])
+            local moved = __move_mouse_to_virtual__(x, y)
             Runtime:sleep(Delay.SHORT, precise)
-            PressAndReleaseMouseButton(button)
+            if moved then
+                PressAndReleaseMouseButton(button)
+            end
         end
         Runtime:sleep(delay, precise)
     end
 
     ---使用鼠标双击屏幕上某个位置。当 `self:is_frozen()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param button MOUSE_BUTTON 鼠标按钮。
-    ---@param x integer 横坐标。
-    ---@param y integer 纵坐标。
+    ---@param x? integer 横坐标。
+    ---@param y? integer 纵坐标。
     ---@param delay? integer 双击后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
     ---@param precise? boolean 是否精确定时
     ---@see Mouse.locate 获取 `(x, y)` 。
     function Mouse:double_click_on(button, x, y, delay, precise)
         delay = delay or Delay.SHORT
         if not self:is_frozen() and self:is_button_value_valid(button) and self:is_position_valid(x, y) then
-            MoveMouseToVirtual(x, y)
+            local moved = __move_mouse_to_virtual__(x, y)
             Runtime:sleep(Delay.SHORT, precise)
-            PressAndReleaseMouseButton(button)
+            if moved then
+                PressAndReleaseMouseButton(button)
+            end
             Runtime:sleep(self.DOUBLE_CLICK_INTERVAL, precise)
-            PressAndReleaseMouseButton(button)
+            if moved then
+                PressAndReleaseMouseButton(button)
+            end
         end
         Runtime:sleep(delay, precise)
     end
@@ -225,8 +249,8 @@ if not __MOUSE_LUA__ then
 
     ---使用鼠标重复点击屏幕上的某个位置若干次。当 `Runtime.is_paused()` 为 `true` 时，该函数将直接返回，不进行任何操作。
     ---@param button MOUSE_BUTTON 鼠标按钮。
-    ---@param x integer 横坐标。
-    ---@param y integer 纵坐标。
+    ---@param x? integer 横坐标。
+    ---@param y? integer 纵坐标。
     ---@param times? integer 重复次数。
     ---@param interval? integer 间隔时间。
     ---@param delay? integer 重复点击动作完成后的延迟时间，单位为毫秒，默认为 `Delay.SHORT`。
@@ -241,10 +265,12 @@ if not __MOUSE_LUA__ then
             and self:is_button_value_valid(button)
             and self:is_position_valid(x, y)
         then
-            MoveMouseToVirtual(x--[[@as integer]], y--[[@as integer]])
+            local moved = __move_mouse_to_virtual__(x, y)
             Runtime:sleep(Delay.SHORT, precise)
             for i = 1, times do
-                PressAndReleaseMouseButton(button)
+                if moved then
+                    PressAndReleaseMouseButton(button)
+                end
                 if i ~= times then
                     Runtime:sleep(interval, precise)
                 end
@@ -269,7 +295,7 @@ if not __MOUSE_LUA__ then
     function Mouse:roll(times, delay, precise)
         times = times or 0
         delay = delay or Delay.SHORT
-        if not self:is_frozen() and math.type(times) == "integer" then
+        if not self:is_frozen() and math.type(times) == "integer" and times > 0 then
             MoveMouseWheel(times)
         end
         Runtime:sleep(delay, precise)

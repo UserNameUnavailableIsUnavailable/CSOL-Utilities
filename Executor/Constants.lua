@@ -2,6 +2,7 @@ if not __CONSTANTS_LUA__ then
     __CONSTANTS_LUA__ = true
     local __version__ = "1.5.4"
 
+    Include("Version.lua")
     Version:set("Constants", __version__)
 
     Constants = {

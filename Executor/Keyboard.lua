@@ -2,6 +2,7 @@ if not __KEYBOARD_LUA__ then
     __KEYBOARD_LUA__ = true
     local __version__ = "1.5.4"
 
+    Include("Constants.lua")
     Include("Emulator.lua")
     Include("Context.lua")
     Include("Runtime.lua")

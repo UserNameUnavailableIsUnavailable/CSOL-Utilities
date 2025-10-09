@@ -19,8 +19,11 @@ annotation: >-
     </ul>
 children:
     - id: SYSTEM_SETTINGS
-      title: 系统设定
+      title: 1. 核心预设
       type: SECTION
+      annotation: >-
+          核心预设包括时区、执行器挂起/恢复按键等选项。若设置不正确，执行器将无法正常工作。
+          <b style="color: red">修改核心预设后，请立即导出 Setting.lua，按照手册中的操作步骤重新加载执行器后再进行后续配置。</b>
       children:
           - id: TIME_ZONE
             title: 时区
@@ -32,8 +35,50 @@ children:
             hint: "<a href='ms-settings:dateandtime'>Windows 10 / 11 用户点此查看操作系统时区</a>"
             type: FIELD
             image: assets/time_zone.avif
+          - id: EXECUTOR_SUSPEND
+            type: SELECT
+            title: 执行器挂起按键
+            label: 选项
+            quoted: true
+            annotation: >-
+              此选项用于挂起执行器，挂起后，执行器将临时冻结所有键盘/鼠标操作。
+            value: "\"LEFT_CTRL_AND_RIGHT_CTRL\""
+            options:
+              - text: 左 Ctrl + 右 Ctrl
+                value: "\"LEFT_CTRL_AND_RIGHT_CTRL\""
+              - text: 左 Alt + 右 Alt
+                value: "\"LEFT_ALT_AND_RIGHT_ALT\""
+              - text: 左 Shift + 右 Shift
+                value: "\"LEFT_SHIFT_AND_RIGHT_SHIFT\""
+              - text: 鼠标中键 + CTRL（不区分左右）
+                value: "\"MIDDLE_AND_CTRL\""
+              - text: 鼠标中键 + Alt（不区分左右）
+                value: "\"MIDDLE_AND_ALT\""
+              - text: 鼠标中键 + Shift（不区分左右）
+                value: "\"MIDDLE_AND_SHIFT\""
+          - id: EXECUTOR_RESUME
+            quoted: true
+            type: SELECT
+            label: 选项
+            title: 执行器恢复按键
+            value: "\"LEFT_ALT_AND_RIGHT_ALT\""
+            annotation: >-
+              恢复执行器，键盘/鼠标的冻结状态将被解除。
+            options:
+              - text: 左 Ctrl + 右 Ctrl
+                value: "\"LEFT_CTRL_AND_RIGHT_CTRL\""
+              - text: 左 Alt + 右 Alt
+                value: "\"LEFT_ALT_AND_RIGHT_ALT\""
+              - text: 左 Shift + 右 Shift
+                value: "\"LEFT_SHIFT_AND_RIGHT_SHIFT\""
+              - text: 鼠标中键 + CTRL（不区分左右）
+                value: "\"MIDDLE_AND_CTRL\""
+              - text: 鼠标中键 + Alt（不区分左右）
+                value: "\"MIDDLE_AND_ALT\""
+              - text: 鼠标中键 + Shift（不区分左右）
+                value: "\"MIDDLE_AND_SHIFT\""
     - id: CreateRoom
-      title: 自动创建房间
+      title: 2. 自动开房功能
       annotation: >-
           挂机出现异常情况后，重新创建房间挂机。所谓异常情况是指：游戏掉线（控制器将会尝试重启游戏）后成功重启、游戏进行过程中被强制踢出、游戏进行过程中因网络波动多次回退到房间等候室等其他导致挂机无法正常进行的情况。
       type: SECTION
@@ -310,7 +355,7 @@ children:
             image: assets/lobby_create_room_2.avif
             legacy_name: CREATE_ROOM
     - id: Idle
-      title: 挂机设定
+      title: 3. 通用挂机设定
       type: SECTION
       children:
           - id: IN_GAME_SENSITIVITY
@@ -329,6 +374,18 @@ children:
                 label: 纵坐标
             legacy_name: ROOM_START_GAME
             image: assets/room_start_game.avif
+          - id: STUDIO_MODE_START_GAME
+            title: 缔造者模式开始游戏按钮
+            annotation: >-
+                缔造者需要额外多点击一个开始游戏按钮才能开始游戏，如不需要可直接保持此处的默认值。
+            type: POSITION
+            x:
+                label: 横坐标
+                value: "-1"
+            y:
+                label: 纵坐标
+                value: "-1"
+            image: assets/studio_mode_start_game.avif
           - id: GAME_CHOOSE_TERRORISTS
             title: 角色所属阵营
             type: SWITCH
@@ -397,28 +454,28 @@ children:
             image: assets/game_esc_menu_cancel.avif
           - id: GAME_INSUFFICIENT_FUNDS_CONFIRM
             title: 资金不足，无法购买确认按钮
-            annotation: 此设定目前已经弃用，置为 0 即可。
+            annotation: 此设定目前已经弃用，保持默认值即可。
             type: POSITION
             x:
                 label: 横坐标
-                value: "0"
+                value: "-1"
             y:
                 label: 纵坐标
-                value: "0"
+                value: "-1"
             legacy_name: GAME_INSUFFICIENT_FUNDS_CONFIRM
 
             image: assets/game_insufficient_funds_confirm.avif
           - id: GAME_PURCHASE_BEFORE_RESPAWN
             title: "复活购买菜单<i style='color: red;'>重复购买</i>或<i style='color: red;'>取消按钮</i>"
-            annotation: 此设定目前已经弃用，置为 0 即可。
+            annotation: 此设定目前已经弃用，保持默认值即可。
             legacy_name: GAME_DEAD_PURCHASE_MENU_REBUY
             type: POSITION
             x:
                 label: 横坐标
-                value: "0"
+                value: "-1"
             y:
                 label: 纵坐标
-                value: "0"
+                value: "-1"
             image: assets/game_purchase_before_respawn.avif
           - id: GAME_RESET_ROUND_KEY
             title: 换弹、复活、回合重置按键
@@ -490,7 +547,7 @@ children:
                   value: "true"
             image: assets/golden_zombie_kill_rewards_confirm.avif
     - id: CombineParts
-      title: 制造所批量合成配件
+      title: 4. 制造所批量合成配件功能
       type: SECTION
       children:
           - id: CRAFT_PARTS_BATCH_COMBINE
@@ -539,7 +596,7 @@ children:
             image: assets/craft_parts_clear.avif
             legacy_name: CRAFT_PARTS_CLEAR
     - id: StorePurchase
-      title: 商店批量购买金币道具
+      title: 5. 商店批量购买金币道具功能
       type: SECTION
       children:
           - id: STORE_BATCH_PURCHASE

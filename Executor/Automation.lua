@@ -1,6 +1,6 @@
 if not __AUTOMATION_LUA__ then
     __AUTOMATION_LUA__ = true
-    local __version__ = "1.5.4"
+    local __version__ = "1.5.5"
 
     Include("Delay.lua")
     Include("Console.lua")
@@ -70,14 +70,46 @@ if not __AUTOMATION_LUA__ then
         return false
     end
 
+    Console:info(("开始手动接管：%s。"):format(Setting.SELECT_EXECUTOR_SUSPEND))
+    Console:info(("结束手动接管：%s。"):format(Setting.SELECT_EXECUTOR_RESUME))
+
+    Automation.manual_checks = {
+        ["LEFT_ALT_AND_RIGHT_ALT"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT)
+                and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT)
+        end,
+        ["LEFT_CTRL_AND_RIGHT_CTRL"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.LEFT_CTRL)
+                and Keyboard:is_modifier_pressed(Keyboard.RIGHT_CTRL)
+        end,
+        ["LEFT_SHIFT_AND_RIGHT_SHIFT"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.LEFT_SHIFT)
+                and Keyboard:is_modifier_pressed(Keyboard.RIGHT_SHIFT)
+        end,
+        ["MIDDLE_AND_ALT"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.ALT)
+                and Mouse:is_pressed(Mouse.MIDDLE)
+        end,
+        ["MIDDLE_AND_CTRL"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.CTRL)
+                and Mouse:is_pressed(Mouse.MIDDLE)
+        end,
+        ["MIDDLE_AND_SHIFT"] = function()
+            return Keyboard:is_modifier_pressed(Keyboard.SHIFT)
+                and Mouse:is_pressed(Mouse.MIDDLE)
+        end,
+    }
+
     ---手动接管标识。
     Runtime.manual_flag = false
     ---注册暂停事件处理函数，处理用户手动接管事件。
     Runtime:register_interrupt(Interrupt:new({
         name = "手动接管功能",
         handler = function()
+            local check_suspend = Automation.manual_checks[Setting.SELECT_EXECUTOR_SUSPEND]
+            local check_resume = Automation.manual_checks[Setting.SELECT_EXECUTOR_RESUME]
             if
-                Keyboard:is_modifier_pressed(Keyboard.LEFT_CTRL) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_CTRL)
+                type(check_suspend) == "function" and check_suspend()
             then
                 Keyboard:reset()
                 Mouse:reset()
@@ -88,7 +120,7 @@ if not __AUTOMATION_LUA__ then
                 end
                 Runtime.manual_flag = true
             elseif
-                Keyboard:is_modifier_pressed(Keyboard.LEFT_ALT) and Keyboard:is_modifier_pressed(Keyboard.RIGHT_ALT)
+                type(check_resume) == "function" and check_resume()
             then
                 if Runtime.manual_flag then
                     Console:info("中止手动接管，恢复键鼠操作。")
@@ -356,11 +388,11 @@ if not __AUTOMATION_LUA__ then
     function Automation:choose_character()
         Mouse:click_several_times_on(
             Mouse.LEFT,
-            Setting.POSITION_GAME_ESC_MENU_CANCEL_X,
-            Setting.POSITION_GAME_ESC_MENU_CANCEL_X,
+            32767,
+            32767,
             2,
             200
-        ) -- 点击屏幕上某一处，唤醒窗口（此处点击取消按钮处防止冲突）
+        ) -- 点击屏幕中央，唤醒窗口（此处点击取消按钮处防止冲突）
         if Setting.SWITCH_GAME_CHOOSE_TERRORISTS then
             Mouse:click_several_times_on(
                 Mouse.LEFT,
@@ -463,8 +495,14 @@ if not __AUTOMATION_LUA__ then
         end
     end
 
+    ---清除所有弹窗。
     function Automation:clear_popups()
         Keyboard:click(Keyboard.ESCAPE, 2000)
+    end
+
+    ---缔造者模式下额外点击一个“开始游戏”按钮，开始游戏。
+    function Automation:studio_mode_start_game()
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STUDIO_MODE_START_GAME_X, Setting.POSITION_STUDIO_MODE_START_GAME_Y, 2000)
     end
 
     ---任务列表。
@@ -515,5 +553,8 @@ if not __AUTOMATION_LUA__ then
         end,
         [Command.CMD_LOCATE_CURSOR] = Automation.locate_cursor,
         [Command.CMD_CLEAR_POPUPS] = Automation.clear_popups,
+        [Command.CMD_WAIT_FOR_LOADING] = function ()
+            Automation:studio_mode_start_game()
+        end
     }
 end -- __AUTOMATION_LUA__

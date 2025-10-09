@@ -118,7 +118,7 @@ void ClassifierIdleEngine::Discriminate()
             Console::Info(Translate("IdleEngine::INFO_Room"));
             break;                         // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // LOGIN -> LOADING
-            command_type_ = Command::TYPE::CMD_NOP;
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_Loading"));
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // LOGIN -> IN_GAME
@@ -158,7 +158,7 @@ void ClassifierIdleEngine::Discriminate()
             Console::Info(Translate("IdleEngine::INFO_LobbyToRoom"));
             break;                         // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // LOBBY -> LOADING
-            command_type_ = Command::TYPE::CMD_NOP;
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_Loading"));
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // LOBBY -> IN_GAME
@@ -205,7 +205,7 @@ void ClassifierIdleEngine::Discriminate()
         }
         break;                             // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // ROOM -> LOADING
-            command_type_ = Command::TYPE::CMD_NOP;
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_RoomToLoading"));
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // ROOM -> IN_GAME
@@ -267,8 +267,8 @@ void ClassifierIdleEngine::Discriminate()
         break;                             // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // LOADING -> LOADING
         {
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             auto elapsed = current_tp - interface_timepoint_;
-            command_type_ = Command::TYPE::CMD_NOP;
             if (elapsed > std::chrono::seconds(120)) // 游戏加载超过 120 秒
             {
                 Console::Warn(Translate("IdleEngine::WARN_LoadingTimeout@1", 120));
@@ -342,7 +342,7 @@ void ClassifierIdleEngine::Discriminate()
         }
         break;                             // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // IN_GAME -> LOADING
-            command_type_ = Command::TYPE::CMD_NOP;
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_Loading"));
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // IN_GAME -> IN_GAME
@@ -410,7 +410,7 @@ void ClassifierIdleEngine::Discriminate()
             Console::Info(Translate("IdleEngine::INFO_ResultsToRoom"));
             break;                         // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // RESULTS -> LOADING
-            command_type_ = Command::TYPE::CMD_NOP;
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_Loading"));
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // RESULTS -> IN_GAME
@@ -449,8 +449,8 @@ void ClassifierIdleEngine::Discriminate()
             command_type_ = Command::TYPE::CMD_START_GAME_ROOM;
             break;                         // esac ROOM
         case GAME_INTERFACE_TYPE::LOADING: // UNKNOWN -> LOADING
+            command_type_ = Command::TYPE::CMD_WAIT_FOR_LOADING;
             Console::Info(Translate("IdleEngine::INFO_Loading"));
-            command_type_ = Command::TYPE::CMD_NOP;
             break;                         // esac LOADING
         case GAME_INTERFACE_TYPE::IN_GAME: // UNKNOWN -> IN_GAME
             Console::Info(Translate("IdleEngine::INFO_InGame"));
@@ -485,6 +485,6 @@ void ClassifierIdleEngine::Discriminate()
         Command::Set(command_type_, Command::CMD_DEFAULT);
         break; // esac CLEAR_POPUPS
     default:
-        Command::Set(command_type_, Command::CMD_REPEATABLE);
+        Command::Set(command_type_, Command::CMD_REPEATABLE); // 其他命令均为可重复
     }
 }

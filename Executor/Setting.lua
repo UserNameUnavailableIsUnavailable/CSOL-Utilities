@@ -1,12 +1,12 @@
 if not __SETTING_LUA__ then
     __SETTING_LUA__ = true
-    local __version__ = "1.5.4"
-
+    local __version__ = "1.5.5"
     Include("Version.lua")
     Version:set("Setting", __version__)
-
     Setting = {
         FIELD_TIME_ZONE = 8,
+        SELECT_EXECUTOR_SUSPEND = "LEFT_CTRL_AND_RIGHT_CTRL",
+        SELECT_EXECUTOR_RESUME = "LEFT_ALT_AND_RIGHT_ALT",
         SWITCH_CREATE_ROOM_ON_EXCEPTION = true,
         POSITION_LOBBY_LIST_ROOMS_X = 36644,
         POSITION_LOBBY_LIST_ROOMS_Y = 29640,
@@ -47,6 +47,8 @@ if not __SETTING_LUA__ then
         FIELD_IN_GAME_SENSITIVITY = 2,
         POSITION_ROOM_START_GAME_X = 47025,
         POSITION_ROOM_START_GAME_Y = 42030,
+        POSITION_STUDIO_MODE_START_GAME_X = 42313,
+        POSITION_STUDIO_MODE_START_GAME_Y = 48772,
         SWITCH_GAME_CHOOSE_TERRORISTS = false,
         POSITION_GAME_CHOOSE_TERRORISTS_TAB_X = 11304,
         POSITION_GAME_CHOOSE_TERRORISTS_TAB_Y = 9596,

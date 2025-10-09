@@ -1,4 +1,4 @@
-export type WidgetType = "NULL"|"SECTION"|"FIELD"|"POSITION"|"SWITCH"|"KEYSTROKES";
+export type WidgetType = "NULL"|"SECTION"|"FIELD"|"POSITION"|"SWITCH"|"KEYSTROKES"|"SELECT";
 
 export type BaseWidget_T = {
     id: string
@@ -33,6 +33,13 @@ export type PositionWidget_T = BaseWidget_T & {
     x: { label: string, value?: string }
     y: { label: string, value?: string }
 };
+
+export type SelectWidget_T = BaseWidget_T & {
+    label: string,
+    options: { text: string, value: string }[]
+    value?: string
+};
+
 export type KeystrokesWidget_T = BaseWidget_T & {
     label: string
     value?: string

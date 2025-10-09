@@ -1,4 +1,5 @@
 <template>
+    <MessageBox title="通知" :text="notifyText" ok-text="确认" cancel-text="取消" :ok-callback="okCallback" :cancel-callback="cancelCallback" v-model:visible="showNotify" />
     <SectionWidget v-if="widget" :widget="widget" />
     <button class="import" @click="import_from_file?.click()">导入</button>
     <input type="file" ref="import_from_file" v-show="false" @change="import_setting($event)" />
@@ -16,6 +17,12 @@ import { type SwitchWidget_T } from '../scripts/Widget';
 import { SaveAs } from '../scripts/Utilities';
 import { ref } from 'vue';
 import { formatText } from 'lua-fmt';
+import MessageBox from "../components/MessageBox.vue";
+
+const notifyText = ref("存在未填写的必填项，是否仍然导出？");
+const okCallback = ref(() => {});
+const cancelCallback = ref(() => {});
+const showNotify = ref(false);
 
 const SETTING_SWITCHES: Map<string, Ref<string>> = new Map();
 provide("SETTING_SWITCHES", SETTING_SWITCHES);
@@ -24,7 +31,7 @@ provide("SETTING_ITEM_STATES", SETTING_ITEM_STATES);
 const SETTING_ITEMS: Map<string, Ref<any>> = new Map();
 provide("SETTING_ITEMS", SETTING_ITEMS);
 
-let widget = ref<SwitchWidget_T | undefined>(undefined);
+let widget = ref<SwitchWidget_T | undefined>();
 fetch("./GeneralSetting.yaml")
     .then(response => response.text())
     .then(data => {
@@ -37,7 +44,7 @@ fetch("./GeneralSetting.yaml")
 const VERSION = inject("VERSION") as string;
 
 /// 导出设置。
-function export_setting() {
+function export_setting_impl() {
     let code = "if not __SETTING_LUA__ then\n" +
         "\t__SETTING_LUA__ = true\n" +
         `\tlocal __version__ = "${VERSION}"\n` +
@@ -47,19 +54,6 @@ function export_setting() {
 
     SETTING_ITEMS.forEach((v, k) => {
         if (v.value === "") {
-            if (SETTING_ITEM_STATES.get(k)?.value) {
-                alert(k);
-                const element = document.getElementById(k);
-                element?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-                element?.classList.add('Glimmer');
-                setTimeout(() => {
-                    element?.classList.remove("Glimmer")
-                }, 2500);
-                throw Error(`${k} is not set.`);
-            }
             code += `\t\t${k} = nil,\n`;
         } else {
             code += `\t\t${k} = ${v.value},\n`;
@@ -136,6 +130,7 @@ function ResolveSetting(ast: any): Map<string, string> {
 
 
 const import_from_file = ref<HTMLInputElement>();
+
 async function import_setting(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -163,6 +158,48 @@ async function import_setting(event: Event) {
         input.value = ""; // 重置，允许重复导入同一个文件
     }
 }
+
+const export_setting = () => {
+    const empty_field_ids: string[] = [];
+    SETTING_ITEMS.forEach((v, k) => {
+        if (v.value === "" && SETTING_ITEM_STATES.get(k)?.value) { // 激活的字段
+            empty_field_ids.push(k);
+        }
+    });
+    
+    if (empty_field_ids.length > 0) {
+        notifyText.value = `存在未填写的必填项：${empty_field_ids.join(", ")}, 是否仍然导出?`;
+        const glimmer = () => {
+            let isFirst = true;
+            empty_field_ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) { // 只滚动到第一个
+                    if (isFirst) {
+                        element.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+                    }
+                    isFirst = false;
+                    element.classList.add('Glimmer'); // 添加闪烁动画
+                    setTimeout(() => {
+                        element?.classList.remove("Glimmer")
+                    }, 2500);
+                }
+            });
+        };
+        okCallback.value = () => {
+            export_setting_impl();
+            glimmer();
+        };
+        cancelCallback.value = () => {
+            glimmer();
+        };
+        showNotify.value = true; // 显示提示框
+    } else {
+        export_setting_impl();
+    }
+};
 </script>
 
 <style lang="scss">

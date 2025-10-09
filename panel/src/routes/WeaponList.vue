@@ -307,7 +307,7 @@ function export_weapon_list() {
     `\tlocal __version__ = "${VERSION}"\n` +
     `\tInclude("Version.lua")\n` +
     `\tVersion:set("WeaponList", __version__)\n` +
-    `\tVersion:require("WeaponList", "Weapon", __version__)\n` +
+    `\tVersion:require("WeaponList", "Weapon", "v1.5.4")\n` +
     `\t${blocks.join("\n")}\n` +
     `end -- __WEAPON_LIST_LUA__\n`;
     console.log(ret);
