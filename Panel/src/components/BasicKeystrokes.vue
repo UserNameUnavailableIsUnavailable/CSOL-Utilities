@@ -70,7 +70,7 @@ onMounted(() => {
     if (props.id && root.value) {
         root.value.id = props.id;
     }
-})
+});
 </script>
 
 <template>

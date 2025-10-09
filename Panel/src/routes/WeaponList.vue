@@ -5,10 +5,10 @@
     <h1>武器列表</h1>
     <ul>
         <li>
-            本配置界面用于导入、导出集成工具 Executor 目录下的 WeaponList.lua 文件；
+            本配置界面用于导入、导出集成工具 Executor 目录下的 WeaponList.lua 文件。
         </li>
         <li>
-            集成工具支持两种挂机模式：默认模式和扩展模式。在本配置面板中，可以同时针对这两种挂机模式进行配置，最后以 Lua 源码形式导出一份武器列表配置文件（即 WeaponList.lua），其中包含对默认模式和扩展模式的配置；
+            集成工具支持两种挂机模式：默认模式和扩展模式。在本配置面板中，可以同时针对这两种挂机模式进行配置，最后以 Lua 源码形式导出一份武器列表配置文件（即 WeaponList.lua），其中包含对默认模式和扩展模式的配置。
         </li>
         <li>
             定制武器的模板会时常更新。
@@ -297,7 +297,7 @@ function export_weapon_list() {
     // default
     blocks.push(`DefaultPartWeapons = ${generate_weapon_list_code(unref(default_part_weapons))}`);
     blocks.push(`DefaultConventionalWeapons = ${generate_weapon_list_code(unref(default_conventional_weapons))}`);
-    blocks.push(`DefaultSpecialWeapons = ${generate_weapon_list_code(default_special_weapons.value)}`);
+    blocks.push(`DefaultSpecialWeapons = ${generate_weapon_list_code(unref(default_special_weapons))}`);
     // extended
     blocks.push(`ExtendedPartWeapons = ${generate_weapon_list_code(unref(extended_part_weapons))}`);
     blocks.push(`ExtendedConventionalWeapons = ${generate_weapon_list_code(unref(extended_conventional_weapons))}`);
@@ -307,7 +307,7 @@ function export_weapon_list() {
     `\tlocal __version__ = "${VERSION}"\n` +
     `\tInclude("Version.lua")\n` +
     `\tVersion:set("WeaponList", __version__)\n` +
-    `\tVersion:require("WeaponList", "Weapon", "v1.5.4")\n` +
+    `\tVersion:require("WeaponList", "Weapon", "1.5.4")\n` +
     `\t${blocks.join("\n")}\n` +
     `end -- __WEAPON_LIST_LUA__\n`;
     console.log(ret);

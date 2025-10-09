@@ -18,11 +18,12 @@ const value = computed({
 })
 
 const root = ref<HTMLInputElement>();
+
 onMounted(() => {
     if (props.id && root.value) {
         root.value.id = props.id;
     }
-})
+});
 </script>
 
 <template>

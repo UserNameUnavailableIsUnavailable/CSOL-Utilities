@@ -22,13 +22,15 @@ const value = computed({
         }
         emit("update:value", v);
     }
-})
+});
+
 const root = ref<HTMLSelectElement | null>();
+
 onMounted(() => {
     if (props.id && root.value) {
         root.value.id = props.id;
     }
-})
+});
 </script>
 
 <template>

@@ -8,13 +8,10 @@ annotation: >-
           鼠标悬停在<b style='color: blue;'>蓝色</b>标题上方查看描述图片。
       </li>
         <li>
-            本配置界面用于导入、导出集成工具 Executor 目录下的 Setting.lua 文件；
+            本配置界面用于导入、导出集成工具 Executor 目录下的 Setting.lua 文件。
         </li>
       <li>
           <b color: 'red'>配置坐标时，为了确保坐标位置准确，必须先运行 Tool 文件夹下的 Tool.exe 工具将窗口居中（Ctrl Alt C），挂机时不强制要求开启 Tool（控制器会自动居中窗口）。有关 Tool.exe 的更多信息请参阅使用手册。</b>
-      </li>
-      <li>
-          每个选项控件的下方会显示此选项对应的 Lua 源代码，有编程经验者可根据需要复制；
       </li>
     </ul>
 children:

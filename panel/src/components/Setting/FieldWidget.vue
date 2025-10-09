@@ -7,6 +7,7 @@ import CodeSnippet from '../CodeSnippet.vue';
 const props = defineProps<{
     widget: FieldWidget_T
 }>();
+
 const widget = props.widget; // widget 来自固定的配置文件，不需要响应式
 
 const id = `FIELD_${widget.id}`; // 字段 id
@@ -16,7 +17,9 @@ const SETTING_ITEMS = inject("SETTING_ITEMS") as Map<string, Ref<string>>;
 const SETTING_SWITCHES = inject("SETTING_SWITCHES") as Map<string, Ref<string>>;
 
 const field = ref(widget.value ?? "");
+
 SETTING_ITEMS.set(id, field);
+
 const snippet = computed(() => {
     return `${id} = ${field.value ? field.value : "nil"}`;
 });
