@@ -28,7 +28,7 @@ B 站 ID：_CoreDump
 
 本工具原本专为 24H 挂机设计，后经过大量重构和版本迭代，在增强 24H 挂机功能的基础上，提供了更多更为丰富的功能。如有任何问题或意见和建议，欢迎通过上述方式与我联系。
 
-**创作不易，若觉得本工具有用，可以给个 Star 支持一下，谢谢！亦可在 [配置面板](https://www.macrohard.fun/CSOL-Utilities/panel/) 进行赞助（资源）。**
+**创作不易，若觉得本工具有用，可以给个 Star 支持一下，谢谢！亦可在 [配置面板](https://www.macrohard.fun/CSOL-Utilities/panel/) 进行赞助。**
 
 ### 工具及使用手册下载
 
