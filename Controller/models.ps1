@@ -11,9 +11,7 @@ if (-not (Test-Path $DownloadDir)) {
 } else {
     Push-Location
     Set-Location $DownloadDir
-    git fetch # fetch latest changes
-    git merge origin/main # merge latest changes
-    git lfs pull # update models
+    git pull
     Pop-Location
 }
 

@@ -1,5 +1,4 @@
 #include "Utilities.hpp"
-#include <shellscalingapi.h>
 #include "Exception.hpp"
 #include "Global.hpp"
 // #include "Console.hpp"

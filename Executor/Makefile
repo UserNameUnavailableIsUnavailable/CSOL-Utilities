@@ -1,6 +1,3 @@
-SHELL := pwsh.exe
-.SHELLFLAGS := -NoLogo -NoProfile -Command
-
 SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
@@ -11,6 +8,8 @@ CURRENT_DIST_DIR = $(DIST_DIR)/Executor
 
 # 源码文件
 SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/*.lua)
+
+include $(SOURCE_DIR)/pwsh.mk
 
 .PHONY: all build clean install
 

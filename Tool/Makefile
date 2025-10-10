@@ -2,8 +2,11 @@ BUILD_TYPE := Release
 SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
-ARCH := Win64
+PLATFORM := Windows
+ARCH := x64
+
 CMAKE_GENERATOR := Visual Studio 17 2022
+
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool/source
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
 CURRENT_DIST_DIR := $(DIST_DIR)/Tool
@@ -27,8 +30,8 @@ clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 exe: | $(TARGET_EXE)
 dll: | $(CURRENT_BUILD_DIR)
-	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
-	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) --target Tool
+	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -A "$(ARCH)" -DCMAKE_BUILD_TYPE="$(BUILD_TYPE)"
+	cmake --build "$(BUILD_DIR)" --config "$(BUILD_TYPE)" --target Tool
 $(TARGET_EXE): | $(CURRENT_BUILD_DIR)
 	$(AHK2EXE) "/in $(AHK_SOURCE_FILE)"
 	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force

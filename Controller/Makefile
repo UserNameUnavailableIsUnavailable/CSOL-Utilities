@@ -1,12 +1,10 @@
-# 源代码目录
 SOURCE_DIR := ..
-# 构建类型
 BUILD_TYPE := Release
-# 构建目录
 BUILD_DIR := ../build
-# 发布目录
 DIST_DIR := ../dist
-ARCH := Win64
+PLATFORM := Windows
+ARCH := x64
+
 CMAKE_GENERATOR := Visual Studio 17 2022
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Controller
@@ -20,7 +18,7 @@ include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 all: build install
 
 build: | $(CURRENT_BUILD_DIR)
-	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -DCMAKE_BUILD_TYPE="$(BUILD_TYPE)"
+	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -A "$(ARCH)" -DCMAKE_BUILD_TYPE="$(BUILD_TYPE)"
 	cmake --build "$(BUILD_DIR)" --config "$(BUILD_TYPE)" --target Controller
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.ps1" "$(BUILD_DIR)/Controller.ps1" -Force
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.cmd" "$(BUILD_DIR)/Controller.cmd" -Force
