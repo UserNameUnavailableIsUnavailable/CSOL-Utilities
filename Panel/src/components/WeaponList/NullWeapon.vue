@@ -35,14 +35,13 @@ function update_field(key: string, value: string) {
 
 <template>
     <BasicField label="武器/装备名称" quoted :value="fields.name" @update:value="update_field('name', $event)" />
-    <br>
     <BasicKeystrokes label="购买按键序列" :value="fields.purchase_sequence" @update:value="update_field('purchase_sequence', $event)" />
     <div>
         <ul>
             <li v-for="remark in remarks" :key="remark" v-html="remark"></li>
         </ul>
     </div>
-    <div style="max-width: 50%;">
+    <div>
         <CodeSnippet format :snippet="GenerateWeaponCode(fields)" />
     </div>
 </template>

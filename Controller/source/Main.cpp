@@ -228,18 +228,12 @@ void Boot(std::unique_ptr<Driver> &driver)
                     /* 先 Alt 后 Enter */
                     if ((GetAsyncKeyState(VK_MENU) & 0x8000) && pKeyboardLowLevelHookStruct->vkCode == VK_RETURN)
                     {
-#ifdef _DEBUG
-                        Console::Debug("屏蔽 { Alt Enter }。");
-#endif
                         return 1;
                     }
                     /* 先 Enter 后 Alt */
                     if ((GetAsyncKeyState(VK_RETURN) & 0x8000) && (pKeyboardLowLevelHookStruct->vkCode == VK_LMENU ||
                                                                    pKeyboardLowLevelHookStruct->vkCode == VK_RMENU))
                     {
-#ifdef _DEBUG
-                        Console::Debug("屏蔽 { Alt Enter }。");
-#endif
                         return 1;
                     }
                 }

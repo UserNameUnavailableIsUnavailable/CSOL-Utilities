@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { ElRadioGroup, ElRadioButton } from 'element-plus';
 
 const props = defineProps<{
     id?: string // 字段 ID
@@ -27,13 +28,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <label ref="root" >
+    <div ref="root">
         <span v-if="props.label" v-html="props.label"></span>
-        &nbsp;
-        <template v-for="opt in props.options">
-            <input type="radio" :checked="value === opt.value" @change="value = opt.value" autocomplete="off" >
-            <label v-html="opt.text"></label>
             &nbsp;
-        </template>
-    </label>
+            <el-radio-group fill="magenta" text-color="white" size="small" v-model="value" style="display: inline-block; margin: 0.5em;">
+                <el-radio-button v-for="opt in props.options" :label="opt.text" :key="opt.value" :value="opt.value" />
+            </el-radio-group>
+    </div>
 </template>

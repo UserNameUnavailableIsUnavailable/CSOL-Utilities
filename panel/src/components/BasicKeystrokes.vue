@@ -74,9 +74,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <label ref="root">
+    <div ref="root">
         <span v-if="label" v-html="label"></span>
-        &nbsp;
-        <input type="text" readonly @focus="on_focus" @blur="on_blur" :value="display" autocomplete="off" />
-    </label>
+        <el-input size="small" style="width: 20em; display: inline-block; margin: 0.5em;" type="text" v-model="display" @blur="on_blur" @focus="on_focus" readonly />
+    </div>
 </template>

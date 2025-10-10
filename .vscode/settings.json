@@ -1,15 +1,9 @@
 {
+  "cmake.useCMakePresets": "always",
+  "cmake.generator": "Visual Studio 17 2022",
   "cmake.sourceDirectory": "${workspaceFolder}",
   "cmake.buildDirectory": "${workspaceFolder}/build",
   "cmake.installPrefix": "${workspaceFolder}/dist",
-  "cmake.preferredGenerators": [
-    "Visual Studio 17 2022",
-    "Visual Studio 16 2019",
-    "Ninja Multi-Config",
-    "Ninja",
-    "NMAKE Makefiles"
-  ],
-  "cmake.platform": "x64",
   "Lua.workspace.ignoreDir": [
     "ConfigPanel.old",
     "vcpkg_installed",

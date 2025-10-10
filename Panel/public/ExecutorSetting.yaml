@@ -1,6 +1,6 @@
-﻿id: GeneralSetting
+﻿id: ExecutorSetting
 type: SECTION
-title: 通用设定
+title: 执行器：通用设定
 annotation: >-
     简短说明：  
     <ul>
@@ -10,8 +10,11 @@ annotation: >-
         <li>
             本配置界面用于导入、导出集成工具 Executor 目录下的 Setting.lua 文件。
         </li>
-      <li>
-          <b color: 'red'>配置坐标时，为了确保坐标位置准确，必须先运行 Tool 文件夹下的 Tool.exe 工具将窗口居中（Ctrl Alt C），挂机时不强制要求开启 Tool（控制器会自动居中窗口）。有关 Tool.exe 的更多信息请参阅使用手册。</b>
+      <li style="color: red;">
+          配置坐标时，为了确保坐标位置准确，必须先运行 Tool 文件夹下的 Tool.exe 工具将游戏窗口居中（热键：Ctrl Alt C），挂机时不强制要求开启 Tool（控制器会自动居中窗口）。有关 Tool.exe 的更多信息请参阅使用手册。
+      </li>
+      <li style="color: red;">
+        配置坐标时，直接将 Logitech G Hub 控制台中输出的形如 <code class="language-plain">(x, y)</code> 的坐标复制到对应的输入框中即可（复制：Ctrl C、粘贴：Ctrl V）。
       </li>
     </ul>
 children:
@@ -26,10 +29,9 @@ children:
             title: 时区
             annotation: >-
                 操作系统时区，单位为小时。例如，对于 UTC-07:30，此处应填写 -7.5。此设定<b style='color:
-                red'>必须</b>保证正确，否则会因时间不匹配导致控制器和执行器无法正确交互。
-            label: "UTC + "
+                red'>必须</b>保证正确，否则会因时间不匹配导致控制器和执行器无法正确交互。<a href='ms-settings:dateandtime'>Windows 10 / 11 用户可点此快捷查看操作系统时区</a>。
+            label: "UTC +"
             value: "8"
-            hint: "<a href='ms-settings:dateandtime'>Windows 10 / 11 用户点此查看操作系统时区</a>"
             type: FIELD
             image: assets/time_zone.avif
           - id: EXECUTOR_SUSPEND
@@ -93,6 +95,7 @@ children:
           - id: LOBBY_LIST_ROOMS
             title: 显示房间列表
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -105,6 +108,7 @@ children:
           - id: LOBBY_BACK
             title: 从游戏大厅返回主页/离开房间回到游戏大厅
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -117,6 +121,7 @@ children:
           - id: LOBBY_CREATE_ROOM_1
             title: 在大厅内新建房间
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -129,6 +134,7 @@ children:
           - id: LOBBY_CREATE_ROOM_GAME_MODE_1
             title: 游戏模式选框-1
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -141,6 +147,7 @@ children:
           - id: LOBBY_CREATE_ROOM_GAME_MODE_2
             title: 游戏模式选框-2
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -153,6 +160,7 @@ children:
           - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL
             title: 地图选择界面向左翻页按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -165,6 +173,7 @@ children:
           - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL
             title: 地图选择界面向右翻页按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -206,6 +215,7 @@ children:
           - id: LOBBY_CREATE_ROOM_MAP_OPTION
             title: 选择游戏地图
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -218,6 +228,7 @@ children:
           - id: LOBBY_CREATE_ROOM_MAP_CHOOSE_FINISH
             title: 完成地图选择
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -230,6 +241,7 @@ children:
           - id: LOBBY_CREATE_ROOM_DIFFICULTY_1
             title: 游戏难度选择-1
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -242,6 +254,7 @@ children:
           - id: LOBBY_CREATE_ROOM_DIFFICULTY_2
             title: 游戏难度选择-2
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -253,7 +266,7 @@ children:
             image: assets/lobby_create_room_difficulty_2.avif
           - id: LOBBY_CREATE_ROOM_LOCK
             title: 房间密码
-            annotation: 自动创建房间时，为房间添加密码，实现担任锁房挂机，亦可防止恶意举报。
+            annotation: 自动创建房间时，为房间添加密码，实现单人锁房挂机，亦可防止恶意举报。
             type: SWITCH
             options:
                 - text: 启用
@@ -268,6 +281,7 @@ children:
           - id: LOBBY_CREATE_ROOM_PASSWORD_CHECKBOX
             title: 房间密码选框
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -282,6 +296,7 @@ children:
           - id: LOBBY_CREATE_ROOM_PASSWORD_TEXTBOX
             title: 密码输入框
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -296,6 +311,7 @@ children:
           - id: LOBBY_CREATE_ROOM_PASSWORD_CONFIRM
             title: 房间密码确认按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -327,7 +343,7 @@ children:
             type: FIELD
             label: 密码
             value: ""
-            hint: 由数字、大小写字母组成
+            annotation: 房间密码，由数字、大小写字母组成。
             quoted: true
             depends_on:
                 - key: CREATE_ROOM_ON_EXCEPTION
@@ -340,6 +356,7 @@ children:
           - id: LOBBY_CREATE_ROOM_2
             title: 创建房间
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -360,11 +377,12 @@ children:
             annotation: >-
                 由于各人游戏内鼠标灵敏度存在较大差异，故引入此选项对转圈时视角移动的灵敏度进行精细化控制。该选项需要结合游戏内的鼠标灵敏度数值进行设定，具体方法为：在游戏内控制台中，输入 <code class="language-plain">sensitivity</code> 查看游戏内鼠标灵敏度精确数值（或在“选项-鼠标”中查看粗略数值），该值作为补偿因子基础值，在该值的基础上进行适当的增大或减小可调整视角运动的灵敏度。<b style='color: red;'>若感到转圈半径过小（即灵敏度过高），则增大此处的灵敏度数值，反之则减小该值</b>。另外，<b style='color: red;'>强烈建议</b>在控制台中通过 <code class="language-plain">m_rawinput 1</code> 启用<b>原始鼠标输入</b>，否则会存在鼠标加速的情况。
             type: FIELD
-            pre_label: 灵敏度
+            label: 补偿因子
             image: assets/in_game_sensitivity.avif
           - id: ROOM_START_GAME
             title: 开始游戏按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -376,6 +394,7 @@ children:
             annotation: >-
                 缔造者需要额外多点击一个开始游戏按钮才能开始游戏，如不需要可直接保持此处的默认值。
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
                 value: "-1"
@@ -396,6 +415,7 @@ children:
           - id: GAME_CHOOSE_TERRORISTS_TAB
             title: T 阵营选项卡
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -408,6 +428,7 @@ children:
           - id: GAME_CHARACTER_OPTION
             title: 角色选项
             annotation: 角色选项，可取 0 ~ 9。
+            label: 选项
             type: FIELD
             legacy_name: CLASS_OPTION
           - id: GAME_CHARACTER_USE_SPECIAL_SKILLS
@@ -443,6 +464,7 @@ children:
           - id: GAME_ESC_MENU_CANCEL
             title: 游戏内 ESC 菜单中的取消按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -453,6 +475,7 @@ children:
             title: 资金不足，无法购买确认按钮
             annotation: 此设定目前已经弃用，保持默认值即可。
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
                 value: "-1"
@@ -467,6 +490,7 @@ children:
             annotation: 此设定目前已经弃用，保持默认值即可。
             legacy_name: GAME_DEAD_PURCHASE_MENU_REBUY
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
                 value: "-1"
@@ -493,6 +517,7 @@ children:
           - id: GAME_CONFIRM_RESULTS
             title: 结算确认按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -513,6 +538,7 @@ children:
           - id: GOLDEN_ZOMBIE_KILL_REWARDS_OPTION
             title: 黄金僵尸奖励选项
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -524,6 +550,7 @@ children:
           - id: GOLDEN_ZOMBIE_KILL_REWARDS_SELECT
             title: 黄金僵尸奖励选择按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -535,6 +562,7 @@ children:
           - id: GOLDEN_ZOMBIE_KILL_REWARDS_CONFIRM
             title: 黄金僵尸奖励选择确认按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -559,6 +587,7 @@ children:
           - id: CRAFT_PARTS_FILL
             title: 自动添加按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -571,6 +600,7 @@ children:
           - id: CRAFT_PARTS_COMBINE
             title: 开始合成按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -583,6 +613,7 @@ children:
           - id: CRAFT_PARTS_CLEAR
             title: 清空按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -608,6 +639,7 @@ children:
           - id: STORE_PURCHASE_OPTION
             title: 购买物品选项
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -620,6 +652,7 @@ children:
           - id: STORE_PURCHASE
             title: 弹窗中的兑换按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:
@@ -632,6 +665,7 @@ children:
           - id: STORE_CONFIRM_PURCHASE
             title: 弹窗中的确认兑换按钮
             type: POSITION
+            label: 坐标
             x:
                 label: 横坐标
             y:

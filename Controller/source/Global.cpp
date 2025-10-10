@@ -12,12 +12,10 @@ std::wstring ExecutorCommandFilePath = L"Directives.lua";                       
 std::wstring GameRootDir;                                                                 /* 游戏根目录 */
 std::wstring LaunchGameCmd;                                                               /* 启动游戏命令 */
 std::wstring IdleEngineType = L"Classifier";                                              /* 检测模式 */
-std::wstring OCRDetectorJSONPath = GetProcessImagePath().parent_path().wstring() + L"\\models\\OCR\\Chinese_Simplified\\detector.json";     /* 检测模型路径 */
-std::wstring OCRRecognizerJSONPath = GetProcessImagePath().parent_path().wstring() + L"\\models\\OCR\\Chinese_Simplified\\recognizer.json"; /* 识别模型路径 */
-std::wstring OCRKeywordsJSONPath = GetProcessImagePath().parent_path().wstring() + L"\\models\\OCR\\Chinese_Simplified\\keywords.json";     /* 关键词路径 */
-std::wstring ClassifierModelJSONPath = GetProcessImagePath().parent_path().wstring() + L"\\models\\Classifier\\ResNet\\CSOL-Utilities-"
-                                       L"ResNet18-800x600.json"; /* 图像分类模型路径
-                                                                  */
+std::wstring OCRDetectorJSONPath = GetProcessImagePath().parent_path() / L"models/OCR/Chinese_Simplified/detector.json";     /* 检测模型路径 */
+std::wstring OCRRecognizerJSONPath = GetProcessImagePath().parent_path() / L"models/OCR/Chinese_Simplified/recognizer.json"; /* 识别模型路径 */
+std::wstring OCRKeywordsJSONPath = GetProcessImagePath().parent_path() / L"models/OCR/Chinese_Simplified/keywords.json";     /* 关键词路径 */
+std::wstring ClassifierModelJSONPath = GetProcessImagePath().parent_path() / L"models/Classifier/ResNet/CSOL-Utilities-ResNet18-800x600.json"; /* 图像分类模型路径 */
 std::wstring LGHUBAgentName = L"lghub_agent.exe";                /* LGHUB Agent 进程名称 */
 uint32_t StartGameRoomTimeout = 900;                             /* 在房间内的最长等待时间 */
 uint32_t LoadMapTimeout = UINT32_MAX;                            /* 在房间内的最长等待时间 */

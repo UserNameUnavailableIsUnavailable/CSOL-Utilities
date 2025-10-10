@@ -1,8 +1,8 @@
 <template>
     <button class="import" @click="import_from_file?.click()">导入</button>
-    <input type="file" ref="import_from_file" v-show="false" @change="import_weapon_list($event)" />
+    <input type="file" ref="import_from_file" v-show="false" @change="import_weapon_list($event)" accept=".lua" />
     <button class="export" @click="export_weapon_list">导出</button>
-    <h1>武器列表</h1>
+    <h1>执行器：挂机武器列表</h1>
     <ul>
         <li>
             本配置界面用于导入、导出集成工具 Executor 目录下的 WeaponList.lua 文件。
@@ -17,8 +17,13 @@
     <h2>挂机模式</h2>
     <p>选择需要配置的挂机模式，两种模式共享护甲配置，其余武器装备的配置独立。</p>
 
+    <el-radio-group fill="magenta" text-color="white" v-model="tag" size="large" style="margin-bottom: 1em;">
+        <el-radio-button label="default" @click="tag='default'">默认挂机模式</el-radio-button>
+        <el-radio-button label="extended" @click="tag='extended'">扩展挂机模式</el-radio-button>
+    </el-radio-group>
+<!-- 
     <input type="radio" value="default" :checked="tag==='default'" @click="tag='default'" /><span>配置默认挂机模式</span>
-    <input type="radio" value="extended" :checked="tag==='extended'" @click="tag='extended'" /><span>配置扩展挂机模式</span>
+    <input type="radio" value="extended" :checked="tag==='extended'" @click="tag='extended'" /><span>配置扩展挂机模式</span> -->
 
     <h2>护甲</h2>
     <div v-if="armor" class="weapon-widget">
@@ -100,6 +105,7 @@
 
 <script lang="ts" setup>
 import { inject, onMounted, reactive, ref, type Ref, unref } from 'vue';
+import { ElRadioGroup, ElRadioButton } from 'element-plus';
 import luaparse from "luaparse";
 import NullWeapon from '../components/WeaponList/NullWeapon.vue';
 import NormalWeapon from '../components/WeaponList/NormalWeapon.vue';

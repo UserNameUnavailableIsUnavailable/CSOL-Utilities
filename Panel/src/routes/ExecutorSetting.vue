@@ -2,7 +2,7 @@
     <MessageBox title="通知" :text="notifyText" ok-text="确认" cancel-text="取消" :ok-callback="okCallback" :cancel-callback="cancelCallback" v-model:visible="showNotify" />
     <SectionWidget v-if="widget" :widget="widget" />
     <button class="import" @click="import_from_file?.click()">导入</button>
-    <input type="file" ref="import_from_file" v-show="false" @change="import_setting($event)" />
+    <input type="file" ref="import_from_file" v-show="false" @change="import_setting($event)" accept=".lua" />
     <button class="export" @click="export_setting">导出</button>
 </template>
 
@@ -32,14 +32,14 @@ const SETTING_ITEMS: Map<string, Ref<any>> = new Map();
 provide("SETTING_ITEMS", SETTING_ITEMS);
 
 let widget = ref<SwitchWidget_T | undefined>();
-fetch("./GeneralSetting.yaml")
+fetch("./ExecutorSetting.yaml")
     .then(response => response.text())
     .then(data => {
         const w = YAML.load(data) as any;
         w.level = 1;
         widget.value = w;
     })
-    .catch(error => console.error("Error fetching GeneralSetting.yaml.", error));
+    .catch(error => console.error("Error fetching ExecutorSetting.yaml.", error));
 
 const VERSION = inject("VERSION") as string;
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, inject, reactive, ref, type Ref } from 'vue';
+import { computed, inject, reactive, ref, watch, type Ref } from 'vue';
 import type { PositionWidget_T } from '../../scripts/Widget';
 import BaseWidget from './BaseWidget.vue';
 import CodeSnippet from '../CodeSnippet.vue';
@@ -43,14 +43,47 @@ const enabled = computed(() => {
 const SETTING_ITEM_STATES = inject("SETTING_ITEM_STATES") as Map<string, Ref<boolean>>;
 SETTING_ITEM_STATES.set(id_x, enabled);
 SETTING_ITEM_STATES.set(id_y, enabled);
+
+const raw_position = ref("");
+
+// 用户手动输入位置坐标
+const position = computed({
+    get() {
+        return raw_position.value;
+    },
+    set(value: string) {
+        raw_position.value = value;
+        if (!value || value.trim().length === 0) {
+            setting_item_x.value = "";
+            setting_item_y.value = "";
+            return;
+        }
+        const pattern = /^\s*\(\s*(\S+)\s*,\s*(\S+)\s*\)\s*$/;
+        const match = value.match(pattern);
+        if (match) {
+            setting_item_x.value = match[1];
+            setting_item_y.value = match[2];
+        }
+    }
+});
+
+// 位置坐标数据从外部导入，更新 raw_position
+watch(() => [setting_item_x.value, setting_item_y.value], () => {
+    if (setting_item_x.value?.trim().length === 0 && setting_item_y.value?.trim().length === 0) {
+        raw_position.value = "";
+    } else {
+        raw_position.value = `(${setting_item_x.value}, ${setting_item_y.value})`;
+    }
+}, { immediate: true });
+
 </script>
 
 <template>
     <div v-show="enabled">
         <BaseWidget :widget="widget">
-            <BasicField :id="'POSITION_' + widget.id + '_X'" :label="widget.x.label" v-model:value="setting_item_x" />
-            <br />
-            <BasicField :id="'POSITION_' + widget.id + '_Y'" :label="widget.y.label" v-model:value="setting_item_y" />
+            <BasicField :id="'POSITION_' + widget.id + '_X'" :label="widget.label" v-model:value="position" />
+            <input type="text" id="'POSITION_' + widget.id + '_X'" style="display: none;" v-model="setting_item_x" />
+            <input type="text" id="'POSITION_' + widget.id + '_Y'" style="display: none;" v-model="setting_item_y" />
         </BaseWidget>
         <CodeSnippet :snippet="snippet" />
     </div>

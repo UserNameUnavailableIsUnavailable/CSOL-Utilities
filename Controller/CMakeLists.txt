@@ -84,8 +84,15 @@ if (dependencies)
     )
 
 # embed manifest into Controller.exe
+# add_custom_command(TARGET Controller POST_BUILD
+#     COMMAND mt -manifest "${CMAKE_CURRENT_SOURCE_DIR}/Controller.exe.manifest" "-outputresource:\"$<TARGET_FILE:Controller>;#1\""
+# )
+
+# copy manifest
 add_custom_command(TARGET Controller POST_BUILD
-    COMMAND mt -manifest "${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml" "-outputresource:\"$<TARGET_FILE:Controller>;#1\""
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Controller.exe.manifest"
+        "$<TARGET_FILE_DIR:Controller>/Controller.exe.manifest"
 )
 
 # assets: locales

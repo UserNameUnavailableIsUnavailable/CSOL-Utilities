@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { ElInput } from 'element-plus';
+
 const props = defineProps<{
     id?: string // 字段 ID
     label?: string // 标签
@@ -56,13 +58,13 @@ onMounted(() => {
 </script>
 
 <template>
-    <label ref="root">
+    <div ref="root">
         <span v-if="props.label" v-html="props.label"></span>
         &nbsp;
-        <input type="text" v-model="raw_value" autocomplete="off" />
+        <el-input size="small" style="width: 20em; display: inline-block; margin: 0.5em;" v-model="raw_value" autocomplete="off" />
         <!-- 字段值非法显示错误标记 -->
         <span v-if="!legal">❌️</span>
         &nbsp;
         <span v-if="props.hint" v-html="props.hint"></span>
-    </label>
+    </div>
 </template>

@@ -32,6 +32,7 @@ export type SwitchWidget_T = BaseWidget_T & {
 export type PositionWidget_T = BaseWidget_T & {
     x: { label: string, value?: string }
     y: { label: string, value?: string }
+    label: string
 };
 
 export type SelectWidget_T = BaseWidget_T & {

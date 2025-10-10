@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { ElSelect, ElOption } from 'element-plus';
 
 const props = defineProps<{
     id?: string // 字段 ID
@@ -34,11 +35,10 @@ onMounted(() => {
 </script>
 
 <template>
-    <label ref="root">
+    <div ref="root">
         <span v-if="props.label" v-html="props.label"></span>
-        &nbsp;
-        <select v-model="value">
-            <option v-for="opt in props.options" :value="opt.value">{{ opt.text }}</option>
-        </select>
-    </label>
+        <el-select size="small" v-model="value" style="display: inline-block; width: 20em; margin: 0.5em;">
+            <el-option v-for="opt in props.options" :key="opt.value" :value="opt.value" :label="opt.text" />
+        </el-select>
+    </div>
 </template>

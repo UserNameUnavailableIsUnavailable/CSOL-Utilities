@@ -153,17 +153,12 @@ const raw_template_name = computed({
 <template>
     <BasicField label="武器/装备名称" quoted :value="fields['name']"
         @update:value="update_field('name', $event)" />
-    <br>
     <BasicKeystrokes label="购买按键序列" :value="fields['purchase_sequence']"
         @update:value="update_field('purchase_sequence', $event)" />
-    <br>
     <BasicSelect label="模板" v-model:value="raw_template_name" :options="options" />
-    <br>
     <BasicField label="每轮攻击持续时间（秒）" :value="fields['attack_duration']"
         @update:value="update_field('attack_duration', $event)" />
-    <br>
     <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].value)" />
-    <br>
     <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].value)" />
     <div>
         <ul>
@@ -171,7 +166,7 @@ const raw_template_name = computed({
         </ul>
     </div>
 
-    <div style="max-width: 50%;">
+    <div>
         <CodeSnippet format :snippet="GenerateWeaponCode(fields)" />
     </div>
 </template>

@@ -9,7 +9,7 @@ CURRENT_DIST_DIR = $(DIST_DIR)/Executor
 # 源码文件
 SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/*.lua)
 
-include $(SOURCE_DIR)/pwsh.mk
+include $(SOURCE_DIR)/make/pwsh.mk
 
 .PHONY: all build clean install
 

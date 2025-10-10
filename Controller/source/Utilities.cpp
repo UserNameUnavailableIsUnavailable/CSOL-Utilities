@@ -1,7 +1,6 @@
 #include "Utilities.hpp"
 #include "Exception.hpp"
 #include "Global.hpp"
-// #include "Console.hpp"
 
 namespace CSOL_Utilities
 {

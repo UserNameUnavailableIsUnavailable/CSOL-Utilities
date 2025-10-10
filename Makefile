@@ -1,16 +1,7 @@
-﻿# 通用代理设置，通过 gnumake PROXY="protocol://proxy:port" 进行设定
-PROXY ?= ""
-export NO_PROXY ?= "localhost,::1"
-export HTTP_PROXY ?= $(PROXY)
-export HTTPS_PROXY ?= $(PROXY)
-
-# 项目设定
+﻿# 项目设定
 PROJECT := CSOL-Utilities
 VERSION := v1.5.5
-PLATFORM := Windows
-ARCH := x64
-DISTRO = $(PROJECT)-$(VERSION)-$(PLATFORM)-$(ARCH)
-
+DISTRO = $(PROJECT)-$(VERSION)
 # 源代码目录
 SOURCE_DIR := .
 # 构建目录
@@ -20,28 +11,27 @@ BUILD_TYPE := Release
 # 发布目录
 DIST_DIR := ./dist
 CURRENT_DIST_DIR = $(DIST_DIR)/$(DISTRO)
-# CMake 设定
-CMAKE_GENERATOR := Visual Studio 17 2022
-
 # 手册文件名
 MANUAL_NAME := $(DISTRO).pdf
 # 压缩包
 BUNDLE_NAME := $(DISTRO).zip
+TARGETS := Controller Executor Manual Tool Bundle
 
-TARGETS = Controller Executor Manual Tool Bundle
-
-include $(SOURCE_DIR)/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
+include $(SOURCE_DIR)/make/proxy.mk
+# 使用 PowerShell 作为 Makefile 的 shell
+include $(SOURCE_DIR)/make/pwsh.mk
+include $(SOURCE_DIR)/make/cmake.mk
 
 .PHONY: all clean environment $(TARGETS)
 
 all: environment $(TARGETS)
 
 Controller: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Controller" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(CURRENT_DIST_DIR)" CMAKE_GENERATOR="$(CMAKE_GENERATOR)" ARCH="$(ARCH)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Controller" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(CURRENT_DIST_DIR)"
 Executor: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Executor" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" DIST_DIR="../$(CURRENT_DIST_DIR)"
 Tool: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Tool" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(CURRENT_DIST_DIR)" CMAKE_GENERATOR="$(CMAKE_GENERATOR)" ARCH="$(ARCH)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Tool" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../$(BUILD_DIR)" BUILD_TYPE="$(BUILD_TYPE)" DIST_DIR="../$(CURRENT_DIST_DIR)"
 Manual: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Manual" SOURCE_DIR="../$(SOURCE_DIR)" BUILD_DIR="../build" DIST_DIR="../$(DIST_DIR)" MANUAL_NAME="$(MANUAL_NAME)"
 Bundle: | $(BUILD_DIR) $(DIST_DIR) $(CURRENT_DIST_DIR)

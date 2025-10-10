@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import GeneralSetting from './routes/GeneralSetting.vue';
-import WeaponList from './routes/WeaponList.vue';
+import ExecutorSetting from './routes/ExecutorSetting.vue';
+import ExecutorWeaponList from './routes/ExecutorWeaponList.vue';
+import ControllerSetting from './routes/ControllerSetting.vue';
 import { RouterView } from 'vue-router';
 import router from './router';
 import { onMounted, ref } from 'vue';
@@ -12,12 +13,16 @@ const routes = [
         component: Introduction
     },
     {
-        path: "/GeneralSetting",
-        component: GeneralSetting
+        path: "/ExecutorSetting",
+        component: ExecutorSetting
     },
     {
-        path: "/WeaponList",
-        component: WeaponList
+        path: "/ExecutorWeaponList",
+        component: ExecutorWeaponList
+    },
+    {
+        path: "/ControllerSetting",
+        component: ControllerSetting
     }
 ];
 
@@ -45,10 +50,11 @@ const onClick = (event: MouseEvent, route: string) => {
 
 <template>
     <div class="container">
-        <div class="tab-group">
+        <div class="navigation">
             <button ref="intro" class="active tab" @click="onClick($event, '/')">简介</button>
-            <button class="inactive tab" @click="onClick($event, '/GeneralSetting')">通用设定</button>
-            <button class="inactive tab" @click="onClick($event, '/WeaponList')">武器列表</button>            
+            <button class="inactive tab" @click="onClick($event, '/ExecutorSetting')">执行器：通用设定</button>
+            <button class="inactive tab" @click="onClick($event, '/ExecutorWeaponList')">执行器：挂机武器列表</button>
+            <button class="inactive tab" @click="onClick($event, '/ControllerSetting')">控制器：通用设定</button>
         </div>
         <div class="panel">
             <RouterView v-slot="{ Component }">
@@ -61,20 +67,11 @@ const onClick = (event: MouseEvent, route: string) => {
 </template>
 
 <style>
-.container {
-	display: grid;
-	grid-template-columns: 10em auto;
-	grid-template-rows: 800px 50px;
-	grid-column-gap: 0px;
-	grid-row-gap: 0px;
-}
-
-.tab-group {
+.navigation {
+    width: 15%;
     position: fixed;
     top: 0;
     left: 0;
-    width: 10em;
-    height: 100vh;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -83,25 +80,27 @@ const onClick = (event: MouseEvent, route: string) => {
 }
 
 .panel {
-    grid-area: 1 / 2 / 2 / 3;
+    width: 84%;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .inactive.tab {
-	background-color: gray;
-    color: white;
+	background-color: white;
+    color: steelblue;
 }
 
 .active.tab {
-	background-color: white;
-    color: gray;
+	background-color: steelblue;
+    color: white;
 }
 
 .tab {
-    width: 10em;
+    width: auto;
 	border-radius: 10px 0px 0px 10px;
-	padding: 10px 20px 10px 20px;
+	padding: 1em 0.25em;
 	text-decoration: none;
 }
-
 </style>
 
