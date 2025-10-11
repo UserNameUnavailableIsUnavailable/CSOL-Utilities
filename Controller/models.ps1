@@ -1,9 +1,8 @@
 param(
     [String]$URL = "https://huggingface.co/UserNameIsUnavailable/CSOL-Utilities-Controller-Models", # URL of the models repository
+    [String]$DownloadDir, # Temporary download directory
     [String]$InstallDir  # dir to store models, optional
 )
-
-$DownloadDir = "$PSScriptRoot/models" # Temporary download directory
 
 if (-not (Test-Path $DownloadDir)) {
     git lfs install # make sure Git LFS is installed

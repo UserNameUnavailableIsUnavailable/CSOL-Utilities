@@ -83,11 +83,6 @@ if (dependencies)
             "$<TARGET_FILE_DIR:Controller>"
     )
 
-# embed manifest into Controller.exe
-# add_custom_command(TARGET Controller POST_BUILD
-#     COMMAND mt -manifest "${CMAKE_CURRENT_SOURCE_DIR}/Controller.exe.manifest" "-outputresource:\"$<TARGET_FILE:Controller>;#1\""
-# )
-
 # copy manifest
 add_custom_command(TARGET Controller POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -107,6 +102,6 @@ add_custom_command(TARGET Controller POST_BUILD
 # run models.ps1 to fetch models (models located in ${CMAKE_CURRENT_SOURCE_DIR}/models)
 # then copy these models to $<TARGET_FILE_DIR:Controller>/models
 add_custom_command(TARGET Controller POST_BUILD
-    COMMAND pwsh -NoProfile -NoLogo -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/models.ps1" -InstallDir "$<TARGET_FILE_DIR:Controller>/models"
+    COMMAND pwsh -NoProfile -NoLogo -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/models.ps1" -DownloadDir "${DOWNLOADS_DIR}/models" -InstallDir "$<TARGET_FILE_DIR:Controller>/models"
 )
 endif()

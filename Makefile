@@ -2,13 +2,14 @@
 PROJECT := CSOL-Utilities
 VERSION := v1.5.5
 DISTRO = $(PROJECT)-$(VERSION)
-# 源代码目录
+# 源码
 SOURCE_DIR := .
-# 构建目录
-BUILD_DIR := ./build
-# 构建类型
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)
+# 构建
 BUILD_TYPE := Release
-# 发布目录
+BUILD_DIR := ./build
+CURRENT_BUILD_DIR = $(BUILD_DIR)/$(DISTRO)
+# 发布
 DIST_DIR := ./dist
 CURRENT_DIST_DIR = $(DIST_DIR)/$(DISTRO)
 # 手册文件名
@@ -20,7 +21,6 @@ TARGETS := Controller Executor Manual Tool Bundle
 include $(SOURCE_DIR)/make/proxy.mk
 # 使用 PowerShell 作为 Makefile 的 shell
 include $(SOURCE_DIR)/make/pwsh.mk
-include $(SOURCE_DIR)/make/cmake.mk
 
 .PHONY: all clean environment $(TARGETS)
 
@@ -41,7 +41,6 @@ clean:
 environment:
 	Write-Host "HTTP_PROXY: $(HTTP_PROXY)" -ForegroundColor GREEN
 	Write-Host "HTTPS_PROXY: $(HTTPS_PROXY)" -ForegroundColor GREEN
-
 $(BUILD_DIR):
 	New-Item -Type Directory -Path "$(BUILD_DIR)" -Force
 $(DIST_DIR):

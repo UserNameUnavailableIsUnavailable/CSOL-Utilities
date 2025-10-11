@@ -11,9 +11,15 @@ AHK_SOURCE_FILE := $(CURRENT_SOURCE_DIR)/exe/Main.ahk
 TARGET_EXE := $(CURRENT_BUILD_DIR)/Tool.exe
 TARGET_DLL := $(CURRENT_BUILD_DIR)/Tool.dll
 
+# 代理
 include $(SOURCE_DIR)/make/proxy.mk
 # 使用 PowerShell 作为 Makefile 的 shell
 include $(SOURCE_DIR)/make/pwsh.mk
+# CMake 设定
+CMAKE_SOURCE_DIR = $(SOURCE_DIR)
+CMAKE_BINARY_DIR = $(BUILD_DIR)
+CMAKE_INSTALL_PREFIX = $(DIST_DIR)
+CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
 include $(SOURCE_DIR)/make/cmake.mk
 
 # AHK2EXE 是 GUI 程序，使用 Start-Process 调用以等待其完成，否则执行将是异步的，进而导致后续命令找不到生成的文件
@@ -32,8 +38,8 @@ clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 exe: | $(TARGET_EXE)
 dll: | $(CURRENT_BUILD_DIR)
-	cmake -S "$(SOURCE_DIR)" -B "$(BUILD_DIR)" -G "$(CMAKE_GENERATOR)" -A "$(CMAKE_PLATFORM)" -T "$(CMAKE_TOOLSET)" $(CMAKE_CONFIGURE_ARGS)
-	cmake --build "$(BUILD_DIR)" --target Tool $(CMAKE_BUILD_ARGS)
+	cmake $(CMAKE_CONFIGURE_ARGS)
+	cmake $(CMAKE_BUILD_ARGS) --target Tool
 $(TARGET_EXE): | $(CURRENT_BUILD_DIR)
 	$(AHK2EXE) "/in $(AHK_SOURCE_FILE)"
 	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force
