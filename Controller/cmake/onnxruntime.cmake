@@ -13,20 +13,20 @@ set(EXTRACT_DIR "${CMAKE_BINARY_DIR}/downloads")
 
 # Check if HTTP_PROXY or HTTPS_PROXY is set
 if(DEFINED ENV{HTTPS_PROXY})
+    message(STATUS "Download ${ZIP_URL} using HTTPS proxy: $ENV{HTTPS_PROXY}")
     execute_process(
         COMMAND curl -L -x "$ENV{HTTPS_PROXY}" -o "${ZIP_PATH}" "${ZIP_URL}"
         RESULT_VARIABLE CURL_RESULT
         OUTPUT_VARIABLE CURL_OUTPUT
     )
-    message(STATUS "Download ${ZIP_URL} using HTTPS proxy: $ENV{HTTPS_PROXY}")
 elseif(DEFINED ENV{HTTP_PROXY})
+    message(STATUS "Download ${ZIP_URL} using HTTP proxy: $ENV{HTTP_PROXY}")
     execute_process(
         COMMAND curl -L -x "$ENV{HTTP_PROXY}" -o "${ZIP_PATH}" "${ZIP_URL}"
         RESULT_VARIABLE CURL_RESULT
         OUTPUT_VARIABLE CURL_OUTPUT
         ERROR_VARIABLE CURL_ERROR
     )
-    message(STATUS "Download ${ZIP_URL} using HTTP proxy: $ENV{HTTP_PROXY}")
 else()
     message(STATUS "Download ${ZIP_URL} without proxy")
     execute_process(

@@ -384,15 +384,14 @@ if not __AUTOMATION_LUA__ then
     end
 
     ---选定角色，开始新一轮游戏。
-    ---@return nil
     function Automation:choose_character()
         Mouse:click_several_times_on(
-            Mouse.LEFT,
+            Mouse.MIDDLE, -- 使用鼠标中键点击，防止与游戏内操作冲突
             32767,
             32767,
             2,
             200
-        ) -- 点击屏幕中央，唤醒窗口（此处点击取消按钮处防止冲突）
+        ) -- 点击屏幕中央，激活窗口
         if Setting.SWITCH_GAME_CHOOSE_TERRORISTS then
             Mouse:click_several_times_on(
                 Mouse.LEFT,
