@@ -38,8 +38,6 @@ const enabled = computed(() => {
 });
 // 这里要求依赖项在创建此组件之前就已经定义
 SETTING_ITEM_STATES.set(id, enabled);
-
-const valid = ref(true);
 </script>
 
 <template>

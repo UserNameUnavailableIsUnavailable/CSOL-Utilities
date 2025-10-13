@@ -317,7 +317,15 @@ function export_weapon_list() {
     `\t${blocks.join("\n")}\n` +
     `end -- __WEAPON_LIST_LUA__\n`;
     console.log(ret);
-    const code = formatText(ret);
+    let code = "";
+    try {
+        code = formatText(ret);
+    } catch (e) {
+        alert('导出 Lua 代码时发生错误，请检查是否存在语法错误！');
+    }
+    if (!code) {
+        return;
+    }
     SaveAs("WeaponList.lua", code);
 }
 

@@ -1,7 +1,7 @@
 <!-- ConventionalWeapon 使用的配置控件 -->
 <script lang="ts" setup>
 
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import CodeSnippet from '../CodeSnippet.vue';
 import { GenerateWeaponCode, HORIZONTAL_STRAFE_MODES, IsValidDuration, VERTICAL_STRAFE_MODES } from '../../scripts/Weapon';
 import BasicField from '../BasicField.vue';
