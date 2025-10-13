@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, watch } from 'vue';
+import { computed, nextTick, watch } from 'vue';
 import CodeHighlighter from '../scripts/CodeHighlighter';
 import { formatText } from 'lua-fmt';
 
@@ -15,8 +15,21 @@ watch(() => props.snippet, async () => {
 }, {
     immediate: true
 });
+
+const content = computed(() => {
+    if (props.format) {
+        try {
+            return formatText(props.snippet);
+        } catch (e) {
+            console.error("代码格式化失败：", e);
+            return props.snippet;
+        }
+    } else {
+        return props.snippet;
+    }
+});
 </script>
 
 <template>
-    <pre class="code-block"><code class="language-lua code-block">{{ props.format ? formatText(snippet) : snippet }}</code></pre>
+    <pre class="code-block"><code class="language-lua code-block">{{ content }}</code></pre>
 </template>

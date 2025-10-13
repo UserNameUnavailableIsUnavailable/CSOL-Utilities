@@ -221,3 +221,22 @@ export function ResolveWeaponList(ast: any) {
         extended_special_weapons: extended_special_weapons
     }
 }
+
+export function IsValidDuration(s: string) {
+    s = s.trim();
+    if (!s) { return false; }
+    if (!isNaN(+(s.trim()))) { return true; }
+    if ([
+        "Delay.MINI_MINI",
+        "Delay.MINI",
+        "Delay.SHORT",
+        "Delay.NORMAL",
+        "Delay.MEDIUM",
+        "Delay.LONG",
+        "Delay.LONG_LONG",
+        "Delay.REFRESH"
+    ].includes(s.replace(/\s+/g, ''))) {
+        return true;
+    }
+    return false;
+}

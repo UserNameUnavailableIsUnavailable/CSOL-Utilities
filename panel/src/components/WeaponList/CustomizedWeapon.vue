@@ -1,6 +1,6 @@
 <!-- Armor 和 PartWeapon 使用的配置控件 -->
 <script lang="ts" setup>
-import { GenerateWeaponCode, HORIZONTAL_STRAFE_MODES, VERTICAL_STRAFE_MODES } from '../../scripts/Weapon';
+import { GenerateWeaponCode, HORIZONTAL_STRAFE_MODES, IsValidDuration, VERTICAL_STRAFE_MODES } from '../../scripts/Weapon';
 import CodeSnippet from '../CodeSnippet.vue';
 import { computed, ref, watch } from 'vue';
 import BasicKeystrokes from '../BasicKeystrokes.vue';
@@ -148,6 +148,7 @@ const raw_template_name = computed({
     }
 });
 
+const is_attack_duration_valid = ref(true);
 </script>
 
 <template>
@@ -157,7 +158,7 @@ const raw_template_name = computed({
         @update:value="update_field('purchase_sequence', $event)" />
     <BasicSelect label="模板" v-model:value="raw_template_name" :options="options" />
     <BasicField label="每轮攻击持续时间（秒）" :value="fields['attack_duration']"
-        @update:value="update_field('attack_duration', $event)" />
+        @update:value="update_field('attack_duration', $event)" :check="IsValidDuration" @update:legal="is_attack_duration_valid = $event" />
     <BasicSelect label="水平扫射方向" :value='fields["horizontal_strafe_mode"]' :options="HORIZONTAL_STRAFE_MODES" @update:value="update_field('horizontal_strafe_mode', $event ?? HORIZONTAL_STRAFE_MODES[0].value)" />
     <BasicSelect label="垂直扫射方向" :value='fields["vertical_strafe_mode"]' :options="VERTICAL_STRAFE_MODES" @update:value="update_field('vertical_strafe_mode', $event ?? VERTICAL_STRAFE_MODES[0].value)" />
     <div>
@@ -167,7 +168,7 @@ const raw_template_name = computed({
     </div>
 
     <div>
-        <CodeSnippet format :snippet="GenerateWeaponCode(fields)" />
+        <CodeSnippet :format="is_attack_duration_valid" :snippet="GenerateWeaponCode(fields)" />
     </div>
 </template>
 

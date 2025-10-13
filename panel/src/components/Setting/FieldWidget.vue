@@ -4,17 +4,21 @@ import { computed, inject, ref, type Ref } from 'vue';
 import BaseWidget from './BaseWidget.vue';
 import BasicField from '../BasicField.vue';
 import CodeSnippet from '../CodeSnippet.vue';
-const props = defineProps<{
+
+const prop = defineProps<{
     widget: FieldWidget_T
 }>();
+const emit = defineEmits<{
+    (e: 'update:legal', legal: boolean): void
+}>();
 
-const widget = props.widget; // widget 来自固定的配置文件，不需要响应式
+const widget = prop.widget;
 
 const id = `FIELD_${widget.id}`; // 字段 id
 
-const SETTING_ITEM_STATES = inject("SETTING_ITEM_STATES") as Map<string, Ref<boolean>>;
-const SETTING_ITEMS = inject("SETTING_ITEMS") as Map<string, Ref<string>>;
-const SETTING_SWITCHES = inject("SETTING_SWITCHES") as Map<string, Ref<string>>;
+const SETTING_ITEMS = inject("SETTING_ITEMS") as Map<string, Ref<string>>; // 所有字段
+const SETTING_ITEM_STATES = inject("SETTING_ITEM_STATES") as Map<string, Ref<boolean>>; // 字段状态（是否启用）
+const SETTING_SWITCHES = inject("SETTING_SWITCHES") as Map<string, Ref<string>>; // 所有开关依赖
 
 const field = ref(widget.value ?? "");
 
@@ -34,12 +38,14 @@ const enabled = computed(() => {
 });
 // 这里要求依赖项在创建此组件之前就已经定义
 SETTING_ITEM_STATES.set(id, enabled);
+
+const valid = ref(true);
 </script>
 
 <template>
     <div v-show="enabled">
         <BaseWidget :widget="widget" >
-            <BasicField :id="'FIELD_' + widget.id" :label="widget.label" v-model:value="field" :quoted="widget.quoted" :hint="widget.hint" />
+            <BasicField :id="'FIELD_' + widget.id" :label="widget.label" v-model:value="field" :quoted="widget.quoted" :hint="widget.hint" @update:legal="emit('update:legal', $event)" />
         </BaseWidget>
         <CodeSnippet :snippet="snippet" />
     </div>
