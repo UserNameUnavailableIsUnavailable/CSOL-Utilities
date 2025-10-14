@@ -31,7 +31,7 @@ provide("SETTING_ITEM_STATES", SETTING_ITEM_STATES);
 const SETTING_ITEMS: Map<string, Ref<any>> = new Map();
 provide("SETTING_ITEMS", SETTING_ITEMS);
 
-let widget = ref<SwitchWidget_T | undefined>();
+const widget = ref<SwitchWidget_T | undefined>();
 fetch("./ExecutorSetting.yaml")
     .then(response => response.text())
     .then(data => {

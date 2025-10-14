@@ -4,8 +4,15 @@ project(TOOL LANGUAGES CXX)
 
 add_library(
     Tool SHARED
-    source/dll/CursorClipper.hpp
-    source/dll/CursorClipper.cpp
-    source/dll/Exports.cpp
-    source/dll/ToolException.hpp
+    source/dll/Tool.h
+    source/dll/Export.h
+    source/dll/Export.cpp
+    source/dll/WindowUtils.h
+    source/dll/WindowUtils.cpp
+)
+
+target_link_libraries(
+    Tool
+    PRIVATE
+    winmm
 )

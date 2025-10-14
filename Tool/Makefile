@@ -28,7 +28,7 @@ AHK2EXE := Start-Process -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe
 .PHONY: all build install clean dll exe
 
 all: build install
-build: | $(CURRENT_BUILD_DIR) dll exe
+build: dll exe | $(CURRENT_BUILD_DIR)
 install:
 	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
 	New-Item -Type Directory -Path $(CURRENT_DIST_DIR) -Force | Out-Null
@@ -40,7 +40,7 @@ exe: | $(TARGET_EXE)
 dll: | $(CURRENT_BUILD_DIR)
 	cmake $(CMAKE_CONFIGURE_ARGS)
 	cmake $(CMAKE_BUILD_ARGS) --target Tool
-$(TARGET_EXE): | $(CURRENT_BUILD_DIR)
+$(TARGET_EXE): $(AHK_SOURCE_FILE) | $(CURRENT_BUILD_DIR)
 	$(AHK2EXE) "/in $(AHK_SOURCE_FILE)"
 	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force
 $(CURRENT_BUILD_DIR):

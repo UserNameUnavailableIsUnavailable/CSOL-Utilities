@@ -24,6 +24,7 @@ get_target_property(OPENCV_INCLUDES opencv_core INTERFACE_INCLUDE_DIRECTORIES)
 
 add_executable(
     Controller
+    Controller.rc # rc file contains manifest
     source/Main.cpp
     source/Driver.cpp
     source/Command.cpp
@@ -61,6 +62,11 @@ target_precompile_headers(Controller
     include/pch.hpp
 )
 
+# since the rc file already includes a manifest, we need to disable automatic manifest generation to avoid conflicts
+target_link_options(
+    Controller PRIVATE /MANIFEST:NO
+)
+
 list(APPEND dependencies "C:/Windows/System32/vcruntime140.dll")
 list(APPEND dependencies "C:/Windows/System32/vcruntime140_1.dll")
 list(APPEND dependencies "C:/Windows/System32/msvcp140.dll")
@@ -82,13 +88,6 @@ if (dependencies)
             ${dependencies}
             "$<TARGET_FILE_DIR:Controller>"
     )
-
-# copy manifest
-add_custom_command(TARGET Controller POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/Controller.exe.manifest"
-        "$<TARGET_FILE_DIR:Controller>/Controller.exe.manifest"
-)
 
 # assets: locales
 # copy ${CMAKE_CURRENT_SOURCE_DIR}/locales to $<TARGET_FILE_DIR:Controller>/locales

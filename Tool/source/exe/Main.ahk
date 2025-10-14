@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-
+;@Ahk2Exe-AddResource Tool.exe.manifest
 #SingleInstance Force
 #Include "Windows.ahk"
 
@@ -30,11 +30,8 @@ if (not hModule)
     MsgBox "加载 Tool.dll 发生错误。错误代码：" A_LastError, "Tool"
     ExitApp
 }
-if (!DllCall("Tool.dll\InitializeToolDll"))
-{
-    MsgBox "初始化 Tool 运行环境发生错误。错误代码：" A_LastError, "Tool"
-    ExitApp
-}
+
+DllCall("Tool.dll\Setup")
 
 global gameModeToggle := false
 
@@ -68,7 +65,8 @@ AppsKey::
 
 #T::
 {
-    DllCall("Tool.dll\ToggleTopmostForegroundWindow")
+    hWnd := DllCall("GetForegroundWindow", "Ptr")
+    DllCall("Tool.dll\ToggleTopmostWindow", "Ptr", hWnd)
 }
 
 #UseHook true
@@ -82,7 +80,7 @@ AppsKey::
 ^!C::
 {
     hForegroundWindow := GetForegroundWindow()
-    DllCall("Tool.dll\CenterWindowClientArea", "Ptr", hForegroundWindow)
+    DllCall("Tool.dll\CenterClient", "Ptr", hForegroundWindow)
 }
 
 #HotIf gameModeToggle
@@ -96,6 +94,6 @@ A_MenuMaskKey := "vkFF"
 
 OnExitClearUp(*)
 {
-    DllCall("Tool.dll\DeinitializeToolDll")
+    DllCall("Tool.dll\Cleanup")
     DllCall("FreeLibrary", "Ptr", hModule)
 }
