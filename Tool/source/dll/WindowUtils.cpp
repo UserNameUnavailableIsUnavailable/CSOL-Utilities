@@ -235,7 +235,7 @@ static void StartCursorClipperImpl()
                     ClipCursor(&rect);
                 }
             } while (false);
-            Sleep(20);
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
         ClipCursor(nullptr);
     };
