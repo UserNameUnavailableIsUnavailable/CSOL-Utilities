@@ -7,9 +7,6 @@
 
 #include "WindowUtils.h"
 
-static void StartCursorClipperImpl();
-static void StopCursorClipperImpl();
-
 constexpr auto TOPMOST_AUDIO_FILE = L"C:\\Windows\\Media\\Speech On.wav";
 constexpr auto UNTOPMOST_AUDIO_FILE = L"C:\\Windows\\Media\\Speech Off.wav";
 
@@ -24,6 +21,7 @@ TOOL_API void SetupWindowUtils()
 
 TOOL_API void CleanupWindowUtils()
 {
+    StopCursorClipper();
 }
 
 TOOL_API void MinimizeForegroundWindow()
@@ -212,44 +210,8 @@ static std::mutex g_clipper_mtx;
 static std::thread g_clipper_thread;
 static std::stop_source g_clipper_thread_stop_source;
 
-static void CALLBACK WindowMessageHandler(
-    HWINEVENTHOOK hWinEventHook,
-    DWORD dwEvent,
-    HWND hWnd,
-    LONG lObjectId,
-    LONG lChildId,
-    DWORD dwEventThreadId,
-    DWORD dwEventTimeInMs
-) noexcept
-{
-    auto hForegroundWnd = GetForegroundWindow();
-    if (hForegroundWnd != g_hClipWnd)
-    {
-        ClipCursor(nullptr);
-        return;
-    }
-    else
-    {
-        RECT rect;
-        GetClientRect(hWnd, &rect);
-        assert(rect.left == 0 && rect.top == 0);
-        POINT pt{ 0, 0 };
-        ClientToScreen(hWnd, &pt);
-        rect.left = pt.x;
-        rect.top = pt.y;
-        rect.right += pt.x;
-        rect.bottom += pt.y;
-        ClipCursor(&rect);
-    }
-}
-
 static void StartCursorClipperImpl()
 {
-    std::lock_guard lk(g_clipper_mtx);
-    if (g_clipper_thread.joinable()) // 已经在运行
-    {
-        return;
-    }
     // 创建线程
     g_clipper_thread_stop_source = std::stop_source(); // 重置 stop source
     g_hClipWnd = GetForegroundWindow(); // 获取当前前台窗口
@@ -258,19 +220,14 @@ static void StartCursorClipperImpl()
         {
             do
             {
-                if (!IsWindow(g_hClipWnd)) return;
-                auto hForegroundWnd = GetForegroundWindow();
-                if (hForegroundWnd != g_hClipWnd)
-                {
-                    ClipCursor(nullptr);
-                }
-                else
+                if (!IsWindow(g_hClipWnd)) return; // 窗口无效，退出线程
+                if (g_hClipWnd == GetForegroundWindow() && IsWindowVisible(g_hClipWnd))
                 {
                     RECT rect;
-                    GetClientRect(hForegroundWnd, &rect);
+                    GetClientRect(g_hClipWnd, &rect);
                     assert(rect.left == 0 && rect.top == 0);
                     POINT pt{ 0, 0 };
-                    ClientToScreen(hForegroundWnd, &pt);
+                    ClientToScreen(g_hClipWnd, &pt);
                     rect.left = pt.x;
                     rect.top = pt.y;
                     rect.right += pt.x;
@@ -278,7 +235,7 @@ static void StartCursorClipperImpl()
                     ClipCursor(&rect);
                 }
             } while (false);
-            Sleep(32);
+            Sleep(20);
         }
         ClipCursor(nullptr);
     };
@@ -287,16 +244,16 @@ static void StartCursorClipperImpl()
 
 TOOL_API void StartCursorClipper()
 {
+    std::lock_guard lk(g_clipper_mtx);
+    if (g_clipper_thread.joinable()) // 已经在运行
+    {
+        return;
+    }
     StartCursorClipperImpl();
 }
 
 static void StopCursorClipperImpl()
 {
-    std::lock_guard lk(g_clipper_mtx);
-    if (!g_clipper_thread.joinable()) // 未在运行
-    {
-        return;
-    }
     g_clipper_thread_stop_source.request_stop(); // 请求停止
     g_clipper_thread.join(); // 等待线程结束
     g_hClipWnd = nullptr;
@@ -304,7 +261,11 @@ static void StopCursorClipperImpl()
 
 TOOL_API void StopCursorClipper()
 {
-    StopCursorClipperImpl();
+    std::lock_guard lk(g_clipper_mtx);
+    if (g_clipper_thread.joinable()) // 未在运行
+    {
+        StopCursorClipperImpl();
+    }
 }
 
 TOOL_API void ToggleCursorClipper()
