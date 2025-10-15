@@ -2,13 +2,16 @@ cmake_minimum_required(VERSION 3.20)
 
 project(TOOL LANGUAGES CXX)
 
+include_directories(
+    Tool
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 add_library(
     Tool SHARED
-    source/dll/Tool.h
-    source/dll/Export.h
-    source/dll/Export.cpp
-    source/dll/WindowUtils.h
-    source/dll/WindowUtils.cpp
+    source/Export.cpp
+    source/WindowUtils.cpp
 )
 
 target_link_libraries(

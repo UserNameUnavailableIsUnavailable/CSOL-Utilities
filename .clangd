@@ -1,17 +1,36 @@
-If:
-  PathMatch: Controller/.*
+# Global library paths and macros
 CompileFlags:
   Add:
     - -Ibuild/vcpkg_installed/x64-windows/include
     - -Ibuild/vcpkg_installed/x64-windows/include/opencv4
-    - -Ibuild/dependencies/include
     - -D_DEBUG
+---
+# C++
+If:
+  PathMatch: .*\.(hpp|cpp|cxx|cc|hxx|hh)$
+CompileFlags:
+  Add:
     - -std=c++20
+---
+# C
+If:
+  PathMatch: .*\.(c|h)$
+CompileFlags:
+  Add:
+    - -std=c17
+---
+# Controller
+If:
+  PathMatch: Controller/.*
+CompileFlags:
+  Add:
+    - -Ibuild/dependencies/include
     - -IController/include
     - -include pch.hpp
 ---
+# Tool
 If:
   PathMatch: Tool/.*
 CompileFlags:
   Add:
-    - std=c++20
+    - -ITool/include

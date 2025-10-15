@@ -3,12 +3,13 @@ SOURCE_DIR := ..
 BUILD_DIR := ../build
 DIST_DIR := ../dist
 
-CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool/source
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
 CURRENT_DIST_DIR := $(DIST_DIR)/Tool
 
-AHK_SOURCE_FILE := $(CURRENT_SOURCE_DIR)/exe/Main.ahk
+AHK_SOURCE_FILE := $(CURRENT_SOURCE_DIR)/main/Tool.ahk
 TARGET_EXE := $(CURRENT_BUILD_DIR)/Tool.exe
+TARGET_ICON := $(CURRENT_SOURCE_DIR)/Tool.ico
 TARGET_DLL := $(CURRENT_BUILD_DIR)/Tool.dll
 
 # 代理
@@ -23,7 +24,7 @@ CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
 include $(SOURCE_DIR)/make/cmake.mk
 
 # AHK2EXE 是 GUI 程序，使用 Start-Process 调用以等待其完成，否则执行将是异步的，进而导致后续命令找不到生成的文件
-AHK2EXE := Start-Process -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe" -Wait -ArgumentList
+AHK2EXE := Start-Process -WorkingDirectory "$(CURRENT_SOURCE_DIR)" -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe" -Wait -ArgumentList
 
 .PHONY: all build install clean dll exe
 
@@ -41,7 +42,8 @@ dll: | $(CURRENT_BUILD_DIR)
 	cmake $(CMAKE_CONFIGURE_ARGS)
 	cmake $(CMAKE_BUILD_ARGS) --target Tool
 $(TARGET_EXE): $(AHK_SOURCE_FILE) | $(CURRENT_BUILD_DIR)
-	$(AHK2EXE) "/in $(AHK_SOURCE_FILE)"
-	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force
+	Write-Host "$(TARGET_ICON)"
+	$(AHK2EXE) "/in `"$$(Join-Path (Get-Location) $(AHK_SOURCE_FILE))`" /out `"$$(Join-Path (Get-Location) $@)`""
+# 	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force
 $(CURRENT_BUILD_DIR):
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null

@@ -1,2 +1,3 @@
 #include <Winuser.h>
 1 RT_MANIFEST "Controller.exe.manifest"
+IDI_ICON1 ICON "Controller.ico"

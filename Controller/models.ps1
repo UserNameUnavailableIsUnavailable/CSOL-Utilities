@@ -4,10 +4,14 @@ param(
     [String]$InstallDir  # dir to store models, optional
 )
 
+Write-Output "Downloading models from $URL to $DownloadDir"
+
 if (-not (Test-Path $DownloadDir)) {
+    Write-Output "Creating download directory: $DownloadDir"
     git lfs install # make sure Git LFS is installed
     git clone $URL $DownloadDir # get models
 } else {
+    Write-Output "Updating existing models in: $DownloadDir"
     Push-Location
     Set-Location $DownloadDir
     git pull
@@ -15,6 +19,7 @@ if (-not (Test-Path $DownloadDir)) {
 }
 
 if ($InstallDir) {
+    Write-Output "Installing models to $InstallDir"
     if (Test-Path $InstallDir) {
         Remove-Item -Path $InstallDir -Recurse -Force -ErrorAction Stop
         New-Item -ItemType Directory -Path $InstallDir -ErrorAction Stop | Out-Null

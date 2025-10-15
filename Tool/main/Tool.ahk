@@ -1,5 +1,10 @@
 #Requires AutoHotkey v2.0
+#SingleInstance Force
+
+;@Ahk2Exe-ExeName Tool.exe
+;@Ahk2Exe-SetMainIcon Tool.ico
 ;@Ahk2Exe-AddResource Tool.exe.manifest
+
 #SingleInstance Force
 #Include "Windows.ahk"
 
