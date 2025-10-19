@@ -295,7 +295,7 @@ if not __MOUSE_LUA__ then
     function Mouse:roll(times, delay, precise)
         times = times or 0
         delay = delay or Delay.SHORT
-        if not self:is_frozen() and math.type(times) == "integer" and times > 0 then
+        if not self:is_frozen() and math.type(times) == "integer" and math.abs(times) > 0 then
             MoveMouseWheel(times)
         end
         Runtime:sleep(delay, precise)
