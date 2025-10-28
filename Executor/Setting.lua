@@ -1,6 +1,6 @@
 if not __SETTING_LUA__ then
     __SETTING_LUA__ = true
-    local __version__ = "1.5.5"
+    local __version__ = "1.5.6"
     Include("Version.lua")
     Version:set("Setting", __version__)
     Setting = {
@@ -68,6 +68,11 @@ if not __SETTING_LUA__ then
         SWITCH_GAME_RESET_ROUND_ON_FAILURE = true,
         POSITION_GAME_CONFIRM_RESULTS_X = 44976,
         POSITION_GAME_CONFIRM_RESULTS_Y = 51748,
+        SWITCH_GIVE_LIKES = true,
+        POSITION_CLOSE_LEAGUE_RANKING_X = 46411,
+        POSITION_CLOSE_LEAGUE_RANKING_Y = 49622,
+        POSITION_GIVE_LIKE_X = 48870,
+        POSITION_GIVE_LIKE_Y = 24113,
         SWITCH_AUTO_CHOOSE_GOLDEN_ZOMBIE_KILL_REWARDS = true,
         POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_X = 28926,
         POSITION_GOLDEN_ZOMBIE_KILL_REWARDS_OPTION_Y = 26724,

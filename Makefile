@@ -1,6 +1,6 @@
 ﻿# 项目设定
 PROJECT := CSOL-Utilities
-VERSION := v1.5.5.1
+VERSION := v1.5.6
 DISTRO = $(PROJECT)-$(VERSION)
 # 源码
 SOURCE_DIR := .

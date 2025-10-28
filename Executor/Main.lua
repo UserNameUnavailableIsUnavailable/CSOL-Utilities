@@ -1,6 +1,6 @@
 if not __MAIN_LUA__ then
     __MAIN_LUA__ = true
-    local __version__ = "1.5.4"
+    local __version__ = "1.5.7"
 
     Include("Automation.lua")
     Include("Command.lua")
@@ -16,9 +16,11 @@ if not __MAIN_LUA__ then
     )
 
     Version:set("Main", __version__)
+    Version:require("Main", "Runtime", "1.5.7")
+    
     Version:assert()
-    ---注册完所有中断处理函数后，开中断。
-    Runtime:enable_interrupt() -- 开中断
+    ---注册完所有例程处理函数后，开例程。
+    Runtime:enable_routine() -- 开例程
 
     local function interpret()
         local cmd = Command:fetch() -- 领取任务
@@ -39,7 +41,7 @@ if not __MAIN_LUA__ then
                 function (e)
                     Console:debug(([[捕获到异常：%s]]):format(tostring(e)))
                     if (not Automation:is_ignored_error(e:get_name())) then
-                        Runtime:fatal()
+                        Runtime:fatal(e)
                     end
                 end
             )

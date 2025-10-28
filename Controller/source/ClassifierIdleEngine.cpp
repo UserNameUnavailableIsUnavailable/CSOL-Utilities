@@ -478,6 +478,9 @@ void ClassifierIdleEngine::Discriminate()
     case Command::TYPE::CMD_NOP:
         Command::Set(command_type_, Command::CMD_ZERO_TIMESTAMP);
         break; // esac NOP
+    case Command::TYPE::CMD_CONFIRM_RESULTS:
+        Command::Set(command_type_, Command::CMD_DEFAULT);
+        break; // esac CONFIRM_RESULTS
     case Command::TYPE::CMD_CREATE_GAME_ROOM:
         Command::Set(command_type_, Command::CMD_DEFAULT);
         break; // esac CREATE_GAME_ROOM

@@ -1,6 +1,6 @@
 if not __AUTOMATION_LUA__ then
     __AUTOMATION_LUA__ = true
-    local __version__ = "1.5.5"
+    local __version__ = "1.5.7"
 
     Include("Delay.lua")
     Include("Console.lua")
@@ -20,6 +20,7 @@ if not __AUTOMATION_LUA__ then
     Include("Version.lua")
 
     Version:set("Automation", __version__)
+    Version:require("Automation", "Runtime", "1.5.6")
 
     ---自动化执行。
     ---@class Automation
@@ -103,7 +104,7 @@ if not __AUTOMATION_LUA__ then
     ---手动接管标识。
     Runtime.manual_flag = false
     ---注册暂停事件处理函数，处理用户手动接管事件。
-    Runtime:register_interrupt(Interrupt:new({
+    Runtime:register_routine(Routine:new({
         name = "手动接管功能",
         handler = function()
             local check_suspend = Automation.manual_checks[Setting.SELECT_EXECUTOR_SUSPEND]
@@ -130,12 +131,12 @@ if not __AUTOMATION_LUA__ then
                 Runtime.manual_flag = false
             end
         end,
-        maskable = false, -- 此中断不可屏蔽
+        maskable = false, -- 此例程不可屏蔽
     }))
 
     Automation.last_reset_or_respawn_time = 0
     ---注册回合重置检查函数，游戏开始后每隔 8 秒进行回合重置。
-    Runtime:register_interrupt(Interrupt:new({
+    Runtime:register_routine(Routine:new({
         name = "复活、回合重置功能",
         handler = function()
             -- 当前未在挂机
@@ -178,7 +179,7 @@ if not __AUTOMATION_LUA__ then
 
     Runtime.last_command_update_timepoint = 0
     Automation:add_ignored_error("__ERROR_COMMAND_CHANGED__")
-    Runtime:register_interrupt(Interrupt:new({
+    Runtime:register_routine(Routine:new({
         name = "接收命令",
         handler = function()
             if Runtime:get_running_time() - Runtime.last_command_update_timepoint < 100 then
@@ -198,6 +199,7 @@ if not __AUTOMATION_LUA__ then
                 local e = Exception:new({
                     name = "__ERROR_COMMAND_CHANGED__",
                     message = "命令变更",
+                    supplement = { Command:fetch() }
                 })
                 Runtime:throw(e) -- 主动触发运行时异常
             end
@@ -207,7 +209,7 @@ if not __AUTOMATION_LUA__ then
     Automation.last_use_health_potion_30_timepoint = 0
     Automation.last_use_health_potion_100_timepoint = 0
     --- 定期使用回血道具
-    Runtime:register_interrupt(Interrupt:new({
+    Runtime:register_routine(Routine:new({
         name = "定期使用回血道具",
         handler = function()
             -- 当前未在挂机
@@ -219,18 +221,18 @@ if not __AUTOMATION_LUA__ then
                 return
             end
             local time = Runtime:get_running_time()
-            if time - Automation.last_use_health_potion_30_timepoint > 1 * 60 * 1000 then -- 每隔 1 分钟使用一次 30% 回血道具
-                Keyboard:click(Keyboard.FIVE, Delay.NORMAL) -- 使用 30 点回血道具
+            if time - Automation.last_use_health_potion_30_timepoint > 1 * 60 * 1000 then      -- 每隔 1 分钟使用一次 30% 回血道具
+                Keyboard:click(Keyboard.FIVE, Delay.NORMAL)                                    -- 使用 30 点回血道具
                 Automation.last_use_health_potion_30_timepoint = time
             elseif time - Automation.last_use_health_potion_100_timepoint > 2 * 60 * 1000 then -- 每隔 2 分钟使用一次 100% 回血道具
-                Keyboard:click(Keyboard.SIX, Delay.NORMAL) -- 使用 100 点回血道具
+                Keyboard:click(Keyboard.SIX, Delay.NORMAL)                                     -- 使用 100 点回血道具
                 Automation.last_use_health_potion_100_timepoint = time
             end
         end,
     }))
 
     local last_anti_shock_timepoint = 0
-    Runtime:register_interrupt(Interrupt:new({
+    Runtime:register_routine(Routine:new({
         name = "防震枪",
         handler = function()
             local cmd = Command:fetch()
@@ -278,14 +280,14 @@ if not __AUTOMATION_LUA__ then
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_LEFT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT  or 32, --[[v1.5.1 正式版引入]]
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_LEFT_COUNT or 32, --[[v1.5.1 正式版引入]]
             150
         ) -- 向左翻页指定次数
         Mouse:click_several_times_on(
             Mouse.LEFT,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_X,
             Setting.POSITION_LOBBY_CREATE_ROOM_MAP_CHOOSE_RIGHT_SCROLL_Y,
-            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT  or 0, --[[v1.5.3 正式版引入]]
+            Setting.FIELD_LOBBY_CREATE_ROOM_MAP_SCROLL_RIGHT_COUNT or 0, --[[v1.5.3 正式版引入]]
             150
         ) -- 向右翻页指定次数
         Mouse:click_on(
@@ -419,9 +421,27 @@ if not __AUTOMATION_LUA__ then
 
     ---尝试确认结算界面。
     function Automation:confirm_results()
-        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI)                                     -- 清除所有可能存在的弹窗
-        Automation:choose_golden_zombie_reward()                                                                     -- 选择黄金僵尸奖励
-        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI)                                     -- 清除所有可能存在的弹窗
+        Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+        Automation:choose_golden_zombie_reward()                                 -- 选择黄金僵尸奖励
+        Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+        -- 点赞
+        if Setting.SWITCH_GIVE_LIKES then
+            Mouse:click_on( -- 关闭联赛排名界面，防止对点赞造成影响
+                Mouse.LEFT,
+                Setting.POSITION_CLOSE_LEAGUE_RANKING_X or -1,
+                Setting.POSITION_CLOSE_LEAGUE_RANKING_Y or -1
+            )
+            -- 点赞按钮位置
+            local x = Setting.POSITION_GIVE_LIKE_X or -1
+            local y = Setting.POSITION_GIVE_LIKE_Y or -1
+            if y < 0 or y > 65535 then return end
+            local step = math.floor(math.abs(Setting.POSITION_GAME_CONFIRM_RESULTS_Y - y) / 32) or 300 -- 点赞按钮间隔
+            while y < Setting.POSITION_GAME_CONFIRM_RESULTS_Y do
+                Mouse:click_on(Mouse.LEFT, x, y, 1, true) -- 依次点击点赞按钮
+                Console:info(("点赞位置：(%d, %d)"):format(x, y))
+                y = y + step
+            end
+        end
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
     end
 
@@ -501,7 +521,8 @@ if not __AUTOMATION_LUA__ then
 
     ---缔造者模式下额外点击一个“开始游戏”按钮，开始游戏。
     function Automation:studio_mode_start_game()
-        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STUDIO_MODE_START_GAME_X, Setting.POSITION_STUDIO_MODE_START_GAME_Y, 2000)
+        Mouse:click_on(Mouse.LEFT, Setting.POSITION_STUDIO_MODE_START_GAME_X, Setting.POSITION_STUDIO_MODE_START_GAME_Y,
+            2000)
     end
 
     ---任务列表。
@@ -552,7 +573,7 @@ if not __AUTOMATION_LUA__ then
         end,
         [Command.CMD_LOCATE_CURSOR] = Automation.locate_cursor,
         [Command.CMD_CLEAR_POPUPS] = Automation.clear_popups,
-        [Command.CMD_WAIT_FOR_LOADING] = function ()
+        [Command.CMD_WAIT_FOR_LOADING] = function()
             Automation:studio_mode_start_game()
         end
     }

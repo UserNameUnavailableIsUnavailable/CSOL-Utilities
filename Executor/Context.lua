@@ -11,7 +11,7 @@ if not __CONTEXT_LUA__ then
     ---@type any[]
     Context.storage = nil
 
-    ---构造一类中断上下文对象。
+    ---构造上下文对象。
     ---@param save_callback function 保存中断现场的回调函数。
     ---@param restore_callback function 恢复中断现场的回调函数。
     ---@return Context

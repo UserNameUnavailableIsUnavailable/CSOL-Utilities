@@ -1,6 +1,6 @@
 ﻿if not __WEAPON_LUA__ then
     __WEAPON_LUA__ = true
-    local __version__ = "1.5.4"
+    local __version__ = "1.5.6"
 
     Include("Runtime.lua")
     Include("Delay.lua")
@@ -10,7 +10,7 @@
     Include("Version.lua")
     Include("Exception.lua")
     Version:set("Weapon", __version__)
-    Version:require("Weapon", "Setting", __version__, nil)
+    Version:require("Weapon", "Setting", "1.5.4", nil)
 
     ---@class WeaponInitializer
     ---@field public name? string
@@ -160,12 +160,12 @@
 
     ---根据 `purchase_sequence` 字段中预设的按键序列购买武器。
     function Weapon:purchase()
-        Runtime:push_interrupt_mask_flag()
-        Runtime:disable_interrupt() -- 暂时关中断，完成原子操作
+        Runtime:push_routine_mask_flag()
+        Runtime:disable_routine() -- 禁止例程执行，完成原子操作
         for _, key in ipairs(self.purchase_sequence) do
             Keyboard:click(key, Delay.MEDIUM, true)
         end
-        Runtime:pop_interrupt_mask_flag()
+        Runtime:pop_routine_mask_flag()
         if self.number == Weapon.GRENADE or self.number == Weapon.NULL then
             Keyboard:click(Weapon.MELEE, Delay.MEDIUM, true) -- 购买手雷后，临时切换到近战武器，防止后续鼠标点击导致使用诸如燃爆等武器。
         end

@@ -1,11 +1,11 @@
 if not __PLAYER_LUA__ then
     __PLAYER_LUA__ = true
-    local __version__ = "1.5.4"
+    local __version__ = "1.5.6"
 
     Include("Keyboard.lua")
     Include("Weapon.lua")
     Include("Mouse.lua")
-    Include("Interrupt.lua")
+    Include("Routine.lua")
     Include("Runtime.lua")
     Include("Utility.lua")
     Include("DateTime.lua")
