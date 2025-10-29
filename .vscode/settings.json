@@ -9,5 +9,6 @@
     "vcpkg_installed",
     "build",
     "dist"
-  ]
+  ],
+  "stylua.targetReleaseVersion": "latest"
 }
