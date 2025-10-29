@@ -425,23 +425,31 @@ if not __AUTOMATION_LUA__ then
         Automation:choose_golden_zombie_reward()                                 -- 选择黄金僵尸奖励
         Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
         -- 点赞
-        if Setting.SWITCH_GIVE_LIKES then
+        repeat
+            if not Setting.SWITCH_GIVE_LIKES then break end -- 点赞功能关闭
             Mouse:click_on( -- 关闭联赛排名界面，防止对点赞造成影响
                 Mouse.LEFT,
                 Setting.POSITION_CLOSE_LEAGUE_RANKING_X or -1,
                 Setting.POSITION_CLOSE_LEAGUE_RANKING_Y or -1
             )
-            -- 点赞按钮位置
-            local x = Setting.POSITION_GIVE_LIKE_X or -1
-            local y = Setting.POSITION_GIVE_LIKE_Y or -1
-            if y < 0 or y > 65535 then return end
-            local step = math.floor(math.abs(Setting.POSITION_GAME_CONFIRM_RESULTS_Y - y) / 32) or 300 -- 点赞按钮间隔
-            while y < Setting.POSITION_GAME_CONFIRM_RESULTS_Y do
-                Mouse:click_on(Mouse.LEFT, x, y, 1, true) -- 依次点击点赞按钮
-                Console:info(("点赞位置：(%d, %d)"):format(x, y))
-                y = y + step
+            -- 点赞按钮位置合法性检查
+            if
+                not (Setting.POSITION_GIVE_LIKE_X and Setting.POSITION_GIVE_LIKE_Y) or
+                not (Setting.POSITION_GIVE_LIKE_X > 0 and Setting.POSITION_GIVE_LIKE_Y > 0) or
+                not (Setting.POSITION_GIVE_LIKE_X < 65536 and Setting.POSITION_GIVE_LIKE_Y < 65536)
+            then
+                break
             end
-        end
+            local x = Setting.POSITION_GIVE_LIKE_X
+            local y_start = Setting.POSITION_GIVE_LIKE_Y
+            if y_start < 0 or y_start > 65535 then break end
+            if y_start >= Setting.POSITION_GAME_CONFIRM_RESULTS_Y then break end
+            local y_end = Setting.POSITION_GAME_CONFIRM_RESULTS_Y
+            local y_step = math.floor(math.abs(y_end - y_start) / 32) or 300 -- 点赞按钮间隔
+            for y = y_start, y_end, y_step do
+                Mouse:click_on(Mouse.LEFT, x, y, 10)                    -- 依次点击点赞按钮
+            end
+        until true
         Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
     end
 
