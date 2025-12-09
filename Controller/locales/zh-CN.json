@@ -22,6 +22,8 @@
     "INFO_HowToExit": "建议在控制台窗口中按下 {{ Ctrl C }} 退出此程序，以便进程安全地回收所有资源。",
     "INFO_SafelyExited": "程序安全地退出。",
     "ERROR_Panic": "程序运行时遇到严重错误，无法继续运行，请按任意键退出程序。",
+    "ERROR_RegisterHotKey@2": "注册热键 {{ {0} }} 失败，错误代码：{1}。",
+    "INFO_RegisterHotKey@1": "成功注册热键：{{ {} }}。",
     "Exception":
     {
         "DETAILED_QUICK_THROW_TEMPLATE@4": "{0}。异常触发位置：源文件 {1} 第 {2} 行，在函数 {3} 中。"

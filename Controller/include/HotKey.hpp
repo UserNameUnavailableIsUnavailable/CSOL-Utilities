@@ -2,14 +2,15 @@
 
 namespace CSOL_Utilities
 {
+
 class HotKey
 {
   public:
     HotKey(const HotKey &) = delete;
     HotKey(HotKey &&) = default;
-    int Id() const noexcept
+    std::uint32_t Id() const noexcept
     {
-        return m_Id;
+        return id_;
     }
     std::string Describe() const;
     HotKey(uint32_t modifiers, uint32_t vk, HWND hWnd = nullptr, bool defer_registration = true);
@@ -17,11 +18,11 @@ class HotKey
     ~HotKey() noexcept;
 
   private:
-    static std::atomic_int s_IdPool;
-    const int m_Id;
+    static std::atomic_uint32_t s_id_pool;
+    const std::uint32_t id_;
     UINT m_Modifiers;
     UINT m_Vk;
-    HWND m_AssociatedWindow;
+    HWND associate_window_;
     bool m_Success = false;
 };
 } // namespace CSOL_Utilities

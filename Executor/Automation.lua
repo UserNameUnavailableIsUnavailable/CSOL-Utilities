@@ -435,10 +435,10 @@ if not __AUTOMATION_LUA__ then
 			if y_start < 0 or y_start > 65535 then
 				break
 			end
-			if y_start >= Setting.POSITION_GAME_CONFIRM_RESULTS_Y then
+			if y_start >= Setting.POSITION_ROOM_START_GAME_Y then
 				break
 			end
-			local y_end = Setting.POSITION_GAME_CONFIRM_RESULTS_Y
+			local y_end = Setting.POSITION_ROOM_START_GAME_Y
 			local y_step = math.floor(math.abs(y_end - y_start) / 32) or 300 -- 点赞按钮间隔
 			for y = y_start, y_end, y_step do
 				Mouse:click_on(Mouse.LEFT, x, y, 10) -- 依次点击点赞按钮
