@@ -9,11 +9,20 @@
         <li>配件自动合成</li>
         <li>商店自动重复购买</li>
     </ul>
+    <h2>下载链接</h2>
+    下面是最新版集成工具及使用手册的下载链接：
+        <ul>
+            <li><a href="https://www.macrohard.fun/CSOL-Utilities/downloads/CSOL-Utilities.pdf" download="CSOL-Utilities.pdf">最新版使用手册</a></li>
+            <li><a href="https://www.macrohard.fun/CSOL-Utilities/downloads/CSOL-Utilities.zip" download="CSOL-Utilities.zip">最新版集成工具（压缩包）</a></li>
+        </ul>
+        <blockquote>
+            受网络带宽限制，下载速度可能较慢，请耐心等待。
+        </blockquote>
     <h2>项目</h2>
     若本项目对您有帮助，可 star 一下本项目的仓库：
     <ul>
         <li>
-            <a href="https://gitee.com/silver1867/csol-24-h" target="_blank">Gitee 仓库</a>
+            <a href="https://gitee.com/silver1867/csol-24-h" target="_blank">Gitee 仓库（已不可用）</a>
         </li>
         <li>
             <a href="https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities" target="_blank">GitHub 仓库</a>

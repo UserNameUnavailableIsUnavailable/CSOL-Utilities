@@ -32,12 +32,12 @@ B 站 ID：_CoreDump
 
 ### 工具及使用手册下载
 
-- Gitee 下载链接：<a href="https://gitee.com/silver1867/csol-24-h/releases">点此下载</a>
-- GitHub 下载链接：<a href="https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities/releases">点此下载</a>
+- 在[GitHub 发布页面](https://github.com/UserNameUnavailableIsUnavailable/CSOL-Utilities/releases)中下载最新版本。
+- [配置面板](http://www.macrohard.fun/CSOL-Utilities/panel)中也提供了下载链接。
 
-国内用户请通过 gitee 下载如下内容（工具压缩包及使用手册），<b style="color:red">下载时不要下载源代码</b>，使用时<b style="color:red">请仔细阅读手册</b>。
+通过 GitHub 发布页面下载时，下载压缩包（.zip）和使用手册（.pdf）即可，不要下载源代码。
 
-<img src="contents_to_download.png" />
+![下载图中所示内容](contents_to_download.png)
 
 ## 主要功能概览
 
