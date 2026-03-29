@@ -2,7 +2,7 @@
 
 ## 环境要求
 
-Linux 或 Windows 平台下，安装 Miniconda 或 Anaconda 后，按如下方式创建虚拟环境：
+Linux 或 Windows 平台下，配置 conda 后，按如下方式创建虚拟环境：
 
 ```powershell
 conda create -p ./.venv python=3.10 -y

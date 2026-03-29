@@ -1,4 +1,3 @@
-.vs/
-vcpkg_installed/
-out/
-models/
+# auto-generated protobuf header files
+*.pb.h
+*.pb.cc

@@ -1,13 +1,36 @@
-.mypy_cache/
-.venv/
-.vs/
-.VSCodeCounter/
+# Build artifacts and temporary files
 build/
 test/
 vcpkg_installed/
 dist/
 tmp/
 temp/
+.mypy_cache/
+.venv/
+.vs/
+.VSCodeCounter/
+out/
+
+# Logs
+logs/
+*.log
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
 *.zip
 *.tar
 *.tar.gz

@@ -1,0 +1,2 @@
+# ignore auto-generated pb.go files
+*.pb.go
