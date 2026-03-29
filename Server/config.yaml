@@ -1,0 +1,14 @@
+# Server configuration
+http:
+  addr: ":9001"
+
+grpc:
+  addr: ":9002"
+
+jwt:
+  secret: "change-me-to-a-random-secret"
+  expiry: 24h
+
+db:
+  postgres_dsn: "host=localhost port=5432 user=csol password=csol dbname=csol sslmode=disable"
+  redis_addr: "localhost:6379"
