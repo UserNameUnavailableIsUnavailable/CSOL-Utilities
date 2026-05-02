@@ -1,14 +1,15 @@
-# Server configuration
+auth:
+  secret: 114514
+  expiry: "24h"
 http:
-  addr: ":9001"
-
-grpc:
-  addr: ":9002"
-
-jwt:
-  secret: "change-me-to-a-random-secret"
-  expiry: 24h
-
+  port: 8080
+routes:
+  login: "/login"
+  profile: "/profile"
 db:
-  postgres_dsn: "host=localhost port=5432 user=csol password=csol dbname=csol sslmode=disable"
-  redis_addr: "localhost:6379"
+  host: "127.0.0.1"
+  port: 5432
+  user: csol_utilities
+  password: 1145141919810
+  name: csol_utilities_db
+  ssl_mode: false

@@ -8,7 +8,6 @@
 #include "LGHUB_Emulator.h"
 
 static uint64_t s_ScriptLoadTime = 0;
-static BOOL s_bEmulating = TRUE;
 static const char* s_lpszCtrlEventCallbackName = NULL;
 
 int luaopen_LGHUB_Emulator(lua_State* L)
@@ -20,7 +19,7 @@ int luaopen_LGHUB_Emulator(lua_State* L)
 
 int emu_IsEmulating(lua_State* L)
 {
-    lua_pushboolean(L, s_bEmulating);
+    lua_pushboolean(L, 1);
     return 1;
 }
 
@@ -143,22 +142,22 @@ int emu_GetModifierState(lua_State *L)
 
 /* impl_emu_emu_ementations*/
 
-void __impl_emu_Sleep(uint32_t milliseconds)
+static void __impl_emu_Sleep(uint32_t milliseconds)
 {
     Sleep(milliseconds);
 }
 
-void __impl_emu_InitializeRunningTime()
+static void __impl_emu_InitializeRunningTime()
 {
     s_ScriptLoadTime = GetTickCount64();
 }
 
-uint64_t __impl_emu_GetRunningTime()
+static uint64_t __impl_emu_GetRunningTime()
 {
     return GetTickCount64() - s_ScriptLoadTime;
 }
 
-int32_t __impl_emu_IsKeyLockOn(const char* key)
+static int32_t __impl_emu_IsKeyLockOn(const char* key)
 {
     if (strcmp(key, "capslock") == 0)
     {
@@ -175,7 +174,7 @@ int32_t __impl_emu_IsKeyLockOn(const char* key)
     return -1;
 }
 
-void __impl_emu_GetMousePosition(LPPOINT pt)
+static void __impl_emu_GetMousePosition(LPPOINT pt)
 {
     int screen_width = GetSystemMetrics(SM_CXSCREEN);
     int screen_height = GetSystemMetrics(SM_CYSCREEN);
@@ -187,7 +186,7 @@ void __impl_emu_GetMousePosition(LPPOINT pt)
     pt->y = y;
 }
 
-void __impl_emu_SetMousePosition(LPPOINT pt)
+static void __impl_emu_SetMousePosition(LPPOINT pt)
 {
     int screen_width = GetSystemMetrics(SM_CXSCREEN);
     int screen_height = GetSystemMetrics(SM_CYSCREEN);
@@ -196,7 +195,7 @@ void __impl_emu_SetMousePosition(LPPOINT pt)
     SetCursorPos(x, y);
 }
 
-void __impl_emu_PressKey(WORD wKey)
+static void __impl_emu_PressKey(WORD wKey)
 {
     INPUT input = { 0 };
     input.type = INPUT_KEYBOARD;
@@ -204,7 +203,7 @@ void __impl_emu_PressKey(WORD wKey)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_ReleaseKey(WORD wKey)
+static void __impl_emu_ReleaseKey(WORD wKey)
 {
     INPUT input = { 0 };
     input.type = INPUT_KEYBOARD;
@@ -213,7 +212,7 @@ void __impl_emu_ReleaseKey(WORD wKey)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_PressAndReleaseKey(WORD wKey)
+static void __impl_emu_PressAndReleaseKey(WORD wKey)
 {
     INPUT input = { 0 };
     input.type = INPUT_KEYBOARD;
@@ -223,7 +222,7 @@ void __impl_emu_PressAndReleaseKey(WORD wKey)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_PressMouseButton(DWORD dwMouseEventFlags)
+static void __impl_emu_PressMouseButton(DWORD dwMouseEventFlags)
 {
     INPUT input = {
         .type = INPUT_MOUSE,
@@ -239,7 +238,7 @@ void __impl_emu_PressMouseButton(DWORD dwMouseEventFlags)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_ReleaseMouseButton(DWORD dwMouseEventFlags)
+static void __impl_emu_ReleaseMouseButton(DWORD dwMouseEventFlags)
 {
     INPUT input = {
         .type = INPUT_MOUSE,
@@ -255,7 +254,7 @@ void __impl_emu_ReleaseMouseButton(DWORD dwMouseEventFlags)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_MoveMouseRelative(long lVirtualX, long lVirtualY)
+static void __impl_emu_MoveMouseRelative(long lVirtualX, long lVirtualY)
 {
     long screen_width = GetSystemMetrics(SM_CXSCREEN);
     long screen_height = GetSystemMetrics(SM_CYSCREEN);
@@ -281,7 +280,7 @@ void __impl_emu_MoveMouseRelative(long lVirtualX, long lVirtualY)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_MoveMouseWheel(long lCount)
+static void __impl_emu_MoveMouseWheel(long lCount)
 {
     INPUT input = {
         .type = INPUT_MOUSE,
@@ -297,7 +296,7 @@ void __impl_emu_MoveMouseWheel(long lCount)
     SendInput(1, &input, sizeof(INPUT));
 }
 
-void __impl_emu_ClearLog()
+static void __impl_emu_ClearLog()
 {
     // reference: https://learn.microsoft.com/en-us/windows/console/clearing-the-screen
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -342,7 +341,7 @@ static void __impl_emu_OutputDebugMessage(const char* message)
     OutputDebugStringA(message);
 }
 
-uint32_t __impl_emu_GetModifierState()
+static uint32_t __impl_emu_GetModifierState()
 {
     uint32_t uState = 0;
     if (GetAsyncKeyState(VK_LMENU) & 0x8000) // left alt
@@ -372,7 +371,7 @@ uint32_t __impl_emu_GetModifierState()
     return uState;
 }
 
-BOOL WINAPI __impl_emu_CtrlHandler(DWORD dwCtrlType)
+static BOOL WINAPI __impl_emu_CtrlHandler(DWORD dwCtrlType)
 {
     const char* lpszEvent;
     switch (dwCtrlType)
@@ -396,7 +395,6 @@ BOOL WINAPI __impl_emu_CtrlHandler(DWORD dwCtrlType)
         lpszEvent = "UNKNOWN";
     }
     printf("Control event %s captured. Emulation will stop.\r\n", lpszEvent);
-    s_bEmulating = FALSE;
     SetConsoleCtrlHandler(__impl_emu_CtrlHandler, FALSE); // 移除控制信号处理函数
     return TRUE;
 }

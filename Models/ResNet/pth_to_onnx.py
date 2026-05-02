@@ -16,14 +16,15 @@ model.eval()
 # export to onnx
 onnx_path = f"{dir}/{model_name}.onnx"
 # 导出 .onnx
-dummy_input = (torch.randn(1, 3, 600, 800),)
+dummy_input = torch.randn(1, 3, 600, 800)
 torch.onnx.export(
     model,
     dummy_input,
     onnx_path,
     export_params=True, # Store trained parameters
-    opset_version=11, # ONNX version
+    opset_version=26, # ONNX version
     do_constant_folding=True, # Optimize constant folding
     input_names=["screenshot"],
     output_names=["interface_type"],
+    dynamo=False
 )

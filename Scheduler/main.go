@@ -1,92 +1,51 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log/slog"
-	"net"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
-	"git.macrohard.fun/root/csol-utilities/server/internal/auth"
-	"git.macrohard.fun/root/csol-utilities/server/internal/config"
-	"git.macrohard.fun/root/csol-utilities/server/internal/handler"
-	"git.macrohard.fun/root/csol-utilities/server/internal/hub"
-	"git.macrohard.fun/root/csol-utilities/server/internal/rpc"
-	"google.golang.org/grpc"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/config"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/internal/auth"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/internal/store/postgres"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/platform/db"
 )
 
 func main() {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	// ── Logger ───────────────────────────────────────────────────────────
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	slog.SetDefault(logger)
-
-	// ── Configuration ────────────────────────────────────────────────────
-	cfg, err := config.Load("config.yaml")
+	var err error
+	config, err := config.Load("config.yaml")
 	if err != nil {
-		slog.Error("failed to load config", "error", err)
-		os.Exit(1)
+		slog.Error("Failed to load config.")
+		return
 	}
-
-	// ── Auth service ─────────────────────────────────────────────────────
-	authSvc := auth.NewService(cfg.JWT.Secret, cfg.JWT.Expiry)
-
-	// ── WebSocket hub ────────────────────────────────────────────────────
-	wsHub := hub.New()
-	go wsHub.Run()
-
-	// ── HTTP router ──────────────────────────────────────────────────────
 	mux := http.NewServeMux()
-	handler.Register(mux, authSvc, wsHub)
 
-	httpServer := &http.Server{
-		Addr:         cfg.HTTP.Addr,
-		Handler:      handler.WithCORS(mux),
-		ReadTimeout:  10 * time.Second,
+	httpSrv := &http.Server{
+		Addr:         fmt.Sprintf(":%v", config.HTTP.Port),
+		Handler:      mux,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
 	}
 
-	// ── gRPC server ─────────────────────────────────────────────────────
-	grpcServer := grpc.NewServer()
-	rpc.Register(grpcServer, wsHub)
-
-	// ── Start servers ────────────────────────────────────────────────────
-	go func() {
-		slog.Info("HTTP server starting", "addr", cfg.HTTP.Addr)
-		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("HTTP server error", "error", err)
-			os.Exit(1)
-		}
-	}()
-
-	go func() {
-		lis, err := net.Listen("tcp", cfg.GRPC.Addr)
-		if err != nil {
-			slog.Error("gRPC listen error", "error", err)
-			os.Exit(1)
-		}
-		slog.Info("gRPC server starting", "addr", cfg.GRPC.Addr)
-		if err := grpcServer.Serve(lis); err != nil {
-			slog.Error("gRPC server error", "error", err)
-			os.Exit(1)
-		}
-	}()
-
-	// ── Graceful shutdown ────────────────────────────────────────────────
-	sig := <-quit
-	slog.Info("shutting down", "signal", sig)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	grpcServer.GracefulStop()
-	if err := httpServer.Shutdown(ctx); err != nil {
-		slog.Error("HTTP shutdown error", "error", err)
+	db, err := db.NewPostgre(&config.DB)
+	if err != nil {
+		slog.Error("Failed to establish connection to DB", "error", err)
+		return
 	}
-	slog.Info("server stopped")
+	defer db.Close()
+
+	us, err := postgres.NewUserStore(db)
+	if err != nil {
+		slog.Error("Failed to create UserStore.")
+		return
+	}
+
+	authSvc := auth.NewService(us, &config.Auth)
+	authSvc.Install(mux, &config.Routes)
+
+	if err = httpSrv.ListenAndServe(); err != nil {
+		slog.Error("Failed to create HTTP server.")
+		return
+	}
 }

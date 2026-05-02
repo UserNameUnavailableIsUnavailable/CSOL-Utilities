@@ -1,6 +1,5 @@
 # Build artifacts and temporary files
 build/
-test/
 vcpkg_installed/
 dist/
 tmp/

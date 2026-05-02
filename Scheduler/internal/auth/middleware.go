@@ -6,36 +6,24 @@ import (
 	"strings"
 )
 
-type contextKey string
+type ContextKey string
 
-const claimsKey contextKey = "claims"
+const claimsKey ContextKey = "claims"
 
-// Middleware returns an HTTP middleware that validates the Authorization header
-// (Bearer <token>) and injects the Claims into the request context.
-func Middleware(svc *Service) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			header := r.Header.Get("Authorization")
-			if header == "" || !strings.HasPrefix(header, "Bearer ") {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
-				return
-			}
-
-			tokenStr := strings.TrimPrefix(header, "Bearer ")
-			claims, err := svc.Validate(tokenStr)
-			if err != nil {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
-				return
-			}
-
-			ctx := context.WithValue(r.Context(), claimsKey, claims)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-// ClaimsFromContext extracts the Claims stored by the auth middleware.
-func ClaimsFromContext(ctx context.Context) (*Claims, bool) {
-	c, ok := ctx.Value(claimsKey).(*Claims)
-	return c, ok
+func (svc *Service) getTokenMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		header := r.Header.Get("Authorization")
+		if header == "" || !strings.HasPrefix(header, "Bearer ") {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		tokenString := strings.TrimPrefix(header, "Bearer ")
+		claims, err := svc.validateToken(tokenString)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		ctx := context.WithValue(r.Context(), claimsKey, claims)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
