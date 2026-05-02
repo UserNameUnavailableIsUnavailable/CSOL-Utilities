@@ -5,11 +5,11 @@ http:
   port: 8080
 routes:
   login: "/login"
-  profile: "/profile"
+  profiles: "/profiles"
 db:
   host: "127.0.0.1"
   port: 5432
   user: csol_utilities
   password: 1145141919810
   name: csol_utilities_db
-  ssl_mode: false
+  ssl_mode: require

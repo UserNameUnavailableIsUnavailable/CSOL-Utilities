@@ -1,20 +1,30 @@
-# Build artifacts and temporary files
 build/
-vcpkg_installed/
+# build artifacts and temporary files
 dist/
+dist-ssr/
 tmp/
 temp/
 .mypy_cache/
 .venv/
 .vs/
-.VSCodeCounter/
 out/
 
-# Logs
+# logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.VSCodeCounter/
 
-# Editor directories and files
+# package manager directories
+node_modules/
+vcpkg_installed/
+*.local
+
+# editor directories and files
 .vscode/
 !.vscode/extensions.json
 *.suo
@@ -33,3 +43,13 @@ Desktop.ini
 *.zip
 *.tar
 *.tar.gz
+
+.luarc.json
+
+# auto-generated protobuf header files
+*.pb.h
+*.pb.cc
+
+# model artifacts
+*.onnx
+*.pth

@@ -7,3 +7,4 @@ sql:
     go:
       out: "Scheduler/internal/db"
       package: "db"
+      sql_package: "pgx/v5"

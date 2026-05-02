@@ -23,6 +23,6 @@ type UpdateUserPasswordHashParams struct {
 }
 
 func (q *Queries) UpdateUserPasswordHash(ctx context.Context, arg UpdateUserPasswordHashParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserPasswordHash, arg.UserPasswordHash, arg.UserID)
+	_, err := q.db.Exec(ctx, updateUserPasswordHash, arg.UserPasswordHash, arg.UserID)
 	return err
 }

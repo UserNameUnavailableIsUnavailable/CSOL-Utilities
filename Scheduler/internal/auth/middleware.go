@@ -10,7 +10,7 @@ type ContextKey string
 
 const claimsKey ContextKey = "claims"
 
-func (svc *Service) getTokenMiddleware(next http.Handler) http.Handler {
+func (svc *Service) InjectMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		if header == "" || !strings.HasPrefix(header, "Bearer ") {

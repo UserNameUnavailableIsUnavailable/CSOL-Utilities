@@ -14,8 +14,8 @@ type HTTP struct {
 }
 
 type Routes struct {
-	Profile string `yaml:"profile"`
-	Login   string `yaml:"login"`
+	Profiles string `yaml:"profiles"`
+	Auth   string `yaml:"auth"`
 }
 
 type DB struct {
@@ -24,7 +24,7 @@ type DB struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Name     string `yaml:"name"`
-	SSLMode  bool   `yaml:"ssl_mode"`
+	SSLMode  string   `yaml:"ssl_mode"`
 }
 
 type Config struct {

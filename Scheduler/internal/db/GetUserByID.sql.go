@@ -24,7 +24,7 @@ type GetUserByIDRow struct {
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, userID int32) (GetUserByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID, userID)
+	row := q.db.QueryRow(ctx, getUserByID, userID)
 	var i GetUserByIDRow
 	err := row.Scan(
 		&i.UserID,

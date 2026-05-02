@@ -8,8 +8,8 @@ import (
 
 	"git.macrohard.fun/root/csol-utilities/Scheduler/config"
 	"git.macrohard.fun/root/csol-utilities/Scheduler/internal/auth"
-	"git.macrohard.fun/root/csol-utilities/Scheduler/internal/store/postgres"
-	"git.macrohard.fun/root/csol-utilities/Scheduler/platform/db"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/internal/store"
+	"git.macrohard.fun/root/csol-utilities/Scheduler/platform/postgre"
 )
 
 func main() {
@@ -28,14 +28,14 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	db, err := db.NewPostgre(&config.DB)
+	db, err := postgre.New(&config.DB)
 	if err != nil {
 		slog.Error("Failed to establish connection to DB", "error", err)
 		return
 	}
 	defer db.Close()
 
-	us, err := postgres.NewUserStore(db)
+	us, err := store.NewUserStore(db)
 	if err != nil {
 		slog.Error("Failed to create UserStore.")
 		return

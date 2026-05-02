@@ -22,6 +22,6 @@ type UpdateUserEmailParams struct {
 }
 
 func (q *Queries) UpdateUserEmail(ctx context.Context, arg UpdateUserEmailParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserEmail, arg.UserEmail, arg.UserID)
+	_, err := q.db.Exec(ctx, updateUserEmail, arg.UserEmail, arg.UserID)
 	return err
 }

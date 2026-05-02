@@ -22,6 +22,6 @@ type UpdateUserNameParams struct {
 }
 
 func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) error {
-	_, err := q.db.ExecContext(ctx, updateUserName, arg.UserName, arg.UserID)
+	_, err := q.db.Exec(ctx, updateUserName, arg.UserName, arg.UserID)
 	return err
 }

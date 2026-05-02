@@ -20,13 +20,13 @@ func Load(path string) (*Config, error) {
 			Expiry: 24 * time.Hour,
 		},
 		Routes: Routes{
-			Login:   "/login",
-			Profile: "/profile",
+			Auth:   "/auth",
+			Profiles: "/profiles",
 		},
 		DB: DB{
 			Host:    "localhost",
 			Port:    5432,
-			SSLMode: false,
+			SSLMode: "require",
 		},
 	}
 

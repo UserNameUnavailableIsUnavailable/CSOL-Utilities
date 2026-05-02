@@ -5,20 +5,21 @@
 package db
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Profile struct {
 	ProfileID        int32
 	UserID           int32
-	ProfileCreatedAt time.Time
-	ProfileUpdatedAt time.Time
+	ProfileCreatedAt pgtype.Timestamp
+	ProfileUpdatedAt pgtype.Timestamp
 }
 
 type ProfileFile struct {
 	ProfileID          int32
-	ProfileFileName    string
-	ProfileFileContent []byte
+	ProfileName        string
+	ProfileDescription string
+	ProfileContent     []byte
 }
 
 type User struct {
@@ -26,8 +27,8 @@ type User struct {
 	UserName              string
 	UserRole              string
 	UserPasswordHash      []byte
-	UserPasswordChangedAt time.Time
+	UserPasswordChangedAt pgtype.Timestamp
 	UserEmail             string
-	UserCreatedAt         time.Time
-	UserUpdatedAt         time.Time
+	UserCreatedAt         pgtype.Timestamp
+	UserUpdatedAt         pgtype.Timestamp
 }

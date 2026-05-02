@@ -15,6 +15,6 @@ where user_id = $1
 `
 
 func (q *Queries) DeleteUser(ctx context.Context, userID int32) error {
-	_, err := q.db.ExecContext(ctx, deleteUser, userID)
+	_, err := q.db.Exec(ctx, deleteUser, userID)
 	return err
 }

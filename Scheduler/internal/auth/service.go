@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -16,14 +17,15 @@ type Service struct {
 }
 
 // NewService creates a new authentication service
-func NewService(users store.UserStore, authCfg *config.Auth) *Service {
+func NewService(users *store.UserStore, authCfg *config.Auth) *Service {
 	return &Service{
-		users:  users,
+		users:  *users,
 		secret: []byte(authCfg.Secret),
 		expiry: authCfg.Expiry,
 	}
 }
 
 func (svc *Service) Install(mux *http.ServeMux, routes *config.Routes) {
-	mux.HandleFunc(routes.Login, svc.getLoginHandler())
+	apiBase := fmt.Sprintf("POST /api%s", routes.Auth)
+	mux.HandleFunc(apiBase + "/login", svc.getLoginHandler())
 }
