@@ -17,13 +17,17 @@ endif
 ifndef CMAKE_CONFIG_TYPE
 $(error CMAKE_CONFIG_TYPE is not defined!)
 endif
+ifndef VERSION
+$(error VERSION is not defined!)
+endif
 
-# CMake 设定
+# CMake settings
 export CMAKE_SUPPORT_MULTI_CONFIG := true
 export CMAKE_PLATFORM := x64
 export CMAKE_TOOLSET := host=x64
-# 生成器 **必须** 支持多配置
-export CMAKE_GENERATOR := Visual Studio 17 2022
-export CMAKE_CONFIGURE_ARGS = -S "$(CMAKE_SOURCE_DIR)" -B "$(CMAKE_BINARY_DIR)" -G "$(CMAKE_GENERATOR)" -A "$(CMAKE_PLATFORM)" -T "$(CMAKE_TOOLSET)"
+# generator **MUST** support multi-config, otherwise the build type will be ignored and all targets will be built in Debug mode by default, which is not what we want.
+# Since this project runs on Windows, Visual Studio 17 2022 or higher is recommended.
+export CMAKE_GENERATOR := Visual Studio 18 2026
+export CMAKE_CONFIGURE_ARGS = -S "$(CMAKE_SOURCE_DIR)" -B "$(CMAKE_BINARY_DIR)" -G "$(CMAKE_GENERATOR)" -A "$(CMAKE_PLATFORM)" -T "$(CMAKE_TOOLSET)" -DVERSION="$(VERSION)"
 export CMAKE_BUILD_ARGS = --build $(CMAKE_BINARY_DIR) --config "$(CMAKE_CONFIG_TYPE)"
 export CMAKE_INSTALL_ARGS = --install $(CMAKE_BINARY_DIR) --prefix "$(CMAKE_INSTALL_PREFIX)"

@@ -537,4 +537,22 @@ void CenterWindowClientArea(HWND hWnd) noexcept
     SetWindowPos(hWnd, nullptr, ptNewWindowTopLeft.x, ptNewWindowTopLeft.y, 0, 0,
                  SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
+
+void QueryRegistryString(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValue, std::wstring &buffer)
+{
+    DWORD cbData = 0;
+    auto ret = RegGetValueW(HKEY_CURRENT_USER, lpSubKey, lpValue, RRF_RT_REG_SZ, nullptr, nullptr, &cbData);
+    if (ret != ERROR_SUCCESS)
+    {
+        throw Exception(Translate("ERROR_Win32_API@2", "RegGetValueW", ret));
+    }
+    buffer.resize(cbData);
+    ret = RegGetValueW(HKEY_CURRENT_USER, lpSubKey, lpValue, RRF_RT_REG_SZ, nullptr, buffer.data(), &cbData);
+    if (ret != ERROR_SUCCESS)
+    {
+        throw Exception(Translate("ERROR_Win32_API@2", "RegGetValueW", ret));
+    }
+    buffer.resize(cbData - 1); /* cbData 包含了末尾空字符 */
+}
+
 } // namespace CSOL_Utilities

@@ -4,7 +4,20 @@ message(STATUS "vcpkg root: $ENV{VCPKG_ROOT}")
 # vcpkg toolchain must be specified before the first project()/enable_language so its hooks add the package paths
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
 
-project(CSOL-Utilities LANGUAGES C CXX)
+# Prefer VERSION from -DVERSION=...; fallback to VERSION.txt.
+if (NOT DEFINED VERSION OR VERSION STREQUAL "")
+    file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" VERSION)
+    string(STRIP "${VERSION}" VERSION)
+endif()
+string(REGEX REPLACE "^\"(.*)\"$" "\\1" VERSION "${VERSION}")
+if (VERSION STREQUAL "")
+    message(FATAL_ERROR "VERSION is empty. Pass -DVERSION=... or set VERSION.txt")
+endif()
+message(STATUS "CSOL-Utilities version: ${VERSION}")
+
+project(CSOL-Utilities VERSION ${VERSION} LANGUAGES C CXX)
+
+include(CTest)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

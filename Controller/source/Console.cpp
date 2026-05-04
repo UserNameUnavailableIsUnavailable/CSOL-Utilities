@@ -6,7 +6,7 @@
 namespace CSOL_Utilities
 {
 
-Console::Console()
+Console::Console() noexcept
 {
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
@@ -18,7 +18,7 @@ Console::Console()
 
     if (!get_input_mode_ok)
     {
-        DetailedQuickThrow(Translate("Console::ERROR_GetConsoleMode@1", GetLastError()));
+        return;
     }
 
     dwInputMode = dwInputMode & ~ENABLE_QUICK_EDIT_MODE; /* 关闭快速编辑模式 */
@@ -27,14 +27,14 @@ Console::Console()
 
     if (!set_input_mode_ok)
     {
-        DetailedQuickThrow(Translate("Console::ERROR_SetConsoleMode@1", GetLastError()));
+        return;
     }
 
     auto get_output_mode_ok = GetConsoleMode(hStdOut, &dwOutputMode);
 
     if (!get_output_mode_ok)
     {
-        DetailedQuickThrow(Translate("Console::ERROR_GetConsoleMode@1", GetLastError()));
+        return;
     }
 
     dwOutputMode = dwOutputMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
@@ -43,7 +43,7 @@ Console::Console()
 
     if (!set_output_mode_ok)
     {
-        DetailedQuickThrow(Translate("Console::ERROR_SetConsoleMode@1", GetLastError()));
+        return;
     }
 }
 

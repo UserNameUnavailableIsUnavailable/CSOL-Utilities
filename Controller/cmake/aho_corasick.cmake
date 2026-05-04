@@ -6,6 +6,11 @@ endif()
 
 set(URL "https://github.com/cjgdev/aho_corasick")
 
+# check if ${DOWNLOADS_DIR}/aho_corasick already exists
+if (EXISTS "${DOWNLOADS_DIR}/aho_corasick")
+    file(REMOVE_RECURSE "${DOWNLOADS_DIR}/aho_corasick")
+endif()
+
 execute_process(
     COMMAND git clone ${URL} "${DOWNLOADS_DIR}/aho_corasick"
     RESULT_VARIABLE GIT_CLONE_RESULT

@@ -13,19 +13,13 @@ find_package(OpenCV CONFIG REQUIRED)
 find_package(Clipper2 CONFIG REQUIRED)
 find_package(onnxruntime CONFIG REQUIRED)
 find_package(aho_corasick CONFIG REQUIRED)
-
-include_directories(
-    Controller
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${DEPENDENCIES_DIR}/include
-)
 get_target_property(OPENCV_INCLUDES opencv_core INTERFACE_INCLUDE_DIRECTORIES)
 
-add_executable(
-    Controller
-    Controller.rc # rc file contains manifest
-    source/Main.cpp
+add_library(
+    ControllerLib
+    source/Configuration.cpp
+    source/Configuration/Game.cpp
+    source/Configuration/Locale.cpp
     source/Driver.cpp
     source/Command.cpp
     source/CommandDispatcher.cpp
@@ -47,8 +41,15 @@ add_executable(
     source/ClassifierIdleEngine.cpp
 )
 
-target_link_libraries(Controller
-    PRIVATE
+target_include_directories(
+    ControllerLib
+    PUBLIC # make ControllerLib available to ControllerTesting
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(
+    ControllerLib
+    PUBLIC
     onnxruntime::onnxruntime
     opencv_core
     opencv_imgcodecs
@@ -57,10 +58,33 @@ target_link_libraries(Controller
     CLI11::CLI11
 )
 
-target_precompile_headers(Controller
+target_compile_definitions(
+    ControllerLib
+    PUBLIC
+    CONTROLLER_VERSION="${VERSION}"
+)
+
+Message(STATUS "Version defined in ControllerLib: ${VERSION}")
+
+target_precompile_headers(
+    ControllerLib
     PRIVATE
     include/pch.hpp
 )
+
+add_executable(
+    Controller
+    Controller.rc # rc file contains manifest
+    source/Main.cpp
+)
+
+target_link_libraries(
+    Controller
+    PRIVATE
+    ControllerLib
+)
+
+target_precompile_headers(Controller REUSE_FROM ControllerLib)
 
 # since the rc file already includes a manifest, we need to disable automatic manifest generation to avoid conflicts
 target_link_options(
@@ -78,6 +102,10 @@ list(APPEND dependencies ${dll_files})
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND dependencies ${pdb_files})
+endif()
+
+if (BUILD_TESTING)
+    add_subdirectory(testing)
 endif()
 
 message(STATUS "Dependencies: ${dependencies}")
@@ -103,4 +131,5 @@ add_custom_command(TARGET Controller POST_BUILD
 add_custom_command(TARGET Controller POST_BUILD
     COMMAND pwsh -NoProfile -NoLogo -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/models.ps1" -DownloadDir "${DOWNLOADS_DIR}/models" -InstallDir "$<TARGET_FILE_DIR:Controller>/models"
 )
+
 endif()

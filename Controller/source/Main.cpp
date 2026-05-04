@@ -19,7 +19,7 @@ void InitializeCommandLineArgs(CLI::App &app, int argc, wchar_t *argv[]);
 void Boot(std::unique_ptr<Driver> &driver);
 
 /* 使用 wmain 作为入口，确保命令行参数以 UTF-16 传入 */
-int wmain(int argc, wchar_t *argv[], wchar_t *envp[])
+int wmain(int argc, wchar_t *argv[])
 {
     using namespace CSOL_Utilities;
     CLI::App main_app{"CSOL-Utilities"};

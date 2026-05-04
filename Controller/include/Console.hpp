@@ -76,7 +76,7 @@ class Console
     }
 
   private:
-    Console();
+    Console() noexcept;
 
     static Console &GetInstance()
     {

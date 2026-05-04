@@ -28,6 +28,6 @@ if ($InstallDir) {
         -not $_.Name.StartsWith(".git") # exclude .git stuff
     } | ForEach-Object {
         Write-Host "Copying $($_.FullName) to $InstallDir" -ForegroundColor Green
-        Copy-Item -Path $_.FullName -Destination $InstallDir -Recurse -Force
+        Copy-Item -Path $_.FullName -Destination "$InstallDir/$($_.Name)" -Recurse -Force
     }
 }

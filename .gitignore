@@ -21,18 +21,20 @@ lerna-debug.log*
 
 # package manager directories
 node_modules/
-vcpkg_installed/
 *.local
 
 # editor directories and files
 .vscode/
-!.vscode/extensions.json
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 .idea
+
+# VSCode integration files for easier development
+!.vscode/extensions.json
+!.vscode/tasks.json
 
 # OS generated files
 Thumbs.db
@@ -53,3 +55,6 @@ Desktop.ini
 # model artifacts
 *.onnx
 *.pth
+
+# Controller.json is auto-generated and should not be tracked
+Controller.json

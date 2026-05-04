@@ -18,6 +18,7 @@ void LoadLanguagePackage(std::unordered_map<std::string, std::string> &lang_pack
 void RemoveWindowBorder(HWND hWnd) noexcept;
 void CenterWindowClientArea(HWND hWnd) noexcept;
 void CenterWindow(HWND hWnd) noexcept;
+void QueryRegistryString(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValue, std::wstring &buffer);
 
 template <typename... VA> class TranslationKey
 {

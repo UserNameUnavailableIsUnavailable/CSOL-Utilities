@@ -4,6 +4,9 @@ CompileFlags:
     - -Ibuild/vcpkg_installed/x64-windows/include
     - -Ibuild/vcpkg_installed/x64-windows/include/opencv4
     - -D_DEBUG
+    - -DVERSION
+Completion:
+  HeaderInsertion: Never
 ---
 # C++
 If:

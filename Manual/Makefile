@@ -16,7 +16,6 @@ TARGET := $(CURRENT_BUILD_DIR)/main.pdf
 include $(SOURCE_DIR)/make/pwsh.mk # 使用 PowerShell 作为 Makefile 的 shell
 
 .PHONY: all build clean install
-
 all: build install
 
 build: $(TARGET)
@@ -27,9 +26,9 @@ clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 $(TARGET): $(SOURCE) | $(CURRENT_BUILD_DIR)
 # build main.pdf
-	xelatex --shell-escape -8bit --output-dir=$(CURRENT_BUILD_DIR) main.tex
+	xelatex --shell-escape -8bit -interaction=nonstopmode -halt-on-error -file-line-error --output-dir=$(CURRENT_BUILD_DIR) main.tex
 # build main.pdf again to ensure references are correct
-	xelatex --shell-escape -8bit --output-dir=$(CURRENT_BUILD_DIR) main.tex
+	xelatex --shell-escape -8bit -interaction=nonstopmode -halt-on-error -file-line-error --output-dir=$(CURRENT_BUILD_DIR) main.tex
 $(CURRENT_BUILD_DIR):
 	New-Item -Type Directory -Path $(CURRENT_BUILD_DIR) -Force
 $(DIST_DIR):
