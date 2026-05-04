@@ -8,6 +8,8 @@ temp/
 .venv/
 .vs/
 out/
+target/
+gen/schemas
 
 # logs
 logs/
