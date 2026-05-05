@@ -7,24 +7,25 @@ CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
 CURRENT_DIST_DIR := $(DIST_DIR)/Tool
 
-AHK_SOURCE_FILE := $(CURRENT_SOURCE_DIR)/main/Tool.ahk
-TARGET_EXE := $(CURRENT_BUILD_DIR)/Tool.exe
-TARGET_ICON := $(CURRENT_SOURCE_DIR)/Tool.ico
-TARGET_DLL := $(CURRENT_BUILD_DIR)/Tool.dll
-
-# 代理
-include $(SOURCE_DIR)/make/proxy.mk
-# 使用 PowerShell 作为 Makefile 的 shell
+# Use PowerShell as the shell for this Makefile
 include $(SOURCE_DIR)/make/pwsh.mk
-# CMake 设定
+# proxy used by vcpkg, git, etc.
+include $(SOURCE_DIR)/make/proxy.mk
+# CMake settings
 CMAKE_SOURCE_DIR = $(SOURCE_DIR)
 CMAKE_BINARY_DIR = $(BUILD_DIR)
-CMAKE_INSTALL_PREFIX = $(DIST_DIR)
+CMAKE_INSTALL_PREFIX = $(CURRENT_DIST_DIR)
 CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
 include $(SOURCE_DIR)/make/cmake.mk
+# AutoHotkey compiler
+ifndef AHK2EXE_PATH
+$(error AHK2EXE_PATH is not set.)
+endif
 
-# AHK2EXE 是 GUI 程序，使用 Start-Process 调用以等待其完成，否则执行将是异步的，进而导致后续命令找不到生成的文件
-AHK2EXE := Start-Process -WorkingDirectory "$(CURRENT_SOURCE_DIR)" -FilePath "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe" -Wait -ArgumentList
+AHK_SOURCE_FILE = $(CURRENT_SOURCE_DIR)/scripts/Tool.ahk
+TARGET_EXE = $(CURRENT_BUILD_DIR)/Tool.exe
+TARGET_ICON = $(CURRENT_SOURCE_DIR)/Tool.ico
+TARGET_DLL = $(CURRENT_BUILD_DIR)/Tool.dll
 
 .PHONY: all build install clean dll exe
 
@@ -32,9 +33,9 @@ all: build install
 build: dll exe | $(CURRENT_BUILD_DIR)
 install:
 	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
+	cmake $(CMAKE_INSTALL_ARGS) --component Tool
 	New-Item -Type Directory -Path $(CURRENT_DIST_DIR) -Force | Out-Null
-	Copy-Item -Path "$(TARGET_DLL)" -Destination "$(CURRENT_DIST_DIR)" -Force
-	Copy-Item -Path "$(TARGET_EXE)" -Destination "$(CURRENT_DIST_DIR)" -Force
+	Copy-Item -Path "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)/*" -Destination "$(CURRENT_DIST_DIR)" -Recurse -Force
 clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 exe: | $(TARGET_EXE)
@@ -42,8 +43,8 @@ dll: | $(CURRENT_BUILD_DIR)
 	cmake $(CMAKE_CONFIGURE_ARGS)
 	cmake $(CMAKE_BUILD_ARGS) --target Tool
 $(TARGET_EXE): $(AHK_SOURCE_FILE) | $(CURRENT_BUILD_DIR)
-	Write-Host "$(TARGET_ICON)"
-	$(AHK2EXE) "/in `"$$(Join-Path (Get-Location) $(AHK_SOURCE_FILE))`" /out `"$$(Join-Path (Get-Location) $@)`""
-# 	Move-Item "$(CURRENT_SOURCE_DIR)/exe/Main.exe" $@ -Force
+# FIXME: Ahk2Exe currently outputs exe to ${CMAKE_BINARY_DIR}/$<CONFIG>/Tool.exe. However, not all cmake generators output artifacts to $<CONFIG> subdirectory.
+# NOTE: It is better to run Ahk2Exe in CMakeLists.txt using add_custom_command, which can ensure the output path is correct regardless of the generator used.
+	& Ahk2Exe.ps1 -CompilerPath "$(AHK2EXE_PATH)" -InputSource "$(AHK_SOURCE_FILE)" -OutputDirectory "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)" -BinaryName "Tool"
 $(CURRENT_BUILD_DIR):
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null

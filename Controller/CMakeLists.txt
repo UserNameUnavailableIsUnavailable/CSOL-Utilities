@@ -133,3 +133,8 @@ add_custom_command(TARGET Controller POST_BUILD
 )
 
 endif()
+
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+    DESTINATION .
+    COMPONENT Controller
+)

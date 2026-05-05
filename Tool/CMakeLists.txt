@@ -19,3 +19,12 @@ target_link_libraries(
     PRIVATE
     winmm
 )
+
+install(TARGETS Tool
+    RUNTIME DESTINATION .
+    COMPONENT Tool
+)
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+    DESTINATION .
+    COMPONENT Tool
+)

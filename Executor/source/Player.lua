@@ -105,7 +105,7 @@ if not __PLAYER_LUA__ then
     ---向随机的方向移动
     function Player:start_move()
         math.randomseed(Runtime:get_running_time())
-        self.run_direction = math.random(0, 4)
+        self.run_direction = math.random(1, 4)
         if self.run_direction == 1 then
             Keyboard:press(Keyboard.W, Delay.MINI)
         elseif self.run_direction == 2 then

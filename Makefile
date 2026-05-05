@@ -13,20 +13,28 @@ BUILD_DIR := ./build
 # CURRENT_BUILD_DIR refers to the build directory of the current target
 CURRENT_BUILD_DIR = $(BUILD_DIR)/$(DISTRO)
 # DIST_DIR refers to the project-level distribution directory, from which we make bundles
-DIST_DIR := ./dist
+DIST_DIR = ./dist
 # CURRENT_DIST_DIR refers to the target's distribution directory
 CURRENT_DIST_DIR = $(DIST_DIR)/$(DISTRO)
 # manual's name
-MANUAL_NAME := $(DISTRO).pdf
+MANUAL_NAME = $(DISTRO).pdf
 # the bundle to release
-BUNDLE_NAME := $(DISTRO).zip
+BUNDLE_NAME = $(DISTRO).zip
+# AutoHotkey Compiler
+AHK2EXE_PATH := C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe
 
 TARGETS := Controller Executor Tool Manual Bundle
 
 # We use paths relative to the project root across all Makefiles for consistency.
 # We prefix SOURCE_DIR, BUILD_DIR, DIST_DIR, etc. with ../ and pass them to sub-Makefiles, so that sub-Makefiles can also use paths relative to the project root.
-
-SUB_MAKE_ARGS = SOURCE_DIR=../$(SOURCE_DIR) BUILD_DIR=../$(BUILD_DIR) DIST_DIR=../$(DIST_DIR) BUILD_TYPE=$(BUILD_TYPE) VERSION="$(VERSION)"
+SUB_MAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
+	CURRENT_SOURCE_DIR="../$(SOURCE_DIR)/$@" \
+	BUILD_DIR="../$(BUILD_DIR)" \
+	CURRENT_BUILD_DIR="../$(BUILD_DIR)/$@" \
+	DIST_DIR="../$(DIST_DIR)" \
+	CURRENT_DIST_DIR="../$(CURRENT_DIST_DIR)/$@" \
+	BUILD_TYPE="$(BUILD_TYPE)" \
+	VERSION="$(VERSION)"
 
 # Use PowerShell v7+ as the shell for this Makefile
 include $(SOURCE_DIR)/make/pwsh.mk
@@ -45,7 +53,7 @@ include $(SOURCE_DIR)/make/proxy.mk
 # For clarity, targets representing project modules start with uppercase, others are lowercased.
 # default target
 .PHONY: all
-all: environment $(TARGETS)
+all: $(TARGETS)
 
 Controller: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Controller" $(SUB_MAKE_ARGS)
@@ -54,7 +62,7 @@ Executor: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Executor" $(SUB_MAKE_ARGS)
 
 Tool: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(SUB_MAKE_ARGS)
+	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(SUB_MAKE_ARGS) AHK2EXE_PATH="$(AHK2EXE_PATH)"
 
 Manual: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(SUB_MAKE_ARGS)
@@ -74,21 +82,22 @@ testing-%:
 	@Write-Host "Running tests for $*..."
 	$(MAKE) --directory="$(SOURCE_DIR)/$*" $(SUB_MAKE_ARGS) testing
 
-# version information
-.PHONY: version
-version:
-	@Write-Host "Project Version: $(VERSION)" -ForegroundColor GREEN
-
-# shell information
-.PHONY: shell
-shell:
-	@Write-Host "Using shell: $(SHELL)" -ForegroundColor GREEN
-
-# environment variables
-.PHONY: env
-env:
-	@Write-Host "HTTP_PROXY: $(HTTP_PROXY)" -ForegroundColor GREEN
-	@Write-Host "HTTPS_PROXY: $(HTTPS_PROXY)" -ForegroundColor GREEN
+# verbose
+.PHONY: verbose
+verbose:
+# PowerShell does not use `\` as line seperator, but Makefile need it.
+# We need to add an `#` to comment `\`.
+	@ # \
+	Write-Host "Project: $(PROJECT)" -ForegroundColor GREEN # \
+	Write-Host "Targets: $(TARGETS)" -ForegroundColor GREEN # \
+	Write-Host "Shell: $(SHELL)" -ForegroundColor GREEN # \
+	Write-Host "Version: $(VERSION)" -ForegroundColor GREEN # \
+	Write-Host "HTTP_PROXY: $(HTTP_PROXY)" -ForegroundColor GREEN # \
+	Write-Host "HTTPS_PROXY: $(HTTPS_PROXY)" -ForegroundColor GREEN # \
+	Write-Host "Source directory: $(SOURCE_DIR)" -ForegroundColor GREEN # \
+	Write-Host "Build directory: $(BUILD_DIR)" -ForegroundColor GREEN # \
+	Write-Host "Distrution directory: $(DIST_DIR)" -ForegroundColor GREEN # \
+	Write-Host "Bundle: $(BUNDLE_NAME)" -ForegroundColor GREEN
 
 .PHONY: clean
 clean:

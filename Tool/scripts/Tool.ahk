@@ -24,7 +24,7 @@ buf := Buffer(512)
 
 DllCall("GetCurrentDirectoryW", "UInt", 512, "Ptr", buf.Ptr)
 
-OnExit OnExitClearUp
+OnExit OnExitCleanUp
 
 global hModule := DllCall("LoadLibraryW", "WStr", "Tool.dll", "Ptr")
 
@@ -32,7 +32,7 @@ if (not hModule)
 {
     str := StrGet(buf, "UTF-16")
 
-    MsgBox "加载 Tool.dll 发生错误。错误代码：" A_LastError, "Tool"
+    MsgBox "Failed to load Tool.dll. Error code：" A_LastError, "Tool"
     ExitApp
 }
 
@@ -40,19 +40,19 @@ DllCall("Tool.dll\Setup")
 
 global gameModeToggle := false
 
-#Down::
-{
-    DllCall(
-        "Tool.dll\MinimizeForegroundWindow",
-    )
-}
-
-#Up::
-{
-    DllCall(
-        "Tool.dll\RestoreMinimizedWindow",
-    )
-}
+; #Down::
+; {
+;     DllCall(
+;         "Tool.dll\MinimizeForegroundWindow",
+;     )
+; }
+;
+; #Up::
+; {
+;     DllCall(
+;         "Tool.dll\RestoreMinimizedWindow",
+;     )
+; }
 
 AppsKey::
 {
@@ -97,7 +97,7 @@ AppsKey::
 A_MenuMaskKey := "vkFF"
 #Hotif
 
-OnExitClearUp(*)
+OnExitCleanUp(*)
 {
     DllCall("Tool.dll\Cleanup")
     DllCall("FreeLibrary", "Ptr", hModule)

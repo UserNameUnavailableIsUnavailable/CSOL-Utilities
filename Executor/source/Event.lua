@@ -32,7 +32,7 @@ if not __Event_LUA__ then
         table.insert(self.callback[identifier], callback)
         return #self.callback[identifier]
     end
-    
+
     ---注销事件。
     ---@param identifier string 事件标识符
     ---@param id integer 回调函数的索引
@@ -43,7 +43,7 @@ if not __Event_LUA__ then
             end
         end
     end
-    
+
     ---触发事件。
     ---@param identifier string 事件标识符
     ---@param args table 传递给回调函数的参数
@@ -56,5 +56,5 @@ if not __Event_LUA__ then
             end
         end
     end
-    
+
 end -- __Event_LUA__

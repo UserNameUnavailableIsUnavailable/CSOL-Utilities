@@ -1,13 +1,13 @@
-SOURCE_DIR := ..
-BUILD_DIR := ../build
-DIST_DIR := ../dist
+SOURCE_DIR ?= ..
+BUILD_DIR ?= ../build
+DIST_DIR ?= ../dist
 
-CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Executor
-CURRENT_BUILD_DIR = $(BUILD_DIR)/Executor
-CURRENT_DIST_DIR = $(DIST_DIR)/Executor
+CURRENT_SOURCE_DIR ?= $(SOURCE_DIR)/Executor
+CURRENT_BUILD_DIR ?= $(BUILD_DIR)/Executor
+CURRENT_DIST_DIR ?= $(DIST_DIR)/Executor
 
 # 源码文件
-SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/*.lua)
+SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/source/*.lua)
 
 include $(SOURCE_DIR)/make/pwsh.mk
 
@@ -26,7 +26,8 @@ install:
 	Copy-Item "$(BUILD_DIR)/Install.cmd" "$(DIST_DIR)/Install.cmd" -Force
 clean:
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null
-$(CURRENT_BUILD_DIR)/%.lua: %.lua | $(CURRENT_BUILD_DIR)
+# Update if the lua source has been updated
+$(CURRENT_BUILD_DIR)/%.lua: $(CURRENT_SOURCE_DIR)/source/%.lua | $(CURRENT_BUILD_DIR)
 	Copy-Item -Path $< -Destination $@ -Force
 $(CURRENT_BUILD_DIR):
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null

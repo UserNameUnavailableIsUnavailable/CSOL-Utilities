@@ -17,7 +17,7 @@ if not __MAIN_LUA__ then
 
     Version:set("Main", __version__)
     Version:require("Main", "Runtime", "1.5.7")
-    
+
     Version:assert()
     ---注册完所有例程处理函数后，开例程。
     Runtime:enable_routine() -- 开例程
