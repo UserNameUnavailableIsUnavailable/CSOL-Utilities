@@ -9,7 +9,7 @@ temp/
 .vs/
 out/
 target/
-gen/schemas
+gen/schemas/
 
 # logs
 logs/
