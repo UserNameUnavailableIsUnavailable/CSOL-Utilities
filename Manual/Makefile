@@ -2,7 +2,7 @@
 
 SOURCE_DIR := ..
 BUILD_DIR := ../build
-DIST_DIR := ../dist
+DIST_ROOT := ../dist
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Manual
 CURRENT_BUILD_DIR = $(BUILD_DIR)/Manual
@@ -20,8 +20,8 @@ all: build install
 
 build: $(TARGET)
 
-install: $(TARGET) | $(DIST_DIR)
-	Copy-Item -Path "$(TARGET)" -Destination "$(DIST_DIR)/$(MANUAL_NAME)" -Force
+install: $(TARGET) | $(DIST_ROOT)
+	Copy-Item -Path "$(TARGET)" -Destination "$(DIST_ROOT)/$(MANUAL_NAME)" -Force
 clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
 $(TARGET): $(SOURCE) | $(CURRENT_BUILD_DIR)
@@ -31,5 +31,5 @@ $(TARGET): $(SOURCE) | $(CURRENT_BUILD_DIR)
 	xelatex --shell-escape -8bit -interaction=nonstopmode -halt-on-error -file-line-error --output-dir=$(CURRENT_BUILD_DIR) main.tex
 $(CURRENT_BUILD_DIR):
 	New-Item -Type Directory -Path $(CURRENT_BUILD_DIR) -Force
-$(DIST_DIR):
-	New-Item -Type Directory -Path $(DIST_DIR) -Force
+$(DIST_ROOT):
+	New-Item -Type Directory -Path $(DIST_ROOT) -Force

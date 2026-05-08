@@ -11,11 +11,12 @@ BUILD_TYPE := Release
 # BUILD_DIR refers to the build directory of the whole project
 BUILD_DIR := ./build
 # CURRENT_BUILD_DIR refers to the build directory of the current target
-CURRENT_BUILD_DIR = $(BUILD_DIR)/$(DISTRO)
+CURRENT_BUILD_DIR = $(BUILD_DIR)
+DIST_ROOT := ./dist
 # DIST_DIR refers to the project-level distribution directory, from which we make bundles
-DIST_DIR = ./dist
+DIST_DIR = $(DIST_ROOT)/$(DISTRO)
 # CURRENT_DIST_DIR refers to the target's distribution directory
-CURRENT_DIST_DIR = $(DIST_DIR)/$(DISTRO)
+CURRENT_DIST_DIR = $(DIST_DIR)
 # manual's name
 MANUAL_NAME = $(DISTRO).pdf
 # the bundle to release
@@ -31,6 +32,7 @@ SUB_MAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
 	CURRENT_SOURCE_DIR="../$(SOURCE_DIR)/$@" \
 	BUILD_DIR="../$(BUILD_DIR)" \
 	CURRENT_BUILD_DIR="../$(BUILD_DIR)/$@" \
+	DIST_ROOT="../$(DIST_ROOT)" \
 	DIST_DIR="../$(DIST_DIR)" \
 	CURRENT_DIST_DIR="../$(CURRENT_DIST_DIR)/$@" \
 	BUILD_TYPE="$(BUILD_TYPE)" \
@@ -68,7 +70,7 @@ Manual: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(SUB_MAKE_ARGS)
 
 Bundle: | $(BUILD_DIR) $(DIST_DIR) $(CURRENT_DIST_DIR)
-	Compress-Archive -Path "$(CURRENT_DIST_DIR)/*" -DestinationPath "$(DIST_DIR)/$(BUNDLE_NAME)" -Force
+	Compress-Archive -Path "$(CURRENT_DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
 
 .PHONY: testing
 TESTABLE_TARGETS := Controller

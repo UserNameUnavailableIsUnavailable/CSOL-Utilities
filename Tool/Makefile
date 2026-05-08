@@ -45,6 +45,6 @@ dll: | $(CURRENT_BUILD_DIR)
 $(TARGET_EXE): $(AHK_SOURCE_FILE) | $(CURRENT_BUILD_DIR)
 # FIXME: Ahk2Exe currently outputs exe to ${CMAKE_BINARY_DIR}/$<CONFIG>/Tool.exe. However, not all cmake generators output artifacts to $<CONFIG> subdirectory.
 # NOTE: It is better to run Ahk2Exe in CMakeLists.txt using add_custom_command, which can ensure the output path is correct regardless of the generator used.
-	& Ahk2Exe.ps1 -CompilerPath "$(AHK2EXE_PATH)" -InputSource "$(AHK_SOURCE_FILE)" -OutputDirectory "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)" -BinaryName "Tool"
+	& "$(CURRENT_SOURCE_DIR)/Ahk2Exe.ps1" -CompilerPath "$(AHK2EXE_PATH)" -InputSource "$(AHK_SOURCE_FILE)" -OutputDirectory "$(CURRENT_BUILD_DIR)/$(BUILD_TYPE)" -BinaryName "Tool"
 $(CURRENT_BUILD_DIR):
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null

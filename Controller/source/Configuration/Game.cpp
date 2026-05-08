@@ -3,20 +3,36 @@
 namespace CSOL_Utilities
 {
 
-GameConfiguration::GameConfiguration(const nlohmann::json& json_obj)
+void to_json(nlohmann::json& j, const GameConfiguration& gc)
 {
-    if (!json_obj.is_object())
+    j = nlohmann::json{
+        { "Game.IsLauncherAvailable", gc.is_launcher_available_ },
+        { "Game.RootDirectory", gc.game_root_dir_ },
+        { "Game.LauncherExecutablePath", gc.launcher_executable_path_ },
+        { "Game.LauncherArguments", gc.launcher_arguments_ },
+        { "Game.WindowTitle", gc.game_window_title_ }
+    };
+}
+
+void from_json(const nlohmann::json& j, GameConfiguration& gc)
+{
+    if (!j.is_object())
     {
         throw std::runtime_error("Invalid JSON object for game configuration");
     }
-    is_launcher_available_ = json_obj.value("Game.IsLauncherAvailable", false);
-    game_root_dir_ = json_obj.value("Game.RootDirectory", "");
-    if (is_launcher_available_)
+    gc.is_launcher_available_ = j.value("Game.IsLauncherAvailable", false);
+    gc.game_root_dir_ = j.value("Game.RootDirectory", "");
+    if (gc.is_launcher_available_)
     {
-        launcher_executable_path_ = json_obj.value("Game.LauncherExecutablePath", "");
-        launcher_arguments_ = json_obj.value("Game.LauncherArguments", std::vector<std::string>{});
+        gc.launcher_executable_path_ = j.value("Game.LauncherExecutablePath", "");
+        gc.launcher_arguments_ = j.value("Game.LauncherArguments", std::vector<std::string>{});
     }
-    game_window_title_ = json_obj.value("Game.WindowTitle", game_window_title_);
+    gc.game_window_title_ = j.value("Game.WindowTitle", gc.game_window_title_);
+}
+
+GameConfiguration::GameConfiguration(const nlohmann::json& json_obj)
+{
+    from_json(json_obj, *this);
 }
 
 std::string GameConfiguration::GetGameLaunchCommand() const

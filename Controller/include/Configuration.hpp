@@ -1,16 +1,20 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "nlohmann/json_fwd.hpp"
 #ifndef CONTROLLER_VERSION
 #define CONTROLLER_VERSION "1.0.0"
 #endif
 
 namespace CSOL_Utilities
 {
+
+// For each configuration type, we need to implement friend functions to_json and from_json,
+// which allows nlohmann::json to serialize and deserialize.
+
 class GameConfiguration
 {
+    friend void to_json(nlohmann::json& j, const GameConfiguration& gc);
+    friend void from_json(const nlohmann::json& j, GameConfiguration& gc);
 public:
     GameConfiguration(const nlohmann::json& json_obj);
     ~GameConfiguration() noexcept = default;
@@ -26,8 +30,11 @@ private:
     std::vector<std::string> launcher_arguments_;
 };
 
+
 class LocaleConfiguration
 {
+    friend void to_json(nlohmann::json& j, const LocaleConfiguration& lc);
+    friend void from_json(const nlohmann::json& j, LocaleConfiguration& lc);
 public:
     LocaleConfiguration(const nlohmann::json& json_obj);
     ~LocaleConfiguration() noexcept = default;
@@ -53,19 +60,66 @@ private:
 
 struct IdleConfiguration
 {
-    std::string engine_type = "Classfier";
-    std::uint32_t start_game_room_timeout = 5 * 60;
-    std::uint32_t login_timeout = 5 * 60;
-    std::uint32_t load_map_timeout = 10 * 60;
-    std::uint32_t max_in_game_time = UINT_MAX;
-    bool default_idle_after_reconnection = true;
-    bool restart_game_on_loading_timeout = true;
-    bool allow_quick_full_screen = false;
-    bool suppress_cso_banner = true;
-    std::string ocr_detector_json_path;
-    std::string ocr_recognizer_json_path;
-    std::string ocr_keywords_json_path;
-    std::string classifier_model_json_path;
+    friend void from_json(const nlohmann::json& j, IdleConfiguration& ic);
+    friend void to_json(nlohmann::json& j, const IdleConfiguration& ic);
+public:
+    // Currently, only Classifer is allowed
+    const std::string& GetEngineType() const noexcept
+    {
+        return engine_type_;
+    }
+    const std::string& GetModelConfigPath() const noexcept
+    {
+        return model_config_path_;
+    }
+    std::int32_t GetStartGameRoomTimeout() const noexcept
+    {
+        return start_game_room_timeout_;
+    }
+    std::int32_t GetLoginTimeout() const noexcept
+    {
+        return login_timeout_;
+    }
+    std::int32_t GetLoadMapTimeout() const noexcept
+    {
+        return load_map_timeout_;
+    }
+    std::int32_t GetMaxInGameTime() const noexcept
+    {
+        return max_in_game_time_;
+    }
+    bool SwitchToDefaultModeAfterReconnection() const noexcept
+    {
+        return switch_to_default_mode_after_reconnection;
+    }
+    bool RestartGameOnLoadingTimeout() const noexcept
+    {
+        return restart_game_on_loading_timeout_;
+    }
+    bool SuppressQuickFullscreen() const noexcept
+    {
+        return suppress_quick_fullscreen_;
+    }
+    bool SuppressCSOBanner() const noexcept
+    {
+        return suppress_cso_banner_;
+    }
+
+    IdleConfiguration(const nlohmann::json& j);
+    IdleConfiguration() = default;
+    ~IdleConfiguration() noexcept = default;
+
+private:
+    std::string engine_type_ = "Classfier";
+    std::string model_config_path_ = "models/Classifier/ResNet/CSOL-Utilities-ResNet18-800x600.json";
+    std::int32_t start_game_room_timeout_ = 5 * 60;
+    std::int32_t login_timeout_ = 5 * 60;
+    std::int32_t load_map_timeout_ = 10 * 60;
+    std::int32_t max_in_game_time_ = UINT_MAX;
+    bool switch_to_default_mode_after_reconnection = true;
+    bool restart_game_on_loading_timeout_ = true;
+    bool suppress_quick_fullscreen_ = true;
+    bool suppress_cso_banner_ = true;
 };
 
 struct ExecutorConfiguration
@@ -93,10 +147,12 @@ struct Accessor<decltype(ConfigurationManager::member)> {\
 private:
     std::shared_ptr<LocaleConfiguration> locale_cfg_;
     std::shared_ptr<GameConfiguration> game_cfg_;
+    std::shared_ptr<IdleConfiguration> idle_cfg_;
     std::vector<std::function<void ()>> reload_callbacks_;
 
 DEFINE_CONFIGURATION_ACCESSOR(locale_cfg_);
 DEFINE_CONFIGURATION_ACCESSOR(game_cfg_);
+DEFINE_CONFIGURATION_ACCESSOR(idle_cfg_);
 
 public:
     ConfigurationManager(const nlohmann::json& json_obj)
