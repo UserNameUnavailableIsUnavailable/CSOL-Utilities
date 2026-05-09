@@ -60,3 +60,5 @@ Desktop.ini
 
 # Controller.json is auto-generated and should not be tracked
 Controller.json
+
+/.luarc.json

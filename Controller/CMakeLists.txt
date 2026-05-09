@@ -21,6 +21,7 @@ add_library(
     source/Configuration/Game.cpp
     source/Configuration/Locale.cpp
     source/Configuration/Idle.cpp
+    source/Configuration/Executor.cpp
     source/Driver.cpp
     source/Command.cpp
     source/CommandDispatcher.cpp

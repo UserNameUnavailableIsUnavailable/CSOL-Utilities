@@ -122,9 +122,24 @@ private:
     bool suppress_cso_banner_ = true;
 };
 
-struct ExecutorConfiguration
+class ExecutorConfiguration
 {
-    std::filesystem::path command_file_path_;
+    friend void from_json(const nlohmann::json& j, ExecutorConfiguration& ec);
+    friend void to_json(nlohmann::json& j, const ExecutorConfiguration& ec);
+public:
+    ExecutorConfiguration() = default;
+    ExecutorConfiguration(const nlohmann::json& json_obj);
+    ~ExecutorConfiguration() noexcept = default;
+    const std::string& GetCommandFilePath() const noexcept
+    {
+        return command_file_path_;
+    }
+    const std::string& GetAgentProcessName() const noexcept
+    {
+        return lghub_agent_process_name_;
+    }
+private:
+    std::string command_file_path_;
     std::string lghub_agent_process_name_;
 };
 

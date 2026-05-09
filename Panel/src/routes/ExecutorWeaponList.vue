@@ -311,7 +311,7 @@ function export_weapon_list() {
     const ret = `if not __WEAPON_LIST_LUA__ then\n` +
     `\t__WEAPON_LIST_LUA__ = true\n` +
     `\tlocal __version__ = "${VERSION}"\n` +
-    `\tInclude("Version.lua")\n` +
+    `\tInclude("core/Version.lua")\n` +
     `\tVersion:set("WeaponList", __version__)\n` +
     `\tVersion:require("WeaponList", "Weapon", "1.5.4")\n` +
     `\t${blocks.join("\n")}\n` +

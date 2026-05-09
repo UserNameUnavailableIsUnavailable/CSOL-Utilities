@@ -48,7 +48,7 @@ function export_setting_impl() {
     let code = "if not __SETTING_LUA__ then\n" +
         "\t__SETTING_LUA__ = true\n" +
         `\tlocal __version__ = "${VERSION}"\n` +
-        `\tInclude("Version.lua")\n` +
+        `\tInclude("core/Version.lua")\n` +
         `\tVersion:set("Setting", __version__)\n` +
         "\tSetting = {\n";
 

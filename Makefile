@@ -57,20 +57,20 @@ include $(SOURCE_DIR)/make/proxy.mk
 .PHONY: all
 all: $(TARGETS)
 
-Controller: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
+Controller: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Controller" $(SUB_MAKE_ARGS)
 
-Executor: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
+Executor: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Executor" $(SUB_MAKE_ARGS)
 
-Tool: | $(BUILD_DIR) $(CURRENT_DIST_DIR)
+Tool: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(SUB_MAKE_ARGS) AHK2EXE_PATH="$(AHK2EXE_PATH)"
 
 Manual: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(SUB_MAKE_ARGS)
 
-Bundle: | $(BUILD_DIR) $(DIST_DIR) $(CURRENT_DIST_DIR)
-	Compress-Archive -Path "$(CURRENT_DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
+Bundle: | $(BUILD_DIR) $(DIST_DIR)
+	Compress-Archive -Path "$(DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
 
 .PHONY: testing
 TESTABLE_TARGETS := Controller
@@ -109,5 +109,3 @@ $(BUILD_DIR):
 	New-Item -Type Directory -Path "$(BUILD_DIR)" -Force
 $(DIST_DIR):
 	New-Item -Type Directory -Path "$(DIST_DIR)" -Force
-$(CURRENT_DIST_DIR): | $(DIST_DIR)
-	New-Item -Type Directory -Path "$(CURRENT_DIST_DIR)" -Force

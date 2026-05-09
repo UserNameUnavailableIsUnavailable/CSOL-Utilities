@@ -6,28 +6,25 @@ CURRENT_SOURCE_DIR ?= $(SOURCE_DIR)/Executor
 CURRENT_BUILD_DIR ?= $(BUILD_DIR)/Executor
 CURRENT_DIST_DIR ?= $(DIST_DIR)/Executor
 
-# 源码文件
-SOURCE_FILES := $(wildcard $(CURRENT_SOURCE_DIR)/source/*.lua)
+MODULES := core custom
 
 include $(SOURCE_DIR)/make/pwsh.mk
 
 .PHONY: all build clean install
 
-all: build install
+all: install
 # 移除 Executor.lua，该文件由 Install.ps1 运行后创建
 	if (Test-Path "$(BUILD_DIR)/Executor.lua") { Remove-Item -Force "$(BUILD_DIR)/Executor.lua" }
-build: | $(CURRENT_BUILD_DIR) $(addprefix $(CURRENT_BUILD_DIR)/,$(notdir $(SOURCE_FILES)))
-	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.ps1" "$(BUILD_DIR)/Install.ps1" -Force
-	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.cmd" "$(BUILD_DIR)/Install.cmd" -Force
-install:
+build: | $(CURRENT_BUILD_DIR)
+	$(foreach module, $(MODULES), \
+	Copy-Item -Recurse "$(CURRENT_SOURCE_DIR)/$(module)" "$(CURRENT_BUILD_DIR)" -Force; \
+	)
+	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.ps1" "$(CURRENT_BUILD_DIR)" -Force
+	Copy-Item "$(CURRENT_SOURCE_DIR)/Install.cmd" "$(CURRENT_BUILD_DIR)" -Force
+install: build
 	if (Test-Path "$(CURRENT_DIST_DIR)") { Remove-Item -Recurse -Force "$(CURRENT_DIST_DIR)" }
 	Copy-Item -Recurse "$(CURRENT_BUILD_DIR)" "$(CURRENT_DIST_DIR)" -Force
-	Copy-Item "$(BUILD_DIR)/Install.ps1" "$(DIST_DIR)/Install.ps1" -Force
-	Copy-Item "$(BUILD_DIR)/Install.cmd" "$(DIST_DIR)/Install.cmd" -Force
 clean:
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null
-# Update if the lua source has been updated
-$(CURRENT_BUILD_DIR)/%.lua: $(CURRENT_SOURCE_DIR)/source/%.lua | $(CURRENT_BUILD_DIR)
-	Copy-Item -Path $< -Destination $@ -Force
 $(CURRENT_BUILD_DIR):
 	New-Item -ItemType Directory -Path "$(CURRENT_BUILD_DIR)" -Force | Out-Null
