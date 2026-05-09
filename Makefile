@@ -28,13 +28,10 @@ TARGETS := Controller Executor Tool Manual Bundle
 
 # We use paths relative to the project root across all Makefiles for consistency.
 # We prefix SOURCE_DIR, BUILD_DIR, DIST_DIR, etc. with ../ and pass them to sub-Makefiles, so that sub-Makefiles can also use paths relative to the project root.
-SUB_MAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
-	CURRENT_SOURCE_DIR="../$(SOURCE_DIR)/$@" \
+COMMON_SUBMAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
 	BUILD_DIR="../$(BUILD_DIR)" \
-	CURRENT_BUILD_DIR="../$(BUILD_DIR)/$@" \
 	DIST_ROOT="../$(DIST_ROOT)" \
 	DIST_DIR="../$(DIST_DIR)" \
-	CURRENT_DIST_DIR="../$(CURRENT_DIST_DIR)/$@" \
 	BUILD_TYPE="$(BUILD_TYPE)" \
 	VERSION="$(VERSION)"
 
@@ -57,17 +54,22 @@ include $(SOURCE_DIR)/make/proxy.mk
 .PHONY: all
 all: $(TARGETS)
 
+# TODO: Add Protos to TARGETS on finish
+.PHONY: Protos
+Protos:
+	$(MAKE) --directory="$(SOURCE_DIR)/Protos" $(COMMON_SUBMAKE_ARGS)
+
 Controller: | $(BUILD_DIR) $(DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Controller" $(SUB_MAKE_ARGS)
+	$(MAKE) --directory="$(SOURCE_DIR)/Controller" $(COMMON_SUBMAKE_ARGS)
 
 Executor: | $(BUILD_DIR) $(DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Executor" $(SUB_MAKE_ARGS)
+	$(MAKE) --directory="$(SOURCE_DIR)/Executor" $(COMMON_SUBMAKE_ARGS)
 
 Tool: | $(BUILD_DIR) $(DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(SUB_MAKE_ARGS) AHK2EXE_PATH="$(AHK2EXE_PATH)"
+	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(COMMON_SUBMAKE_ARGS) AHK2EXE_PATH="$(AHK2EXE_PATH)"
 
 Manual: | $(BUILD_DIR) $(DIST_DIR)
-	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(SUB_MAKE_ARGS)
+	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(COMMON_SUBMAKE_ARGS)
 
 Bundle: | $(BUILD_DIR) $(DIST_DIR)
 	Compress-Archive -Path "$(DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
@@ -82,7 +84,7 @@ testing: $(addprefix testing-,$(__targets))
 .PHONY: testing-%
 testing-%:
 	@Write-Host "Running tests for $*..."
-	$(MAKE) --directory="$(SOURCE_DIR)/$*" $(SUB_MAKE_ARGS) testing
+	$(MAKE) --directory="$(SOURCE_DIR)/$*" $(COMMON_SUBMAKE_ARGS) testing
 
 # verbose
 .PHONY: verbose

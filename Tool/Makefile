@@ -4,7 +4,7 @@ BUILD_DIR := ../build
 DIST_DIR := ../dist
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Tool
-CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool/$(BUILD_TYPE)
+CURRENT_BUILD_DIR = $(BUILD_DIR)/Tool
 CURRENT_DIST_DIR := $(DIST_DIR)/Tool
 
 # Use PowerShell as the shell for this Makefile

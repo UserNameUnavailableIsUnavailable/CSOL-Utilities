@@ -136,6 +136,7 @@ add_custom_command(TARGET Controller POST_BUILD
 
 endif()
 
+# FIXME: Currently ControllerLib.lib is also copied into dist dir.
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
     DESTINATION .
     COMPONENT Controller

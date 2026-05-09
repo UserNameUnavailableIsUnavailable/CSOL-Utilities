@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package Controller;
+
+service ConfigurationService {
+  rpc RetrieveConfiguration(RetrieveConfigurationRequest) returns (RetrieveConfigurationResponse);
+  rpc UpdateConfiguration(UpdateConfigurationRequest) returns (UpdateConfigurationResponse);
+}
+
+message RetrieveConfigurationRequest {
+}
+
+message RetrieveConfigurationResponse {
+  bool ok = 1;
+  string data = 2;
+}
+
+message UpdateConfigurationRequest {
+  string data = 1;
+}
+
+message UpdateConfigurationResponse {
+  bool ok = 1;
+}

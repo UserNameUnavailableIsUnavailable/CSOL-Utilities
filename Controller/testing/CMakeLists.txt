@@ -31,9 +31,12 @@ target_compile_definitions(
     CONTROLLER_VERSION="${VERSION}"
     SOURCE_DIR="${CMAKE_SOURCE_DIR}"
     CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    CURRENT_BUILD_DIR="${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 target_precompile_headers(ControllerTesting REUSE_FROM ControllerLib)
 
 include(GoogleTest)
 gtest_discover_tests(ControllerTesting)
+
+# TODO: Run configure.ps1 automatically if Controller.json is missing in CMAKE_CURRENT_BINARY_DIR.

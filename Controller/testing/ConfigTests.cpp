@@ -7,7 +7,7 @@ using namespace CSOL_Utilities;
 
 TEST(ConfigurationManagerTest, LoadTest)
 {
-    auto json_file_path = GetSourceDirectory() / L"Controller.json";
+    auto json_file_path = GetBuildDirectory() / L"Controller.json";
     std::cout << "JSON config path: " << json_file_path << std::endl;
     std::ifstream ifs(json_file_path);
     ASSERT_TRUE(ifs.is_open());

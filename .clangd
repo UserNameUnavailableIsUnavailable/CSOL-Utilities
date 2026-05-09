@@ -3,6 +3,7 @@ CompileFlags:
   Add:
     - -Ibuild/vcpkg_installed/x64-windows/include
     - -Ibuild/vcpkg_installed/x64-windows/include/opencv4
+    - -Ibuild/gen
     - -D_DEBUG
     - -DVERSION
 Completion:

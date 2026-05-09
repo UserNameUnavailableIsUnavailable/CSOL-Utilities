@@ -3,9 +3,9 @@ BUILD_TYPE ?= Release
 BUILD_DIR ?= ../build
 DIST_DIR ?= ../dist
 
-CURRENT_SOURCE_DIR ?= $(SOURCE_DIR)/Controller
-CURRENT_BUILD_DIR ?= $(BUILD_DIR)/Controller/$(BUILD_TYPE)
-CURRENT_DIST_DIR ?= $(DIST_DIR)/Controller
+CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Controller
+CURRENT_BUILD_DIR = $(BUILD_DIR)/Controller
+CURRENT_DIST_DIR = $(DIST_DIR)/Controller
 
 # 代理
 include $(SOURCE_DIR)/make/proxy.mk

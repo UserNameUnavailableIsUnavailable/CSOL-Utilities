@@ -20,10 +20,7 @@ target_link_libraries(
     winmm
 )
 
-install(TARGETS Tool
-    RUNTIME DESTINATION .
-    COMPONENT Tool
-)
+# FIXME: Currently *.exp and *.lib is also copied into dist dir.
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
     DESTINATION .
     COMPONENT Tool
