@@ -6,7 +6,7 @@
 #include <lauxlib.h>
 #include <Windows.h>
 
-__declspec(dllexport) int luaopen_LGHUB_Emulator(lua_State* L);
+__declspec(dllexport) int luaopen_Emulator(lua_State* L);
 __declspec(dllexport) int emu_IsEmulating(lua_State* L);
 __declspec(dllexport) int emu_Sleep(lua_State* L);
 __declspec(dllexport) int emu_InitializeRunningTime(lua_State* L);

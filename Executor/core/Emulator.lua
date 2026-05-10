@@ -19,15 +19,15 @@ if not __EMULATOR_LUA__ then
     assert(os.getenv("OS") == "Windows_NT", "该脚本仅支持 Windows 系统。")
     assert(os.getenv("PROCESSOR_ARCHITECTURE") == "AMD64", "仅支持 Intel IA-32e 及 AMD64 架构处理器。")
     package.cpath = package.cpath .. ";" .. PATH:format("?.dll")
-    local LGHUB_Emulator = require("LGHUB_Emulator")
+    local Emulator = require("Emulator")
 
     __RunningInEmulator__ = true -- 本地运行
 
-    LGHUB_Emulator.InitializeRunningTime()
+    Emulator.InitializeRunningTime()
     ---休眠指定的时间。
     ---@param milliseconds number 休眠的时间（单位：毫秒）
     function Sleep(milliseconds)
-        LGHUB_Emulator.Sleep(milliseconds)
+        Emulator.Sleep(milliseconds)
     end
 
     ---输出日志信息。
@@ -40,7 +40,7 @@ if not __EMULATOR_LUA__ then
     ---获取脚本运行时间。
     ---@return number # 脚本运行时间（单位：毫秒）
     function GetRunningTime()
-        return LGHUB_Emulator.GetRunningTime()
+        return Emulator.GetRunningTime()
     end
 
     ---获取日期/时间，与 os.date 函数相同。
@@ -52,7 +52,7 @@ if not __EMULATOR_LUA__ then
     end
 
     function ClearLog()
-        LGHUB_Emulator.ClearLog()
+        Emulator.ClearLog()
     end
 
     ---检查指定的键盘锁定键是否开启。
@@ -107,7 +107,7 @@ if not __EMULATOR_LUA__ then
     function PressKey(...)
         for i = 1, select("#", ...) do
             local key = select(i, ...)
-            execute_keyboard_operation(LGHUB_Emulator.PressKey, key)
+            execute_keyboard_operation(Emulator.PressKey, key)
         end
     end
     ---释放指定的键。
@@ -115,7 +115,7 @@ if not __EMULATOR_LUA__ then
     function ReleaseKey(...)
         for i = 1, select("#", ...) do
             local key = select(i, ...)
-            execute_keyboard_operation(LGHUB_Emulator.ReleaseKey, key)
+            execute_keyboard_operation(Emulator.ReleaseKey, key)
         end
     end
     ---按下并释放指定的键。
@@ -123,47 +123,47 @@ if not __EMULATOR_LUA__ then
     function PressAndReleaseKey(...)
         for i = 1, select("#", ...) do
             local key = select(i, ...)
-            execute_keyboard_operation(LGHUB_Emulator.PressAndReleaseKey, key)
+            execute_keyboard_operation(Emulator.PressAndReleaseKey, key)
         end
     end
     ---按下指定的鼠标按钮。
     ---@param button integer 鼠标按钮序号（1, 2, 3, 4, 5）
     function PressMouseButton(button)
-        LGHUB_Emulator.PressMosueButton(button)
+        Emulator.PressMosueButton(button)
     end
     ---释放指定的鼠标按钮。
     ---@param button integer 鼠标按钮序号（1, 2, 3, 4, 5）
     function ReleaseMouseButton(button)
-        LGHUB_Emulator.ReleaseMouseButton(button)
+        Emulator.ReleaseMouseButton(button)
     end
     ---按下并释放指定的鼠标按钮。
     ---@param button integer 鼠标按钮序号（1, 2, 3, 4, 5）
     function PressAndReleaseMouseButton(button)
-        LGHUB_Emulator.PressAndReleaseMouseButton(button)
+        Emulator.PressAndReleaseMouseButton(button)
     end
     ---移动鼠标光标到指定位置。
     ---@param x integer 鼠标光标的横坐标
     ---@param y integer 鼠标光标的纵坐标
     function MoveMouseTo(x, y)
-        LGHUB_Emulator.SetMousePosition(x, y)
+        Emulator.SetMousePosition(x, y)
     end
     ---移动鼠标光标到虚拟屏幕中的指定位置。
     ---@param x integer 鼠标光标的横坐标
     ---@param y integer 鼠标光标的纵坐标
     function MoveMouseToVirtual(x, y)
-        LGHUB_Emulator.SetMousePosition(x, y)
+        Emulator.SetMousePosition(x, y)
     end
     ---相对当前位置移动鼠标光标。
     ---@param downward number 鼠标光标向下移动的距离（负数表示向上）
     ---@param rightward number 鼠标光标向右移动的距离（负数表示向左）
     function MoveMouseRelative(downward, rightward)
-        LGHUB_Emulator.MoveMouseRelative(downward, rightward)
+        Emulator.MoveMouseRelative(downward, rightward)
     end
 
     ---获取鼠标光标的当前坐标。
     ---@return integer x, integer y 鼠标光标的坐标
     function GetMousePosition()
-        return LGHUB_Emulator.GetMousePosition()
+        return Emulator.GetMousePosition()
     end
 
     ---判断指定的鼠标按钮是否被按下。
@@ -176,18 +176,18 @@ if not __EMULATOR_LUA__ then
     ---@param fmt string 调试信息格式化字符串
     ---@param ... any 调试信息格式化参数
     function OutputDebugMessage(fmt, ...)
-        LGHUB_Emulator.OutputDebugMessage(fmt:format(...))
+        Emulator.OutputDebugMessage(fmt:format(...))
     end
     ---滚动鼠标滚轮。
     ---@param count number 滚动的次数（正数表示向上滚动，负数表示向下滚动）
     function MoveMouseWheel(count)
-        LGHUB_Emulator.MoveMouseWheel(count)
+        Emulator.MoveMouseWheel(count)
     end
     ---判断修饰键是否按下。
     ---@param key string 按键名称
     ---@return boolean
     function IsModifierPressed(key)
-        local state = LGHUB_Emulator.GetModifierState()
+        local state = Emulator.GetModifierState()
         if key == "alt" then
             return (state & (0x3 << 0)) ~= 0
         elseif key == "lalt" then
@@ -214,6 +214,6 @@ if not __EMULATOR_LUA__ then
     end
 
     function __IsEmulating__()
-        return LGHUB_Emulator.IsEmulating()
+        return Emulator.IsEmulating()
     end
 end -- __EMULATOR_LUA__

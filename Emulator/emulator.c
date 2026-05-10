@@ -5,12 +5,12 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <inttypes.h>
-#include "LGHUB_Emulator.h"
+#include "emulator.h"
 
 static uint64_t s_ScriptLoadTime = 0;
 static const char* s_lpszCtrlEventCallbackName = NULL;
 
-int luaopen_LGHUB_Emulator(lua_State* L)
+int luaopen_Emulator(lua_State* L)
 {
     luaL_newlib(L, Exports);
     SetConsoleCtrlHandler(__impl_emu_CtrlHandler, TRUE);

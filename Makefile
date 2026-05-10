@@ -24,7 +24,7 @@ BUNDLE_NAME = $(DISTRO).zip
 # AutoHotkey Compiler
 AHK2EXE_PATH := C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe
 
-TARGETS := Controller Executor Tool Manual Bundle
+TARGETS := Controller Executor Tool Emulator Manual Bundle
 
 # We use paths relative to the project root across all Makefiles for consistency.
 # We prefix SOURCE_DIR, BUILD_DIR, DIST_DIR, etc. with ../ and pass them to sub-Makefiles, so that sub-Makefiles can also use paths relative to the project root.
@@ -40,12 +40,6 @@ include $(SOURCE_DIR)/make/pwsh.mk
 # proxy settings
 include $(SOURCE_DIR)/make/proxy.mk
 
-# Sometimes we may want to run all commands in one shell session.
-# For example, we may want keep all testing logs in one session.
-# We can do this by enabling ONESHELL.
-# ifdef ONESHELL
-# .ONESHELL:
-# endif
 .PHONY: $(TARGETS)
 
 # TIP: We may add phony targets on demand
@@ -67,6 +61,9 @@ Executor: | $(BUILD_DIR) $(DIST_DIR)
 
 Tool: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Tool" $(COMMON_SUBMAKE_ARGS) AHK2EXE_PATH="$(AHK2EXE_PATH)"
+	
+Emulator:
+	$(MAKE) --directory="$(SOURCE_DIR)/Emulator" $(COMMON_SUBMAKE_ARGS)
 
 Manual: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Manual" MANUAL_NAME="$(MANUAL_NAME)" $(COMMON_SUBMAKE_ARGS)
