@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package Controller;
+package CSOL_Utilities.Protos.Controller;
 
 service ConfigurationService {
-  rpc RetrieveConfiguration(RetrieveConfigurationRequest) returns (RetrieveConfigurationResponse);
-  rpc UpdateConfiguration(UpdateConfigurationRequest) returns (UpdateConfigurationResponse);
+  rpc Retrieve(RetrieveConfigurationRequest) returns (RetrieveConfigurationResponse);
+  rpc Update(UpdateConfigurationRequest) returns (UpdateConfigurationResponse);
 }
 
 message RetrieveConfigurationRequest {

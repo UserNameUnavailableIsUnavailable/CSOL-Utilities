@@ -12,6 +12,7 @@
     },
     "clipper2",
     "lua",
-    "fmt"
+    "fmt",
+    "grpc"
   ]
 }

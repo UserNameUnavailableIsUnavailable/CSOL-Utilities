@@ -30,6 +30,7 @@ set(DOWNLOADS_DIR "${CMAKE_BINARY_DIR}/downloads")
 file(MAKE_DIRECTORY "${DOWNLOADS_DIR}")
 file(MAKE_DIRECTORY "${DEPENDENCIES_DIR}")
 
+add_subdirectory(Protos)
 add_subdirectory(Controller)
 add_subdirectory(Tool)
 add_subdirectory(Emulator)

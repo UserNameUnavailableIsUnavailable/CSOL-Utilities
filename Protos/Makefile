@@ -1,19 +1,19 @@
-SOURCE_DIR ?= ..
-BUILD_DIR ?= ./build
+﻿SOURCE_DIR ?= ..
+BUILD_TYPE ?= Release
+BUILD_DIR ?= ../build
+DIST_DIR ?= ../dist
 
 CURRENT_SOURCE_DIR = $(SOURCE_DIR)/Protos
 CURRENT_BUILD_DIR = $(BUILD_DIR)/gen/Protos
+CURRENT_BUILD_DIR = $(BUILD_DIR)/gen/Protos
+CURRENT_DIST_DIR = $(DIST_DIR)/Controller
 
-MODULES := Controller
-MODULE_DIRS := $(addprefix $(CURRENT_BUILD_DIR)/,$(MODULES))
 
-
-PROTO_SOURCE_FILES := $(foreach module,$(MODULES),$(wildcard $(CURRENT_SOURCE_DIR)/$(module)/*.proto))
-__proto_build_files := $(patsubst $(CURRENT_SOURCE_DIR)/%,$(CURRENT_BUILD_DIR)/%,$(PROTO_SOURCE_FILES))
-PROTO_CPP_FILES := $(__proto_build_files:.proto=.pb.cc) \
-				   $(__proto_build_files:.proto=.pb.h)
-
-PROTO_TARGETS := $(PROTO_CPP_FILES)
+CMAKE_SOURCE_DIR = $(SOURCE_DIR)
+CMAKE_BINARY_DIR = $(BUILD_DIR)
+CMAKE_INSTALL_PREFIX = $(CURRENT_DIST_DIR)
+CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
+include $(SOURCE_DIR)/make/cmake.mk
 
 include $(SOURCE_DIR)/make/pwsh.mk
 
@@ -21,16 +21,10 @@ include $(SOURCE_DIR)/make/pwsh.mk
 all: build
 
 .PHONY: build
-build: | $(CURRENT_BUILD_DIR) $(MODULE_DIRS) $(PROTO_TARGETS)
-
-$(CURRENT_BUILD_DIR)/%.pb.cc $(CURRENT_BUILD_DIR)/%.pb.h: $(CURRENT_SOURCE_DIR)/%.proto
-	protoc --proto_path="$(CURRENT_SOURCE_DIR)" --cpp_out="$(CURRENT_BUILD_DIR)" $<
+build:
+	cmake $(CMAKE_CONFIGURE_ARGS)
+	cmake $(CMAKE_BUILD_ARGS) --target GenerateProtos
 
 .PHONY: clean
 clean:
 	Remove-Item -Recurse -Force "$(CURRENT_BUILD_DIR)" -ErrorAction SilentlyContinue
-
-$(CURRENT_BUILD_DIR):
-	New-Item -Type Directory -Path "$(CURRENT_BUILD_DIR)" -Force
-$(MODULE_DIRS):
-	New-Item -Type Directory -Path "$@" -Force
