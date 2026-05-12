@@ -1,7 +1,5 @@
 #include "Classifier.hpp"
-
 #include <nlohmann/json.hpp>
-
 #include "Exception.hpp"
 #include "Utilities.hpp"
 

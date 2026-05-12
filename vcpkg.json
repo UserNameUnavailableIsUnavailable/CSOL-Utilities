@@ -4,11 +4,7 @@
     "nlohmann-json",
     "gtest",
     {
-      "name": "opencv",
-      "features": [
-        "default-features",
-        "thread"
-      ]
+      "name": "opencv"
     },
     "clipper2",
     "lua",

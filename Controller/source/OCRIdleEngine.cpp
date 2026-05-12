@@ -265,7 +265,8 @@ void OCRIdleEngine::Analyze()
         DWORD dwPId = 0;
         if (Global::RestartGameOnLoadingTimeout)
         {
-            GetWindowThreadProcessId(game_process_info_->get_window_handle(), &dwPId);
+            auto win32_window_handle = reinterpret_cast<HWND>(game_process_info_->get_window_handle());
+            GetWindowThreadProcessId(win32_window_handle, &dwPId);
             if (dwPId)
             {
                 Console::Warn(Translate("IdleEngine::OCR::INFO_TryKillGameProcess"));
@@ -362,14 +363,14 @@ void OCRIdleEngine::Recognize(std::vector<std::string> &results)
     thread_local std::vector<uint8_t> buffer;
     thread_local auto capture_error_count{0};
     results.clear(); /* 清空结果 */
-    auto game_window_handle = game_process_info_->get_window_handle();
-    if (!IsWindow(game_window_handle))
+    auto win32_game_window_handle = reinterpret_cast<HWND>(game_process_info_->get_window_handle());
+    if (!IsWindow(win32_game_window_handle))
     {
         return;
     }
     try
     {
-        CaptureWindowAsBmp(game_window_handle, buffer);
+        CaptureWindowAsBmp(win32_game_window_handle, buffer);
 #ifdef _DEBUG
         std::ofstream bmp_file("capture.bmp", std::ios::binary | std::ios::out | std::ios::trunc);
         bmp_file.write(reinterpret_cast<char *>(buffer.data()), buffer.size());

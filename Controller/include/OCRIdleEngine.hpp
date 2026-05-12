@@ -40,7 +40,7 @@ class OCRIdleEngine : public IdleEngine
     cv::Mat game_screenshot_;
     std::vector<uint8_t> image_buf_;
     aho_corasick::trie trie_;
-    std::function<void(HWND)> remove_window_border_;
+    std::function<void(std::uintptr_t)> remove_window_border_;
 
   private:
     virtual void Discriminate() override;

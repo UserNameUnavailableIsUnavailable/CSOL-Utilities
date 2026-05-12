@@ -10,9 +10,9 @@ class GameProcessInformation
     const std::wstring window_title_;              // 窗口标题
     const std::wstring executable_path_;           // 可执行文件路径
     const std::wstring launch_command_;            // 启动命令
-    std::atomic<HWND> window_handle_ = nullptr;    // 窗口句柄，会被多个线程访问
-    std::atomic<DWORD> process_id_ = 0;            // 进程 ID
-    std::atomic<HANDLE> process_handle_ = nullptr; // 进程句柄
+    std::atomic<std::uintptr_t> window_handle_ = 0;    // 窗口句柄，会被多个线程访问
+    std::atomic<std::uintptr_t> process_id_ = 0;            // 进程 ID
+    std::atomic<std::uintptr_t> process_handle_ = 0; // 进程句柄
   public:
     GameProcessInformation(std::wstring game_process_name, std::wstring game_window_title,
                            std::wstring game_executable_path, std::wstring game_process_launch_command)
@@ -25,8 +25,8 @@ class GameProcessInformation
     void clear() noexcept
     {
         set_process_id(0);
-        set_window_handle(nullptr);
-        set_process_handle(nullptr);
+        set_window_handle(0);
+        set_process_handle(0);
     }
     const std::wstring &get_process_name() const noexcept
     {
@@ -44,35 +44,27 @@ class GameProcessInformation
     {
         return launch_command_;
     }
-    HWND get_window_handle() const noexcept
+    std::uintptr_t get_window_handle() const noexcept
     {
         return window_handle_.load(std::memory_order_acquire);
     }
-    void set_window_handle(HWND hWnd) noexcept
+    void set_window_handle(std::uintptr_t window_handle) noexcept
     {
-        window_handle_.store(hWnd, std::memory_order_release);
+        window_handle_.store(window_handle, std::memory_order_release);
     }
-    DWORD get_process_id() const noexcept
+    std::uintptr_t get_process_id() const noexcept
     {
         return process_id_.load(std::memory_order_acquire);
     }
-    void set_process_id(DWORD pid) noexcept
+    void set_process_id(std::uintptr_t pid) noexcept
     {
         process_id_.store(pid, std::memory_order_release);
     }
-    HANDLE get_process_handle() const noexcept
+    std::uintptr_t get_process_handle() const noexcept
     {
         return process_handle_.load(std::memory_order_acquire);
     }
-    void set_process_handle(HANDLE hProcess) noexcept
-    {
-        // 执行原子交换，确保旧的进程句柄被正确关闭，防止资源泄漏
-        auto h = process_handle_.exchange(hProcess, std::memory_order_acq_rel);
-        if (h != nullptr && h != INVALID_HANDLE_VALUE)
-        {
-            CloseHandle(h);
-        }
-    }
+    void set_process_handle(std::uintptr_t process_handle) noexcept;
 };
 
 /* 游戏状态 */

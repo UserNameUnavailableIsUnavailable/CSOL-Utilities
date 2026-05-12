@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "vcpkg toolchain file")
-
-project(Protos CXX)
-
 find_package(protobuf CONFIG REQUIRED)
 
 set(MODULES Controller)
@@ -20,10 +15,10 @@ foreach(MODULE ${MODULES})
         PROTOC_OUT_DIR "${CMAKE_BINARY_DIR}/gen/Protos"
         # import proto source files from the current source directory
         IMPORT_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
-        VERBOSE
     )
 
     list(APPEND PROTO_GEN_FILES ${MODULE_GEN})
 endforeach()
 
-add_custom_target(GenerateProtos ALL DEPENDS ${PROTO_GEN_FILES})
+add_custom_target(Protos ALL DEPENDS ${PROTO_GEN_FILES})
+

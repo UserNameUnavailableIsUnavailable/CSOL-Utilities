@@ -28,7 +28,7 @@ try
         }
     }
     $out = $dir.FullName
-    Start-Process -FilePath "$CompilerPath" -ArgumentList "/in `"$src`" /out `"$out\$BinaryName.exe`"" -Wait
+    Start-Process -FilePath $CompilerPath -ArgumentList "/in `"$src`" /out `"$out\$BinaryName.exe`"" -Wait
 }
 catch
 {

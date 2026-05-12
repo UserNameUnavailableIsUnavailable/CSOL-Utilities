@@ -1,5 +1,9 @@
 #include "IdleEngine.hpp"
 
+#define NOMINMAX
+#include <Windows.h>
+#include <tlhelp32.h>
+
 #include "Console.hpp"
 #include "Global.hpp"
 #include "Utilities.hpp"
@@ -169,7 +173,8 @@ void IdleEngine::Watch()
 {
     if (process_state_ == GAME_PROCESS_STATE::RUNNING) // 游戏进程正在运行
     {
-        DWORD dwStatus = WaitForSingleObjectEx(game_process_info_->get_process_handle(), INFINITE,
+        auto process_handle = reinterpret_cast<HANDLE>(game_process_info_->get_process_handle());
+        DWORD dwStatus = WaitForSingleObjectEx(process_handle, INFINITE,
                                                TRUE); /* 等待进程退出，或新的 APC 出现 */
         if (dwStatus == WAIT_OBJECT_0)                /* 游戏进程退出 */
         {
@@ -184,7 +189,7 @@ void IdleEngine::Watch()
     }
     else if (process_state_ == GAME_PROCESS_STATE::BEING_CREATED) // 游戏进程正在创建
     {
-        assert(game_process_info_->get_process_handle() == nullptr);
+        assert(game_process_info_->get_process_handle() == 0);
         if (SearchGameWindow()) // 查找游戏窗口成功
         {
             SleepEx(10000, TRUE);     // 等待 10 秒，确保游戏进程完全启动
@@ -229,7 +234,7 @@ void IdleEngine::Watch()
     }
     else if (process_state_ == GAME_PROCESS_STATE::UNKNOWN) // 初始状态未知
     {
-        assert(game_process_info_->get_process_handle() == nullptr);
+        assert(game_process_info_->get_process_handle() == 0);
         if (SearchGameWindow()) // 查找游戏窗口
         {
             Console::Info(Translate("IdleEngine::GameProcessDetector::INFO_ProcessDetected@1",
@@ -257,18 +262,18 @@ bool IdleEngine::SearchGameWindow()
         const std::wstring window_title;             // 待查找的窗口标题
         bool found;                                  // 是否找到
         DWORD process_id;                            // 查到的进程 ID
-        HWND window_handle;                          // 查到的窗口句柄
-        HANDLE process_handle;                       // 查到的进程句柄
+        std::uintptr_t window_handle;                          // 查到的窗口句柄
+        std::uintptr_t process_handle;                       // 查到的进程句柄
     };
     WindowInformation params{
         .executable_path = game_process_info_->get_executable_path(),
         .window_title = game_process_info_->get_window_title(),
         .found = false,
         .process_id = 0,
-        .window_handle = nullptr,
-        .process_handle = nullptr,
+        .window_handle = 0,
+        .process_handle = 0,
     };
-    auto impl = [](HWND hWnd, LPARAM lParam) -> BOOL {
+    auto impl = [](HWND win32_window_handle, LPARAM lParam) -> BOOL {
         auto params = reinterpret_cast<WindowInformation *>(lParam);
 
         std::wstring window_title;
@@ -276,11 +281,11 @@ bool IdleEngine::SearchGameWindow()
         DWORD_PTR window_title_length = 0;
         // 向窗口发送 WM_GETTEXTLENGTH
         // 消息，获取窗口标题长度，需要设置超时时间，防止有部分窗口不响应该消息
-        auto ret = SendMessageTimeoutW(hWnd, WM_GETTEXTLENGTH, 0, 0, SMTO_ABORTIFHUNG, 200, &window_title_length);
+        auto ret = SendMessageTimeoutW(win32_window_handle, WM_GETTEXTLENGTH, 0, 0, SMTO_ABORTIFHUNG, 200, &window_title_length);
         if (ret == 0) // 失败或超时
         {
 #ifdef _DEBUG
-            Console::Debug(std::format("枚举窗口（句柄：0x{:X}）失败或超时。", reinterpret_cast<std::uintptr_t>(hWnd)));
+            Console::Debug(std::format("枚举窗口（句柄：0x{:X}）失败或超时。", reinterpret_cast<std::uintptr_t>(win32_window_handle)));
 #endif
             return TRUE; // 继续枚举下一个窗口
         }
@@ -289,27 +294,27 @@ bool IdleEngine::SearchGameWindow()
             return TRUE; // 继续枚举下一个窗口
         }
         window_title.resize(window_title_length + 1); // length 不包含 '\0'
-        auto iSize = GetWindowTextW(hWnd, window_title.data(), static_cast<int>(window_title.size()));
+        auto iSize = GetWindowTextW(win32_window_handle, window_title.data(), static_cast<int>(window_title.size()));
         window_title.resize(iSize); // iSize 为不含末尾空字符的实际长度
 #ifdef _DEBUG
-        Console::Debug(std::format("窗口句柄：0x{:#x}，窗口标题：{}", reinterpret_cast<std::uintptr_t>(hWnd),
+        Console::Debug(std::format("窗口句柄：0x{:#x}，窗口标题：{}", reinterpret_cast<std::uintptr_t>(win32_window_handle),
                                    ConvertUtf16ToUtf8(window_title)));
 #endif
         // 匹配窗口标题
         if (window_title == params->window_title)
         {
-            params->window_handle = hWnd;
+            params->window_handle = reinterpret_cast<std::uintptr_t>(win32_window_handle);
             // 获取窗口所属进程 ID
             DWORD dwOwnerProcessId = 0;
-            GetWindowThreadProcessId(hWnd, &dwOwnerProcessId);
+            GetWindowThreadProcessId(win32_window_handle, &dwOwnerProcessId);
             // 获取进程的可执行文件路径
             if (dwOwnerProcessId == 0) // 无法获取进程 ID
             {
                 return TRUE; // 继续枚举
             }
             // 打开进程
-            HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwOwnerProcessId);
-            if (!hProcess) // 无法打开进程
+            HANDLE win32_process_handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, dwOwnerProcessId);
+            if (!win32_process_handle) // 无法打开进程
             {
                 return TRUE; // 继续枚举
             }
@@ -317,7 +322,7 @@ bool IdleEngine::SearchGameWindow()
             std::filesystem::path p;
             try
             {
-                p = GetProcessImagePath(reinterpret_cast<uintptr_t>(hProcess));
+                p = GetProcessImagePath(reinterpret_cast<uintptr_t>(win32_process_handle));
             }
             catch (std::exception &e)
             {
@@ -331,12 +336,12 @@ bool IdleEngine::SearchGameWindow()
             {
                 params->found = true;
                 params->process_id = dwOwnerProcessId;
-                params->process_handle = hProcess;
+                params->process_handle = reinterpret_cast<std::uintptr_t>(win32_process_handle);
                 return FALSE; // 停止枚举
             }
             else
             {
-                CloseHandle(hProcess);
+                CloseHandle(win32_process_handle);
             }
         }
         return TRUE; // 继续枚举
@@ -351,9 +356,19 @@ bool IdleEngine::SearchGameWindow()
     }
     else
     {
-        game_process_info_->set_window_handle(nullptr);
+        game_process_info_->set_window_handle(0);
         game_process_info_->set_process_id(0);
-        game_process_info_->set_process_handle(nullptr);
+        game_process_info_->set_process_handle(0);
     }
     return params.found;
+}
+
+void GameProcessInformation::set_process_handle(std::uintptr_t window_handle) noexcept
+{
+    // 执行原子交换，确保旧的进程句柄被正确关闭，防止资源泄漏
+    auto h = process_handle_.exchange(window_handle, std::memory_order_acq_rel);
+    if (h != 0 && reinterpret_cast<HANDLE>(h) != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(reinterpret_cast<HANDLE>(h));
+    }
 }

@@ -39,6 +39,10 @@ COMMON_SUBMAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
 include $(SOURCE_DIR)/make/pwsh.mk
 # proxy settings
 include $(SOURCE_DIR)/make/proxy.mk
+CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
+CMAKE_SOURCE_DIR = $(SOURCE_DIR)
+CMAKE_BINARY_DIR = $(BUILD_DIR)
+include $(SOURCE_DIR)/make/cmake.mk
 
 .PHONY: $(TARGETS)
 
@@ -70,6 +74,10 @@ Manual: | $(BUILD_DIR) $(DIST_DIR)
 
 Bundle: | $(BUILD_DIR) $(DIST_DIR)
 	Compress-Archive -Path "$(DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
+
+.PHONY: prepare
+prepare:
+	cmake $(CMAKE_CONFIGURE_ARGS)
 
 .PHONY: testing
 TESTABLE_TARGETS := Controller

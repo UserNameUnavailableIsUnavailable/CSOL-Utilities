@@ -4,10 +4,6 @@
 // This file is included beforehand in other source files (see CMakeLists.txt),
 // so you needn't include this file explicitly.
 
-#define NOMINMAX
-#include <Windows.h>
-#include <tlhelp32.h>
-
 #include <clipper2/clipper.core.h>
 #include <clipper2/clipper.offset.h>
 #include <onnxruntime/onnxruntime_cxx_api.h>

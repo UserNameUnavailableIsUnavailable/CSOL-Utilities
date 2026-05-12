@@ -3,13 +3,15 @@
 #include "Exception.hpp"
 #include "Utilities.hpp"
 
+#include <Windows.h>
+
 namespace CSOL_Utilities
 {
 
 std::atomic_uint32_t HotKey::s_id_pool(0);
 
-HotKey::HotKey(uint32_t modifiers, uint32_t vk, HWND hWnd, bool defer_registration)
-    : id_(s_id_pool++), m_Modifiers(modifiers | MOD_NOREPEAT), m_Vk(vk), associate_window_(hWnd)
+HotKey::HotKey(uint32_t modifiers, uint32_t vk, std::uintptr_t window_handle, bool defer_registration)
+    : id_(s_id_pool++), m_Modifiers(modifiers | MOD_NOREPEAT), m_Vk(vk), associate_window_(window_handle)
 {
     if (!defer_registration)
     {
@@ -23,7 +25,7 @@ void HotKey::Register()
     {
         return;
     }
-    auto ok = RegisterHotKey(associate_window_, id_, m_Modifiers, m_Vk);
+    auto ok = RegisterHotKey(reinterpret_cast<HWND>(associate_window_), id_, m_Modifiers, m_Vk);
     if (!ok)
     {
         throw Exception(Translate("HotKey::ERROR_RegisterHotKey@2", Describe(), GetLastError()));
@@ -36,7 +38,7 @@ HotKey::~HotKey() noexcept
 {
     if (m_Success)
     {
-        UnregisterHotKey(associate_window_, id_);
+        UnregisterHotKey(reinterpret_cast<HWND>(associate_window_), id_);
     }
 }
 

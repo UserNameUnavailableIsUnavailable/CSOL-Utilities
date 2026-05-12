@@ -2,6 +2,7 @@
 
 #include "CSOBannerSuppressor.hpp"
 #include "CommandDispatcher.hpp"
+// TODO: Use HotKey2 instead
 #include "HotKey.hpp"
 #include "IdleEngine.hpp"
 #include "LowLevelKeyboardHook.hpp"

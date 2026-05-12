@@ -1,7 +1,5 @@
 <template>
     <div>
-        <button>click me</button>
-        <pre><code>{{ src }}</code></pre>
     </div>
 </template>
 
@@ -18,6 +16,5 @@ async function generateExecutorSrc() {
 
 onMounted(async () => {
     src.value = await generateExecutorSrc();
-    console.log(src.value);
 });
 </script>

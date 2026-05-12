@@ -1,5 +1,10 @@
 #pragma once
 
+// This header is Windows-specific.
+
+#define NOMINMAX
+#include <Windows.h>
+
 namespace CSOL_Utilities
 {
 class LowLevelKeyboardHook

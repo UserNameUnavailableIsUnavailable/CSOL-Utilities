@@ -23,7 +23,7 @@ const routes = [
     {
         path: "/ControllerSetting",
         component: ControllerSetting
-    }
+    },
 ];
 
 const intro = ref();

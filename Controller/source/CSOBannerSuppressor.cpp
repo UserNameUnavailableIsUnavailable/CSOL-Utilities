@@ -1,6 +1,9 @@
 ﻿#include "CSOBannerSuppressor.hpp"
 
 #include "Console.hpp"
+
+#include "Utilities.hpp"
+
 #include "Utilities.hpp"
 
 namespace CSOL_Utilities

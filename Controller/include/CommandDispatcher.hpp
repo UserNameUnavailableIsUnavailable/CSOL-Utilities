@@ -30,8 +30,8 @@ class CommandDispatcher : public Module
     bool has_worker_finished_ = true;
     const std::size_t COMMAND_BUFFER_SIZE = 512;
     std::filesystem::path cmd_file_path_; /* 用 filesystem 处理文件路径 */
-    BYTE *command_buffer_;                /* 命令缓冲区 */
-    HANDLE file_handle_;                  /* 命令内容大小基本固定，直接采用 Win32 API
+    char *command_buffer_;                /* 命令缓冲区 */
+    std::uintptr_t file_handle_;                  /* 命令内容大小基本固定，直接采用 Win32 API
                                              写命令以提高效率 */
 };
 

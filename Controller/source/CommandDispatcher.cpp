@@ -38,7 +38,7 @@ CommandDispatcher::CommandDispatcher(std::filesystem::path command_file_path)
     : cmd_file_path_(std::move(command_file_path))
 {
     command_buffer_ =
-        reinterpret_cast<BYTE *>(VirtualAlloc(nullptr, COMMAND_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+        reinterpret_cast<char*>(VirtualAlloc(nullptr, COMMAND_BUFFER_SIZE, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
     if (!command_buffer_)
     {
         throw Exception(Translate("ERROR_Win32_API@2", "VirtualAlloc", GetLastError()));
@@ -46,9 +46,10 @@ CommandDispatcher::CommandDispatcher(std::filesystem::path command_file_path)
 
     constexpr auto attrbutes = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
-    file_handle_ = CreateFileW(cmd_file_path_.wstring().c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS,
-                               attrbutes, NULL);
-    if (file_handle_ == INVALID_HANDLE_VALUE)
+    auto win32_file_handle = CreateFileW(cmd_file_path_.wstring().c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
+                               attrbutes, nullptr);
+    file_handle_ = reinterpret_cast<std::uintptr_t>(win32_file_handle);
+    if (reinterpret_cast<HANDLE>(file_handle_) == INVALID_HANDLE_VALUE)
     {
         throw Exception(Translate("ERROR_Win32_API@2", "CreateFileW", ConvertUtf16ToUtf8(cmd_file_path_.wstring())));
     }
@@ -113,18 +114,19 @@ void CommandDispatcher::Terminate() noexcept
 void CommandDispatcher::WriteCommandFile(std::string_view directives)
 {
     DWORD dwBytesWritten = 0;
-    SetFilePointer(file_handle_, 0, NULL, FILE_BEGIN);
+    auto win32_file_handle = reinterpret_cast<HANDLE>(file_handle_);
+    SetFilePointer(win32_file_handle, 0, nullptr, FILE_BEGIN);
     memset(command_buffer_, ' ', COMMAND_BUFFER_SIZE); // 用空格清空缓冲区
     assert(directives.length() < COMMAND_BUFFER_SIZE); // 命令不可能超过缓冲区大小
     memcpy(command_buffer_, directives.data(),
            directives.length() * sizeof(char)); // 拷贝命令内容
-    auto ok = WriteFile(file_handle_, command_buffer_, COMMAND_BUFFER_SIZE, &dwBytesWritten, NULL);
-    FlushFileBuffers(file_handle_);
+    auto ok = WriteFile(win32_file_handle, command_buffer_, COMMAND_BUFFER_SIZE, &dwBytesWritten, NULL);
+    FlushFileBuffers(win32_file_handle);
     if (ok)
     {
         // 直接写入 COMMAND_BUFFER_SIZE 字节，文件大小固定，因此不需要截断文件
-        // SetFilePointer(file_handle_, dwBytesWritten, NULL, FILE_BEGIN);
-        // SetEndOfFile(file_handle_);
+        // SetFilePointer(win32_file_handle, dwBytesWritten, NULL, FILE_BEGIN);
+        // SetEndOfFile(win32_file_handle);
     }
     else
     {
@@ -135,10 +137,10 @@ void CommandDispatcher::WriteCommandFile(std::string_view directives)
 CommandDispatcher::~CommandDispatcher() noexcept
 {
     Terminate();
-    if (file_handle_ && file_handle_ != INVALID_HANDLE_VALUE)
+    if (file_handle_ && reinterpret_cast<HANDLE>(file_handle_) != INVALID_HANDLE_VALUE)
     {
-        CloseHandle(file_handle_);
-        file_handle_ = INVALID_HANDLE_VALUE;
+        CloseHandle(reinterpret_cast<HANDLE>(file_handle_));
+        file_handle_ = reinterpret_cast<std::uintptr_t>(INVALID_HANDLE_VALUE);
     }
     if (command_buffer_)
     {

@@ -1,4 +1,5 @@
 #include "Configuration.hpp"
+#include <Windows.h>
 #include "Utilities.hpp"
 #include "Exception.hpp"
 #include "nlohmann/json_fwd.hpp"

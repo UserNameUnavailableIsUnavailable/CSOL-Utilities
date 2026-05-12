@@ -1,7 +1,17 @@
 ﻿#pragma once
 
+// Windows platform specific helpers.
+
+// TODO: Rename this header, explicitly state this is Windows specific.
+
+// Since this is Windows-specific, we can safely include Windows headers.
+#define NOMINMAX
+#include <Windows.h>
+#include <TlHelp32.h>
+
 namespace CSOL_Utilities
 {
+
 namespace Global
 {
 extern std::unordered_map<std::string, std::string> g_LanguagePackage; /* 语言包 */
@@ -19,7 +29,7 @@ void RemoveWindowBorder(HWND hWnd) noexcept;
 void CenterWindowClientArea(HWND hWnd) noexcept;
 void CenterWindow(HWND hWnd) noexcept;
 void QueryRegistryString(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValue, std::wstring &buffer);
-
+bool SafeTerminateProcess(HANDLE hProcess, DWORD dwMilliseconds) noexcept;
 template <typename... VA> class TranslationKey
 {
   public:
@@ -83,6 +93,4 @@ template <typename... VA> std::string Translate(TranslationKey<std::type_identit
         return ss.str();
     }
 }
-
-bool SafeTerminateProcess(HANDLE hProcess, DWORD dwMilliseconds) noexcept;
 } // namespace CSOL_Utilities

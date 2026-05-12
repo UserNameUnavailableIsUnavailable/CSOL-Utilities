@@ -25,25 +25,26 @@ void ClassifierIdleEngine::Discriminate()
     std::chrono::system_clock::time_point recognize_start = std::chrono::system_clock::now();
     auto interface_type = interface_type_.load(std::memory_order_acquire);
     auto game_window_handle = game_process_info_->get_window_handle();
-    if (!IsWindow(game_window_handle))
+    auto win32_game_window_handle = reinterpret_cast<HWND>(game_window_handle);
+    if (!IsWindow(win32_game_window_handle))
     {
         return;
     }
-    if (IsIconic(game_window_handle))
+    if (IsIconic(win32_game_window_handle))
     {
         // 尝试恢复窗口
-        ShowWindow(game_window_handle, SW_NORMAL);
+        ShowWindow(win32_game_window_handle, SW_NORMAL);
     }
-    if (GetForegroundWindow() != game_window_handle)
+    if (GetForegroundWindow() != win32_game_window_handle)
     {
         // 尝试将窗口置于最前，并激活
-        SetWindowPos(game_window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        SetWindowPos(win32_game_window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
-    CenterWindowClientArea(game_window_handle); // 将窗口客户区居中
+    CenterWindowClientArea(win32_game_window_handle); // 将窗口客户区居中
     auto current_tp = std::chrono::system_clock::now();
     try
     {
-        CaptureWindowAsBmp(game_window_handle, buffer);
+        CaptureWindowAsBmp(win32_game_window_handle, buffer);
     }
     catch (const std::exception &e)
     {
@@ -274,7 +275,7 @@ void ClassifierIdleEngine::Discriminate()
                 Console::Warn(Translate("IdleEngine::WARN_LoadingTimeout@1", 120));
                 if (Global::RestartGameOnLoadingTimeout)
                 {
-                    auto hProcess = game_process_info_->get_process_handle();
+                    auto hProcess = reinterpret_cast<HANDLE>(game_process_info_->get_process_handle());
                     if (hProcess)
                     {
                         Console::Warn(Translate("IdleEngine::INFO_TryKillGameProcess"));
@@ -366,7 +367,7 @@ void ClassifierIdleEngine::Discriminate()
             {
                 Console::Warn(Translate("IdleEngine::WARN_MaxInGameTimeReached@1", Global::MaxInGameTime));
                 // 强制结束游戏进程
-                auto hProcess = game_process_info_->get_process_handle();
+                auto hProcess = reinterpret_cast<HANDLE>(game_process_info_->get_process_handle());
                 if (hProcess)
                 {
                     Console::Warn(Translate("IdleEngine::INFO_TryKillGameProcess"));
