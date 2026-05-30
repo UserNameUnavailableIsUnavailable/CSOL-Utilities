@@ -1,9 +1,12 @@
+# Models are large files, so we store them in a separate repository and add it as a submodule.
 [submodule "Models"]
 	path = Models
 	url = git@hf.co:UserNameIsUnavailable/CSOL-Utilities-Models
+
+# Emulator and Tool are stored in separate repositories for better modularity and maintainability since they are not strictly part of the core utilities but rather additional components that can be developed and updated independently.
 [submodule "Emulator"]
 	path = Emulator
 	url = git@github.com:UserNameUnavailableIsUnavailable/LGHUB-Emulator.git
 [submodule "Tool"]
 	path = Tool
-	url = git@github.com:UserNameUnavailableIsUnavailable/CSOL-Utilities-Tool.git
+	url = git@github.com:UserNameUnavailableIsUnavailable/Gaming-HotKey-Tool.git
