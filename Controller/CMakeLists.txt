@@ -11,6 +11,8 @@ find_package(Clipper2 CONFIG REQUIRED)
 find_package(onnxruntime CONFIG REQUIRED)
 find_package(aho_corasick CONFIG REQUIRED)
 get_target_property(OPENCV_INCLUDES opencv_core INTERFACE_INCLUDE_DIRECTORIES)
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 add_library(
     ControllerLib
@@ -38,12 +40,16 @@ add_library(
     source/Utilities.cpp
     source/Classifier.cpp
     source/ClassifierIdleEngine.cpp
+    source/Server.cpp
+    ${CMAKE_BINARY_DIR}/gen/Protos/Controller/Configuration.pb.cc
+    ${CMAKE_BINARY_DIR}/gen/Protos/Controller/Configuration.grpc.pb.cc
 )
 
 target_include_directories(
     ControllerLib
     PUBLIC # make ControllerLib available to ControllerTesting
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/gen
 )
 
 target_link_libraries(
@@ -55,6 +61,8 @@ target_link_libraries(
     opencv_imgproc
     Clipper2::Clipper2
     CLI11::CLI11
+    gRPC::grpc++
+    protobuf::libprotobuf
 )
 
 target_compile_definitions(
@@ -63,7 +71,7 @@ target_compile_definitions(
     CONTROLLER_VERSION="${VERSION}"
 )
 
-Message(STATUS "Version defined in ControllerLib: ${VERSION}")
+message(STATUS "Version defined in ControllerLib: ${VERSION}")
 
 target_precompile_headers(
     ControllerLib

@@ -8,6 +8,7 @@ file(GLOB CONTROLLER_TEST_SOURCES CONFIGURE_DEPENDS
 
 add_executable(
     ControllerTesting
+    ServerTest
     ${CONTROLLER_TEST_SOURCES}
 )
 
