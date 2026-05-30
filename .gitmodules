@@ -1,0 +1,9 @@
+[submodule "Models"]
+	path = Models
+	url = git@hf.co:UserNameIsUnavailable/CSOL-Utilities-Models
+[submodule "Emulator"]
+	path = Emulator
+	url = git@github.com:UserNameUnavailableIsUnavailable/LGHUB-Emulator.git
+[submodule "Tool"]
+	path = Tool
+	url = git@github.com:UserNameUnavailableIsUnavailable/CSOL-Utilities-Tool.git
