@@ -379,4 +379,4 @@ if not __JSON_LUA__ then
         end
         return res
     end
-end -- __JSON_LUA__
+end -- !__JSON_LUA__

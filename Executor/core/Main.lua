@@ -53,4 +53,4 @@ if not __MAIN_LUA__ then
     function Main(args)
         StartUp()
     end
-end -- __MAIN_LUA__
+end -- !__MAIN_LUA__

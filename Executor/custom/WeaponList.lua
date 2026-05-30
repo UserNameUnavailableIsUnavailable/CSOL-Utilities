@@ -6,7 +6,7 @@ if not __WEAPON_LIST_LUA__ then
     Version:set("WeaponList", __version__)
     Version:require("WeaponList", "Setting", __version__)
     Version:require("WeaponList", "Weapon", __version__)
-    
+
     Armor =
         Weapon:new({ name = "护甲", })
 
@@ -39,4 +39,4 @@ if not __WEAPON_LIST_LUA__ then
         Weapon:new({ name = "扩展武器列表 — 特殊武器 1" }),
         Weapon:new({ name = "扩展武器列表 — 特殊武器 2" })
     }
-end -- __WEAPON_LIST_LUA__
+end -- !__WEAPON_LIST_LUA__

@@ -216,4 +216,4 @@ if not __EMULATOR_LUA__ then
     function __IsEmulating__()
         return Emulator.IsEmulating()
     end
-end -- __EMULATOR_LUA__
+end -- !__EMULATOR_LUA__

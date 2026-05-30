@@ -129,4 +129,4 @@ if not __COMMAND_LUA__ then
         end
         return Command.CMD_NOP
     end
-end -- __COMMAND_LUA__
+end -- !__COMMAND_LUA__

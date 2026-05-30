@@ -318,4 +318,4 @@ if not __MOUSE_LUA__ then
     Runtime:register_fatal_handler(function()
         Mouse:reset()
     end)
-end -- __MOUSE_LUA__
+end -- !__MOUSE_LUA__

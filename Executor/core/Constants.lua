@@ -267,4 +267,4 @@ if not __CONSTANTS_LUA__ then
         },
         ---@alias MOUSE_BUTTON Constants.MOUSE_BUTTON
     }
-end -- __CONSTANTS_LUA__
+end -- !__CONSTANTS_LUA__

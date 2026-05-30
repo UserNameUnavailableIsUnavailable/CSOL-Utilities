@@ -387,4 +387,4 @@ if not __RUNTIME_LUA__ then
         end
         error(("程序发生灾难错误，无法继续运行。灾难错误：%s"):format(tostring(e))) -- 抛出致命错误
     end
-end -- __RUNTIME_LUA__
+end -- !__RUNTIME_LUA__

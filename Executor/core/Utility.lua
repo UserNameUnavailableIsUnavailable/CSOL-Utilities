@@ -45,4 +45,4 @@
         local json = JSON.encode(t)
         OutputDebugMessage(json)
     end
-end -- Utility_lua
+end -- !__UTILITY_LUA__

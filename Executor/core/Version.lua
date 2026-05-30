@@ -1,7 +1,7 @@
 if not __VERSION_LUA__ then
     __VERSION_LUA__ = true
     local __version__ = "1.6.0"
-    
+
     ---@class Version
     ---@field private records table<string, string>
     ---@field private requirements function[]
@@ -96,4 +96,4 @@ if not __VERSION_LUA__ then
         Console:info("版本断言检查通过。")
         self.requirements = {} -- 通过，释放空间
     end
-end -- __VERSION_LUA__
+end -- !__VERSION_LUA__

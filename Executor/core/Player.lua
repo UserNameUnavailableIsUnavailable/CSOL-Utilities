@@ -305,4 +305,4 @@ if not __PLAYER_LUA__ then
         self:attack_with_conventional_weapons()
         self:attack_with_special_weapons()
     end
-end -- __PLAYER_LUA__
+end -- !__PLAYER_LUA__

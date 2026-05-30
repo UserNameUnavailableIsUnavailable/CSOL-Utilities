@@ -585,4 +585,4 @@ if not __AUTOMATION_LUA__ then
 			Automation:studio_mode_start_game()
 		end,
 	}
-end -- __AUTOMATION_LUA__
+end -- !__AUTOMATION_LUA__

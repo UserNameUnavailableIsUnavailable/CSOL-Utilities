@@ -57,4 +57,4 @@ if not __Event_LUA__ then
         end
     end
 
-end -- __Event_LUA__
+end -- !__Event_LUA__

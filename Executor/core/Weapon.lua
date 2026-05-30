@@ -327,4 +327,4 @@
         disposal = self:strafe_iterator(-1, timepoint) -- 强制结束扫射
         if disposal then disposal() end
     end
-end -- __WEAPON_LUA__
+end -- !__WEAPON_LUA__

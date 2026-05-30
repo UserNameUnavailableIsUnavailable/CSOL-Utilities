@@ -17,4 +17,4 @@ if not __DELAY_LUA__ then
         LONG_LONG = 500,
         REFRESH = 1000,
     }
-end -- __DELAY_LUA__
+end -- !__DELAY_LUA__

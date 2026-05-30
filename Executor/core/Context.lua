@@ -24,4 +24,4 @@ if not __CONTEXT_LUA__ then
         setmetatable(obj, self)
         return obj
     end
-end -- __CONTEXT_LUA__
+end -- !__CONTEXT_LUA__

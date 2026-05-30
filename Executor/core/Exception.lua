@@ -1,7 +1,7 @@
 if not __ERROR_LUA__ then
     __ERROR_LUA__ = true
     local __version__ = "1.6.0"
-    
+
     Include("core/JSON.lua")
     Include("core/Version.lua")
     Version:set("Error", __version__)
@@ -98,4 +98,4 @@ if not __ERROR_LUA__ then
             traceback = self.traceback
         })
     end
-end -- __ERROR_LUA__
+end -- !__ERROR_LUA__

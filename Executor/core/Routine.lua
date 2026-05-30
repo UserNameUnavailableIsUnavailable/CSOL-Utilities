@@ -87,4 +87,4 @@ if not __ROUTINE_LUA__ then
     function Routine:get_result()
         return self.result
     end
-end -- __ROUTINE_LUA__
+end -- !__ROUTINE_LUA__

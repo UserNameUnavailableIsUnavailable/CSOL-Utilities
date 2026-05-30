@@ -1,5 +1,5 @@
-if not Console_lua then
-    Console_lua = true
+if not __CONSOLE_LUA__ then
+    __CONSOLE_LUA__ = true
     local __version__ = "1.6.0"
 
     Include("core/Emulator.lua")
@@ -117,4 +117,4 @@ if not Console_lua then
     function Console:clear()
         ClearLog()
     end
-end -- Console_lua
+end -- !__CONSOLE_LUA__

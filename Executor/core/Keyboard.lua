@@ -527,4 +527,4 @@ if not __KEYBOARD_LUA__ then
     Runtime:register_fatal_handler(function()
         Keyboard:reset()
     end)
-end -- __KEYBOARD_LUA__
+end -- !__KEYBOARD_LUA__
