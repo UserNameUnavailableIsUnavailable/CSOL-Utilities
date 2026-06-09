@@ -520,7 +520,8 @@ if not __AUTOMATION_LUA__ then
 
 	---清除所有弹窗。
 	function Automation:clear_popups()
-		Keyboard:click(Keyboard.ESCAPE, 2000)
+        Mouse:click_on(Mouse.MIDDLE, 32768, 32768) -- activate the window without side effects
+		Keyboard:click(Keyboard.ESCAPE, 1000)
 	end
 
 	---缔造者模式下额外点击一个“开始游戏”按钮，开始游戏。

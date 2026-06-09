@@ -13,6 +13,8 @@ lerna-debug.log*
 /dist-ssr/
 *.local
 
+/src-tauri/gen/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

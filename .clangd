@@ -1,9 +1,9 @@
 # Global library paths and macros
 CompileFlags:
   Add:
-    - -Ibuild/vcpkg_installed/x64-windows/include
-    - -Ibuild/vcpkg_installed/x64-windows/include/opencv4
-    - -Ibuild/gen
+    - -Ivcpkg_installed/x64-windows/include
+    - -Ivcpkg_installed/x64-windows/include/opencv4
+    - -Igen
     - -D_DEBUG
     - -DVERSION
 Completion:

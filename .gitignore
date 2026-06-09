@@ -1,5 +1,6 @@
 build/
-# build artifacts and temporary files
+out/
+target/
 dist/
 dist-ssr/
 tmp/
@@ -7,9 +8,12 @@ temp/
 .mypy_cache/
 .venv/
 .vs/
-out/
-target/
-gen/schemas/
+gen/
+generated/
+dep/
+deps/
+dependencies/
+downloads/
 
 # logs
 logs/
@@ -22,6 +26,7 @@ lerna-debug.log*
 .VSCodeCounter/
 
 # package manager directories
+vcpkg_installed/
 node_modules/
 *.local
 

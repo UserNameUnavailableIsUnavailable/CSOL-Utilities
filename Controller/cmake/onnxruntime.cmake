@@ -9,7 +9,7 @@ set(VERSION "1.22.0")
 set(ZIP_NAME "onnxruntime-win-x64-${VERSION}")
 set(ZIP_URL "https://github.com/microsoft/onnxruntime/releases/download/v${VERSION}/${ZIP_NAME}.zip")
 set(ZIP_PATH "${DOWNLOADS_DIR}/${ZIP_NAME}.zip")
-set(EXTRACT_DIR "${CMAKE_BINARY_DIR}/downloads")
+set(EXTRACT_DIR "${DOWNLOADS_DIR}")
 
 # Check if HTTP_PROXY or HTTPS_PROXY is set
 if(DEFINED ENV{HTTPS_PROXY})
@@ -46,14 +46,15 @@ endif()
 file(ARCHIVE_EXTRACT
     INPUT "${ZIP_PATH}"
     DESTINATION "${EXTRACT_DIR}"
+    VERBOSE
 )
 
-file(GLOB items "${CMAKE_BINARY_DIR}/downloads/${ZIP_NAME}/include/*")
+file(GLOB items "${DOWNLOADS_DIR}/${ZIP_NAME}/include/*")
 foreach(item IN LISTS items)
     file(COPY "${item}" DESTINATION "${DEPENDENCIES_DIR}/include/onnxruntime")
 endforeach(item IN LISTS items)
 
-file(GLOB items "${CMAKE_BINARY_DIR}/downloads/${ZIP_NAME}/lib/*")
+file(GLOB items "${DOWNLOADS_DIR}/${ZIP_NAME}/lib/*")
 foreach(item IN LISTS items)
     # copy .lib to lib
     if (item MATCHES "\\.lib$")
@@ -66,5 +67,4 @@ foreach(item IN LISTS items)
         file(COPY "${item}" DESTINATION "${DEPENDENCIES_DIR}/bin")
     endif()
 endforeach(item IN LISTS items)
-file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/downloads/${ZIP_NAME}")
 set(onnxruntime_installed ON CACHE BOOL "onnxruntime installed" FORCE)

@@ -37,8 +37,7 @@ COMMON_SUBMAKE_ARGS = SOURCE_DIR="../$(SOURCE_DIR)" \
 
 # Use PowerShell v7+ as the shell for this Makefile
 include $(SOURCE_DIR)/make/pwsh.mk
-# proxy settings
-include $(SOURCE_DIR)/make/proxy.mk
+
 CMAKE_CONFIG_TYPE = $(BUILD_TYPE)
 CMAKE_SOURCE_DIR = $(SOURCE_DIR)
 CMAKE_BINARY_DIR = $(BUILD_DIR)

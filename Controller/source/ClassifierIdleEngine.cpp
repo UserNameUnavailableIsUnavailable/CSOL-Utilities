@@ -34,11 +34,13 @@ void ClassifierIdleEngine::Discriminate()
     {
         // 尝试恢复窗口
         ShowWindow(win32_game_window_handle, SW_NORMAL);
+        return; // 等待下一轮判定
     }
     if (GetForegroundWindow() != win32_game_window_handle)
     {
         // 尝试将窗口置于最前，并激活
         SetWindowPos(win32_game_window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        return; // 等待下一轮判定
     }
     CenterWindowClientArea(win32_game_window_handle); // 将窗口客户区居中
     auto current_tp = std::chrono::system_clock::now();

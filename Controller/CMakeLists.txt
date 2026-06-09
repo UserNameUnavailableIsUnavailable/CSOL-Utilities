@@ -41,15 +41,15 @@ add_library(
     source/Classifier.cpp
     source/ClassifierIdleEngine.cpp
     source/Server.cpp
-    ${CMAKE_BINARY_DIR}/gen/Protos/Controller/Configuration.pb.cc
-    ${CMAKE_BINARY_DIR}/gen/Protos/Controller/Configuration.grpc.pb.cc
+    ${GENERATED_DIR}/Protos/Controller/Configuration.pb.cc
+    ${GENERATED_DIR}/Protos/Controller/Configuration.grpc.pb.cc
 )
 
 target_include_directories(
     ControllerLib
     PUBLIC # make ControllerLib available to ControllerTesting
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/gen
+    ${GENERATED_DIR}
 )
 
 target_link_libraries(
