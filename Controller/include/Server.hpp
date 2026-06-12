@@ -1,13 +1,12 @@
-#include <functional>
+#pragma once
 
 #include <grpcpp/grpcpp.h>
-#include <grpcpp/impl/service_type.h>
 
 #include "NonCopyable.hpp"
 
 namespace CSOL_Utilities
 {
-class Server : NonCopyable
+class Server : public NonCopyable
 {
     enum class Status
     {
@@ -19,7 +18,7 @@ public:
     explicit Server(const std::string& address);
     ~Server() noexcept;
 
-    void Start(std::function<void()> on_ready = nullptr);
+    void Start(std::function<void()> on_before_wait = nullptr);
     void Stop();
     void Register(std::string name, std::unique_ptr<grpc::Service> service);
 

@@ -8,7 +8,6 @@ Server::Server(const std::string& address)
 
 static const char* kErrorNotIdle = "The server has already been started or is being started.";
 static const char* kErrorNotRunning = "The server is not running.";
-
 void Server::Register(std::string name, std::unique_ptr<grpc::Service> service)
 {
     if (status_.load(std::memory_order_acquire) != Status::kIdle)

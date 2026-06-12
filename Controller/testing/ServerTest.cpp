@@ -1,18 +1,19 @@
 #include <gtest/gtest.h>
 
 #include "Server.hpp"
+
 #include "Protos/Controller/Configuration.pb.h"
 #include "Protos/Controller/Configuration.grpc.pb.h"
 
 using namespace CSOL_Utilities;
 
-class ConfigurationServiceImpl : public Protos::Controller::ConfigurationService::Service
+class ConfigurationServiceImpl : public Protos::Controller::Configuration::Service
 {
 public:
     virtual grpc::Status Retrieve(
         grpc::ServerContext* context,
-        const Protos::Controller::RetrieveConfigurationRequest* request,
-        Protos::Controller::RetrieveConfigurationResponse* response
+        const Protos::Controller::RetrieveRequest* request,
+        Protos::Controller::RetrieveResponse* response
     ) override
     {
         response->set_data("example");
@@ -21,8 +22,8 @@ public:
     }
     virtual grpc::Status Update(
         grpc::ServerContext* context,
-        const Protos::Controller::UpdateConfigurationRequest* request,
-        Protos::Controller::UpdateConfigurationResponse* response
+        const Protos::Controller::UpdateRequest* request,
+        Protos::Controller::UpdateResponse* response
     ) override
     {
         std::cout << "data received:\n";
@@ -35,11 +36,11 @@ public:
 class ConfigurationClientImpl
 {
 public:
-    ConfigurationClientImpl(std::shared_ptr<grpc::Channel> channel) : stub_(Protos::Controller::ConfigurationService::NewStub(channel)) {}
+    ConfigurationClientImpl(std::shared_ptr<grpc::Channel> channel) : stub_(Protos::Controller::Configuration::NewStub(channel)) {}
     std::string Retrieve()
     {
-        Protos::Controller::RetrieveConfigurationRequest req;
-        Protos::Controller::RetrieveConfigurationResponse res;
+        Protos::Controller::RetrieveRequest req;
+        Protos::Controller::RetrieveResponse res;
         grpc::ClientContext ctx;
         grpc::Status status = stub_->Retrieve(&ctx, req, &res);
         if (status.ok()) {
@@ -49,7 +50,7 @@ public:
         }
     }
 private:
-    std::unique_ptr<Protos::Controller::ConfigurationService::Stub> stub_;
+    std::unique_ptr<Protos::Controller::Configuration::Stub> stub_;
 };
 
 TEST(ServerTest, ConfigService)
