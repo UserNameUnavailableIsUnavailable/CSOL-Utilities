@@ -3,7 +3,7 @@ CompileFlags:
   Add:
     - -Ivcpkg_installed/x64-windows/include
     - -Ivcpkg_installed/x64-windows/include/opencv4
-    - -Igen
+    - -Igenerated
     - -D_DEBUG
     - -DVERSION
 Completion:
@@ -26,9 +26,10 @@ If:
   PathMatch: Controller/.*
 CompileFlags:
   Add: [
-    "-Ibuild/dependencies/include",
+    "-Idependencies/include",
     "-IController/include",
-    "-include pch.hpp"
+    "-include",
+    "pch.hpp"
   ]
 ---
 # Tool
