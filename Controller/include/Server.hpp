@@ -1,6 +1,7 @@
 #pragma once
 
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/impl/service_type.h>
 
 #include "NonCopyable.hpp"
 

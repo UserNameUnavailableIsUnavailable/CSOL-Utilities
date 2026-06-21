@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 if (onnxruntime_installed)
     return()
 endif()
-set(VERSION "1.22.0")
+set(VERSION "1.10.0")
 
 set(ZIP_NAME "onnxruntime-win-x64-${VERSION}")
 set(ZIP_URL "https://github.com/microsoft/onnxruntime/releases/download/v${VERSION}/${ZIP_NAME}.zip")

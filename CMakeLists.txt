@@ -34,7 +34,7 @@ file(MAKE_DIRECTORY "${DOWNLOADS_DIR}")
 file(MAKE_DIRECTORY "${DEPENDENCIES_DIR}")
 file(MAKE_DIRECTORY "${GENERATED_DIR}")
 
-add_subdirectory(Protos)
+add_subdirectory(Protocol)
 add_subdirectory(Controller)
 add_subdirectory(Tool)
 add_subdirectory(Emulator)

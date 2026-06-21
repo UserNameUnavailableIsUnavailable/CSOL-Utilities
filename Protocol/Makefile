@@ -13,10 +13,13 @@ include $(SOURCE_DIR)/make/pwsh.mk
 .PHONY: all
 all: build
 
+.PHONY: configure
+configure:
+	cmake $(CMAKE_CONFIGURE_ARGS)
+
 .PHONY: build
 build:
-	cmake $(CMAKE_CONFIGURE_ARGS)
-	cmake $(CMAKE_BUILD_ARGS) --target Protos
+	cmake $(CMAKE_BUILD_ARGS) --target Protocol
 
 .PHONY: clean
 clean:

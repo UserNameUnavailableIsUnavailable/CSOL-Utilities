@@ -21,7 +21,6 @@ all: build install
 
 .PHONY: build
 build: | $(CURRENT_BUILD_DIR)
-	cmake $(CMAKE_CONFIGURE_ARGS)
 	cmake $(CMAKE_BUILD_ARGS) --target Controller
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.ps1" "$(BUILD_DIR)/Controller.ps1" -Force
 	Copy-Item "$(CURRENT_SOURCE_DIR)/Controller.cmd" "$(BUILD_DIR)/Controller.cmd" -Force
@@ -35,7 +34,6 @@ install:
 
 .PHONY: testing
 testing:
-	cmake $(CMAKE_CONFIGURE_ARGS) -DBUILD_TESTING=ON
 	cmake $(CMAKE_BUILD_ARGS) --target ControllerTesting
 	ctest --test-dir "$(CMAKE_BINARY_DIR)" -C "$(BUILD_TYPE)" --output-on-failure --progress --verbose
 .PHONY: clean

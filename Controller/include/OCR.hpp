@@ -46,8 +46,8 @@ class OCR_Detector
     std::unique_ptr<Ort::Session> session;
     std::unique_ptr<Ort::Env> env_;
     Ort::SessionOptions sessionOptions;
-    std::vector<Ort::AllocatedStringPtr> input_names_;
-    std::vector<Ort::AllocatedStringPtr> output_names_;
+    std::vector<std::string> input_names_;
+    std::vector<std::string> output_names_;
 
     std::filesystem::path model_path_;
     float dilation_offset_ratio_ = 1.5f;
@@ -73,8 +73,8 @@ class OCR_Recognizer
     std::unique_ptr<Ort::Session> session;
     std::unique_ptr<Ort::Env> env_;
     Ort::SessionOptions session_opts_;
-    std::vector<Ort::AllocatedStringPtr> input_names_;
-    std::vector<Ort::AllocatedStringPtr> output_names_;
+    std::vector<std::string> input_names_;
+    std::vector<std::string> output_names_;
     const int dstHeight = 48;
     std::string ScoreToText(const std::vector<float> &score, size_t h, size_t w);
     std::vector<std::string> dictionary_; // 语言字典

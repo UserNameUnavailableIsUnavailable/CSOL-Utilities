@@ -1,0 +1,21 @@
+{
+    "Controller": {
+        "Locale": "zh-CN",
+        "GameRootDir": "C:\\Program Files (x86)\\TCGAME\\TCGameApps\\csol",
+        "Launch": [
+            "C:\\Program Files (x86)\\TCGAME\\tcgame.exe",
+            "cso"
+        ],
+        "ExecutorCommandFilePath": "Executor\\cmd.lua",
+        "StartGameRoomTimeout": 120,
+        "LoginTimeout": 600,
+        "LoadMapTimeout": 300,
+        "DefaultIdleAfterReconnection": true,
+        "RestartGameOnLoadingTimeout": true,
+        "SuppressCSOBanner": true,
+        "InferenceModel": {
+            "MetadataPath": "Models\\ResNet-800x600.json",
+            "ModelPath": "Models\\ResNet18-800x600.onnx"
+        }
+    }
+}

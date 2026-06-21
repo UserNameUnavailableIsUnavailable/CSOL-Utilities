@@ -162,8 +162,18 @@ std::vector<std::array<cv::Point, 4>> OCR_Detector::Run(const cv::Mat &image)
 
     assert(inputTensor.IsTensor());
 
-    std::vector<const char *> inputNames = {input_names_.data()->get()};
-    std::vector<const char *> outputNames = {output_names_.data()->get()};
+    std::vector<const char *> inputNames;
+    inputNames.reserve(input_names_.size());
+    for (const auto &name : input_names_)
+    {
+        inputNames.push_back(name.c_str());
+    }
+    std::vector<const char *> outputNames;
+    outputNames.reserve(output_names_.size());
+    for (const auto &name : output_names_)
+    {
+        outputNames.push_back(name.c_str());
+    }
     auto results = session->Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, inputNames.size(),
                                 outputNames.data(), outputNames.size());
     assert(results.size() == 1 && results.front().IsTensor());

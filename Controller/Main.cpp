@@ -18,6 +18,28 @@ std::function<void()> g_ctrl_c_callback;
 void InitializeCommandLineArgs(CLI::App &app, int argc, wchar_t *argv[]);
 void Boot(std::unique_ptr<Driver> &driver);
 
+const char* FOZU = 
+R"(
+                            _ooOoo_
+                           o8888888o
+                           88" . "88
+                           (| -_- |)
+                            O\ = /O
+                        ____/`---'\____
+                      .   ' \\| |// `.
+                       / \\||| : |||// \
+                     / _||||| -:- |||||- \
+                       | | \\\ - /// | |
+                     | \_| ''\---/'' | |
+                      \ .-\__ `-` ___/-. /
+                   ___`. .' /--.--\ `. . __
+                ."" '< `.___\_<|>_/___.' >'"".
+               | | : `- \`.;`\ _ /`;.`/ - ` : | |
+                 \ \ `-. \_ __\ /__ _/ .-` / /
+         ======`-.____`-.___\_____/___.-`____.-'======
+                            `=---='
+)";
+
 /* 使用 wmain 作为入口，确保命令行参数以 UTF-16 传入 */
 int wmain(int argc, wchar_t *argv[])
 {

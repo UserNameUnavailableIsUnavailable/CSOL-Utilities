@@ -24,7 +24,7 @@ BUNDLE_NAME = $(DISTRO).zip
 # AutoHotkey Compiler
 AHK2EXE_PATH := C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe
 
-TARGETS := Controller Executor Tool Emulator Manual Bundle
+TARGETS := Controller Executor Tool Emulator Manual Bundle Models Protocol
 
 # We use paths relative to the project root across all Makefiles for consistency.
 # We prefix SOURCE_DIR, BUILD_DIR, DIST_DIR, etc. with ../ and pass them to sub-Makefiles, so that sub-Makefiles can also use paths relative to the project root.
@@ -48,16 +48,22 @@ include $(SOURCE_DIR)/make/cmake.mk
 # TIP: We may add phony targets on demand
 # For clarity, targets representing project modules start with uppercase, others are lowercased.
 # default target
-.PHONY: all
-all: $(TARGETS)
+.PHONY: prepare all
+all: prepare $(TARGETS)
 
-# TODO: Add Protos to TARGETS on finish
-.PHONY: Protos
-Protos:
-	$(MAKE) --directory="$(SOURCE_DIR)/Protos" $(COMMON_SUBMAKE_ARGS)
+prepare:
+	cmake $(CMAKE_CONFIGURE_ARGS)
+
+Protocol:
+	$(MAKE) --directory="$(SOURCE_DIR)/Protocol" $(COMMON_SUBMAKE_ARGS)
 
 Controller: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Controller" $(COMMON_SUBMAKE_ARGS)
+
+Models: | $(BUILD_DIR) $(DIST_DIR)
+	New-Item -Type SymbolicLink -Target "$(BUILD_DIR)/Models/artifacts" -Path "$(BUILD_DIR)/Models" -Force
+	if (Test-Path "$(DIST_DIR)/Models") { Remove-Item -Recurse -Force "$(DIST_DIR)/Models" }
+	Copy-Item "$(SOURCE_DIR)/Models/artifacts" "$(DIST_DIR)/Models" -Recurse -Force
 
 Executor: | $(BUILD_DIR) $(DIST_DIR)
 	$(MAKE) --directory="$(SOURCE_DIR)/Executor" $(COMMON_SUBMAKE_ARGS)
@@ -73,10 +79,6 @@ Manual: | $(BUILD_DIR) $(DIST_DIR)
 
 Bundle: | $(BUILD_DIR) $(DIST_DIR)
 	Compress-Archive -Path "$(DIST_DIR)/*" -DestinationPath "$(DIST_ROOT)/$(BUNDLE_NAME)" -Force
-
-.PHONY: prepare
-prepare:
-	cmake $(CMAKE_CONFIGURE_ARGS)
 
 .PHONY: testing
 TESTABLE_TARGETS := Controller

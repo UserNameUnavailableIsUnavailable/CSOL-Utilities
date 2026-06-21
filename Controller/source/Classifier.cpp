@@ -1,26 +1,21 @@
 #include "Classifier.hpp"
 #include <nlohmann/json.hpp>
-#include "Exception.hpp"
+#include "ModelUtilities.hpp"
 #include "Utilities.hpp"
 
 using namespace CSOL_Utilities;
 
-Classifier::Classifier(std::filesystem::path json_path)
+void Classifier::LoadMetadata(Classifier& classifier, const std::filesystem::path& metadata_path)
 {
-    if (!std::filesystem::is_regular_file(json_path))
+    std::ifstream ifs(metadata_path);
+    if (!ifs.is_open())
     {
-        throw Exception(Translate("ERROR_FileNotFound@1", ConvertUtf16ToUtf8(json_path)));
+        throw std::runtime_error(std::format("Failed to open {}", ConvertUtf16ToUtf8(metadata_path.wstring())));
     }
-    std::ifstream json_fstream(json_path);
-    if (!json_fstream)
-    {
-        throw Exception(Translate("ERROR_FailedToReadLabelFile@1", ConvertUtf16ToUtf8(json_path)));
-    }
-    nlohmann::json metadata_json;
-    json_fstream >> metadata_json;
-    // JSON 样例
+    nlohmann::json metadata;
+    ifs >> metadata;
+    // JSON template
     // {
-    //     "model_path": "resnet18.onnx",
     //     "labels": [
     //         { "0": "foo" },
     //         { "1": "bar" }
@@ -31,81 +26,56 @@ Classifier::Classifier(std::filesystem::path json_path)
     //    "width": 800,
     //    "height": 600
     // }
-    if (!metadata_json.contains("model_path"))
-    {
-        throw Exception(Translate("ERROR_MandatoryFieldMissing@1", "model_path"));
-    }
-    model_path_ = metadata_json["model_path"].get<std::string>();
-    if (model_path_.is_relative()) // 若是相对路径，则相对于 JSON 文件所在目录
-    {
-        model_path_ = json_path.parent_path() / model_path_;
-    }
-    if (metadata_json.contains("confidence_threshold"))
-    {
-        confidence_threshold_ = metadata_json["confidence_threshold"].get<float>();
-    }
-    if (!metadata_json.contains("labels")) // labels 为必填项
-    {
-        throw Exception(Translate("ERROR_MandatoryFieldMissing@1", "labels"));
-    }
-    for (auto &item : metadata_json["labels"])
-    {
-        for (auto &[key, value] : item.items())
-        {
-            int index = std::stoi(key);
-            labels_.emplace(index, value.get<std::string>());
-        }
-    }
-    if (metadata_json.contains("mean"))
-    {
-        auto mean_array = metadata_json["mean"].get<std::vector<float>>();
-        for (size_t i = 0; i < 3 && i < mean_array.size(); ++i)
-        {
-            mean_[i] = mean_array[i];
-        }
-    }
-    if (metadata_json.contains("std"))
-    {
-        auto std_array = metadata_json["std"].get<std::vector<float>>();
-        for (size_t i = 0; i < 3 && i < std_array.size(); ++i)
-        {
-            std_[i] = std_array[i];
-        }
-    }
-    if (metadata_json.contains("width"))
-    {
-        input_width_ = metadata_json["width"].get<int>();
-    }
-    if (metadata_json.contains("height"))
-    {
-        input_height_ = metadata_json["height"].get<int>();
-    }
+    classifier.input_width_ = metadata.value<int>("width", classifier.input_width_);
+    classifier.input_height_ = metadata.value<int>("height", classifier.input_height_);
+    classifier.std_ = metadata.value<std::array<float, 3>>("std", classifier.std_);
+    classifier.mean_ = metadata.value<std::array<float, 3>>("mean", classifier.mean_);
+    classifier.confidence_threshold_ = metadata.value<float>("confidence_threshold", classifier.confidence_threshold_);
+    metadata["labels"].get_to(classifier.labels_);
+}
+
+void Classifier::LoadModel(Classifier& classfier, const std::filesystem::path& model_path)
+{
     // 加载模型
-    if (!std::filesystem::is_regular_file(model_path_))
+    if (!std::filesystem::is_regular_file(model_path))
     {
-        throw Exception(Translate("ERROR_FileNotFound@1", ConvertUtf16ToUtf8(model_path_)));
+        throw std::runtime_error(std::format("{} does not exist or is not a regular file", ConvertUtf16ToUtf8(model_path.wstring())));
     }
     // 并行推理
-    session_options_.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
+    classfier.session_options_.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
     // 禁用空转，降低开销
-    session_options_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, "0");
-    session_options_.AddConfigEntry(kOrtSessionOptionsConfigAllowInterOpSpinning, "0");
+    classfier.session_options_.AddConfigEntry(kOrtSessionOptionsConfigAllowIntraOpSpinning, "0");
+    classfier.session_options_.AddConfigEntry(kOrtSessionOptionsConfigAllowInterOpSpinning, "0");
     // 图优化级别拉满
-    session_options_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
-    env_ = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, model_path_.stem().string().c_str());
-    session_ = std::make_unique<Ort::Session>(*env_, model_path_.wstring().c_str(), session_options_);
-    auto input_names = session_->GetInputNames();
-    auto output_names = session_->GetOutputNames();
-    std::swap(input_names_, input_names);
-    std::swap(output_names_, output_names);
-    for (auto &name : input_names_)
+    classfier.session_options_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+    classfier.env_ = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_ERROR, model_path.stem().string().c_str());
+    classfier.session_ = std::make_unique<Ort::Session>(*classfier.env_, model_path.wstring().c_str(), classfier.session_options_);
+    classfier.input_names_ = GetInputNames(*classfier.session_);
+    classfier.output_names_ = GetOutputNames(*classfier.session_);
+    for (auto &name : classfier.input_names_)
     {
-        input_names_c_str_.emplace_back(name.c_str());
+        classfier.input_names_c_str_.emplace_back(name.c_str());
     }
-    for (auto &name : output_names_)
+    for (auto &name : classfier.output_names_)
     {
-        output_names_c_str_.emplace_back(name.c_str());
+        classfier.output_names_c_str_.emplace_back(name.c_str());
     }
+}
+
+Classifier::Classifier(std::filesystem::path json_path)
+{
+    LoadMetadata(*this, json_path);
+    auto model_path = json_path.replace_extension(".onnx");
+    LoadModel(*this, model_path);
+}
+
+Classifier::Classifier(std::filesystem::path model_dir, std::string model_name)
+{
+    std::wstring model_name_w = ConvertUtf8ToUtf16(model_name);
+    std::filesystem::path metadata_json_path = model_dir / (model_name_w + L".json");
+    LoadMetadata(*this, metadata_json_path);
+    std::filesystem::path model_path = model_dir / (model_name_w + L".onnx");
+    LoadModel(*this, model_path);
 }
 
 std::vector<float> Classifier::Preprocess(const cv::Mat &image)

@@ -1,102 +1,31 @@
-# Note:
-# If you use vcpkg bundled in Visual Studio from Visual Studio's Developer Shell, then you do not have to manually set `VCPKG_ROOT`.
-
 cmake_minimum_required(VERSION 3.20)
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+project(Controller)
 
-find_package(CLI11 CONFIG REQUIRED)
-find_package(OpenCV CONFIG REQUIRED)
-find_package(Clipper2 CONFIG REQUIRED)
-find_package(onnxruntime CONFIG REQUIRED)
-find_package(aho_corasick CONFIG REQUIRED)
-get_target_property(OPENCV_INCLUDES opencv_core INTERFACE_INCLUDE_DIRECTORIES)
-find_package(protobuf CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
+message(STATUS "Source dir: ${PROJECT_SOURCE_DIR}")
 
-add_library(
-    ControllerLib
-    source/Configuration.cpp
-    source/Configuration/Game.cpp
-    source/Configuration/Locale.cpp
-    source/Configuration/Idle.cpp
-    source/Configuration/Executor.cpp
-    source/Driver.cpp
-    source/Command.cpp
-    source/CommandDispatcher.cpp
-    source/Console.cpp
-    source/CSOBannerSuppressor.cpp
-    source/Global.cpp
-    source/Hotkey.cpp
-    source/LowLevelKeyboardHook.cpp
-    source/IdleEngine.cpp
-    source/ModelUtilities.cpp
-    source/OCR.cpp
-    source/OCR_Detector.cpp
-    source/OCR_Recognizer.cpp
-    source/OCRIdleEngine.cpp
-    source/OCRUtilities.cpp
-    source/pch.cpp
-    source/Utilities.cpp
-    source/Classifier.cpp
-    source/ClassifierIdleEngine.cpp
-    source/Server.cpp
-    ${GENERATED_DIR}/Protos/Controller/Configuration.pb.cc
-    ${GENERATED_DIR}/Protos/Controller/Configuration.grpc.pb.cc
-)
-
-target_include_directories(
-    ControllerLib
-    PUBLIC # make ControllerLib available to ControllerTesting
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${GENERATED_DIR}
-)
-
-target_link_libraries(
-    ControllerLib
-    PUBLIC
-    onnxruntime::onnxruntime
-    opencv_core
-    opencv_imgcodecs
-    opencv_imgproc
-    Clipper2::Clipper2
-    CLI11::CLI11
-    gRPC::grpc++
-    protobuf::libprotobuf
-)
-
-target_compile_definitions(
-    ControllerLib
-    PUBLIC
-    CONTROLLER_VERSION="${VERSION}"
-)
-
-message(STATUS "Version defined in ControllerLib: ${VERSION}")
-
-target_precompile_headers(
-    ControllerLib
-    PRIVATE
-    include/pch.hpp
-)
+# Shared lib
+add_subdirectory(source)
+add_subdirectory(testing)
 
 add_executable(
     Controller
-    Controller.rc # rc file contains manifest
-    source/Main.cpp
+    Main.cpp
+    Controller.rc
 )
-
-target_link_libraries(
-    Controller
-    PRIVATE
-    ControllerLib
-)
-
-target_precompile_headers(Controller REUSE_FROM ControllerLib)
 
 # since the rc file already includes a manifest, we need to disable automatic manifest generation to avoid conflicts
 target_link_options(
     Controller PRIVATE /MANIFEST:NO
 )
+
+target_link_libraries(
+    Controller
+    PRIVATE
+    ControllerLib
+)
+
+# deal with deps
 
 list(APPEND dependencies "C:/Windows/System32/vcruntime140.dll")
 list(APPEND dependencies "C:/Windows/System32/vcruntime140_1.dll")
@@ -109,10 +38,6 @@ list(APPEND dependencies ${dll_files})
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND dependencies ${pdb_files})
-endif()
-
-if (BUILD_TESTING)
-    add_subdirectory(testing)
 endif()
 
 message(STATUS "Dependencies: ${dependencies}")
@@ -131,18 +56,12 @@ add_custom_command(TARGET Controller POST_BUILD
         "${CMAKE_CURRENT_SOURCE_DIR}/locales"
         "$<TARGET_FILE_DIR:Controller>/locales"
 )
-
-# assets: models
-# run models.ps1 to fetch models (models located in ${CMAKE_CURRENT_SOURCE_DIR}/models)
-# then copy these models to $<TARGET_FILE_DIR:Controller>/models
-add_custom_command(TARGET Controller POST_BUILD
-    COMMAND pwsh -NoProfile -NoLogo -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/models.ps1" -DownloadDir "${DOWNLOADS_DIR}/models" -InstallDir "$<TARGET_FILE_DIR:Controller>/models"
-)
-
 endif()
 
-# FIXME: Currently ControllerLib.lib is also copied into dist dir.
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
     DESTINATION .
+    #ignore *.lib, *.exp files
     COMPONENT Controller
+    PATTERN "*.lib" EXCLUDE
+    PATTERN "*.exp" EXCLUDE
 )

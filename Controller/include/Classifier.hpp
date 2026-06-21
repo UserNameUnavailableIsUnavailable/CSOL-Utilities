@@ -4,6 +4,7 @@ class Classifier
 {
   public:
     Classifier(std::filesystem::path json_path);
+    Classifier(std::filesystem::path model_dir, std::string model_name);
     ~Classifier() = default;
     // 运行图像分类
     /// @param image 输入图像
@@ -12,8 +13,10 @@ class Classifier
     std::string Run(const cv::Mat &image);
 
   private:
+    static void LoadMetadata(Classifier& classifier, const std::filesystem::path& model_path);
+    static void LoadModel(Classifier& classifier, const std::filesystem::path& model_path);
     std::vector<float> Preprocess(const cv::Mat &image);
-    std::unordered_map<int, std::string> labels_; // <标签索引，标签名称>
+    std::vector<std::string> labels_;
     std::unique_ptr<Ort::Session> session_;
     std::unique_ptr<Ort::Env> env_;
     std::vector<std::string> input_names_;
@@ -23,7 +26,6 @@ class Classifier
     Ort::SessionOptions session_options_;
     std::array<float, 3> mean_ = {0.485f, 0.456f, 0.406f}; // ResNet-50 标准化均值
     std::array<float, 3> std_ = {0.229f, 0.224f, 0.225f};  // ResNet-50 标准化标准差
-    std::filesystem::path model_path_;
     float confidence_threshold_ = 0.95f; // 置信度阈值，softmax 归一化概率超过此值才接受
     int input_width_ = 800;              // 输入图像宽度
     int input_height_ = 600;             // 输入图像高度

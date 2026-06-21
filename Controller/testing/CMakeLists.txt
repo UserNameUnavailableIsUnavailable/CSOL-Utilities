@@ -2,21 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 
 find_package(GTest CONFIG REQUIRED)
 
-file(GLOB CONTROLLER_TEST_SOURCES CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-)
-
 add_executable(
     ControllerTesting
-    ServerTest
-    ${CONTROLLER_TEST_SOURCES}
-)
+    TestUtilities.cpp
 
-target_include_directories(
-    ControllerTesting
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    ${DEPENDENCIES_DIR}/include
+    Model.cpp
 )
 
 target_link_libraries(
@@ -35,9 +25,6 @@ target_compile_definitions(
     CURRENT_BUILD_DIR="${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-target_precompile_headers(ControllerTesting REUSE_FROM ControllerLib)
-
 include(GoogleTest)
 gtest_discover_tests(ControllerTesting)
 
-# TODO: Run configure.ps1 automatically if Controller.json is missing in CMAKE_CURRENT_BINARY_DIR.

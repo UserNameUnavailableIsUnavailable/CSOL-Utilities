@@ -39,6 +39,10 @@ node_modules/
 *.sw?
 .idea
 
+# python
+__pycache__/
+.venv/
+
 # VSCode integration files for easier development
 !.vscode/extensions.json
 !.vscode/tasks.json

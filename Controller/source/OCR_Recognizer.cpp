@@ -172,8 +172,18 @@ std::string OCR_Recognizer::Run(const cv::Mat &src)
     Ort::Value inputTensor = Ort::Value::CreateTensor<float>(
         memoryInfo, inputTensorValues.data(), inputTensorValues.size(), inputShape.data(), inputShape.size());
     assert(inputTensor.IsTensor());
-    std::vector<const char *> inputNames = {input_names_.data()->get()};
-    std::vector<const char *> outputNames = {output_names_.data()->get()};
+    std::vector<const char *> inputNames;
+    inputNames.reserve(input_names_.size());
+    for (const auto &name : input_names_)
+    {
+        inputNames.push_back(name.c_str());
+    }
+    std::vector<const char *> outputNames;
+    outputNames.reserve(output_names_.size());
+    for (const auto &name : output_names_)
+    {
+        outputNames.push_back(name.c_str());
+    }
     auto outputTensor = session->Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, inputNames.size(),
                                      outputNames.data(), outputNames.size());
     assert(outputTensor.size() == 1 && outputTensor.front().IsTensor());

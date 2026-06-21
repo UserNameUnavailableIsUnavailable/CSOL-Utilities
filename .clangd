@@ -3,7 +3,7 @@ CompileFlags:
   Add:
     - -Ivcpkg_installed/x64-windows/include
     - -Ivcpkg_installed/x64-windows/include/opencv4
-    - -Igenerated
+    - -IProtocol
     - -D_DEBUG
     - -DVERSION
 Completion:
