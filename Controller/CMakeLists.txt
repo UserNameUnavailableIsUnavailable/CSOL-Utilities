@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(Controller)
 
+list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
 message(STATUS "Source dir: ${PROJECT_SOURCE_DIR}")
 
 # Shared lib
