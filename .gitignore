@@ -5,6 +5,8 @@ dist/
 dist-ssr/
 tmp/
 temp/
+__pycache__/
+.venv/
 .mypy_cache/
 .venv/
 .vs/
@@ -39,10 +41,6 @@ node_modules/
 *.sw?
 .idea
 
-# python
-__pycache__/
-.venv/
-
 # VSCode integration files for easier development
 !.vscode/extensions.json
 !.vscode/tasks.json
@@ -58,16 +56,3 @@ Desktop.ini
 *.tar.gz
 
 .luarc.json
-
-# auto-generated protobuf header files
-*.pb.h
-*.pb.cc
-
-# model artifacts
-*.onnx
-*.pth
-
-# Controller.json is auto-generated and should not be tracked
-Controller.json
-
-/.luarc.json
