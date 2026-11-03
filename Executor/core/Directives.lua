@@ -1,1 +1,0 @@
-Command.directives={id=0,type=0,timepoint=0, repeatable=true}
