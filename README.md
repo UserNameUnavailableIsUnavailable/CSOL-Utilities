@@ -68,4 +68,10 @@ B 站 ID：_CoreDump
 
 ## 开发者文档
 
+v2.0.0 开发分支仅保留 Classifier 图像分类挂机引擎，已移除 OCR 引擎及其命令行参数。ONNX Runtime 使用 vcpkg 提供的 CPU 版本，不再需要根目录下的 `dependencies/` 或手动下载 ONNX Runtime；运行时 DLL 由 vcpkg 部署。`Controller/dependencies/logitech-ghub-api-extender` 子模块保留供后续 DLL 集成使用。
+
+当前 vcpkg 基线的 ONNX 默认静态注册与 ONNX Runtime 的算子注册冲突，项目通过 [ONNX port overlay](cmake/ports/onnx/portfile.cmake) 设置 `ONNX_DISABLE_STATIC_REGISTRATION=ON`。升级基线时需确认上游已解决此问题后再移除 overlay。
+
+`LGHUBHookDemo` 演示如何以挂起状态启动 `C:\Program Files\LGHUB\lghub_agent.exe`，加载 `lgextender.dll`，等待 `InitializeLGHubHooks` 完成后再恢复主线程。构建该目标时会自动构建并复制 DLL；也可将其他 DLL 路径作为首个命令行参数传入。
+
 有一定编程经验的用户，可阅读 [CSOL 集成工具开发者文档](https://blog.macrohard.fun/CSOL-Utilities/) 了解更多详细信息（已经过时，由于个人精力有限，还需一段时间才能更新）。

@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
-message(STATUS "vcpkg root: $ENV{VCPKG_ROOT}")
-# vcpkg toolchain must be specified before the first project()/enable_language so its hooks add the package paths
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
-# Keep manifest-installed packages outside the build tree so deleting build/ does not force reinstall.
-set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed" CACHE PATH "vcpkg installed tree" FORCE)
-
 # Prefer VERSION from -DVERSION=...; fallback to VERSION.txt.
-if (NOT DEFINED VERSION OR VERSION STREQUAL "")
+if(NOT DEFINED VERSION OR VERSION STREQUAL "")
     file(READ "${CMAKE_SOURCE_DIR}/VERSION.txt" VERSION)
     string(STRIP "${VERSION}" VERSION)
 endif()
@@ -19,23 +13,21 @@ message(STATUS "CSOL-Utilities version: ${VERSION}")
 
 project(CSOL-Utilities VERSION ${VERSION} LANGUAGES C CXX)
 
-include(CTest)
-
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_PREFIX_PATH "${VCPKG_INSTALLED_DIR}/x64-windows" CACHE STRING "vcpkg prefix path" FORCE)
 
-set(DEPENDENCIES_DIR "${CMAKE_SOURCE_DIR}/dependencies")
-set(DOWNLOADS_DIR "${CMAKE_SOURCE_DIR}/downloads")
-set(GENERATED_DIR "${CMAKE_SOURCE_DIR}/generated")
+# Check MSVC
+if(MSVC)
+    add_compile_options(/utf-8 /W4 /permissive-)
+endif()
 
-file(MAKE_DIRECTORY "${DOWNLOADS_DIR}")
-file(MAKE_DIRECTORY "${DEPENDENCIES_DIR}")
-file(MAKE_DIRECTORY "${GENERATED_DIR}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(_DEBUG=1)
+endif()
 
-add_subdirectory(Protocol)
-add_subdirectory(Controller)
-add_subdirectory(Tool)
-add_subdirectory(Emulator)
-
+include_directories(${CMAKE_SOURCE_DIR}/include)
+add_subdirectory(utilities)
+add_subdirectory(controller)
+enable_testing()
+add_subdirectory(testing)

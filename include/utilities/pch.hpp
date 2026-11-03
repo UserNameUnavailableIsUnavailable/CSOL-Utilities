@@ -1,0 +1,34 @@
+#pragma once
+
+#include <string>
+#include <filesystem>
+#include <algorithm>
+#include <atomic>
+#include <cassert>
+#include <chrono>
+#include <climits>
+#include <condition_variable>
+#include <csignal>
+#include <cstdint>
+#include <exception>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <numeric>
+#include <sstream>
+#include <stop_token>
+#include <string>
+#include <string_view>
+#include <thread>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+#include <expected>
+
+#include <spdlog/spdlog.h>

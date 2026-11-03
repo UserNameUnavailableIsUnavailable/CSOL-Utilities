@@ -12,9 +12,6 @@ __pycache__/
 .vs/
 gen/
 generated/
-dep/
-deps/
-dependencies/
 downloads/
 
 # logs

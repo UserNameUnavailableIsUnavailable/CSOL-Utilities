@@ -411,9 +411,9 @@ if not __AUTOMATION_LUA__ then
 
 	---尝试确认结算界面。
 	function Automation:confirm_results()
-		Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+		Keyboard:click_several_times(Keyboard.ESCAPE, 2, Delay.MINI, 100) -- 清除所有可能存在的弹窗
 		Automation:choose_golden_zombie_reward() -- 选择黄金僵尸奖励
-		Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, Delay.MINI) -- 清除所有可能存在的弹窗
+		Keyboard:click_several_times(Keyboard.ESCAPE, 4, Delay.MINI, 100) -- 清除所有可能存在的弹窗
 		-- 点赞
 		repeat
 			if not Setting.SWITCH_GIVE_LIKES then
@@ -443,10 +443,10 @@ if not __AUTOMATION_LUA__ then
 			local y_end = Setting.POSITION_ROOM_START_GAME_Y
 			local y_step = math.floor(math.abs(y_end - y_start) / 32) or 300 -- 点赞按钮间隔
 			for y = y_start, y_end, y_step do
-				Mouse:click_on(Mouse.LEFT, x, y, 10) -- 依次点击点赞按钮
+				Mouse:click_on(Mouse.LEFT, x, y, 100) -- 依次点击点赞按钮
 			end
 		until true
-		Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y) -- 点击确认完成结算
+		Mouse:click_on(Mouse.LEFT, Setting.POSITION_GAME_CONFIRM_RESULTS_X, Setting.POSITION_GAME_CONFIRM_RESULTS_Y, 100) -- 点击确认完成结算
 	end
 
 	---合成配件。

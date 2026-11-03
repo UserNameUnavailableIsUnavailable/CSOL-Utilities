@@ -6,9 +6,14 @@
     {
       "name": "opencv"
     },
-    "clipper2",
+    {
+      "name": "onnxruntime",
+      "default-features": false
+    },
     "lua",
     "fmt",
-    "grpc"
+    "grpc",
+    "cppwinrt",
+    "spdlog"
   ]
 }

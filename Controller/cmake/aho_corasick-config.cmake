@@ -1,1 +1,0 @@
-include("${CMAKE_CURRENT_LIST_DIR}/aho_corasick.cmake")

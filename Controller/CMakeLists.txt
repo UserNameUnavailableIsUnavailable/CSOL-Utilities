@@ -1,69 +1,47 @@
-cmake_minimum_required(VERSION 3.20)
+find_package(CLI11 CONFIG REQUIRED)
+find_package(onnxruntime CONFIG REQUIRED)
+find_package(OpenCV CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
-project(Controller)
+add_library(
+    ControllerLib
+    STATIC
+    source/pch.cpp
+    source/injector.cpp
+)
 
-list(APPEND CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/cmake")
+# Compile startup initialization into consumers so archive extraction cannot omit it.
+target_sources(
+    ControllerLib
+    INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/preset.cpp
+)
 
-message(STATUS "Source dir: ${PROJECT_SOURCE_DIR}")
+target_precompile_headers(
+    ControllerLib
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/include/controller/pch.hpp
+)
 
-# Shared lib
-add_subdirectory(source)
-add_subdirectory(testing)
+target_link_libraries(
+    ControllerLib
+    PUBLIC
+    UtilitiesLib
+    CLI11::CLI11
+    opencv_core
+    opencv_imgcodecs
+    opencv_imgproc
+    onnxruntime::onnxruntime
+    spdlog::spdlog
+)
 
 add_executable(
     Controller
-    Main.cpp
-    Controller.rc
-)
-
-# since the rc file already includes a manifest, we need to disable automatic manifest generation to avoid conflicts
-target_link_options(
-    Controller PRIVATE /MANIFEST:NO
+    source/main.cpp
 )
 
 target_link_libraries(
     Controller
     PRIVATE
     ControllerLib
-)
-
-# deal with deps
-
-list(APPEND dependencies "C:/Windows/System32/vcruntime140.dll")
-list(APPEND dependencies "C:/Windows/System32/vcruntime140_1.dll")
-list(APPEND dependencies "C:/Windows/System32/msvcp140.dll")
-list(APPEND dependencies "C:/Windows/System32/msvcp140_1.dll")
-list(APPEND dependencies "C:/Windows/System32/msvcp140_atomic_wait.dll")
-file(GLOB dll_files "${DEPENDENCIES_DIR}/bin/*.dll")
-file(GLOB pdb_files "${DEPENDENCIES_DIR}/bin/*.pdb")
-list(APPEND dependencies ${dll_files})
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    list(APPEND dependencies ${pdb_files})
-endif()
-
-message(STATUS "Dependencies: ${dependencies}")
-
-if (dependencies)
-    add_custom_command(TARGET Controller POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${dependencies}
-            "$<TARGET_FILE_DIR:Controller>"
-    )
-
-# assets: locales
-# copy ${CMAKE_CURRENT_SOURCE_DIR}/locales to $<TARGET_FILE_DIR:Controller>/locales
-add_custom_command(TARGET Controller POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/locales"
-        "$<TARGET_FILE_DIR:Controller>/locales"
-)
-endif()
-
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-    DESTINATION .
-    #ignore *.lib, *.exp files
-    COMPONENT Controller
-    PATTERN "*.lib" EXCLUDE
-    PATTERN "*.exp" EXCLUDE
 )
