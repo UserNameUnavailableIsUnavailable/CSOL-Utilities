@@ -1,6 +1,6 @@
 #pragma once
 
-namespace controller {
+namespace lghubex {
 class Injector {
 public:
     Injector();
@@ -10,5 +10,7 @@ private:
     std::expected<void, std::error_code> TerminateExisting();
     std::wstring process_name_;
     std::wstring image_path_;
+    std::wstring executable_root_;
+    std::wstring inject_dll_;
 };
-} // namespace Controller
+} // namespace lghubex

@@ -1,3 +1,5 @@
+add_subdirectory(dependencies)
+
 find_package(CLI11 CONFIG REQUIRED)
 find_package(onnxruntime CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
@@ -7,20 +9,12 @@ add_library(
     ControllerLib
     STATIC
     source/pch.cpp
-    source/injector.cpp
-)
-
-# Compile startup initialization into consumers so archive extraction cannot omit it.
-target_sources(
-    ControllerLib
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/source/preset.cpp
 )
 
 target_precompile_headers(
     ControllerLib
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/include/controller/pch.hpp
+    source/pch.hpp
 )
 
 target_link_libraries(
@@ -44,4 +38,5 @@ target_link_libraries(
     Controller
     PRIVATE
     ControllerLib
+    ExtenderLib
 )

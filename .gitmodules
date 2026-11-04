@@ -10,6 +10,6 @@
 [submodule "tool"]
 	path = tool
 	url = https://github.com/UserNameUnavailableIsUnavailable/Gaming-HotKey-Tool.git
-[submodule "controller/dependencies/logitech-ghub-api-extender"]
-	path = controller/dependencies/logitech-ghub-api-extender
+[submodule "lghubex/dependencies/logitech-ghub-api-extender"]
+	path = lghubex/dependencies/logitech-ghub-api-extender
 	url = https://github.com/UserNameUnavailableIsUnavailable/logitech-ghub-api-extender.git

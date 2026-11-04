@@ -1,8 +1,8 @@
-#include <controller/injector.hpp>
+#include <lghubex/injector.hpp>
 
 #include <gtest/gtest.h>
 
 TEST(InjectorTest, Inject) {
-    controller::Injector injector;
+    lghubex::Injector injector;
     injector.Inject();
 }

@@ -54,7 +54,7 @@ std::expected<void, std::error_code> TerminateProcess(std::uintptr_t process_id,
 
     auto wait_result = ::WaitForSingleObject(hProcess, static_cast<DWORD>(timeout_ms));
     if (wait_result == WAIT_OBJECT_0) {
-        spdlog::debug("Process terminated gracefully");
+        spdlog::info("Process terminated gracefully");
         return {};
     }
     if (wait_result == WAIT_FAILED) {
@@ -68,7 +68,7 @@ std::expected<void, std::error_code> TerminateProcess(std::uintptr_t process_id,
             // ::CloseHandle(hProcess); // handled by unique_ptr
             return std::unexpected<std::error_code>(make_system_error(::GetLastError()));
         } else {
-            spdlog::debug("Process terminated forcefully");
+            spdlog::info("Process terminated forcefully");
             return {};
         }
     }
@@ -76,4 +76,25 @@ std::expected<void, std::error_code> TerminateProcess(std::uintptr_t process_id,
     return {};
 }
 
+
+std::expected<std::wstring, std::error_code> GetExecutableRoot() {
+    std::wstring path(256, L'\0');
+    std::size_t size = 0;
+    while (true) {
+        size = ::GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()));
+        if (size == 0) {
+            return std::unexpected<std::error_code>(make_system_error(::GetLastError()));
+        } else if (size == path.size()) {
+            path.resize(path.size() + path.size() / 2);
+        } else {
+            path.resize(size);
+            break;
+        }
+    }
+    auto pos = path.find_last_of(L"\\/");
+    if (pos != std::wstring::npos) {
+        path.resize(pos);
+    }
+    return path;
+}
 } // namespace utilities

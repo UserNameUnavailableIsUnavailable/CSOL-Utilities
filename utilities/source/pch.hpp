@@ -30,5 +30,7 @@
 #include <utility>
 #include <vector>
 #include <expected>
+#include <cctype>
+#include <cwctype>
 
 #include <spdlog/spdlog.h>
