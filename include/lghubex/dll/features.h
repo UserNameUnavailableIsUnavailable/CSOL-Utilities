@@ -4,9 +4,8 @@
 extern "C" {
 #endif
 struct lua_State;
-int l_print(struct lua_State *L);
-int l_loadfile(struct lua_State *L);
-int l_dofile(struct lua_State *L);
+void RestoreBuiltinFunctions(struct lua_State *L);
+void RestoreBuiltinModules(struct lua_State *L);
 #ifdef __cplusplus
 }
 #endif

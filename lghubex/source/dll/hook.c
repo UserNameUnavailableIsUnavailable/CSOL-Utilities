@@ -92,46 +92,14 @@ static void PrependModulePath(lua_State *L, const char *path)
     lua_pop(L, 1);
 }
 
-void InjectModules(lua_State *L)
+void ApplyInjection(lua_State *L)
 {
     if (L == NULL)
     {
         return;
     }
-    // `require`
-    luaL_requiref(L, "package", luaopen_package, 1);
-    lua_pop(L, 1);
-
-    // `debug` module
-    luaL_requiref(L, "debug", luaopen_debug, 1);
-    lua_pop(L, 1);
-
-    // `os` module
-    luaL_requiref(L, "os", luaopen_os, 1);
-    lua_pop(L, 1);
-    // IMPORTANT: disable `os.exit` function to avoid terminating the host process
-    lua_getglobal(L, "os");
-    lua_pushnil(L);
-    lua_setfield(L, -2, "exit");
-    lua_pop(L, 1);
-
-    // `io` module
-    luaL_requiref(L, "io", luaopen_io, 1);
-    lua_pop(L, 1);
-
-    // `coroutine` module
-    luaL_requiref(L, "coroutine", luaopen_coroutine, 1);
-    lua_pop(L, 1);
-
-    // `print` function built-on `OutputLogMessage`.
-    lua_pushcfunction(L, l_print);
-    lua_setglobal(L, "print");
-
-    lua_pushcfunction(L, l_dofile);
-    lua_setglobal(L, "dofile");
-
-    lua_pushcfunction(L, l_loadfile);
-    lua_setglobal(L, "loadfile");
+    RestoreBuiltinModules(L);
+    RestoreBuiltinFunctions(L);
 
     #if defined(PROJECT_ROOT) && defined(_DEBUG)
     PrependModulePath(L, PROJECT_ROOT "/executor/?.lua");
@@ -172,6 +140,6 @@ uint64_t InitializeLuaVM(uint64_t vm, uint64_t param1, uint64_t param2)
     assert(g_RawInitializer != NULL);
     uint64_t res = g_RawInitializer(vm, param1, param2);
     lua_State *L = *(lua_State **)(vm + LUA_STATE_OFFSET);
-    InjectModules(L);
+    ApplyInjection(L);
     return res;
 }
