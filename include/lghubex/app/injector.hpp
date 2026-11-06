@@ -1,5 +1,9 @@
 #pragma once
 
+#include <expected>
+#include <string>
+#include <system_error>
+
 namespace lghubex {
 class Injector {
 public:

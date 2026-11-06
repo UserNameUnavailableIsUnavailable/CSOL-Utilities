@@ -1,4 +1,4 @@
-#include <lghubex/injector.hpp>
+#include <lghubex/app/injector.hpp>
 #include <utilities/common.hpp>
 #include <utilities/string.hpp>
 #include <utilities/process_thread.hpp>
@@ -7,10 +7,6 @@
 #include <Windows.h>
 
 namespace lghubex {
-namespace detail {
-    
-} // namespace detail
-
 static const wchar_t kProcessName[] = L"lghub_agent.exe";
 static const wchar_t kImagePath[] = L"C:\\Program Files\\LGHUB\\lghub_agent.exe";
 static const wchar_t kInjectDll[] = L"lghubex.dll";
@@ -53,7 +49,7 @@ void Injector::Inject() {
     auto si = STARTUPINFOW{
         .cb = sizeof(STARTUPINFOW)
     };
-    auto ok = CreateProcessW(
+    auto ok = ::CreateProcessW(
         path.data(),
         nullptr,
         nullptr,
@@ -66,15 +62,23 @@ void Injector::Inject() {
         &pi
     );
     if (!ok) {
-        spdlog::error("Failed to create process.");
+        auto error = utilities::make_system_error(::GetLastError());
+        spdlog::error("Failed to create process: {}.", error.message());
+        return;
     } else {
-        spdlog::info("Successfully created process in suspended state.");
+        spdlog::info("Successfully created process in suspended state. PID = {}.", pi.dwProcessId);
     }
     auto hProcess = pi.hProcess;
     auto hThread = pi.hThread;
-    utilities::Defer d1([&] {
-        ResumeThread(hThread);
-        spdlog::info("Resuming thread");
+    bool injection_succeeded = false;
+    DEFER([&] {
+        if (injection_succeeded) {
+            ::ResumeThread(hThread);
+            spdlog::info("Resuming thread.");
+        } else {
+            ::TerminateProcess(hProcess, ERROR_DLL_INIT_FAILED);
+            ::WaitForSingleObject(hProcess, INFINITE);
+        }
         ::CloseHandle(hThread);
         ::CloseHandle(hProcess);
     });
@@ -94,10 +98,11 @@ void Injector::Inject() {
         spdlog::error("`{}` does not exist or is not a regular file.", utilities::Utf16ToUtf8(dll_path));
         return;
     }
+    const SIZE_T dll_path_bytes = (dll_path.size() + 1) * sizeof(wchar_t);
     auto remote_mem = ::VirtualAllocEx(
         hProcess,
         nullptr,
-        dll_path.size(),
+        dll_path_bytes,
         MEM_COMMIT | MEM_RESERVE,
         PAGE_READWRITE
     );
@@ -105,14 +110,14 @@ void Injector::Inject() {
         spdlog::error("Failed to allocate memory in remote process.");
         return;
     }
-    utilities::Defer d2([&] {
+    DEFER([&] {
         ::VirtualFreeEx(hProcess, remote_mem, 0, MEM_RELEASE);
     });
     if (!::WriteProcessMemory(
         hProcess,
         remote_mem,
-        dll_path.data(),
-        dll_path.size() * sizeof(wchar_t),
+        dll_path.c_str(),
+        dll_path_bytes,
         nullptr
     )) {
         spdlog::error("Failed to write to remote process memory.");
@@ -131,15 +136,29 @@ void Injector::Inject() {
         spdlog::error("Failed to create remote thread.");
         return;
     }
+    DEFER([&] {
+        ::CloseHandle(h);
+    });
     spdlog::info("Created remote thread, waiting for it to finish.");
-    auto wait_result = ::WaitForSingleObjectEx(h, INFINITE, false);
-    if (wait_result == WAIT_OBJECT_0) {
-        spdlog::info("Remote thread exited.");
-    } else {
-        auto e = utilities::make_system_error(::GetLastError());
-        spdlog::error("Error occurred while waiting for remote thread to finish: {}.", e.message());
+    auto wait_result = ::WaitForSingleObject(h, INFINITE);
+    if (wait_result != WAIT_OBJECT_0) {
+        auto error = utilities::make_system_error(::GetLastError());
+        spdlog::error("Failed while waiting for the injection thread: {}.", error.message());
+        return;
     }
-    ::CloseHandle(h);
+    DWORD load_result = 0;
+    if (!::GetExitCodeThread(h, &load_result)) {
+        auto error = utilities::make_system_error(::GetLastError());
+        spdlog::error("Failed to get the injection thread result: {}.", error.message());
+        return;
+    }
+    if (load_result == 0) {
+        spdlog::error("The injection thread failed to load the DLL.");
+        return;
+    }
+
+    injection_succeeded = true;
+    spdlog::info("DLL injected successfully.");
 }
 
 std::expected<void, std::error_code> Injector::TerminateExisting() {

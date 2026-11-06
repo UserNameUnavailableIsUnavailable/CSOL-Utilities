@@ -33,9 +33,9 @@
 
 #include <winrt/Windows.System.Diagnostics.h>
 
-#include <onnxruntime_cxx_api.h>
-#include <onnxruntime_run_options_config_keys.h>
-#include <onnxruntime_session_options_config_keys.h>
+// #include <onnxruntime_cxx_api.h>
+// #include <onnxruntime_run_options_config_keys.h>
+// #include <onnxruntime_session_options_config_keys.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgcodecs.hpp>

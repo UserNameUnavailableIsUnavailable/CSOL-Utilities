@@ -9,7 +9,7 @@ find_package(spdlog CONFIG REQUIRED)
 
 target_precompile_headers(
     UtilitiesLib
-    PUBLIC
+    PRIVATE
     source/pch.hpp
 )
 

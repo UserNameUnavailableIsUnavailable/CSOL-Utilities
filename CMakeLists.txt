@@ -11,8 +11,14 @@ if (VERSION STREQUAL "")
 endif()
 message(STATUS "CSOL-Utilities version: ${VERSION}")
 
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_SOURCE_DIR}/vcpkg/triplets")
+set(VCPKG_TARGET_TRIPLET "x64-windows-mixed")
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 project(CSOL-Utilities VERSION ${VERSION} LANGUAGES C CXX)
 
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -22,11 +28,15 @@ if(MSVC)
     add_compile_options(/utf-8 /W4 /permissive-)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(_DEBUG=1)
-endif()
+add_compile_definitions(
+    $<$<CONFIG:Debug>:_DEBUG=1>
+)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/dependencies/include
+)
+
 add_subdirectory(utilities)
 add_subdirectory(controller)
 add_subdirectory(lghubex)

@@ -16,4 +16,4 @@ function(register_test test)
     gtest_discover_tests(${test})
 endfunction()
 
-add_subdirectory(controller)
+add_subdirectory(lghubex)

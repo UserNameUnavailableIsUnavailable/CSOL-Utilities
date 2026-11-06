@@ -11,7 +11,7 @@ if not __EMULATOR_LUA__ then
     __RunningInEmulator__ = false -- 在 G HUB 中运行
 
     if
-        not require -- 没有提供 require，说明在 G HUB 中运行
+        not EMULATING -- 没有提供 require，说明在 G HUB 中运行
     then
         return
     end

@@ -1,4 +1,4 @@
-#include <lghubex/injector.hpp>
+#include <lghubex/app/injector.hpp>
 
 int main() {
     try {

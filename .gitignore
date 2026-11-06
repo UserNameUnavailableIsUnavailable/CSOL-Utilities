@@ -6,6 +6,7 @@ dist-ssr/
 tmp/
 temp/
 __pycache__/
+.cache/
 .venv/
 .mypy_cache/
 .venv/
@@ -13,6 +14,7 @@ __pycache__/
 gen/
 generated/
 downloads/
+dependencies/
 
 # logs
 logs/

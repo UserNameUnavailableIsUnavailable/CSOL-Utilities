@@ -3,18 +3,10 @@
     "cli11",
     "nlohmann-json",
     "gtest",
-    {
-      "name": "opencv"
-    },
-    {
-      "name": "onnxruntime",
-      "default-features": false
-    },
-    "lua",
+    "opencv",
     "fmt",
-    "grpc",
-    "cppwinrt",
     "spdlog",
-    "minhook"
+    "minhook",
+    "onnxruntime"
   ]
 }

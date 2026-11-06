@@ -1,7 +1,4 @@
-add_subdirectory(dependencies)
-
 find_package(CLI11 CONFIG REQUIRED)
-find_package(onnxruntime CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
@@ -25,7 +22,6 @@ target_link_libraries(
     opencv_core
     opencv_imgcodecs
     opencv_imgproc
-    onnxruntime::onnxruntime
     spdlog::spdlog
 )
 
@@ -38,5 +34,4 @@ target_link_libraries(
     Controller
     PRIVATE
     ControllerLib
-    ExtenderLib
 )
