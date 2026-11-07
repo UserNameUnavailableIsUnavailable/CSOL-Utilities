@@ -1,7 +1,7 @@
 ---@class Promise
 local Promise = {}
 
-local Scheduler = require("Scheduler")
+local Scheduler = require("executor.core.Scheduler")
 
 ---@enum Promise.State
 Promise.State = {
@@ -87,7 +87,6 @@ function Promise.async(fn)
             -- eager
             local ok, e = coroutine.resume(co)
             if not ok then reject(e) end
-            -- store coroutine reference
         end
         return Promise.create(wrapper)
     end
@@ -95,27 +94,31 @@ end
 
 ---Wait for results of a promise.
 ---@param self Promise
+---@return any
 function Promise:await()
+    local current, is_main = coroutine.running()
+    -- NOTE: Main corotuine is not yieldable, and if we decide to block wait for the promise in main, then the entire program may stuck. So we enforce the user to await in a non-blocking environment.
+    -- For resolved / rejected promises, we also enforce this rule to avoid potential errors.
+    if (not current or is_main) then
+        error("`Promise.await` is only allowed in async functions")
+    end
     if self._state == Promise.State.RESOLVED then
         return self._result
     elseif self._state == Promise.State.REJECTED then
         error(self._reason)
     else -- register the current task to scheduler
-        local co = coroutine.running()
-        assert(co ~= nil, "Promise.await must be called inside an async function")
         local settled = false
         self:and_then(function (result)
             if settled then return end
             settled = true
             self._scheduler:submit(function ()
-                coroutine.resume(co, true, result)
+                coroutine.resume(current, is_main, true, result)
             end)
         end)
         self:or_else(function (reason)
             if settled then return end
             settled = true
-            coroutine.resume(co, true, reason)
-
+            coroutine.resume(current, is_main, true, reason)
         end)
         local ok, result_or_reason = coroutine.yield()
         if ok then
@@ -201,6 +204,7 @@ function Promise:finally(fn)
     return child
 end
 
+---Attempts to close a promise early, causing observers to get rejected.
 function Promise:close()
     -- TODO: notify the backend to cancel
     self:_reject("Promise closed")
