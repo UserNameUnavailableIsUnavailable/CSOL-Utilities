@@ -27,14 +27,16 @@ static fn_t functions[] = {
     {l_rawlen, "rawlen"},
 };
 
-void RestoreBuiltinFunctions(struct lua_State *L) {
+void RestoreBuiltinFunctions(struct lua_State *L)
+{
     for (size_t i = 0; i < sizeof(functions) / sizeof(functions[0]); i++) {
         lua_pushcfunction(L, functions[i].function);
         lua_setglobal(L, functions[i].name);
     }
 }
 
-void RestoreBuiltinModules(struct lua_State *L) {
+void RestoreBuiltinModules(struct lua_State *L)
+{
     // `require`
     luaL_requiref(L, "package", luaopen_package, 1);
     lua_pop(L, 1);
@@ -61,11 +63,13 @@ void RestoreBuiltinModules(struct lua_State *L) {
     lua_pop(L, 1);
 }
 
-static int l_print(struct lua_State *L) {
+static int l_print(struct lua_State *L)
+{
     int argc = lua_gettop(L);
     luaL_Buffer buf;
     luaL_buffinit(L, &buf);
-    for (int i = 1; i <= argc; i++) {
+    for (int i = 1; i <= argc; i++)
+    {
         size_t len;
         const char *s = luaL_tolstring(L, i, &len);
         luaL_addlstring(&buf, s, len);
@@ -88,12 +92,15 @@ static int l_print(struct lua_State *L) {
 }
 
 // Minimal implementation of loadfile
-static int l_loadfile(struct lua_State *L) {
+static int l_loadfile(struct lua_State *L)
+{
     const char *filename = luaL_optstring(L, 1, NULL);
     int status = luaL_loadfilex(L, filename, NULL);
-    if (status == LUA_OK) {
+    if (status == LUA_OK)
+    {
         return 1; // Returns the compiled function
-    } else {
+    } else
+    {
         lua_pushnil(L);
         lua_insert(L, -2); // nil, error message
         return 2;
@@ -101,23 +108,27 @@ static int l_loadfile(struct lua_State *L) {
 }
 
 // Minimal implementation of dofile
-static int l_dofile(struct lua_State *L) {
+static int l_dofile(struct lua_State *L)
+{
     const char *filename = luaL_optstring(L, 1, NULL);
-    if (luaL_loadfilex(L, filename, NULL) != LUA_OK) {
+    if (luaL_loadfilex(L, filename, NULL) != LUA_OK)
+    {
         return lua_error(L); // dofile throws errors directly
     }
     lua_call(L, 0, LUA_MULTRET);
     return lua_gettop(L); // Returns all results
 }
 
-static int l_rawget(struct lua_State *L) {
+static int l_rawget(struct lua_State *L)
+{
     luaL_checktype(L, 1, LUA_TTABLE);
     lua_pushvalue(L, 2);          // push key
     lua_rawget(L, 1);             // pops key, pushes value
     return 1;
 }
 
-static int l_rawset(struct lua_State *L) {
+static int l_rawset(struct lua_State *L)
+{
     luaL_checktype(L, 1, LUA_TTABLE);
     lua_pushvalue(L, 2);          // push key
     lua_pushvalue(L, 3);          // push value
@@ -125,12 +136,14 @@ static int l_rawset(struct lua_State *L) {
     return 1;                     // return the table, like the stdlib
 }
 
-static int l_rawequal(struct lua_State *L) {
+static int l_rawequal(struct lua_State *L)
+{
     lua_pushboolean(L, lua_rawequal(L, 1, 2));
     return 1;
 }
 
-static int l_rawlen(struct lua_State *L) {
+static int l_rawlen(struct lua_State *L)
+{
     lua_pushinteger(L, (lua_Integer)lua_rawlen(L, 1));
     return 1;
 }
