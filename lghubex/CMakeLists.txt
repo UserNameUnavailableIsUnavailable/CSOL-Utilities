@@ -2,14 +2,14 @@ include("${CMAKE_SOURCE_DIR}/cmake/lua.cmake")
 
 add_library(
     lghubex_app_impl
-    INTERFACE
+    STATIC
     source/app/pch.cpp
     source/app/injector.cpp
 )
 
 add_library(
     lghubex_dll_impl
-    INTERFACE
+    STATIC
     source/dll/pattern.c
     source/dll/hook.c
     source/dll/features.c

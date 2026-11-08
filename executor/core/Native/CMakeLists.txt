@@ -1,6 +1,6 @@
 add_library(
     Native_impl
-    INTERFACE
+    STATIC
     Types.hpp
     Multiplexer.hpp
     Multiplexer.cpp
@@ -22,5 +22,3 @@ target_link_libraries(
     Native
     Native_impl
 )
-
-set_target_properties(Native_dll PROPERTIES OUTPUT_NAME "Native")
