@@ -112,13 +112,13 @@ function Promise:await()
             if settled then return end
             settled = true
             self._scheduler:submit(function ()
-                coroutine.resume(current, is_main, true, result)
+                coroutine.resume(current, true, result)
             end)
         end)
         self:or_else(function (reason)
             if settled then return end
             settled = true
-            coroutine.resume(current, is_main, true, reason)
+            coroutine.resume(current, false, reason)
         end)
         local ok, result_or_reason = coroutine.yield()
         if ok then

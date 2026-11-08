@@ -1,7 +1,8 @@
-#include "Multiplexer.hpp"
-#include "Channel.hpp"
+#include <executor/native/Multiplexer.hpp>
+#include <executor/native/Channel.hpp>
 
 #include <stdexcept>
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 Multiplexer::Multiplexer() {

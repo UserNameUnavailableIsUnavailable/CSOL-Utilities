@@ -17,7 +17,7 @@ add_library(
 
 add_executable(
     lghubex_app
-    source/app/main.cpp
+    source/app/app.cpp
 )
 target_link_libraries(
     lghubex_app

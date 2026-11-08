@@ -40,6 +40,6 @@ include_directories(
 add_subdirectory(utilities)
 add_subdirectory(controller)
 add_subdirectory(lghubex)
-add_subdirectory(executor/core/Native)
+add_subdirectory(executor)
 enable_testing()
 add_subdirectory(testing)

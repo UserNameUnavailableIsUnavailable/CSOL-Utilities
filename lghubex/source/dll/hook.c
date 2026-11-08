@@ -7,6 +7,8 @@
 #include <lghubex/dll/features.h>
 #include <lghubex/dll/hook.h>
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 const size_t LUA_STATE_OFFSET = 0x30;
 static uint64_t InitializeLuaVM(uint64_t vm, uint64_t param1, uint64_t param2);
 static LuaVMInitializer_T g_RawInitializer = NULL;
@@ -80,16 +82,49 @@ int HookLuaVmInitializer(LuaVMInitializer_T origin)
     return 0; // Return the original function pointer as the backup
 }
 
+
 // Must be called after `package` module is loaded.
 static void PrependModulePath(lua_State *L, const char *path)
 {
     lua_getglobal(L, "package");
     lua_getfield(L, -1, "path");
-    const char *current_path = lua_tostring(L, -1);
+    // if nil, assign directly, concat otherwise
+    int is_nil = lua_isnil(L, -1);
     lua_pop(L, 1);
-    lua_pushfstring(L, "%s;%s", path, current_path);
-    lua_setfield(L, -2, "path");
+
+    if (is_nil) {
+        lua_pushstring(L, path);
+        lua_setfield(L, -2, "path");
+        lua_pop(L, 1);
+    } else {
+        lua_getfield(L, -1, "path");
+        const char *current_path = lua_tostring(L, -1);
+        lua_pop(L, 1);
+        lua_pushfstring(L, "%s;%s", path, current_path);
+        lua_setfield(L, -2, "path");
+        lua_pop(L, 1);
+    }
+}
+
+static void PrependNativePath(lua_State *L, const char *path)
+{
+    lua_getglobal(L, "package");
+    lua_getfield(L, -1, "cpath");
+    int is_nil = lua_isnil(L, -1);
     lua_pop(L, 1);
+    
+    if (is_nil) {
+        lua_pushstring(L, path);
+        lua_setfield(L, -2, "cpath");
+        lua_pop(L, 1);
+    } else {
+        lua_getfield(L, -1, "cpath");
+        const char *current_path = lua_tostring(L, -1);
+        lua_pop(L, 1);
+        lua_pushfstring(L, "%s;%s", path, current_path);
+        lua_setfield(L, -2, "cpath");
+        lua_pop(L, 1);
+    }
 }
 
 void ApplyInjection(lua_State *L)
@@ -102,6 +137,8 @@ void ApplyInjection(lua_State *L)
     RestoreBuiltinFunctions(L);
 
     #if defined(PROJECT_ROOT) && defined(_DEBUG)
+    char debug_native_path[] = PROJECT_ROOT "/?.dll";
+    PrependNativePath(L, debug_native_path);
     char debug_import_path[] = PROJECT_ROOT "/?.lua";
     PrependModulePath(L, debug_import_path);
     char debug_init_path[] = PROJECT_ROOT "/?/init.lua";
@@ -119,21 +156,25 @@ void ApplyInjection(lua_State *L)
         //                            ^
         //                            p
         size_t dir_length = p - g_ModuleDirectory->path;
-        const char init[] = "\\?\\init.lua";
-        const char import[] = "\\?.lua";
+        const char native_path[] = "\\?.dll";
+        const char init_path[] = "\\?\\init.lua";
+        const char import_path[] = "\\?.lua";
+        size_t extra = MAX(sizeof(native_path), MAX(sizeof(import_path), sizeof(init_path)));
 
         // WideCharToMultiByte does not null-terminate an output string if the input string length is explicitly specified without a terminating null character.
         size_t required = WideCharToMultiByte(CP_UTF8, 0, g_ModuleDirectory->path, (int)dir_length, NULL, 0, NULL, NULL);
 
-        required += sizeof(init); // required now includes null-terminator
+        required += extra; // required now includes null-terminator
 
         char *u8 = (char *)malloc(required);
         if (u8)
         {
             size_t length = WideCharToMultiByte(CP_UTF8, 0, g_ModuleDirectory->path, (int)dir_length, u8, (int)required, NULL, NULL);
-            memcpy(u8 + length, import, sizeof(import));
+            memcpy(u8 + length, native_path, sizeof(native_path));
+            PrependNativePath(L, u8);
+            memcpy(u8 + length, import_path, sizeof(import_path));
             PrependModulePath(L, u8);
-            memcpy(u8 + length, init, sizeof(init));
+            memcpy(u8 + length, init_path, sizeof(init_path));
             PrependModulePath(L, u8);
             free(u8);
         }
