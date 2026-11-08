@@ -102,7 +102,10 @@ void ApplyInjection(lua_State *L)
     RestoreBuiltinFunctions(L);
 
     #if defined(PROJECT_ROOT) && defined(_DEBUG)
-    PrependModulePath(L, PROJECT_ROOT "/executor/?.lua");
+    char debug_import_path[] = PROJECT_ROOT "/?.lua";
+    PrependModulePath(L, debug_import_path);
+    char debug_init_path[] = PROJECT_ROOT "/?/init.lua";
+    PrependModulePath(L, debug_init_path);
     #endif
 
     if (g_ModuleDirectory)
@@ -112,26 +115,28 @@ void ApplyInjection(lua_State *L)
         {
             --p;        
         }
-        const wchar_t executor[] = L"executor\\?.lua";
-        size_t dir_length = p - g_ModuleDirectory->path + 1;
-        size_t pattern_length = sizeof(executor) / sizeof(wchar_t);
-        size_t length = dir_length + pattern_length;
-        wchar_t *u16 = (wchar_t *)malloc(length * sizeof(wchar_t));
-        if (u16)
-        {
-            memcpy(u16, g_ModuleDirectory->path, dir_length * sizeof(wchar_t));
-            memcpy(u16 + dir_length, executor, pattern_length * sizeof(wchar_t));
-        }
-        size_t u8_length = WideCharToMultiByte(CP_UTF8, 0, u16, (int)length, NULL, 0, NULL, NULL);
-        char *u8 = (char *)malloc(u8_length + 1);
+        // C:\path\to\module\directory\lghubex
+        //                            ^
+        //                            p
+        size_t dir_length = p - g_ModuleDirectory->path;
+        const char init[] = "\\?\\init.lua";
+        const char import[] = "\\?.lua";
+
+        // WideCharToMultiByte does not null-terminate an output string if the input string length is explicitly specified without a terminating null character.
+        size_t required = WideCharToMultiByte(CP_UTF8, 0, g_ModuleDirectory->path, (int)dir_length, NULL, 0, NULL, NULL);
+
+        required += sizeof(init); // required now includes null-terminator
+
+        char *u8 = (char *)malloc(required);
         if (u8)
         {
-            WideCharToMultiByte(CP_UTF8, 0, u16, (int)length, u8, (int)u8_length, NULL, NULL);
-            u8[u8_length] = '\0';
+            size_t length = WideCharToMultiByte(CP_UTF8, 0, g_ModuleDirectory->path, (int)dir_length, u8, (int)required, NULL, NULL);
+            memcpy(u8 + length, import, sizeof(import));
+            PrependModulePath(L, u8);
+            memcpy(u8 + length, init, sizeof(init));
             PrependModulePath(L, u8);
             free(u8);
         }
-        free(u16);
     }
 }
 
