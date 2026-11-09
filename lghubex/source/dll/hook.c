@@ -6,6 +6,7 @@
 
 #include <lghubex/dll/features.h>
 #include <lghubex/dll/hook.h>
+#include <lghubex/dll/logitech.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -135,6 +136,13 @@ void ApplyInjection(lua_State *L)
     }
     RestoreBuiltinModules(L);
     RestoreBuiltinFunctions(L);
+    // CreateLogitechNamespace(L);
+
+    #ifdef _DEBUG
+    // push lua_State address as global
+    lua_pushlightuserdata(L, L);
+    lua_setglobal(L, "g_LuaState");
+    #endif
 
     #if defined(PROJECT_ROOT) && defined(_DEBUG)
     char debug_native_path[] = PROJECT_ROOT "/?.dll";
@@ -166,17 +174,17 @@ void ApplyInjection(lua_State *L)
 
         required += extra; // required now includes null-terminator
 
-        char *u8 = (char *)malloc(required);
+        char *u8 = (char *)HeapAlloc(GetProcessHeap(), 0, required);
         if (u8)
         {
             size_t length = WideCharToMultiByte(CP_UTF8, 0, g_ModuleDirectory->path, (int)dir_length, u8, (int)required, NULL, NULL);
-            memcpy(u8 + length, native_path, sizeof(native_path));
+            CopyMemory(u8 + length, native_path, sizeof(native_path));
             PrependNativePath(L, u8);
-            memcpy(u8 + length, import_path, sizeof(import_path));
+            CopyMemory(u8 + length, import_path, sizeof(import_path));
             PrependModulePath(L, u8);
-            memcpy(u8 + length, init_path, sizeof(init_path));
+            CopyMemory(u8 + length, init_path, sizeof(init_path));
             PrependModulePath(L, u8);
-            free(u8);
+            HeapFree(GetProcessHeap(), 0, u8);
         }
     }
 }

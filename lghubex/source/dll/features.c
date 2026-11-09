@@ -76,17 +76,19 @@ static int l_print(struct lua_State *L)
         lua_pop(L, 1); // remove the string returned by luaL_tolstring from the stack
         if (i != argc) {
             luaL_addchar(&buf, '\t');
-        } else {
-            luaL_addchar(&buf, '\n');
         }
     }
-    luaL_pushresult(&buf); // push the final concatenated string onto the stack
-    const char *msg = lua_tostring(L, -1);
+    luaL_addchar(&buf, '\n');
+    luaL_pushresult(&buf);
+    int message_index = lua_gettop(L);
 
-    lua_getglobal(L, "OutputLogMessage"); // push the OutputLogMessage function onto the stack
-    lua_pushvalue(L, -2); // push the concatenated string as the argument
-    lua_call(L, 1, 0); // call OutputLogMessage with 1 argument and 0 return values
-    lua_pop(L, 1); // remove the concatenated string from the stack
+    lua_getglobal(L, "require");
+    lua_pushliteral(L, "executor.Logitech");
+    lua_call(L, 1, 1);
+    lua_getfield(L, -1, "OutputMessage");
+    lua_remove(L, -2);
+    lua_pushvalue(L, message_index);
+    lua_call(L, 1, 0);
 
     return 0;
 }

@@ -1,15 +1,13 @@
 add_library(
     Native_impl
     STATIC
-    native/Multiplexer.cpp
-    native/Channel.cpp
-    native/Timer.cpp
+    native/time.c
 )
 
 add_library(
     Native
     SHARED
-    native/dll.cpp
+    native/dll.c
 )
 
 find_package(Lua CONFIG REQUIRED)
