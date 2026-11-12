@@ -50,6 +50,15 @@ protected:
         ApplyInjection(state);
         ASSERT_EQ(lua_gettop(state), stackTop);
 
+        lua_getfield(state, LUA_REGISTRYINDEX, "executor.Native.Storage");
+        ASSERT_TRUE(lua_istable(state, -1));
+        lua_getfield(state, -1, "GetStorage");
+        EXPECT_TRUE(lua_isfunction(state, -1));
+        lua_pop(state, 1);
+        lua_getfield(state, -1, "SetStorage");
+        EXPECT_TRUE(lua_isfunction(state, -1));
+        lua_pop(state, 2);
+
         lua_getglobal(state, "package");
         lua_getfield(state, -1, "cpath");
         ASSERT_TRUE(lua_isstring(state, -1));

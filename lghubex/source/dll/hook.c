@@ -6,7 +6,6 @@
 
 #include <lghubex/dll/features.h>
 #include <lghubex/dll/hook.h>
-#include <lghubex/dll/logitech.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
@@ -136,7 +135,7 @@ void ApplyInjection(lua_State *L)
     }
     RestoreBuiltinModules(L);
     RestoreBuiltinFunctions(L);
-    // CreateLogitechNamespace(L);
+    InstallNativeStorage(L);
 
     #ifdef _DEBUG
     // push lua_State address as global

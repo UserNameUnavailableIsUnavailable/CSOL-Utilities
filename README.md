@@ -68,6 +68,78 @@ B 站 ID：_CoreDump
 
 ## 开发者文档
 
+### Native input API
+
+`require("executor.Native")` returns one cached module containing the native
+time functions and a minimal set of keyboard/mouse APIs plus `Sleep`. Legacy
+Logitech globals remain available. Wrappers resolve the current global function
+at call time, including replacements installed after requiring the module.
+`Native.Sleep` calls Logitech's host sleep, not a native thread sleep.
+Direct legacy calls bypass validation and press tracking and are not recommended.
+
+On first require in a new Lua VM, the module releases only presses still tracked
+from previous VMs through the new VM's raw host APIs. It does not release every
+supported key or button or remove any globals.
+Missing required press/release APIs or host errors fail
+module loading explicitly.
+Documented scan codes, including Pause (`0x146`), are forwarded without
+key-specific substitutions. Host rejections remain explicit errors.
+
+`Native.Keyboard_Press(...)` and `Native.Keyboard_Release(...)` validate the entire argument
+list before calling the host. Arguments must be supported key names or integral
+scan codes; query-only names `ctrl`, `shift`, and `alt` cannot be pressed.
+For example, `Native.Keyboard_Press(30, "b")` presses A and B, whereas
+`Native.Keyboard_Press(30, "?")` raises an error without pressing either key.
+`Native.Mouse_Press(button)` and `Native.Mouse_Release(button)` accept
+exactly one integer button identifier from 1 to 5.
+`Native.Keyboard_Click(...)` validates the complete key sequence before
+calling the raw `PressAndReleaseKey`. `Native.Mouse_Click(button)` validates one button
+before calling the raw `PressAndReleaseMouseButton`. Successful calls remove
+those inputs from tracking because they end released; host errors propagate.
+
+`Native.Keyboard_IsPressed(key)` queries Win32 for a Logitech key name or scan
+code, including the query-only aliases `ctrl`, `shift`, and `alt`. It checks
+current OS key state, not the tracked-input map.
+Keys sharing a Win32 virtual key, such as Enter and numpad Enter, share query state.
+`Native.Keyboard_IsLocked(key)` accepts only Caps Lock, Num Lock and Scroll Lock
+names or scan codes and returns their toggle state.
+`Native.Mouse_IsPressed(button)` validates a button from 1 to 5 and calls the
+raw `IsMouseButtonPressed`.
+`Native.Mouse_GetPosition`, `Native.Mouse_SetPosition`, `Native.Mouse_Move`, and
+`Native.Mouse_Scroll` call `GetMousePosition`, `MoveMouseToVirtual`,
+`MoveMouseRelative`, and `MoveMouseWheel`, respectively. Position coordinates
+retain Logitech's normalized 0–65535 units; setting position uses the virtual
+desktop. These wrappers resolve the current global on every call and preserve
+host results and errors. Other Logitech functions are not exported by Native;
+use the original globals when needed. Old unprefixed Native aliases are removed.
+
+Presses and the monotonic timer origin live in a single `NativeStorage` object
+owned by the hook DLL and initialized exactly once. `Keyboard` and `Mouse`
+classes own their private maps and implement `Press`, `Release`, and `Reset`.
+The `Time` class owns the private monotonic origin and implements
+`GetMonotonicTimestamp` and `GetSystemTimestamp`, exposed as
+`Native.Time_GetMonotonicTimestamp()` and `Native.Time_GetSystemTimestamp()`.
+Both return integer milliseconds; system time is measured since the Unix epoch.
+Each VM receives registry `GetStorage`/`SetStorage`
+accessors, allowing Native to retrieve the same object after VM destruction
+and native-module unloading/reloading. Both DLLs must be built together with
+the same C++ ABI/runtime. Storage replacement is rejected; `SetStorage` only
+accepts the existing instance. Requiring Native does not reset the timer.
+Rebuild and restart the hook when
+changing the storage layout. A missing storage bridge is an explicit load error.
+The separate keyboard and mouse maps own their
+key names and scan codes; they do not retain references into a destroyed VM.
+Repeated presses of an already-held input do not add another entry. Key names
+and equivalent scan codes identify the same input. Explicit releases remove
+that input from its map.
+`Native.Keyboard_ListPressed()` and `Native.Mouse_ListPressed()` return independent
+arrays in unspecified order.
+`Native.Keyboard_Reset()` and `Native.Mouse_Reset()` release their
+respective maps in unspecified order; call them during profile cleanup.
+Host errors propagate, leaving failed and not-yet-released entries tracked.
+The former manual `MarkKeyAsPressed`/`MarkKeyAsReleased` and
+`MarkButtonAsPressed`/`MarkButtonAsReleased` APIs are no longer needed or exposed.
+
 v2.0.0 开发分支仅保留 Classifier 图像分类挂机引擎，已移除 OCR 引擎及其命令行参数。ONNX Runtime 使用 vcpkg 提供的 CPU 版本，不再需要根目录下的 `dependencies/` 或手动下载 ONNX Runtime；运行时 DLL 由 vcpkg 部署。`Controller/dependencies/logitech-ghub-api-extender` 子模块保留供后续 DLL 集成使用。
 
 当前 vcpkg 基线的 ONNX 默认静态注册与 ONNX Runtime 的算子注册冲突，项目通过 [ONNX port overlay](cmake/ports/onnx/portfile.cmake) 设置 `ONNX_DISABLE_STATIC_REGISTRATION=ON`。升级基线时需确认上游已解决此问题后再移除 overlay。

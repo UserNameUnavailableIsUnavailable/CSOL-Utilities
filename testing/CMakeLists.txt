@@ -17,3 +17,4 @@ function(register_test test)
 endfunction()
 
 add_subdirectory(lghubex)
+add_subdirectory(executor)

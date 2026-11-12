@@ -61,6 +61,8 @@ void RestoreBuiltinModules(struct lua_State *L)
     // `coroutine` module
     luaL_requiref(L, "coroutine", luaopen_coroutine, 1);
     lua_pop(L, 1);
+
+    lua_gc(L, LUA_GCRESTART, 0);
 }
 
 static int l_print(struct lua_State *L)
@@ -82,11 +84,8 @@ static int l_print(struct lua_State *L)
     luaL_pushresult(&buf);
     int message_index = lua_gettop(L);
 
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "executor.Logitech");
-    lua_call(L, 1, 1);
-    lua_getfield(L, -1, "OutputMessage");
-    lua_remove(L, -2);
+    // call OutputLogMessage
+    lua_getglobal(L, "OutputLogMessage");
     lua_pushvalue(L, message_index);
     lua_call(L, 1, 0);
 

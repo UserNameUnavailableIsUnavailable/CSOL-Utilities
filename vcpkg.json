@@ -3,10 +3,8 @@
     "cli11",
     "nlohmann-json",
     "gtest",
-    "opencv",
     "fmt",
     "spdlog",
-    "minhook",
-    "onnxruntime"
+    "minhook"
   ]
 }

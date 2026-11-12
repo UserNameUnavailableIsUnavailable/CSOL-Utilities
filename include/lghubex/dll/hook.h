@@ -15,6 +15,7 @@ extern struct DllDirectory *g_ModuleDirectory;
 uint32_t InitializeDllDirectory(uintptr_t hDll);
 
 struct lua_State;
+void InstallNativeStorage(struct lua_State *L);
 void ApplyInjection(struct lua_State *L);
 
 typedef uint64_t (*LuaVMInitializer_T)(uint64_t vm, uint64_t param1, uint64_t param2);

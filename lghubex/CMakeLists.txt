@@ -13,7 +13,7 @@ add_library(
     source/dll/pattern.c
     source/dll/hook.c
     source/dll/features.c
-    source/dll/logitech.c
+    source/dll/storage.cpp
 )
 
 add_executable(

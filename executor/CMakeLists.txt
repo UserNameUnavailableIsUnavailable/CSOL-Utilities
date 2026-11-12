@@ -1,16 +1,23 @@
 add_library(
     Native_impl
     STATIC
-    native/time.c
+    native/time.cpp
+    native/keyboard.cpp
+    native/mouse.cpp
+    native/builtin.cpp
+    native/input.cpp
+    native/storage.cpp
 )
 
 add_library(
     Native
     SHARED
-    native/dll.c
+    native/dll.cpp
 )
 
 find_package(Lua CONFIG REQUIRED)
+
+target_link_libraries(Native_impl PUBLIC Lua::Static)
 
 target_link_libraries(
     Native
