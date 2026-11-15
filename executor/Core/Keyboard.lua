@@ -252,7 +252,7 @@ Keyboard.KeyCode = {
 
 ---检查给定的按键名是否有效。
 ---@param key any 按键名或按键扫描码
-local function IsValidKey(key)
+local function is_valid_key(key)
     if type(key) == "string" then
         for _, v in pairs(Keyboard.KeyName) do
             if v == key then
@@ -276,24 +276,19 @@ local unreleased = {}
 
 local frozen = true
 
-local L = require("Logitech")
-L.AfterLoad(function ()
-    frozen = false
-end)
-
 ---Freeze keyboard operations.
-function Keyboard.Freeze()
+function Keyboard.freeze()
     frozen = true
 end
 
 ---Unfreeze keyboard operations.
-function Keyboard.UnFreeze()
+function Keyboard.unfreeze()
     frozen = false
 end
 
 ---Whether the keyboard is in frozen state.
 ---@return boolean
-function Keyboard.IsFrozen()
+function Keyboard.is_frozen()
     return frozen
 end
 
@@ -303,21 +298,21 @@ end
 ---@param delay? integer 按下按键后的延迟时间。可以直接使用预定义于Delay表中的字段，如 `Delay.NORMAL`。
 ---@param precise? boolean|nil 是否精确定时
 ---按下按键。
-function Keyboard.Press(key, delay, precise)
-    if not Keyboard.IsFrozen() then
-        if IsValidKey(key) then
+function Keyboard.press(key, delay, precise)
+    if not Keyboard.is_frozen() then
+        if is_valid_key(key) then
             unreleased[key] = true
             L.PressKey(key--[[@as string|integer]])
         end
         if type(key) == "table" then
             local keys = {}
             for _, v in ipairs(key) do
-                if IsValidKey(v) then
+                if is_valid_key(v) then
                     keys[#keys + 1] = v
                     unreleased[v] = true
                 end
             end
-            PressKey(table.unpack(keys))
+            L.PressKey(table.unpack(keys))
         end
     end
     -- TODO: Await this call when Runtime.sleep returns a Promise.
@@ -329,15 +324,15 @@ end
 ---@param delay? integer 按下按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@param precise? boolean 是否精确定时
 function Keyboard.Release(key, delay, precise)
-    if not Keyboard.IsFrozen() then
-        if type(key) == "string" and IsValidKey(key) then
+    if not Keyboard.is_frozen() then
+        if type(key) == "string" and is_valid_key(key) then
             unreleased[key] = nil
             ReleaseKey(key)
         end
         if type(key) == "table" then
             local keys = {}
             for _, v in ipairs(key) do
-                if IsValidKey(v) then
+                if is_valid_key(v) then
                     keys[#keys + 1] = v
                     unreleased[v] = nil
                 end
@@ -353,15 +348,15 @@ end
 ---@param key Key|Key[] 按键名称，如 `Keyboard.ESCAPE`
 ---@param delay? integer 点击按键之后的延迟时间，单位为毫秒。可以直接使用预定义于 `Delay` 表中的字段，如 `Delay.NORMAL`。
 ---@param precise? boolean 是否精确定时
-function Keyboard.Click(key, delay, precise)
-    if not Keyboard.IsFrozen() then
-        if type(key) == "string" and IsValidKey(key) then
+function Keyboard.click(key, delay, precise)
+    if not Keyboard.is_frozen() then
+        if type(key) == "string" and is_valid_key(key) then
             PressAndReleaseKey(key)
         end
         if type(key) == "table" then
             local keys = {}
             for _, v in ipairs(key) do
-                if IsValidKey(v) then
+                if is_valid_key(v) then
                     keys[#keys + 1] = v
                 end
             end
@@ -392,7 +387,7 @@ function Keyboard.click_several_times(key, times, interval, delay, precise)
     interval = interval or Delay.SHORT
     delay = delay or Delay.SHORT
     times = times or 0
-    if not Keyboard.IsFrozen() and math.type(times) == "integer" and IsValidKey(key) then
+    if not Keyboard.is_frozen() and math.type(times) == "integer" and is_valid_key(key) then
         for i = 1, times do
             PressAndReleaseKey(key)
             if i ~= times then
@@ -411,103 +406,103 @@ end
 ---@param interval? integer
 ---@param delay? integer
 ---@param precise? boolean
-function Keyboard.send_input(s, interval, delay, precise)
+function Keyboard.simulate(s, interval, delay, precise)
     interval = interval or Delay.SHORT
     delay = delay or Delay.SHORT
-    if not Keyboard.IsFrozen() then
+    if not Keyboard.is_frozen() then
         local shift = false -- shift 是否按下
         for i = 1, #s do
             local c = s:sub(i, i)
             if string.byte("0") <= string.byte(c) and string.byte(c) <= string.byte("9") then
-                Keyboard.Click(c, interval, precise)
+                Keyboard.click(c, interval, precise)
             elseif string.byte("A") <= string.byte(c) and string.byte(c) <= string.byte("Z") then
                 if
-                    not IsKeyLockOn(Keyboard.CAPS_LOCK) -- 非大写锁定状态
+                    not Keyboard.is_locked(Keyboard.CAPS_LOCK) -- 非大写锁定状态
                 then
-                    Keyboard.Press(Keyboard.LEFT_SHIFT)
+                    Keyboard.press(Keyboard.LEFT_SHIFT)
                     shift = true
                 end
-                Keyboard.Click(c:lower(), interval, precise)
+                Keyboard.click(c:lower(), interval, precise)
                 if shift then
-                    Keyboard.Release(Keyboard.LEFT_SHIFT)
+                    Keyboard.release(Keyboard.LEFT_SHIFT)
                     shift = false
                 end
             elseif string.byte("a") <= string.byte(c) and string.byte(c) <= string.byte("z") then
                 if
-                    IsKeyLockOn(Keyboard.CAPS_LOCK) -- 大写锁定状态
+                    Keyboard.is_locked(Keyboard.CAPS_LOCK) -- 大写锁定状态
                 then
-                    Keyboard.Press(Keyboard.LEFT_SHIFT)
+                    Keyboard.press(Keyboard.LEFT_SHIFT)
                     shift = true
                 end
-                Keyboard.Click(c, interval, precise)
+                Keyboard.click(c, interval, precise)
                 if shift then
-                    Keyboard.Release(Keyboard.LEFT_SHIFT)
+                    Keyboard.release(Keyboard.LEFT_SHIFT)
                     shift = false
                 end
             elseif c == "-" then
-                Keyboard.Click(Keyboard.MINUS, interval, precise)
+                Keyboard.click(Keyboard.MINUS, interval, precise)
             elseif c == "=" then
-                Keyboard.Click(Keyboard.EQUAL, interval, precise)
+                Keyboard.click(Keyboard.EQUAL, interval, precise)
             elseif c == "[" then
-                Keyboard.Click(Keyboard.LBRACKET, interval, precise)
+                Keyboard.click(Keyboard.LBRACKET, interval, precise)
             elseif c == "]" then
-                Keyboard.Click(Keyboard.RBRACKET, interval, precise)
+                Keyboard.click(Keyboard.RBRACKET, interval, precise)
             elseif c == "\\" then
-                Keyboard.Click(Keyboard.BACKSLASH, interval, precise)
+                Keyboard.click(Keyboard.BACKSLASH, interval, precise)
             elseif c == ";" then
-                Keyboard.Click(Keyboard.SEMICOLON, interval, precise)
+                Keyboard.click(Keyboard.SEMICOLON, interval, precise)
             elseif c == "'" then
-                Keyboard.Click(Keyboard.QUOTE, interval, precise)
+                Keyboard.click(Keyboard.QUOTE, interval, precise)
             elseif c == "," then
-                Keyboard.Click(Keyboard.COMMA, interval, precise)
+                Keyboard.click(Keyboard.COMMA, interval, precise)
             elseif c == "." then
-                Keyboard.Click(Keyboard.PERIOD, interval, precise)
+                Keyboard.click(Keyboard.PERIOD, interval, precise)
             elseif c == "/" then
-                Keyboard.Click(Keyboard.SLASH, interval, precise)
+                Keyboard.click(Keyboard.SLASH, interval, precise)
             else
-                Keyboard.Press(Keyboard.LEFT_SHIFT)
+                Keyboard.press(Keyboard.LEFT_SHIFT)
                 if c == "~" then
-                    Keyboard.Click(Keyboard.BACKQUOTE, interval, precise)
+                    Keyboard.click(Keyboard.BACKQUOTE, interval, precise)
                 elseif c == "!" then
-                    Keyboard.Click(Keyboard.ONE, interval, precise)
+                    Keyboard.click(Keyboard.ONE, interval, precise)
                 elseif c == "@" then
-                    Keyboard.Click(Keyboard.TWO, interval, precise)
+                    Keyboard.click(Keyboard.TWO, interval, precise)
                 elseif c == "#" then
-                    Keyboard.Click(Keyboard.THREE, interval, precise)
+                    Keyboard.click(Keyboard.THREE, interval, precise)
                 elseif c == "$" then
-                    Keyboard.Click(Keyboard.FOUR, interval, precise)
+                    Keyboard.click(Keyboard.FOUR, interval, precise)
                 elseif c == "%" then
-                    Keyboard.Click(Keyboard.FIVE, interval, precise)
+                    Keyboard.click(Keyboard.FIVE, interval, precise)
                 elseif c == "^" then
-                    Keyboard.Click(Keyboard.SIX, interval, precise)
+                    Keyboard.click(Keyboard.SIX, interval, precise)
                 elseif c == "&" then
-                    Keyboard.Click(Keyboard.SEVEN, interval, precise)
+                    Keyboard.click(Keyboard.SEVEN, interval, precise)
                 elseif c == "*" then
-                    Keyboard.Click(Keyboard.EIGHT, interval, precise)
+                    Keyboard.click(Keyboard.EIGHT, interval, precise)
                 elseif c == "(" then
-                    Keyboard.Click(Keyboard.NINE, interval, precise)
+                    Keyboard.click(Keyboard.NINE, interval, precise)
                 elseif c == ")" then
-                    Keyboard.Click(Keyboard.ZERO, interval, precise)
+                    Keyboard.click(Keyboard.ZERO, interval, precise)
                 elseif c == "_" then
-                    Keyboard.Click(Keyboard.MINUS, interval, precise)
+                    Keyboard.click(Keyboard.MINUS, interval, precise)
                 elseif c == "+" then
-                    Keyboard.Click(Keyboard.EQUAL, interval, precise)
+                    Keyboard.click(Keyboard.EQUAL, interval, precise)
                 elseif c == "{" then
-                    Keyboard.Click(Keyboard.LBRACKET, interval, precise)
+                    Keyboard.click(Keyboard.LBRACKET, interval, precise)
                 elseif c == "}" then
-                    Keyboard.Click(Keyboard.RBRACKET, interval, precise)
+                    Keyboard.click(Keyboard.RBRACKET, interval, precise)
                 elseif c == "|" then
-                    Keyboard.Click(Keyboard.BACKSLASH, interval, precise)
+                    Keyboard.click(Keyboard.BACKSLASH, interval, precise)
                 elseif c == ":" then
-                    Keyboard.Click(Keyboard.SEMICOLON, interval, precise)
+                    Keyboard.click(Keyboard.SEMICOLON, interval, precise)
                 elseif c == '"' then
-                    Keyboard.Click(Keyboard.QUOTE, interval, precise)
+                    Keyboard.click(Keyboard.QUOTE, interval, precise)
                 elseif c == "<" then
-                    Keyboard.Click(Keyboard.COMMA, interval, precise)
+                    Keyboard.click(Keyboard.COMMA, interval, precise)
                 elseif c == ">" then
-                    Keyboard.Click(Keyboard.PERIOD, interval, precise)
+                    Keyboard.click(Keyboard.PERIOD, interval, precise)
                 elseif c == "?" then
-                    Keyboard.Click(Keyboard.SLASH, interval, precise)
+                    Keyboard.click(Keyboard.SLASH, interval, precise)
                 end
                 Keyboard.Release(Keyboard.LEFT_SHIFT)
             end
@@ -517,23 +512,18 @@ function Keyboard.send_input(s, interval, delay, precise)
     Runtime.sleep(delay, precise)
 end
 
----判断修饰键（SHIFT、CTRL、ALT）是否按下。
----@param key Key 可取 `Keyboard.SHIFT`、`Keyboard.CTRL`、`Keyboard.ALT`、`Keyboard.LEFT_SHIFT`、`Keyboard.RIGHT_SHIFT`、`Keyboard.LEFT_CTRL`、`Keyboard.RIGHT_CTRL`、`Keyboard.LEFT_ALT`、`Keyboard.RIGHT_ALT`
----@return boolean # 指定修饰键是否按下
-function Keyboard.IsModifierPressed(key)
-    return IsModifierPressed(key)
+---判断指定按键是否按下。
+---@param key Key
+---@return boolean
+function Keyboard.is_pressed(key)
+    return Native.keyboard_is_pressed(key)
 end
 
 ---判断锁定键（CAPSLOCK、SCROLLLOCK、NUMLOCK）是否处于开启状态。
 ---@param key Key 按键名称，可取 `Keyboard.CAPS_LOCK`、`Keyboard.SCROLL_LOCK`、`Keyboard.NUM_LOCK`
 ---@return boolean
-function Keyboard.IsKeyLockOn(key)
-    return IsKeyLockOn(key)
+function Keyboard.is_locked(key)
+    return Native.keyboard_is_locked(key)
 end
-
-L.BeforeUnload(function ()
-    Keyboard.Freeze()
-    Keyboard.reset()
-end)
 
 return Keyboard

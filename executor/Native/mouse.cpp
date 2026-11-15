@@ -91,18 +91,23 @@ int Mouse::ListPressed(lua_State* state) const {
 void InitializeMouse(lua_State* state) {
   input::RequireFunction(state, "PressMouseButton");
   input::RequireFunction(state, "ReleaseMouseButton");
+  input::RequireFunction(state, "PressAndReleaseMouseButton");
+  input::RequireFunction(state, "GetMousePosition");
+  input::RequireFunction(state, "MoveMouseToVirtual");
+  input::RequireFunction(state, "MoveMouseRelative");
+  input::RequireFunction(state, "MoveMouseWheel");
   GetStorage(state).mouse.Reset(state);
   const luaL_Reg kFunctions[] = {
-      {"Mouse_Press", PressMouseButton},
-      {"Mouse_Release", ReleaseMouseButton},
-      {"Mouse_Click", ClickMouseButton},
-      {"Mouse_Reset", ResetMouse},
-      {"Mouse_ListPressed", ListPressedButtons},
-      {"Mouse_IsPressed", IsPressed},
-      {"Mouse_GetPosition", GetPosition},
-      {"Mouse_SetPosition", SetPosition},
-      {"Mouse_Move", Move},
-      {"Mouse_Scroll", Scroll},
+      {"Mouse_press", PressMouseButton},
+      {"Mouse_release", ReleaseMouseButton},
+      {"Mouse_click", ClickMouseButton},
+      {"Mouse_reset", ResetMouse},
+      {"Mouse_list_pressed", ListPressedButtons},
+      {"Mouse_is_pressed", IsPressed},
+      {"Mouse_get_position", GetPosition},
+      {"Mouse_set_position", SetPosition},
+      {"Mouse_move", Move},
+      {"Mouse_scroll", Scroll},
       {nullptr, nullptr},
   };
   luaL_setfuncs(state, kFunctions, 0);

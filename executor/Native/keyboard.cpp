@@ -240,15 +240,17 @@ int Keyboard::IsLocked(lua_State* state) const {
 void InitializeKeyboard(lua_State* state) {
   input::RequireFunction(state, "PressKey");
   input::RequireFunction(state, "ReleaseKey");
+  input::RequireFunction(state, "PressAndReleaseKey");
+  input::RequireFunction(state, "IsKeyLockOn");
   GetStorage(state).keyboard.Reset(state);
   const luaL_Reg kFunctions[] = {
-      {"Keyboard_Press", PressKeyboardKey},
-      {"Keyboard_Release", ReleaseKeyboardKey},
-      {"Keyboard_Click", ClickKeyboardKey},
-      {"Keyboard_Reset", ResetKeyboard},
-      {"Keyboard_ListPressed", ListPressedKeyboardKeys},
-      {"Keyboard_IsPressed", IsPressed},
-      {"Keyboard_IsLocked", IsLocked},
+      {"Keyboard_press", PressKeyboardKey},
+      {"Keyboard_release", ReleaseKeyboardKey},
+      {"Keyboard_click", ClickKeyboardKey},
+      {"Keyboard_reset", ResetKeyboard},
+      {"Keyboard_list_pressed", ListPressedKeyboardKeys},
+      {"Keyboard_is_pressed", IsPressed},
+      {"Keyboard_is_locked", IsLocked},
       {nullptr, nullptr},
   };
   luaL_setfuncs(state, kFunctions, 0);

@@ -140,6 +140,67 @@ Host errors propagate, leaving failed and not-yet-released entries tracked.
 The former manual `MarkKeyAsPressed`/`MarkKeyAsReleased` and
 `MarkButtonAsPressed`/`MarkButtonAsReleased` APIs are no longer needed or exposed.
 
+### Coroutine async runtime
+
+`executor.Core.Task`, `executor.Core.Scheduler`, and `executor.Core.Runtime`
+provide lazy coroutine tasks. `Runtime.Sleep(milliseconds)` returns a Task,
+not a blocking sleep; the timer starts when that task runs. Delays must be
+integers from 0 to 2147483647 milliseconds. `Native.Sleep` remains the blocking
+legacy Logitech wrapper.
+
+```lua
+local Task = require("executor.Core.Task")
+local Scheduler = require("executor.Core.Scheduler")
+local Runtime = require("executor.Core.Runtime")
+
+local root = Task.Create(function()
+    Runtime.Sleep(1000):Await()
+    return "finished"
+end)
+Scheduler.Prepare(root)
+Scheduler.Submit(root:GetId())
+while Scheduler.Run() do end
+print(root:Await())
+Scheduler.Shutdown()
+```
+
+`Prepare(task)` registers a suspended task; `Submit(id)` marks it ready.
+`Run()` polls native completions, resumes one ready batch, and returns whether
+scheduled tasks remain. It blocks on IOCP only when no task is ready, and
+detects stalled tasks with no pending I/O. Newly submitted tasks run in the next
+batch. `Task:Await()` inside a scheduled coroutine schedules a lazy child and
+suspends the caller until it finishes. Multiple callers can await the same
+Task: it executes once, and all receive its results, including nil values.
+Completed tasks can be awaited outside the scheduler. Self/cyclic awaits and
+unsupported yields are explicit errors.
+
+Awaited failures propagate to the caller and can be caught with `pcall`.
+Unhandled root failures shut the scheduler down and are raised by `Run`.
+`Shutdown()` closes remaining coroutine frames and native resources;
+`Initialize()` allows reuse after shutdown. Explicit task cancellation is
+deferred; shutdown marks unfinished tasks failed.
+
+The native primitives are a `Timer` waitable, a `TimerChannel` holding task ids
+and a deadline heap, and an IOCP `Multiplexer`. A Windows thread-pool timer posts
+channel readiness into IOCP; callbacks never access Lua, task tables or the
+deadline heap. `Native.Runtime_sleep(id, milliseconds)` queues an operation and
+`Native.Runtime_poll(timeout)` returns completed ids, removing each once.
+Timeout is -1 for blocking, 0 for nonblocking, or a positive millisecond limit;
+no pending native work returns immediately. `Runtime_open` and `Runtime_close`
+manage explicit native lifetime.
+
+Async state and timer callback code are owned by the hook DLL, not Native.dll.
+When the hook attaches a new Lua VM, it destroys the old async instance, cancels
+timers, waits for callbacks and discards old completions before the new runtime
+is used. Keyboard/mouse state and the monotonic origin remain retained.
+This does not rely on Lua finalizers or the old VM returning from a callback.
+Rebuild and restart both DLLs together. One VM/thread owns the scheduler and
+native queues; concurrent old/new VM execution is unsupported.
+Forced `TerminateThread` during arbitrary Lua/C++ allocation or native mutation
+can still corrupt process state; no in-process framework can make that safe.
+Replacement handles abandoned timers and a thread stopped while waiting on IOCP,
+but is not a general guarantee against forced thread termination.
+
 v2.0.0 开发分支仅保留 Classifier 图像分类挂机引擎，已移除 OCR 引擎及其命令行参数。ONNX Runtime 使用 vcpkg 提供的 CPU 版本，不再需要根目录下的 `dependencies/` 或手动下载 ONNX Runtime；运行时 DLL 由 vcpkg 部署。`Controller/dependencies/logitech-ghub-api-extender` 子模块保留供后续 DLL 集成使用。
 
 当前 vcpkg 基线的 ONNX 默认静态注册与 ONNX Runtime 的算子注册冲突，项目通过 [ONNX port overlay](cmake/ports/onnx/portfile.cmake) 设置 `ONNX_DISABLE_STATIC_REGISTRATION=ON`。升级基线时需确认上游已解决此问题后再移除 overlay。

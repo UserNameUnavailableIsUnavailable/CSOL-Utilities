@@ -126,7 +126,9 @@ TEST_F(NativeInputTest, PreservesLegacyGlobalsAndExportsOnlyMinimalApi) {
             "Mouse_Press", "Mouse_Release", "Mouse_Click", "Mouse_Reset",
             "Mouse_ListPressed", "Mouse_IsPressed", "Mouse_GetPosition",
             "Mouse_SetPosition", "Mouse_Move", "Mouse_Scroll",
-            "Time_GetMonotonicTimestamp", "Time_GetSystemTimestamp", "Sleep"
+            "Time_GetMonotonicTimestamp", "Time_GetSystemTimestamp", "Sleep",
+            "Debug_GetThreadId", "Runtime_open", "Runtime_sleep",
+            "Runtime_poll", "Runtime_close"
         })
         for name, value in pairs(Native) do
             assert(expected[name] and type(value) == "function", name)

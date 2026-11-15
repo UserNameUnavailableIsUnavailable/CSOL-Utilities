@@ -17,6 +17,22 @@ function Native.Time_GetSystemTimestamp() return 0 end
 ---@param ms integer
 function Native.Sleep(ms) end
 
+---Attach a fresh async runtime after Runtime_close. Repeated attachment is idempotent.
+function Native.Runtime_open() end
+
+---Queue a timer completion for a task id. An id may have only one pending timer.
+---@param task_id integer nonnegative task identifier
+---@param milliseconds integer from 0 to 2147483647
+function Native.Runtime_sleep(task_id, milliseconds) end
+
+---Poll IOCP; return each completed task id once. No pending I/O returns immediately.
+---@param timeout? integer -1 (default) waits; 0 polls; positive values bound the wait
+---@return integer[] ready_task_ids
+function Native.Runtime_poll(timeout) return {} end
+
+---Stop timers, join callbacks, discard pending completions and close IOCP.
+function Native.Runtime_close() end
+
 ---Validate all keys before pressing any.
 ---@param ... integer|string supported Logitech scan codes or names
 function Native.Keyboard_Press(...) end

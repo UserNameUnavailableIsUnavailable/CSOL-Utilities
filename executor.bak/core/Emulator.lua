@@ -58,7 +58,7 @@ if not __EMULATOR_LUA__ then
     ---检查指定的键盘锁定键是否开启。
     ---@param key string 键盘锁定键名称（"capslock"、"numlock"、"scrolllock"）
     ---@return boolean
-    function IsKeyLockOn(key)
+    function Keyboard.is_locked(key)
         if key == "capslock" then
             key = "CapsLock"
         elseif key == "numlock" then

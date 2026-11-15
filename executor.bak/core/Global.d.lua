@@ -120,7 +120,7 @@ end
 ---Determine if a particular lock button is currently in an enabled state.
 ---@param key_name string the predefined keyname of the lock button to be checked
 ---@return boolean
-function IsKeyLockOn(key_name) return false end
+function Keyboard.is_locked(key_name) return false end
 
 ---Send log messages to the Windows debugger.
 ---@param ... any formatted string containing the message
