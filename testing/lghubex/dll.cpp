@@ -50,7 +50,7 @@ protected:
         ApplyInjection(state);
         ASSERT_EQ(lua_gettop(state), stackTop);
 
-        lua_getfield(state, LUA_REGISTRYINDEX, "executor.Native.Storage");
+        lua_getfield(state, LUA_REGISTRYINDEX, "executor.core.Native.Storage");
         ASSERT_TRUE(lua_istable(state, -1));
         lua_getfield(state, -1, "GetStorage");
         EXPECT_TRUE(lua_isfunction(state, -1));

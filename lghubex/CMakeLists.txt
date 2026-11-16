@@ -14,10 +14,6 @@ add_library(
     source/dll/hook.c
     source/dll/features.c
     source/dll/storage.cpp
-    "${PROJECT_SOURCE_DIR}/executor/Native/waitable.cpp"
-    "${PROJECT_SOURCE_DIR}/executor/Native/channel.cpp"
-    "${PROJECT_SOURCE_DIR}/executor/Native/multiplexer.cpp"
-    "${PROJECT_SOURCE_DIR}/executor/Native/runtime.cpp"
 )
 
 add_executable(

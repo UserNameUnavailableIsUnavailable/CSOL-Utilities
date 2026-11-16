@@ -1,7 +1,7 @@
 local Scheduler = {}
 
-local Native = require("executor.Native")
-local Task = require("executor.Core.Task")
+local native = require("executor.core.Native")
+local Task = require("executor.core.Task")
 
 local suspended = {}
 local tasks = {}
@@ -95,7 +95,7 @@ function Scheduler.shutdown()
         task._waiters = {}
     end
     tasks, suspended, ready, queued = {}, {}, {}, {}
-    Native.Runtime_close()
+    native.Runtime_close()
     if #failures > 0 then
         error(table.concat(failures, "\n"), 0)
     end
@@ -105,7 +105,7 @@ local function runBatch()
     if not Scheduler.has_pending() then
         return false
     end
-    local completions = Native.Runtime_poll(#ready == 0 and -1 or 0)
+    local completions = native.Runtime_poll(#ready == 0 and -1 or 0)
     for _, id in ipairs(completions) do
         local task = suspended[id]
         assert(task and task._waiting_io, "completion for a task without pending I/O")
@@ -136,7 +136,7 @@ local function runBatch()
             if result.n ~= 2 or type(request) ~= "table" then
                 fail(task, "tasks must yield through Await or Runtime.Sleep", failures)
             elseif request.kind == "sleep" then
-                local registered, message = pcall(Native.Runtime_sleep, id, request.delay)
+                local registered, message = pcall(native.Runtime_sleep, id, request.delay)
                 if registered then
                     task._waiting_io = true
                 else
@@ -172,7 +172,7 @@ end
 function Scheduler.initialize()
     assert(not running and not Scheduler.has_pending(),
         "cannot initialize a scheduler with pending tasks")
-    Native.Runtime_open()
+    native.Runtime_open()
 end
 
 return Scheduler

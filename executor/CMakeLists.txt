@@ -1,19 +1,23 @@
 add_library(
     Native_impl
     STATIC
-    native/time.cpp
-    native/keyboard.cpp
-    native/mouse.cpp
-    native/raw.cpp
-    native/input.cpp
-    native/storage.cpp
-    native/async.cpp
+    core/Native/time.cpp
+    core/Native/keyboard.cpp
+    core/Native/mouse.cpp
+    core/Native/raw.cpp
+    core/Native/input.cpp
+    core/Native/storage.cpp
+    core/Native/async.cpp
+    core/Native/waitable.cpp
+    core/Native/channel.cpp
+    core/Native/multiplexer.cpp
+    core/Native/runtime.cpp
 )
 
 add_library(
     Native
     SHARED
-    native/dll.cpp
+    core/Native/dll.cpp
 )
 
 find_package(Lua CONFIG REQUIRED)
@@ -30,6 +34,6 @@ add_custom_command(
     TARGET Native POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
         "$<TARGET_FILE:Native>"
-        "${CMAKE_SOURCE_DIR}/executor/$<TARGET_FILE_NAME:Native>"
+        "${CMAKE_SOURCE_DIR}/executor/core/$<TARGET_FILE_NAME:Native>"
     VERBATIM
 )

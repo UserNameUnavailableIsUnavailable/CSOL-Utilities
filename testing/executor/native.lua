@@ -1,4 +1,4 @@
-local Native = require("executor.Native")
+local Native = require("executor.core.Native")
 local lu = require("luaunit")
 
 function TestGetMonotonicTimestamp()

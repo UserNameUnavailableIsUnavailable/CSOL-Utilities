@@ -1,4 +1,4 @@
-#include <executor/native/global_storage.hpp>
+#include <executor/core/Native/global_storage.hpp>
 
 namespace {
 

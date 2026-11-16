@@ -1,9 +1,10 @@
 local Runtime = {}
 
-local Task = require("executor.Core.Task")
+local Task = require("executor.core.Task")
 
 ---Create a lazy sleep task. Its timer starts when the task is scheduled.
 ---@param milliseconds integer
+---@nodiscard
 function Runtime.sleep(milliseconds)
     assert(type(milliseconds) == "number" and math.type(milliseconds) == "integer"
         and milliseconds >= 0 and milliseconds <= 2147483647,

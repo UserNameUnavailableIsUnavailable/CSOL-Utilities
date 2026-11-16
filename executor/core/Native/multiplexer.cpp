@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <chrono>
-#include <executor/native/channel.hpp>
-#include <executor/native/multiplexer.hpp>
+#include <executor/core/Native/channel.hpp>
+#include <executor/core/Native/multiplexer.hpp>
 #include <stdexcept>
 #include <system_error>
 

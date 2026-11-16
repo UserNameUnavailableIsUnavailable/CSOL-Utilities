@@ -1,5 +1,5 @@
 ---@meta
----@module "executor.Native"
+---@module "executor.core.Native"
 local Native = {}
 
 -- Requiring this module releases tracked inputs left by previous VMs.
@@ -7,15 +7,21 @@ local Native = {}
 
 ---Get milliseconds elapsed since hook-owned storage was initialized.
 ---@return integer
-function Native.Time_GetMonotonicTimestamp() return 0 end
+function Native.Time_get_monotonic_timestamp() return 0 end
 
 ---Get milliseconds since the Unix epoch.
 ---@return integer
-function Native.Time_GetSystemTimestamp() return 0 end
+function Native.Time_get_system_timestamp() return 0 end
 
 ---Call the current global Logitech Sleep implementation.
 ---@param ms integer
-function Native.Sleep(ms) end
+function Native.Raw_sleep(ms) end
+
+---Get current thread id.
+---@return integer
+function Native.Raw_get_thread_id()
+    return 0
+end
 
 ---Attach a fresh async runtime after Runtime_close. Repeated attachment is idempotent.
 function Native.Runtime_open() end
@@ -35,68 +41,68 @@ function Native.Runtime_close() end
 
 ---Validate all keys before pressing any.
 ---@param ... integer|string supported Logitech scan codes or names
-function Native.Keyboard_Press(...) end
+function Native.Keyboard_press(...) end
 
 ---Validate all keys before releasing any.
 ---@param ... integer|string supported Logitech scan codes or names
-function Native.Keyboard_Release(...) end
+function Native.Keyboard_release(...) end
 
 ---Validate, press and release all keys; remove successful clicks from tracking.
 ---@param ... integer|string supported Logitech scan codes or names
-function Native.Keyboard_Click(...) end
+function Native.Keyboard_click(...) end
 
 ---Release all tracked keys in unspecified order.
-function Native.Keyboard_Reset() end
+function Native.Keyboard_reset() end
 
 ---Return an independent array of tracked keys in unspecified order.
 ---@return (integer|string)[]
-function Native.Keyboard_ListPressed() return {} end
+function Native.Keyboard_list_pressed() return {} end
 
 ---Query current OS key state via Win32, independently of tracked presses.
 ---Keys sharing a Win32 virtual key (Enter and numpad Enter) share query state.
 ---@param key integer|string Logitech scan code/name, or ctrl/shift/alt
 ---@return boolean
-function Native.Keyboard_IsPressed(key) return false end
+function Native.Keyboard_is_pressed(key) return false end
 
 ---Query the toggle state of capslock, numlock or scrolllock.
 ---@param key integer|string Logitech scan code or lock key name
 ---@return boolean
-function Native.Keyboard_IsLocked(key) return false end
+function Native.Keyboard_is_locked(key) return false end
 
 ---@param button integer button identifier from 1 to 5
-function Native.Mouse_Press(button) end
+function Native.Mouse_press(button) end
 
 ---@param button integer button identifier from 1 to 5
-function Native.Mouse_Release(button) end
+function Native.Mouse_release(button) end
 
 ---@param button integer button identifier from 1 to 5
-function Native.Mouse_Click(button) end
+function Native.Mouse_click(button) end
 
 ---Release all tracked mouse buttons in unspecified order.
-function Native.Mouse_Reset() end
+function Native.Mouse_reset() end
 
 ---@return integer[] buttons in unspecified order
-function Native.Mouse_ListPressed() return {} end
+function Native.Mouse_list_pressed() return {} end
 
 ---@param button integer button identifier from 1 to 5
 ---@return boolean
-function Native.Mouse_IsPressed(button) return false end
+function Native.Mouse_is_pressed(button) return false end
 
 ---Return normalized Logitech coordinates.
 ---@return integer x
 ---@return integer y
-function Native.Mouse_GetPosition() return 0, 0 end
+function Native.Mouse_get_position() return 0, 0 end
 
 ---Set normalized coordinates across the virtual desktop via MoveMouseToVirtual.
 ---@param x integer normalized coordinate from 0 to 65535
 ---@param y integer normalized coordinate from 0 to 65535
-function Native.Mouse_SetPosition(x, y) end
+function Native.Mouse_set_position(x, y) end
 
 ---@param dx integer relative horizontal movement
 ---@param dy integer relative vertical movement
-function Native.Mouse_Move(dx, dy) end
+function Native.Mouse_move(dx, dy) end
 
 ---@param clicks integer wheel movement
-function Native.Mouse_Scroll(clicks) end
+function Native.Mouse_scroll(clicks) end
 
 return Native

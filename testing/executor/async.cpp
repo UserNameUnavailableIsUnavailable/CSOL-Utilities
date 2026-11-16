@@ -3,10 +3,30 @@
 #include <lghubex/dll/hook.h>
 
 #include <chrono>
-#include <executor/native/global_storage.hpp>
-#include <executor/native/runtime.hpp>
+#include <executor/core/Native/global_storage.hpp>
+#include <executor/core/Native/runtime.hpp>
 #include <filesystem>
+#include <string>
 #include <thread>
+
+namespace {
+
+void ConfigureNativePath(lua_State* state) {
+  lua_getglobal(state, "package");
+  lua_getfield(state, -1, "cpath");
+  const char* existing = lua_tostring(state, -1);
+  std::string path = std::string(TEST_PROJECT_ROOT) + "\\?.dll";
+  if (existing != nullptr) {
+    path += ";";
+    path += existing;
+  }
+  lua_pop(state, 1);
+  lua_pushlstring(state, path.data(), path.size());
+  lua_setfield(state, -2, "cpath");
+  lua_pop(state, 1);
+}
+
+}  // namespace
 
 class AsyncTest : public ::testing::Test {
  protected:
@@ -15,36 +35,42 @@ class AsyncTest : public ::testing::Test {
     ASSERT_NE(state_, nullptr);
     luaL_openlibs(state_);
     InstallNativeStorage(state_);
+    ConfigureNativePath(state_);
     luaL_getsubtable(state_, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
-    lua_pushcfunction(state_, luaopen_executor_Native);
-    lua_setfield(state_, -2, "executor.Native");
     const std::filesystem::path root(TEST_PROJECT_ROOT);
     for (const auto* name : {"Task", "Scheduler", "Runtime"}) {
       const auto path =
           root / "executor" / "Core" / (std::string(name) + ".lua");
       ASSERT_EQ(luaL_loadfile(state_, path.string().c_str()), LUA_OK)
           << lua_tostring(state_, -1);
-      const auto module = std::string("executor.Core.") + name;
+      const auto module = std::string("executor.core.") + name;
       lua_setfield(state_, -2, module.c_str());
     }
     lua_pop(state_, 1);
     Run(R"lua(
       PressKey = function() end
       ReleaseKey = function() end
+      PressAndReleaseKey = function() end
+      IsKeyLockOn = function() return false end
       PressMouseButton = function() end
       ReleaseMouseButton = function() end
-      Native = require("executor.Native")
-      Task = require("executor.Core.Task")
-      Scheduler = require("executor.Core.Scheduler")
-      Runtime = require("executor.Core.Runtime")
+      PressAndReleaseMouseButton = function() end
+      GetMousePosition = function() return 0, 0 end
+      MoveMouseToVirtual = function() end
+      MoveMouseRelative = function() end
+      MoveMouseWheel = function() end
+      Native = require("executor.core.Native")
+      Task = require("executor.core.Task")
+      Scheduler = require("executor.core.Scheduler")
+      Runtime = require("executor.core.Runtime")
       function spawn(fn)
-        local task = Task.Create(fn)
-        Scheduler.Prepare(task)
-        Scheduler.Submit(task:GetId())
+        local task = Task.create(fn)
+        Scheduler.prepare(task)
+        Scheduler.submit(task:get_id())
         return task
       end
       function drain()
-        while Scheduler.Run() do end
+        while Scheduler.run() do end
       end
     )lua");
   }
@@ -127,39 +153,39 @@ TEST_F(AsyncTest, ValidatesNativeOperationsWithoutPartialRegistration) {
 TEST_F(AsyncTest, AwaitIsLazyAndPreservesMultipleResults) {
   Run(R"lua(
     local started = false
-    local child = Task.Create(function()
+    local child = Task.create(function()
       started = true
-      Runtime.Sleep(15):Await()
+      Runtime.sleep(15):await()
       return "done", nil, 7
     end)
-    assert(not started and not child:IsDone() and not child:IsCancelled())
-    assert(not pcall(child.Await, child))
-    assert(not Scheduler.HasPending())
+    assert(not started and not child:is_done() and not child:is_cancelled())
+    assert(not pcall(child.await, child))
+    assert(not Scheduler.has_pending())
     local root = spawn(function()
-      local result = table.pack(child:Await())
+      local result = table.pack(child:await())
       assert(result.n == 3 and result[1] == "done" and result[3] == 7)
-      local again = table.pack(child:Await())
+      local again = table.pack(child:await())
       assert(again.n == 3 and again[3] == 7)
       return 42
     end)
     drain()
-    assert(started and root:IsDone() and child:IsDone())
-    assert(root:Await() == 42)
-    assert(not Scheduler.Run())
+    assert(started and root:is_done() and child:is_done())
+    assert(root:await() == 42)
+    assert(not Scheduler.run())
   )lua");
 }
 
 TEST_F(AsyncTest, ConcurrentTasksShareOneAwaitedTask) {
   Run(R"lua(
     local runs, completed = 0, 0
-    local shared = Task.Create(function()
+    local shared = Task.create(function()
       runs = runs + 1
-      Runtime.Sleep(20):Await()
+      Runtime.sleep(20):await()
       return 8
     end)
     for _ = 1, 3 do
       spawn(function()
-        assert(shared:Await() == 8)
+        assert(shared:await() == 8)
         completed = completed + 1
       end)
     end
@@ -174,15 +200,15 @@ TEST_F(AsyncTest, SleepDoesNotBlockOtherReadyTasksOrFinishEarly) {
     local sequence = {}
     local slow = spawn(function()
       sequence[#sequence + 1] = "start"
-      Runtime.Sleep(60):Await()
+      Runtime.sleep(60):await()
       sequence[#sequence + 1] = "end"
     end)
     spawn(function()
-      Runtime.Sleep(0):Await()
+      Runtime.sleep(0):await()
       sequence[#sequence + 1] = "other"
     end)
     drain()
-    assert(slow:IsDone())
+    assert(slow:is_done())
     assert(table.concat(sequence, ",") == "start,other,end")
   )lua");
   EXPECT_GE(std::chrono::steady_clock::now() - start,
@@ -191,26 +217,26 @@ TEST_F(AsyncTest, SleepDoesNotBlockOtherReadyTasksOrFinishEarly) {
 
 TEST_F(AsyncTest, AwaitedErrorsAreCatchableAndRootErrorsCleanup) {
   Run(R"lua(
-    local child = Task.Create(function()
-      Runtime.Sleep(0):Await()
+    local child = Task.create(function()
+      Runtime.sleep(0):await()
       error("child failure")
     end)
     local root = spawn(function()
-      local ok, err = pcall(child.Await, child)
+      local ok, err = pcall(child.await, child)
       assert(not ok and err:find("child failure", 1, true))
-      Runtime.Sleep(0):Await()
+      Runtime.sleep(0):await()
       return "caught"
     end)
     drain()
-    assert(root:Await() == "caught")
-    spawn(function() Runtime.Sleep(1000):Await() end)
+    assert(root:await() == "caught")
+    spawn(function() Runtime.sleep(1000):await() end)
     spawn(function() error("root failure") end)
-    local ok, err = pcall(Scheduler.Run)
+    local ok, err = pcall(Scheduler.run)
     assert(not ok and err:find("root failure", 1, true))
-    assert(not Scheduler.HasPending())
+    assert(not Scheduler.has_pending())
     assert(not pcall(Native.Runtime_poll, 0))
-    Scheduler.Initialize()
-    spawn(function() Runtime.Sleep(0):Await() end)
+    Scheduler.initialize()
+    spawn(function() Runtime.sleep(0):await() end)
     drain()
   )lua");
 }
@@ -221,54 +247,54 @@ TEST_F(AsyncTest, FailedTasksAndShutdownCloseCoroutineResources) {
     local function resource()
       return setmetatable({}, { __close = function() closed = closed + 1 end })
     end
-    local failed = Task.Create(function()
+    local failed = Task.create(function()
       local guard <close> = resource()
       error("guard failure")
     end)
     spawn(function()
-      local ok, err = pcall(failed.Await, failed)
+      local ok, err = pcall(failed.await, failed)
       assert(not ok and err:find("guard failure", 1, true))
       assert(closed == 1)
     end)
     drain()
     spawn(function()
       local guard <close> = resource()
-      Runtime.Sleep(1000):Await()
+      Runtime.sleep(1000):await()
     end)
-    assert(Scheduler.Run())
-    assert(Scheduler.Run())
-    Scheduler.Shutdown()
+    assert(Scheduler.run())
+    assert(Scheduler.run())
+    Scheduler.shutdown()
     assert(closed == 2)
-    assert(not Scheduler.HasPending())
-    Scheduler.Shutdown()
+    assert(not Scheduler.has_pending())
+    Scheduler.shutdown()
   )lua");
 }
 
 TEST_F(AsyncTest,
        PendingSleepCannotBeSubmittedEarlyAndNativeErrorsAreAwaitable) {
   Run(R"lua(
-    local sleep = Runtime.Sleep(20)
-    Scheduler.Prepare(sleep)
-    Scheduler.Submit(sleep:GetId())
-    assert(Scheduler.Run())
-    local ok, err = pcall(Scheduler.Submit, sleep:GetId())
+    local sleep = Runtime.sleep(20)
+    Scheduler.prepare(sleep)
+    Scheduler.submit(sleep:get_id())
+    assert(Scheduler.run())
+    local ok, err = pcall(Scheduler.submit, sleep:get_id())
     assert(not ok and err:find("before its I/O completes", 1, true))
     drain()
     local original = Native.Runtime_sleep
     Native.Runtime_sleep = function() error("timer registration failure") end
     spawn(function()
-      local task = Runtime.Sleep(0)
-      local success, message = pcall(task.Await, task)
+      local task = Runtime.sleep(0)
+      local success, message = pcall(task.await, task)
       assert(not success and message:find("timer registration failure", 1, true))
     end)
     drain()
     Native.Runtime_sleep = original
     spawn(function()
-      local bad = Task.Create(function() coroutine.yield("unsupported") end)
-      local success, message = pcall(bad.Await, bad)
+      local bad = Task.create(function() coroutine.yield("unsupported") end)
+      local success, message = pcall(bad.await, bad)
       assert(not success and message:find("tasks must yield", 1, true))
-      assert(not pcall(Scheduler.Run))
-      assert(not pcall(Scheduler.Submit, Scheduler.GetCurrent():GetId()))
+      assert(not pcall(Scheduler.run))
+      assert(not pcall(Scheduler.submit, Scheduler.get_running():get_id()))
     end)
     drain()
   )lua");
@@ -277,40 +303,40 @@ TEST_F(AsyncTest,
 TEST_F(AsyncTest, RejectsCyclesInvalidYieldsAndInvalidSleep) {
   Run(R"lua(
     for _, value in ipairs({-1, 1.5, "1", false, {}, 2147483648}) do
-      assert(not pcall(Runtime.Sleep, value))
+      assert(not pcall(Runtime.sleep, value))
     end
-    assert(not pcall(Runtime.Sleep))
+    assert(not pcall(Runtime.sleep))
     local a, b
-    a = Task.Create(function() b:Await() end)
-    b = Task.Create(function() a:Await() end)
-    Scheduler.Prepare(a)
-    Scheduler.Submit(a:GetId())
+    a = Task.create(function() b:await() end)
+    b = Task.create(function() a:await() end)
+    Scheduler.prepare(a)
+    Scheduler.submit(a:get_id())
     local ok, err = pcall(drain)
     assert(not ok and err:find("cyclic task await", 1, true))
-    assert(not Scheduler.HasPending())
-    Scheduler.Initialize()
+    assert(not Scheduler.has_pending())
+    Scheduler.initialize()
     spawn(function() coroutine.yield("invalid") end)
     ok, err = pcall(drain)
     assert(not ok and err:find("tasks must yield", 1, true))
-    Scheduler.Initialize()
-    local suspended = Task.Create(function() end)
-    Scheduler.Prepare(suspended)
-    ok, err = pcall(Scheduler.Run)
+    Scheduler.initialize()
+    local suspended = Task.create(function() end)
+    Scheduler.prepare(suspended)
+    ok, err = pcall(Scheduler.run)
     assert(not ok and err:find("scheduler stalled", 1, true))
   )lua");
 }
 
 TEST_F(AsyncTest, PreparedTaskStartsWhenAwaitedAndSubmissionIsIdempotent) {
   Run(R"lua(
-    local child = Task.Create(function() return "prepared" end)
-    Scheduler.Prepare(child)
-    local root = spawn(function() return child:Await() end)
-    Scheduler.Submit(root:GetId())
+    local child = Task.create(function() return "prepared" end)
+    Scheduler.prepare(child)
+    local root = spawn(function() return child:await() end)
+    Scheduler.submit(root:get_id())
     drain()
-    assert(root:Await() == "prepared")
-    assert(not pcall(Scheduler.Submit, 999999))
-    assert(not pcall(Scheduler.Prepare, root))
-    assert(not pcall(Task.Create, "invalid"))
+    assert(root:await() == "prepared")
+    assert(not pcall(Scheduler.submit, 999999))
+    assert(not pcall(Scheduler.prepare, root))
+    assert(not pcall(Task.create, "invalid"))
   )lua");
 }
 
@@ -321,14 +347,20 @@ TEST_F(AsyncTest, NewVmDiscardsPreviousPendingTimersAndRejectsOldVm) {
   ASSERT_NE(state_, nullptr);
   luaL_openlibs(state_);
   InstallNativeStorage(state_);
-  lua_pushcfunction(state_, luaopen_executor_Native);
-  lua_setglobal(state_, "openNative");
+  ConfigureNativePath(state_);
   Run(R"lua(
     PressKey = function() end
     ReleaseKey = function() end
+    PressAndReleaseKey = function() end
+    IsKeyLockOn = function() return false end
     PressMouseButton = function() end
     ReleaseMouseButton = function() end
-    Native = openNative()
+    PressAndReleaseMouseButton = function() end
+    GetMousePosition = function() return 0, 0 end
+    MoveMouseToVirtual = function() end
+    MoveMouseRelative = function() end
+    MoveMouseWheel = function() end
+    Native = require("executor.core.Native")
     assert(#Native.Runtime_poll(0) == 0)
     Native.Runtime_sleep(456, 0)
     local ids = Native.Runtime_poll()
@@ -346,23 +378,33 @@ TEST_F(AsyncTest, NewVmDiscardsPreviousPendingTimersAndRejectsOldVm) {
   Run("assert(#Native.Runtime_poll(0) == 0)");
 }
 
-TEST_F(AsyncTest, HookCallbacksSurviveActualNativeDllUnload) {
-  HMODULE module = LoadLibraryA(NATIVE_DLL_PATH);
-  ASSERT_NE(module, nullptr);
-  auto open = reinterpret_cast<lua_CFunction>(
-      GetProcAddress(module, "luaopen_executor_Native"));
-  ASSERT_NE(open, nullptr);
-  lua_pushcfunction(state_, open);
-  lua_setglobal(state_, "openDllNative");
-  Run("openDllNative().Runtime_sleep(987, 10)");
+TEST_F(AsyncTest,
+       NativeModuleLoadsThroughLuaAndFinalizesCallbacksBeforeUnload) {
+  Run("Native.Runtime_sleep(987, 1000)");
+  auto* storage = &GetStorage(state_);
   lua_close(state_);
   state_ = nullptr;
-  ASSERT_TRUE(FreeLibrary(module));
-  EXPECT_EQ(GetModuleHandleA(NATIVE_DLL_PATH), nullptr);
+  EXPECT_EQ(GetModuleHandleA("Native.dll"), nullptr);
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
   state_ = luaL_newstate();
   ASSERT_NE(state_, nullptr);
   luaL_openlibs(state_);
   InstallNativeStorage(state_);
-  EXPECT_EQ(GetStorage(state_).runtime, nullptr);
+  ConfigureNativePath(state_);
+  Run(R"lua(
+    PressKey = function() end
+    ReleaseKey = function() end
+    PressAndReleaseKey = function() end
+    IsKeyLockOn = function() return false end
+    PressMouseButton = function() end
+    ReleaseMouseButton = function() end
+    PressAndReleaseMouseButton = function() end
+    GetMousePosition = function() return 0, 0 end
+    MoveMouseToVirtual = function() end
+    MoveMouseRelative = function() end
+    MoveMouseWheel = function() end
+  )lua");
+  Run("Native = require('executor.core.Native')");
+  EXPECT_EQ(&GetStorage(state_), storage);
+  EXPECT_NE(GetStorage(state_).runtime, nullptr);
 }

@@ -1,4 +1,4 @@
----@class executor.Core.Task
+---@class executor.core.Task
 local Task = {}
 
 Task.State = {
@@ -49,7 +49,7 @@ end
 
 function Task:await()
     if not self:is_done() then
-        local Scheduler = require("executor.Core.Scheduler")
+        local Scheduler = require("executor.core.Scheduler")
         local caller = Scheduler.get_running()
         assert(caller and coroutine.running() == caller._coroutine,
             "Task:Await must run inside a scheduled task")

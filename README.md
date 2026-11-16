@@ -70,11 +70,11 @@ B 站 ID：_CoreDump
 
 ### Native input API
 
-`require("executor.Native")` returns one cached module containing the native
-time functions and a minimal set of keyboard/mouse APIs plus `Sleep`. Legacy
+`require("executor.core.Native")` returns one cached module containing the native
+time functions and a minimal set of keyboard/mouse APIs plus `Raw_sleep`. Legacy
 Logitech globals remain available. Wrappers resolve the current global function
 at call time, including replacements installed after requiring the module.
-`Native.Sleep` calls Logitech's host sleep, not a native thread sleep.
+`Native.Raw_sleep` is a blocking native sleep.
 Direct legacy calls bypass validation and press tracking and are not recommended.
 
 On first require in a new Lua VM, the module releases only presses still tracked
@@ -113,18 +113,24 @@ desktop. These wrappers resolve the current global on every call and preserve
 host results and errors. Other Logitech functions are not exported by Native;
 use the original globals when needed. Old unprefixed Native aliases are removed.
 
-Presses and the monotonic timer origin live in a single `NativeStorage` object
-owned by the hook DLL and initialized exactly once. `Keyboard` and `Mouse`
+Presses and the monotonic timer origin live in one `NativeStorage` object,
+allocated by `Native.dll` and retained through an opaque pointer in
+`lghubex.dll`. The hook pre-registers `GetStorage`/`SetStorage` Lua C functions
+in the registry; Native uses those callbacks instead of linking against the
+hook or requiring the hook to know Native's C++ layout. Lua's standard
+`require("executor.core.Native")` loader finds and loads the module through
+`package.cpath`; `lghubex.dll` has no link-time dependency on `Native.dll`.
+`Keyboard` and `Mouse`
 classes own their private maps and implement `Press`, `Release`, and `Reset`.
 The `Time` class owns the private monotonic origin and implements
 `GetMonotonicTimestamp` and `GetSystemTimestamp`, exposed as
 `Native.Time_GetMonotonicTimestamp()` and `Native.Time_GetSystemTimestamp()`.
 Both return integer milliseconds; system time is measured since the Unix epoch.
-Each VM receives registry `GetStorage`/`SetStorage`
-accessors, allowing Native to retrieve the same object after VM destruction
-and native-module unloading/reloading. Both DLLs must be built together with
-the same C++ ABI/runtime. Storage replacement is rejected; `SetStorage` only
-accepts the existing instance. Requiring Native does not reset the timer.
+Each VM receives the storage accessors, allowing Native to retrieve the same
+object after VM destruction and native-module unloading/reloading. Both DLLs
+must be built together with the same C++ ABI/runtime. Storage replacement is
+rejected; `SetStorage` only accepts the existing instance. Requiring Native
+does not reset the timer.
 Rebuild and restart the hook when
 changing the storage layout. A missing storage bridge is an explicit load error.
 The separate keyboard and mouse maps own their
@@ -142,16 +148,16 @@ The former manual `MarkKeyAsPressed`/`MarkKeyAsReleased` and
 
 ### Coroutine async runtime
 
-`executor.Core.Task`, `executor.Core.Scheduler`, and `executor.Core.Runtime`
+`executor.core.Task`, `executor.core.Scheduler`, and `executor.core.Runtime`
 provide lazy coroutine tasks. `Runtime.Sleep(milliseconds)` returns a Task,
 not a blocking sleep; the timer starts when that task runs. Delays must be
-integers from 0 to 2147483647 milliseconds. `Native.Sleep` remains the blocking
-legacy Logitech wrapper.
+integers from 0 to 2147483647 milliseconds. `Native.Raw_sleep` is the separate
+blocking native sleep primitive.
 
 ```lua
-local Task = require("executor.Core.Task")
-local Scheduler = require("executor.Core.Scheduler")
-local Runtime = require("executor.Core.Runtime")
+local Task = require("executor.core.Task")
+local Scheduler = require("executor.core.Scheduler")
+local Runtime = require("executor.core.Runtime")
 
 local root = Task.Create(function()
     Runtime.Sleep(1000):Await()
@@ -189,10 +195,11 @@ Timeout is -1 for blocking, 0 for nonblocking, or a positive millisecond limit;
 no pending native work returns immediately. `Runtime_open` and `Runtime_close`
 manage explicit native lifetime.
 
-Async state and timer callback code are owned by the hook DLL, not Native.dll.
-When the hook attaches a new Lua VM, it destroys the old async instance, cancels
-timers, waits for callbacks and discards old completions before the new runtime
-is used. Keyboard/mouse state and the monotonic origin remain retained.
+Async state and timer callback code are owned by Native.dll. A Lua finalizer
+stops timers and joins callbacks before Lua unloads the module normally; when a
+new VM imports Native, it also replaces any runtime left by a terminated VM.
+Keyboard/mouse state and the monotonic origin remain retained in the opaque
+storage object.
 This does not rely on Lua finalizers or the old VM returning from a callback.
 Rebuild and restart both DLLs together. One VM/thread owns the scheduler and
 native queues; concurrent old/new VM execution is unsupported.

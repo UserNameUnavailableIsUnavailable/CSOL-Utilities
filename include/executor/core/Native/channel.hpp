@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <executor/native/types.hpp>
-#include <executor/native/waitable.hpp>
+#include <executor/core/Native/types.hpp>
+#include <executor/core/Native/waitable.hpp>
 #include <queue>
 #include <unordered_set>
 #include <vector>

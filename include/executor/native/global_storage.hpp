@@ -1,8 +1,8 @@
 #pragma once
 
-#include <executor/native/keyboard.hpp>
-#include <executor/native/mouse.hpp>
-#include <executor/native/time.hpp>
+#include <executor/core/Native/keyboard.hpp>
+#include <executor/core/Native/mouse.hpp>
+#include <executor/core/Native/time.hpp>
 #include <memory>
 
 class AsyncRuntime;
@@ -17,7 +17,7 @@ struct NativeStorage {
   lua_State* runtime_owner = nullptr;
 };
 
-inline constexpr char kNativeStorageRegistryKey[] = "executor.Native.Storage";
+inline constexpr char kNativeStorageRegistryKey[] = "executor.core.Native.Storage";
 
 NativeStorage& GetStorage(lua_State* state);
 // The hook-owned instance cannot be replaced after initialization.

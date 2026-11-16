@@ -1,6 +1,6 @@
 #include <chrono>
-#include <executor/native/dll.hpp>
-#include <executor/native/global_storage.hpp>
+#include <executor/core/Native/dll.hpp>
+#include <executor/core/Native/global_storage.hpp>
 
 namespace {
 
@@ -34,8 +34,8 @@ int Time::GetSystemTimestamp(lua_State* state) const {
 
 void InitializeTime(lua_State* state) {
   const luaL_Reg kFunctions[] = {
-      {"Time_GetMonotonicTimestamp", GetMonotonicTimestamp},
-      {"Time_GetSystemTimestamp", GetSystemTimestamp},
+      {"Time_get_monotonic_timestamp", GetMonotonicTimestamp},
+      {"Time_get_system_timestamp", GetSystemTimestamp},
       {nullptr, nullptr},
   };
   luaL_setfuncs(state, kFunctions, 0);

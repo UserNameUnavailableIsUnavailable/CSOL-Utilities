@@ -1,12 +1,12 @@
 local Async = {}
 
-local Runtime = require("executor.Core.Runtime")
-local Task = require("executor.Core.Task")
-local Scheduler = require("executor.Core.Scheduler")
+local Runtime = require("executor.core.Runtime")
+local Task = require("executor.core.Task")
+local Scheduler = require("executor.core.Scheduler")
 
 ---Spawn an async task
 ---@param fn fun(): any
----@return executor.Core.Task
+---@return executor.core.Task
 function Async.spawn(fn)
     local task = Task.create(fn)
     Scheduler.prepare(task)
